@@ -11,6 +11,7 @@ const routes = [
   { path: "/student-cv-template", priority: 0.75, changeFrequency: "monthly" },
   { path: "/school-leaver-cv-example", priority: 0.75, changeFrequency: "monthly" },
   { path: "/cv-with-no-experience", priority: 0.75, changeFrequency: "monthly" },
+  { path: "/career-change-cv-uk", priority: 0.85, changeFrequency: "monthly" },
   { path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
