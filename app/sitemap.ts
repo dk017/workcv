@@ -27,6 +27,7 @@ const routes = [
   { path: "/cancel-cvmaker-uk", priority: 0.8, changeFrequency: "weekly" },
   { path: "/cancel-livecareer-uk", priority: 0.8, changeFrequency: "weekly" },
   { path: "/cancel-enhancv-uk", priority: 0.75, changeFrequency: "weekly" },
+  { path: "/cancel-zety-uk", priority: 0.8, changeFrequency: "weekly" },
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.35, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.35, changeFrequency: "yearly" },
