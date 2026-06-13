@@ -1,0 +1,15 @@
+services:
+  app:
+    image: ${WORKCV_IMAGE:?Set WORKCV_IMAGE to a pushed GHCR image tag}
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${APP_PORT:-3004}:3000"
+    env_file:
+      - .env
+    networks:
+      - shared_db
+
+networks:
+  shared_db:
+    external: true
+    name: werkcv_default
