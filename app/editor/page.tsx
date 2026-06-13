@@ -26,5 +26,5 @@ export default async function EditorPage({
     redirect(`/login?${params.toString()}`);
   }
 
-  return <CvEditor userEmail={user.email} />;
+  return <CvEditor />;
 }

@@ -4,9 +4,15 @@ import { applySessionCookie, verifyEmailLoginCode } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const email = typeof body.email === "string" ? body.email : "";
-    const code = typeof body.code === "string" ? body.code : "";
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+    const payload = typeof body === "object" && body ? (body as Record<string, unknown>) : {};
+    const email = typeof payload.email === "string" ? payload.email : "";
+    const code = typeof payload.code === "string" ? payload.code : "";
     const session = await verifyEmailLoginCode(email, code);
 
     if (!session) {

@@ -4,8 +4,14 @@ import { requestEmailLoginCode } from "@/lib/auth";
 
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    const email = typeof body.email === "string" ? body.email : "";
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+    const payload = typeof body === "object" && body ? (body as Record<string, unknown>) : {};
+    const email = typeof payload.email === "string" ? payload.email : "";
     const result = await requestEmailLoginCode(email);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {

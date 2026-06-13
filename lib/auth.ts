@@ -71,11 +71,15 @@ export async function requestEmailLoginCode(emailInput: string) {
   );
 
   const transporter = getEmailTransporter();
-  const from = process.env.AUTH_FROM_EMAIL || process.env.SMTP_USER || "contact@workcv.co.uk";
+  const fromEmail = process.env.AUTH_FROM_EMAIL || process.env.SMTP_USER || "contact@werkcv.nl";
+  const fromName = process.env.AUTH_FROM_NAME || "WorkCV";
+  const from = `${fromName} <${fromEmail}>`;
+  const replyTo = process.env.AUTH_REPLY_TO_EMAIL || "contact@workcv.co.uk";
 
   if (transporter) {
     await transporter.sendMail({
       from,
+      replyTo,
       to: email,
       subject: "Your WorkCV login code",
       text: `Your WorkCV login code is ${code}. This code expires in ${loginCodeTtlMinutes} minutes.`,

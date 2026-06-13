@@ -43,7 +43,7 @@ const tabs: Array<{ id: TabId; label: string; icon: typeof User }> = [
   { id: "template", label: "Template", icon: LayoutTemplate },
 ];
 
-export function CvEditor({ userEmail }: { userEmail: string }) {
+export function CvEditor() {
   const [cv, setCv] = useState<CvData>(sampleCv);
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [saveState, setSaveState] = useState("Loading saved CV...");
@@ -238,14 +238,6 @@ export function CvEditor({ userEmail }: { userEmail: string }) {
     }
   };
 
-  const logout = async () => {
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } finally {
-      window.location.href = "/";
-    }
-  };
-
   const startDownload = () => {
     if (!pdfUnlocked) {
       setCheckoutOpen(true);
@@ -306,9 +298,6 @@ export function CvEditor({ userEmail }: { userEmail: string }) {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <div className="rounded-md border border-line bg-white px-4 py-2 text-sm font-bold text-navy">
-              {userEmail}
-            </div>
             <button
               type="button"
               onClick={() => setTemplatePickerOpen(true)}
@@ -324,13 +313,6 @@ export function CvEditor({ userEmail }: { userEmail: string }) {
             <div className="rounded-md border border-line bg-paper px-4 py-2 text-sm text-muted">
               {saveState}
             </div>
-            <button
-              type="button"
-              onClick={logout}
-              className="inline-flex min-h-10 items-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
-            >
-              Log out
-            </button>
             <button
               type="button"
               onClick={resetDraft}

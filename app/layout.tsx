@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
 
-import { Footer, Header } from "@/components/marketing";
+import { Header } from "@/components/header";
+import { Footer } from "@/components/marketing";
 import { site } from "@/lib/site";
 import "./globals.css";
 
