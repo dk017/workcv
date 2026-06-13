@@ -32,7 +32,7 @@ const homepageFaqs = [
   {
     question: "Do I need to log in before using the editor?",
     answer:
-      "Yes. When you enter the editor, you will be asked to log in so your CV can be saved and reopened later.",
+      "No. You can start in the editor without creating an account. Your draft is kept in your browser unless a feature clearly says otherwise.",
   },
   {
     question: "Is the format right for UK jobs?",

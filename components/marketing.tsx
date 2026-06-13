@@ -50,6 +50,10 @@ export function Footer({ line = site.summary }: { line?: string }) {
           <Link href="/pricing">Pricing</Link>
           <Link href="/templates">Templates</Link>
           <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
+          <Link href="/contact">Contact</Link>
+          <Link href="/privacy">Privacy</Link>
+          <Link href="/terms">Terms</Link>
+          <Link href="/refund-policy">Refunds</Link>
         </div>
       </div>
     </footer>

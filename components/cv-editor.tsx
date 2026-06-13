@@ -502,7 +502,9 @@ function DownloadModal({
   onCheckout: (email: string) => void;
 }) {
   const [email, setEmail] = useState(defaultEmail);
-  const canSubmit = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
+  const canSubmit =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && digitalAccessAccepted;
 
   return (
     <div className="download-modal fixed inset-0 z-50 flex items-center justify-center bg-navy/45 p-4">
@@ -564,6 +566,25 @@ function DownloadModal({
             placeholder="you@example.com"
             className="min-h-11 w-full rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-gold-tint"
           />
+        </label>
+
+        <label className="mt-4 flex gap-3 rounded-md border border-line bg-surface p-4 text-sm leading-6 text-muted">
+          <input
+            type="checkbox"
+            checked={digitalAccessAccepted}
+            onChange={(event) => setDigitalAccessAccepted(event.target.checked)}
+            className="mt-1 h-4 w-4 shrink-0 accent-navy"
+          />
+          <span>
+            I want immediate digital access after payment and understand that
+            once PDF access starts my cancellation rights may be affected. This
+            does not affect statutory rights for faulty or misdescribed digital
+            content. See the{" "}
+            <a className="font-bold text-navy underline" href="/refund-policy">
+              refund policy
+            </a>
+            .
+          </span>
         </label>
 
         {error && (
