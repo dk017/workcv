@@ -139,7 +139,7 @@ const relatedLinks = [
   ["Career change CV UK", "/career-change-cv-uk"],
   ["Return to work CV UK", "/return-to-work-cv-uk"],
   ["CV employment gap UK", "/cv-employment-gap-uk"],
-  ["CV with no experience UK", "/cv-with-no-experience"],
+  ["CV with no experience UK", "/cv-no-experience-uk"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
 ];
 

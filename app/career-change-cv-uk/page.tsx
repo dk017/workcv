@@ -131,7 +131,7 @@ const mistakes = [
 ];
 
 const relatedLinks = [
-  ["CV with no experience UK", "/cv-with-no-experience"],
+  ["CV with no experience UK", "/cv-no-experience-uk"],
   ["Student CV template", "/student-cv-template"],
   ["School leaver CV example", "/school-leaver-cv-example"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],

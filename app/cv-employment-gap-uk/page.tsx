@@ -120,7 +120,7 @@ const mistakes = [
 const relatedLinks = [
   ["Return to work CV UK", "/return-to-work-cv-uk"],
   ["Career change CV UK", "/career-change-cv-uk"],
-  ["CV with no experience UK", "/cv-with-no-experience"],
+  ["CV with no experience UK", "/cv-no-experience-uk"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
   ["Pricing", "/pricing"],
 ];
