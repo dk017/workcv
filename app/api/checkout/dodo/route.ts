@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { getCurrentUserFromRequest } from "@/lib/auth";
+import { userOwnsCvDocument } from "@/lib/cv-documents";
 import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 
@@ -18,6 +20,11 @@ function isValidEmail(value: unknown): value is string {
 }
 
 export async function POST(request: NextRequest) {
+  const user = await getCurrentUserFromRequest(request);
+  if (!user) {
+    return NextResponse.json({ error: "Log in before checkout." }, { status: 401 });
+  }
+
   let body: unknown;
   try {
     body = await request.json();
@@ -38,6 +45,11 @@ export async function POST(request: NextRequest) {
   }
 
   try {
+    const ownsDocument = await userOwnsCvDocument(user.id, draftId);
+    if (!ownsDocument) {
+      return NextResponse.json({ error: "CV not found" }, { status: 404 });
+    }
+
     await ensurePaymentTables();
     const checkout = await createDodoCheckout({
       draftId,

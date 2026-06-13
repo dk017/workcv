@@ -31,6 +31,7 @@ import { site } from "@/lib/site";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
+const saveDelayMs = 650;
 
 type TabId = "profile" | "experience" | "education" | "skills" | "template";
 
@@ -42,46 +43,61 @@ const tabs: Array<{ id: TabId; label: string; icon: typeof User }> = [
   { id: "template", label: "Template", icon: LayoutTemplate },
 ];
 
-export function CvEditor() {
+export function CvEditor({ userEmail }: { userEmail: string }) {
   const [cv, setCv] = useState<CvData>(sampleCv);
   const [activeTab, setActiveTab] = useState<TabId>("profile");
-  const [saveState, setSaveState] = useState("Saved locally");
+  const [saveState, setSaveState] = useState("Loading saved CV...");
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    let currentDraftId = window.localStorage.getItem(draftIdKey);
-    if (!currentDraftId) {
-      currentDraftId = window.crypto.randomUUID();
-      window.localStorage.setItem(draftIdKey, currentDraftId);
-    }
-    setDraftId(currentDraftId);
+    let cancelled = false;
 
-    const saved = window.localStorage.getItem(storageKey);
-    const templateParam = new URLSearchParams(window.location.search).get("template") as
-      | TemplateId
-      | null;
-    const validTemplate = templates.some((template) => template.id === templateParam)
-      ? templateParam
-      : null;
+    const loadDocument = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const templateParam = params.get("template");
+      const query = templateParam ? `?template=${encodeURIComponent(templateParam)}` : "";
 
-    if (saved) {
       try {
-        const parsed = JSON.parse(saved) as CvData;
-        setCv(validTemplate ? { ...parsed, template: validTemplate } : parsed);
+        const response = await fetch(`/api/cv/current${query}`);
+        if (response.status === 401) {
+          window.location.href = `/login?next=${encodeURIComponent(
+            `${window.location.pathname}${window.location.search}`
+          )}`;
+          return;
+        }
+        if (!response.ok) throw new Error("Failed to load saved CV");
+
+        const data = (await response.json()) as {
+          document?: { id: string; data: CvData };
+        };
+        if (!data.document) throw new Error("Missing CV document");
+
+        if (!cancelled) {
+          setDraftId(data.document.id);
+          window.localStorage.setItem(draftIdKey, data.document.id);
+          window.localStorage.removeItem(storageKey);
+          setCv(data.document.data);
+          setSaveState("Saved to your account");
+          setLoaded(true);
+        }
       } catch {
-        window.localStorage.removeItem(storageKey);
-        if (validTemplate) {
-          setCv((current) => ({ ...current, template: validTemplate }));
+        if (!cancelled) {
+          setSaveState("Could not load your saved CV");
+          setLoaded(true);
         }
       }
-    } else if (validTemplate) {
-      setCv((current) => ({ ...current, template: validTemplate }));
-    }
+    };
+
+    loadDocument();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -123,14 +139,29 @@ export function CvEditor() {
   }, [draftId]);
 
   useEffect(() => {
-    const id = window.setTimeout(() => {
-      window.localStorage.setItem(storageKey, JSON.stringify(cv));
-      setSaveState("Saved locally");
-    }, 350);
+    if (!loaded || !draftId) return;
 
-    setSaveState("Saving...");
-    return () => window.clearTimeout(id);
-  }, [cv]);
+    let cancelled = false;
+    const id = window.setTimeout(async () => {
+      try {
+        const response = await fetch("/api/cv/current", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ documentId: draftId, data: cv }),
+        });
+        if (!response.ok) throw new Error("Save failed");
+        if (!cancelled) setSaveState("Saved to your account");
+      } catch {
+        if (!cancelled) setSaveState("Save failed - retrying on next edit");
+      }
+    }, saveDelayMs);
+
+    setSaveState("Saving to your account...");
+    return () => {
+      cancelled = true;
+      window.clearTimeout(id);
+    };
+  }, [cv, draftId, loaded]);
 
   const completion = useMemo(() => {
     const checks = [
@@ -177,15 +208,42 @@ export function CvEditor() {
     }));
   };
 
-  const resetDraft = () => {
-    window.localStorage.removeItem(storageKey);
-    const nextDraftId = window.crypto.randomUUID();
-    window.localStorage.setItem(draftIdKey, nextDraftId);
-    setDraftId(nextDraftId);
-    setPdfUnlocked(false);
+  const resetDraft = async () => {
+    setSaveState("Creating a new saved CV...");
     setCheckoutError(null);
-    setCv(sampleCv);
-    setActiveTab("profile");
+
+    try {
+      const response = await fetch("/api/cv/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ template: cv.template }),
+      });
+      const data = (await response.json()) as {
+        document?: { id: string; data: CvData };
+        error?: string;
+      };
+      if (!response.ok || !data.document) {
+        throw new Error(data.error || "Could not create a new CV");
+      }
+
+      window.localStorage.removeItem(storageKey);
+      window.localStorage.setItem(draftIdKey, data.document.id);
+      setDraftId(data.document.id);
+      setPdfUnlocked(false);
+      setCv(data.document.data);
+      setActiveTab("profile");
+      setSaveState("Saved to your account");
+    } catch (error) {
+      setSaveState(error instanceof Error ? error.message : "Could not create a new CV");
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      window.location.href = "/";
+    }
   };
 
   const startDownload = () => {
@@ -198,7 +256,7 @@ export function CvEditor() {
   };
 
   const startCheckout = async (email: string) => {
-    if (!draftId) {
+    if (!draftId || !loaded) {
       setCheckoutError("Your draft is still initialising. Please try again.");
       return;
     }
@@ -248,6 +306,9 @@ export function CvEditor() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <div className="rounded-md border border-line bg-white px-4 py-2 text-sm font-bold text-navy">
+              {userEmail}
+            </div>
             <button
               type="button"
               onClick={() => setTemplatePickerOpen(true)}
@@ -263,6 +324,13 @@ export function CvEditor() {
             <div className="rounded-md border border-line bg-paper px-4 py-2 text-sm text-muted">
               {saveState}
             </div>
+            <button
+              type="button"
+              onClick={logout}
+              className="inline-flex min-h-10 items-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+            >
+              Log out
+            </button>
             <button
               type="button"
               onClick={resetDraft}
@@ -545,7 +613,7 @@ function DownloadModal({
               "One-time PDF download",
               "No subscription",
               "No automatic renewal",
-              "Payment unlocks this browser draft",
+              "Payment unlocks this saved CV",
             ].map((item) => (
               <li key={item} className="flex gap-2">
                 <Check className="h-5 w-5 text-success" />

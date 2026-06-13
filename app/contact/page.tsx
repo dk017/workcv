@@ -21,7 +21,7 @@ export default function ContactPage() {
             Need help with your CV download?
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted">
-            For payment, download, refund, or account-free editor support, email
+            For payment, download, refund, or saved-editor support, email
             us and include the receipt email you used at checkout.
           </p>
         </div>

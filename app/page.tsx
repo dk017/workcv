@@ -32,7 +32,7 @@ const homepageFaqs = [
   {
     question: "Do I need to log in before using the editor?",
     answer:
-      "No. You can start in the editor without creating an account. Your draft is kept in your browser unless a feature clearly says otherwise.",
+      "Yes. WorkCV asks you to log in with a one-time email code before the editor so your CV can be saved and reopened later. There is no password to remember.",
   },
   {
     question: "Is the format right for UK jobs?",

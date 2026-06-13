@@ -45,7 +45,7 @@ export default function TermsPage() {
           body: (
             <p>
               After payment succeeds, WorkCV unlocks PDF download access for the
-              browser draft used at checkout. Keep your receipt email and contact
+              saved CV document used at checkout. Keep your receipt email and contact
               us if payment succeeds but the editor does not unlock.
             </p>
           ),

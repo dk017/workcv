@@ -1,7 +1,8 @@
 import { Pool } from "pg";
 
 let pool: Pool | null = null;
-let setupPromise: Promise<void> | null = null;
+let paymentSetupPromise: Promise<void> | null = null;
+let authSetupPromise: Promise<void> | null = null;
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -25,8 +26,8 @@ export function getPool() {
 }
 
 export async function ensurePaymentTables() {
-  if (!setupPromise) {
-    setupPromise = getPool()
+  if (!paymentSetupPromise) {
+    paymentSetupPromise = getPool()
       .query(`
         CREATE TABLE IF NOT EXISTS workcv_payment_checkouts (
           id TEXT PRIMARY KEY,
@@ -63,10 +64,66 @@ export async function ensurePaymentTables() {
       `)
       .then(() => undefined)
       .catch((error) => {
-        setupPromise = null;
+        paymentSetupPromise = null;
         throw error;
       });
   }
 
-  return setupPromise;
+  return paymentSetupPromise;
+}
+
+export async function ensureAuthTables() {
+  if (!authSetupPromise) {
+    authSetupPromise = getPool()
+      .query(`
+        CREATE TABLE IF NOT EXISTS workcv_users (
+          id TEXT PRIMARY KEY,
+          email TEXT NOT NULL UNIQUE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS workcv_login_codes (
+          id TEXT PRIMARY KEY,
+          email TEXT NOT NULL,
+          code_hash TEXT NOT NULL,
+          expires_at TIMESTAMPTZ NOT NULL,
+          used_at TIMESTAMPTZ,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_login_codes_email_idx
+          ON workcv_login_codes (email, created_at DESC);
+
+        CREATE TABLE IF NOT EXISTS workcv_sessions (
+          token_hash TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES workcv_users(id) ON DELETE CASCADE,
+          expires_at TIMESTAMPTZ NOT NULL,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_sessions_user_idx
+          ON workcv_sessions (user_id);
+
+        CREATE TABLE IF NOT EXISTS workcv_cv_documents (
+          id TEXT PRIMARY KEY,
+          user_id TEXT NOT NULL REFERENCES workcv_users(id) ON DELETE CASCADE,
+          title TEXT NOT NULL DEFAULT 'My CV',
+          data JSONB NOT NULL,
+          template_id TEXT NOT NULL DEFAULT 'classic',
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_cv_documents_user_updated_idx
+          ON workcv_cv_documents (user_id, updated_at DESC);
+      `)
+      .then(() => undefined)
+      .catch((error) => {
+        authSetupPromise = null;
+        throw error;
+      });
+  }
+
+  return authSetupPromise;
 }
