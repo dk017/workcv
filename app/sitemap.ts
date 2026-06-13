@@ -17,6 +17,7 @@ const routes = [
   { path: "/cv-employment-gap-uk", priority: 0.85, changeFrequency: "monthly" },
   { path: "/cv-personal-statement-uk", priority: 0.85, changeFrequency: "monthly" },
   { path: "/ats-cv-template-uk", priority: 0.85, changeFrequency: "monthly" },
+  { path: "/right-to-work-cv-uk", priority: 0.8, changeFrequency: "monthly" },
   { path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
