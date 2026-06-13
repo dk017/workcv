@@ -20,6 +20,7 @@ const routes = [
   { path: "/right-to-work-cv-uk", priority: 0.8, changeFrequency: "monthly" },
   { path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
+  { path: "/zety-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
   { path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
   { path: "/livecareer-alternative", priority: 0.75, changeFrequency: "monthly" },
   { path: "/cancel-myperfectcv-uk", priority: 0.85, changeFrequency: "weekly" },

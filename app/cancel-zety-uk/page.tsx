@@ -367,6 +367,9 @@ export default function CancelZetyUkPage() {
             <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
               See no-subscription details
             </ButtonLink>
+            <ButtonLink href="/zety-alternative-uk" variant="secondary">
+              Compare Zety alternative
+            </ButtonLink>
           </div>
         </div>
       </section>
