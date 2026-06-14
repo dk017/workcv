@@ -16,6 +16,7 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 const checkedDate = "13 June 2026";
@@ -96,25 +97,11 @@ const faqItems = [
   },
 ];
 
-const productSchema = {
-  "@context": "https://schema.org",
-  "@type": "Product",
-  name: "WorkCV",
+const productSchema = buildWorkCvProductSchema({
   description:
     "UK CV builder positioned as a focused alternative to design-led CV template tools.",
-  brand: {
-    "@type": "Brand",
-    name: "WorkCV",
-  },
-  offers: {
-    "@type": "Offer",
-    price: "4.99",
-    priceCurrency: "GBP",
-    availability: "https://schema.org/InStock",
-    url: `${site.url}/canva-cv-alternative-uk`,
-    description: "One-time CV PDF download price. No monthly subscription.",
-  },
-};
+  url: `${site.url}/canva-cv-alternative-uk`,
+});
 
 const faqSchema = {
   "@context": "https://schema.org",

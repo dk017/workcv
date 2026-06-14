@@ -5,7 +5,7 @@ export const site = {
   locale: "en-GB",
   price: "£4.99",
   summary:
-    "WorkCV is a UK CV builder for people who want one strong CV without a subscription.",
+    "One UK CV. One payment. Nothing to cancel.",
 };
 
 export const routes = [

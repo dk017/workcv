@@ -21,11 +21,11 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "WorkCV - UK CV builder without a subscription",
+    default: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
     template: "%s | WorkCV",
   },
   description:
-    "Build a UK CV free, then pay GBP 4.99 when you download the final PDF. No subscription and no automatic renewal.",
+    "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF. No subscription and no automatic renewal.",
   alternates: {
     canonical: "/",
   },
@@ -34,9 +34,24 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: site.url,
     siteName: site.name,
-    title: "WorkCV - UK CV builder without a subscription",
+    title: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
     description:
-      "Build a UK CV free, then pay GBP 4.99 when you download the final PDF.",
+      "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF.",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+    description:
+      "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF.",
+    images: ["/opengraph-image"],
   },
 };
 

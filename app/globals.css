@@ -12,12 +12,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   background: #f8f7f3;
   color: #1a1a1a;
+  overflow-x: hidden;
 }
 
 ::selection {

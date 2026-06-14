@@ -45,7 +45,9 @@ export function Footer({ line = site.summary }: { line?: string }) {
   return (
     <footer className="border-t border-line bg-surface">
       <div className="container-page flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-2xl text-sm text-muted">{line}</p>
+        <p className="max-w-2xl font-display text-2xl font-semibold leading-tight text-navy">
+          {line}
+        </p>
         <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
           <Link href="/pricing">Pricing</Link>
           <Link href="/templates">Templates</Link>
@@ -305,6 +307,63 @@ export function ProblemComparison() {
   );
 }
 
+export function ProofSection() {
+  const proofPoints = [
+    {
+      stat: "£4.99",
+      title: "shown before the editor",
+      body:
+        "The price is not saved for the last click. You see the one-time PDF price before you start.",
+    },
+    {
+      stat: "0",
+      title: "renewals to cancel",
+      body:
+        "The checkout unlocks one saved CV PDF. There is no monthly plan, renewal date, or account trap.",
+    },
+    {
+      stat: "2026",
+      title: "UK pricing checked",
+      body:
+        "The pricing page compares WorkCV against trial-and-renewal CV builders using dated source checks.",
+    },
+  ];
+
+  return (
+    <section className="bg-surface py-24">
+      <div className="container-page grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
+        <div>
+          <SectionLabel>Proof before payment</SectionLabel>
+          <h2 className="font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
+            The promise is visible before you pay.
+          </h2>
+          <p className="mt-6 text-lg leading-8 text-muted">
+            CV builders make people nervous because the cheap trial is often not
+            the real price. WorkCV keeps the proof close to the action: price,
+            preview, and no renewal are all clear before checkout.
+          </p>
+          <div className="mt-8">
+            <ButtonLink href="/pricing" variant="secondary">
+              Check the pricing proof
+            </ButtonLink>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
+          {proofPoints.map((item) => (
+            <div key={item.title} className="rounded-xl border border-line bg-paper p-6">
+              <div className="font-display text-5xl font-semibold leading-none text-navy">
+                {item.stat}
+              </div>
+              <h3 className="mt-4 text-base font-bold text-navy">{item.title}</h3>
+              <p className="mt-3 text-sm leading-6 text-muted">{item.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function ComparisonPanel({
   title,
   items,
@@ -372,8 +431,8 @@ export function FinalCta({
 }: {
   heading: string;
   body: string;
-  secondaryHref?: string;
-  secondary?: string;
+  secondaryHref?: string | null;
+  secondary?: string | null;
 }) {
   return (
     <section className="bg-navy py-20 text-white">
@@ -385,14 +444,16 @@ export function FinalCta({
             href="/editor"
             className="inline-flex min-h-12 items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-bold text-navy"
           >
-            Build my CV
+            Create my CV, pay at download
           </Link>
-          <Link
-            href={secondaryHref}
-            className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/35 px-6 py-3 text-sm font-bold text-white"
-          >
-            {secondary}
-          </Link>
+          {secondaryHref && secondary && (
+            <Link
+              href={secondaryHref}
+              className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/35 px-6 py-3 text-sm font-bold text-white"
+            >
+              {secondary}
+            </Link>
+          )}
         </div>
       </div>
     </section>

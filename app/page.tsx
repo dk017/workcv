@@ -8,15 +8,16 @@ import {
   FaqSection,
   FinalCta,
   ProblemComparison,
+  ProofSection,
   SectionLabel,
   TrustStrip,
 } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Build a UK CV without a subscription",
+  title: "One UK CV. GBP 4.99. Nothing to cancel.",
   description:
-    "Create your CV free, then pay GBP 4.99 when you download the final PDF. Built for UK job applications with no recurring billing.",
+    "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF. No subscription and no automatic renewal.",
 };
 
 const homepageFaqs = [
@@ -51,20 +52,19 @@ export default function HomePage() {
     <>
       <section className="quiet-grid bg-paper py-20 md:py-28">
         <div className="container-page grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
-          <div>
-            <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              UK CV builder
-            </p>
-            <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Build a UK CV without a subscription.
+          <div className="min-w-0">
+            <h1 className="max-w-[22rem] font-display text-4xl font-semibold leading-[1.02] text-navy sm:max-w-3xl sm:text-5xl md:text-7xl">
+              <span className="block">One UK CV.</span>
+              <span className="block">£4.99.</span>
+              <span className="block">Nothing to cancel.</span>
             </h1>
-            <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Create your CV free, then pay {site.price} when you download the
-              final PDF. Built for UK job applications, with clean templates and
-              no recurring billing.
+            <p className="mt-7 max-w-[22rem] text-lg leading-8 text-muted sm:max-w-2xl sm:text-xl">
+              Build your CV first, preview the result, then pay {site.price}{" "}
+              when the PDF is ready. No monthly plan. No renewal. No cancellation
+              page to hunt down.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-3">
-              {["UK-ready CV structure", `One-time ${site.price} download`, "No automatic renewal"].map(
+              {[`One-time ${site.price} PDF`, "UK-ready CV structure", "No automatic renewal"].map(
                 (item) => (
                   <div key={item} className="flex items-center gap-2">
                     <Check className="h-5 w-5 text-success" />
@@ -74,10 +74,7 @@ export default function HomePage() {
               )}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV</ButtonLink>
-              <ButtonLink href="/pricing" variant="secondary">
-                See pricing
-              </ButtonLink>
+              <ButtonLink href="/editor">Create my CV, pay at download</ButtonLink>
             </div>
           </div>
           <CvPreview />
@@ -86,8 +83,9 @@ export default function HomePage() {
 
       <TrustStrip />
       <ProblemComparison />
+      <ProofSection />
 
-      <section className="bg-surface py-24">
+      <section className="bg-paper py-24">
         <div className="container-page">
           <SectionLabel>How it works</SectionLabel>
           <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
@@ -192,8 +190,10 @@ export default function HomePage() {
 
       <FaqSection faqs={homepageFaqs} title="Common questions before you start." />
       <FinalCta
-        heading="Build your CV without the monthly fees."
-        body={`Start free. Pay ${site.price} when you download. No subscription and no recurring billing to keep track of.`}
+        heading="One CV. One payment. Nothing to cancel."
+        body={`Create the CV first. Pay ${site.price} only when you want the final PDF. No renewal date waiting for you later.`}
+        secondaryHref={null}
+        secondary={null}
       />
     </>
   );

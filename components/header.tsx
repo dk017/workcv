@@ -20,16 +20,10 @@ export function Header() {
         <div className="flex items-center gap-3">
           <HeaderAuth />
           <Link
-            href="/templates"
-            className="hidden rounded-md border border-line-strong px-4 py-2 text-sm font-bold text-navy hover:bg-white sm:inline-flex"
-          >
-            See example
-          </Link>
-          <Link
             href="/editor"
-            className="rounded-md bg-navy px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-navy-hover"
+            className="hidden rounded-md bg-navy px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-navy-hover sm:inline-flex"
           >
-            Build my CV
+            Create my CV
           </Link>
         </div>
       </div>
