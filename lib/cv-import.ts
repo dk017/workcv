@@ -2,6 +2,7 @@ import crypto from "crypto";
 
 import mammoth from "mammoth";
 import OpenAI from "openai";
+import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { z } from "zod";
 
 import type { CvData, TemplateId } from "@/lib/editor-data";
@@ -114,7 +115,6 @@ function cleanText(value: string) {
 }
 
 async function extractPdfText(buffer: Buffer) {
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const documentTask = pdfjs.getDocument({
     data: new Uint8Array(buffer),
     disableWorker: true,
@@ -234,36 +234,56 @@ export async function parseCvTextWithAi(text: string, template: TemplateId) {
   const client = new OpenAI({ apiKey });
   const model = process.env.OPENAI_MODEL || "gpt-4o-mini";
 
-  const completion = await client.chat.completions.create({
-    model,
-    temperature: 0.1,
-    response_format: {
-      type: "json_schema",
-      json_schema: {
-        name: "workcv_imported_cv",
-        strict: true,
-        schema: parsedCvJsonSchema,
+  let content: string | null | undefined;
+  try {
+    const completion = await client.chat.completions.create({
+      model,
+      temperature: 0.1,
+      response_format: {
+        type: "json_schema",
+        json_schema: {
+          name: "workcv_imported_cv",
+          strict: true,
+          schema: parsedCvJsonSchema,
+        },
       },
-    },
-    messages: [
-      {
-        role: "system",
-        content:
-          "You convert existing CV text into structured fields for a UK CV builder. Preserve facts from the source. Do not invent employers, dates, qualifications, contact details, metrics, links, or awards. Omit photo, date of birth, nationality, gender, marital status, and full address details. Use concise UK English. If a field is not present, return an empty string or empty array.",
-      },
-      {
-        role: "user",
-        content: `Parse this CV into WorkCV editor fields. Keep bullet points action-focused but faithful to the source. Infer a short targetRole only when the CV clearly states or strongly implies one.\n\n${sourceText}`,
-      },
-    ],
-  });
+      messages: [
+        {
+          role: "system",
+          content:
+            "You convert existing CV text into structured fields for a UK CV builder. Preserve facts from the source. Do not invent employers, dates, qualifications, contact details, metrics, links, or awards. Omit photo, date of birth, nationality, gender, marital status, and full address details. Use concise UK English. If a field is not present, return an empty string or empty array.",
+        },
+        {
+          role: "user",
+          content: `Parse this CV into WorkCV editor fields. Keep bullet points action-focused but faithful to the source. Infer a short targetRole only when the CV clearly states or strongly implies one.\n\n${sourceText}`,
+        },
+      ],
+    });
 
-  const content = completion.choices[0]?.message.content;
-  if (!content) {
-    throw new CvImportError("The CV could not be parsed. Please try another file.", 502);
+    content = completion.choices[0]?.message.content;
+  } catch (error) {
+    console.error("workcv_import_openai_error", {
+      model,
+      status: typeof error === "object" && error && "status" in error ? error.status : undefined,
+      message: error instanceof Error ? error.message : String(error),
+    });
+    throw new CvImportError("AI CV import is temporarily unavailable. Please try again shortly.", 502);
   }
 
-  const parsed = parsedCvSchema.parse(JSON.parse(content));
+  if (!content) {
+    throw new CvImportError("AI could not read the CV details. Please try another PDF or DOCX file.", 502);
+  }
+
+  let parsed: ParsedCv;
+  try {
+    parsed = parsedCvSchema.parse(JSON.parse(content));
+  } catch (error) {
+    console.error("workcv_import_ai_output_error", {
+      message: error instanceof Error ? error.message : String(error),
+    });
+    throw new CvImportError("AI returned an unreadable CV import. Please try again.", 502);
+  }
+
   return {
     cv: toEditorData(parsed, template),
     extractedCharacters: sourceText.length,

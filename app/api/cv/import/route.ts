@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
   const user = await getCurrentUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
+  let stage = "read_form";
   try {
     const formData = await request.formData();
     const file = formData.get("file");
@@ -26,12 +27,19 @@ export async function POST(request: NextRequest) {
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
+    stage = "extract_text";
     const extractedText = await extractCvText(buffer, file.name, file.type);
+    stage = "parse_with_ai";
     const result = await parseCvTextWithAi(extractedText, template);
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("workcv_import_cv_error", error);
+    console.error("workcv_import_cv_error", {
+      stage,
+      message: error instanceof Error ? error.message : String(error),
+      name: error instanceof Error ? error.name : undefined,
+      stack: error instanceof Error ? error.stack : undefined,
+    });
 
     if (error instanceof CvImportError) {
       return NextResponse.json({ error: error.message }, { status: error.status });
