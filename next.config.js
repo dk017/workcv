@@ -3,7 +3,10 @@ const nextConfig = {
   output: "standalone",
   experimental: {
     outputFileTracingIncludes: {
-      "/api/cv/import": ["./node_modules/pdfjs-dist/legacy/build/**/*"],
+      "/api/cv/import": [
+        "./node_modules/pdfjs-dist/legacy/build/**/*",
+        "./node_modules/@napi-rs/canvas*/**/*",
+      ],
     },
   },
   webpack(config, { isServer }) {
