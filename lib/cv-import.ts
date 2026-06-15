@@ -1,4 +1,6 @@
 import crypto from "crypto";
+import path from "path";
+import { pathToFileURL } from "url";
 
 import mammoth from "mammoth";
 import OpenAI from "openai";
@@ -115,6 +117,9 @@ function cleanText(value: string) {
 
 async function extractPdfText(buffer: Buffer) {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
+  pdfjs.GlobalWorkerOptions.workerSrc ||= pathToFileURL(
+    path.join(process.cwd(), "node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs")
+  ).href;
   const documentTask = pdfjs.getDocument({
     data: new Uint8Array(buffer),
     disableWorker: true,
