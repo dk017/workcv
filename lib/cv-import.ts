@@ -2,7 +2,6 @@ import crypto from "crypto";
 
 import mammoth from "mammoth";
 import OpenAI from "openai";
-import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
 import { z } from "zod";
 
 import type { CvData, TemplateId } from "@/lib/editor-data";
@@ -115,6 +114,7 @@ function cleanText(value: string) {
 }
 
 async function extractPdfText(buffer: Buffer) {
+  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
   const documentTask = pdfjs.getDocument({
     data: new Uint8Array(buffer),
     disableWorker: true,

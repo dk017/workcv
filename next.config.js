@@ -1,6 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  experimental: {
+    outputFileTracingIncludes: {
+      "/api/cv/import": ["./node_modules/pdfjs-dist/legacy/build/**/*"],
+    },
+  },
   webpack(config, { isServer }) {
     if (isServer) {
       config.resolve.fallback = {
