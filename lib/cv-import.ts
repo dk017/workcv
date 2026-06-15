@@ -117,7 +117,7 @@ function cleanText(value: string) {
 
 async function extractPdfText(buffer: Buffer) {
   const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  pdfjs.GlobalWorkerOptions.workerSrc ||= pathToFileURL(
+  pdfjs.GlobalWorkerOptions.workerSrc = pathToFileURL(
     path.join(process.cwd(), "node_modules/pdfjs-dist/legacy/build/pdf.worker.mjs")
   ).href;
   const documentTask = pdfjs.getDocument({
