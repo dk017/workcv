@@ -1,6 +1,15 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "standalone",
+  webpack(config, { isServer }) {
+    if (isServer) {
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        canvas: false,
+      };
+    }
+    return config;
+  },
   async redirects() {
     return [
       { source: "/cv-template-uk", destination: "/templates", permanent: true },

@@ -12,6 +12,7 @@ import {
   Save,
   Sparkles,
   Trash2,
+  Upload,
   User,
   X,
 } from "lucide-react";
@@ -53,6 +54,7 @@ export function CvEditor() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -279,6 +281,14 @@ export function CvEditor() {
     }
   };
 
+  const applyImportedCv = (importedCv: CvData) => {
+    setCv(importedCv);
+    setPdfUnlocked(false);
+    setActiveTab("profile");
+    setImportOpen(false);
+    setSaveState("Saving imported CV...");
+  };
+
   const selectedTemplate = templates.find((template) => template.id === cv.template);
 
   return (
@@ -313,6 +323,14 @@ export function CvEditor() {
             <div className="rounded-md border border-line bg-paper px-4 py-2 text-sm text-muted">
               {saveState}
             </div>
+            <button
+              type="button"
+              onClick={() => setImportOpen(true)}
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+            >
+              <Upload className="h-4 w-4" />
+              Import CV
+            </button>
             <button
               type="button"
               onClick={resetDraft}
@@ -442,6 +460,13 @@ export function CvEditor() {
           }}
         />
       )}
+      {importOpen && (
+        <ImportCvModal
+          template={cv.template}
+          onClose={() => setImportOpen(false)}
+          onApply={applyImportedCv}
+        />
+      )}
       {checkoutOpen && (
         <DownloadModal
           defaultEmail={cv.email}
@@ -451,6 +476,207 @@ export function CvEditor() {
           onCheckout={startCheckout}
         />
       )}
+    </div>
+  );
+}
+
+function ImportCvModal({
+  template,
+  onClose,
+  onApply,
+}: {
+  template: TemplateId;
+  onClose: () => void;
+  onApply: (cv: CvData) => void;
+}) {
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [fileName, setFileName] = useState("");
+  const [importedCv, setImportedCv] = useState<CvData | null>(null);
+
+  const handleFile = async (file: File) => {
+    const lowerName = file.name.toLowerCase();
+    const isAllowed =
+      file.type === "application/pdf" ||
+      file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+      lowerName.endsWith(".pdf") ||
+      lowerName.endsWith(".docx");
+
+    setError(null);
+    setImportedCv(null);
+    setFileName(file.name);
+
+    if (!isAllowed) {
+      setError("Upload a PDF or DOCX CV.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError("File too large. Maximum size is 10MB.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("template", template);
+
+      const response = await fetch("/api/cv/import", {
+        method: "POST",
+        body: formData,
+      });
+      const data = (await response.json()) as { cv?: CvData; error?: string };
+
+      if (!response.ok || !data.cv) {
+        throw new Error(data.error || "We could not import that CV.");
+      }
+
+      setImportedCv(data.cv);
+    } catch (importError) {
+      setError(
+        importError instanceof Error
+          ? importError.message
+          : "We could not import that CV."
+      );
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const onDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    setIsDragging(false);
+    const file = event.dataTransfer.files[0];
+    if (file) void handleFile(file);
+  };
+
+  const importedSummary = importedCv
+    ? [
+        importedCv.fullName || "Name not found",
+        importedCv.targetRole || "Target role not found",
+        `${importedCv.experience.filter((item) => item.role || item.company).length} roles`,
+        `${lines(importedCv.skills).length} skills`,
+      ]
+    : [];
+
+  return (
+    <div className="download-modal fixed inset-0 z-50 flex items-center justify-center bg-navy/45 p-4">
+      <div className="w-full max-w-2xl rounded-xl border border-line bg-white p-6 shadow-soft">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
+              Import CV
+            </p>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-navy">
+              Turn an existing CV into editable fields.
+            </h2>
+            <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
+              Upload a PDF or DOCX. WorkCV reads the text, fills the editor, and
+              keeps your selected template.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isUploading}
+            className="rounded-md border border-line px-3 py-1 text-sm font-bold text-muted hover:text-navy disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Close
+          </button>
+        </div>
+
+        <label
+          onDrop={onDrop}
+          onDragOver={(event) => {
+            event.preventDefault();
+            setIsDragging(true);
+          }}
+          onDragLeave={() => setIsDragging(false)}
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed p-8 text-center transition ${
+            isDragging
+              ? "border-navy bg-greensoft"
+              : "border-line-strong bg-paper hover:bg-greensoft"
+          }`}
+        >
+          <input
+            type="file"
+            accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            disabled={isUploading}
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              if (file) void handleFile(file);
+              event.target.value = "";
+            }}
+            className="sr-only"
+          />
+          <Upload className="h-10 w-10 text-navy" />
+          <span className="mt-4 text-lg font-bold text-navy">
+            {isUploading ? "Reading your CV..." : "Drop your CV here or choose a file"}
+          </span>
+          <span className="mt-2 text-sm text-muted">PDF or DOCX, up to 10MB</span>
+          {fileName && <span className="mt-3 text-sm font-bold text-navy">{fileName}</span>}
+        </label>
+
+        {error && (
+          <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">
+            {error}
+          </p>
+        )}
+
+        {importedCv && (
+          <div className="mt-5 rounded-xl border border-line bg-surface p-5">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h3 className="font-display text-2xl font-semibold text-navy">
+                  Import preview
+                </h3>
+                <p className="mt-1 text-sm leading-6 text-muted">
+                  Review the filled fields after applying. Your PDF download will
+                  stay locked until checkout is completed again.
+                </p>
+              </div>
+              <Check className="mt-1 h-6 w-6 shrink-0 text-success" />
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {importedSummary.map((item) => (
+                <div
+                  key={item}
+                  className="rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-navy"
+                >
+                  {item}
+                </div>
+              ))}
+            </div>
+            {importedCv.profile && (
+              <p className="mt-4 line-clamp-3 text-sm leading-6 text-muted">
+                {importedCv.profile}
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
+          <button
+            type="button"
+            onClick={() => importedCv && onApply(importedCv)}
+            disabled={!importedCv || isUploading}
+            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-not-allowed disabled:opacity-55"
+          >
+            <Upload className="h-4 w-4" />
+            Replace current draft with import
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            disabled={isUploading}
+            className="inline-flex min-h-12 items-center justify-center rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy hover:bg-paper disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            Keep current draft
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
