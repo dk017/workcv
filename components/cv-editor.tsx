@@ -345,7 +345,7 @@ export function CvEditor() {
               className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
             >
               <Download className="h-4 w-4" />
-              {pdfUnlocked ? "Download PDF" : `Unlock PDF ${site.price}`}
+              Download CV
             </button>
           </div>
         </div>

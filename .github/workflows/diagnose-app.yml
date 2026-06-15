@@ -1,0 +1,34 @@
+name: Diagnose app
+
+on:
+  workflow_dispatch:
+    inputs:
+      deploy_dir:
+        description: "Remote deploy directory"
+        required: true
+        default: "/opt/workcv"
+      tail:
+        description: "Number of recent app log lines to inspect"
+        required: true
+        default: "400"
+
+jobs:
+  app-logs:
+    name: Read filtered app logs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Read import logs
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            set -eu
+            cd "${{ github.event.inputs.deploy_dir }}"
+            docker compose -p workcv -f docker-compose.ghcr.yml logs --tail "${{ github.event.inputs.tail }}" app \
+              | grep -Ei 'workcv_import|cv/import|openai|pdf|error' \
+              | tail -200 || true
