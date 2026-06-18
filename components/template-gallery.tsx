@@ -1,7 +1,17 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, Check, FileText, LayoutTemplate } from "lucide-react";
+import {
+  ArrowRight,
+  Boxes,
+  Check,
+  FileText,
+  GraduationCap,
+  HeartHandshake,
+  Laptop,
+  LayoutTemplate,
+  Stethoscope,
+} from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
 import { NoSubscriptionCtaStrip } from "@/components/marketing";
@@ -201,6 +211,87 @@ export function TemplateGallery() {
                 <p className="mt-3 text-sm leading-6 text-muted">{body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-surface py-16 md:py-20">
+        <div className="container-page grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="mb-3 text-sm font-bold uppercase tracking-[0.14em] text-navy">
+              Role templates
+            </p>
+            <h2 className="font-display text-4xl font-semibold text-navy">
+              Start with wording shaped around the job.
+            </h2>
+            <p className="mt-5 text-lg leading-8 text-muted">
+              Role-specific templates give you a stronger first draft than a
+              blank layout because the sections, bullets and skills already
+              match what employers scan for.
+            </p>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            {[
+              {
+                href: "/cv-template-nurse-uk",
+                title: "Nurse CV template UK",
+                body:
+                  "NMC-focused sections, clinical bullet examples, CPD guidance and an editable registered nurse CV draft.",
+                cta: "Open nurse template",
+                icon: Stethoscope,
+              },
+              {
+                href: "/cv-template-teacher-uk",
+                title: "Teacher CV template UK",
+                body:
+                  "QTS, classroom impact, safeguarding, behaviour and assessment examples in an editable teacher CV draft.",
+                cta: "Open teacher template",
+                icon: GraduationCap,
+              },
+              {
+                href: "/cv-template-warehouse-uk",
+                title: "Warehouse CV template UK",
+                body:
+                  "Picking, packing, goods-in, scanner use, manual handling and shift reliability in an editable warehouse CV draft.",
+                cta: "Open warehouse template",
+                icon: Boxes,
+              },
+              {
+                href: "/cv-template-graduate-uk",
+                title: "Graduate CV template UK",
+                body:
+                  "Degree, projects, internships, part-time work and transferable skills shaped into an editable graduate CV draft.",
+                cta: "Open graduate template",
+                icon: Laptop,
+              },
+              {
+                href: "/cv-template-care-worker-uk",
+                title: "Care worker CV template UK",
+                body:
+                  "Person-centred care, safeguarding, records, home-care and residential-care evidence in an editable care worker CV draft.",
+                cta: "Open care worker template",
+                icon: HeartHandshake,
+              },
+            ].map((item) => {
+              const Icon = item.icon;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group rounded-xl border border-line bg-white p-6 transition hover:-translate-y-1 hover:border-navy"
+                >
+                  <Icon className="h-7 w-7 text-gold" />
+                  <h3 className="mt-5 font-display text-3xl font-semibold text-navy">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-7 text-muted">{item.body}</p>
+                  <span className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy">
+                    {item.cta}
+                    <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
+                  </span>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -13,7 +13,13 @@ export const metadata: Metadata = {
 export default async function EditorPage({
   searchParams,
 }: {
-  searchParams: { template?: string; payment?: string; draftId?: string };
+  searchParams: {
+    template?: string;
+    payment?: string;
+    draftId?: string;
+    roleTemplate?: string;
+    new?: string;
+  };
 }) {
   const user = await getCurrentUser();
   if (!user) {
@@ -22,6 +28,8 @@ export default async function EditorPage({
     if (searchParams.template) editorParams.set("template", searchParams.template);
     if (searchParams.payment) editorParams.set("payment", searchParams.payment);
     if (searchParams.draftId) editorParams.set("draftId", searchParams.draftId);
+    if (searchParams.roleTemplate) editorParams.set("roleTemplate", searchParams.roleTemplate);
+    if (searchParams.new) editorParams.set("new", searchParams.new);
     params.set("next", `/editor${editorParams.toString() ? `?${editorParams}` : ""}`);
     redirect(`/login?${params.toString()}`);
   }

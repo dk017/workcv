@@ -23,8 +23,8 @@ const nextConfig = {
       { source: "/cv-template-uk", destination: "/templates", permanent: true },
       { source: "/cv-builder-uk", destination: "/cv-builder", permanent: true },
       {
-        source: "/cv-with-no-experience-uk",
-        destination: "/cv-with-no-experience",
+        source: "/cv-with-no-experience",
+        destination: "/cv-no-experience-uk",
         permanent: true,
       },
       {

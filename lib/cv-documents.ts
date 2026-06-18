@@ -2,6 +2,7 @@ import crypto from "crypto";
 
 import { ensureAuthTables, getPool } from "@/lib/db";
 import { CvData, sampleCv, templates, type TemplateId } from "@/lib/editor-data";
+import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 
 export type CvDocument = {
   id: string;
@@ -62,11 +63,18 @@ export async function getOrCreateCurrentCv(userId: string, template?: TemplateId
   return createCvDocument(userId, template);
 }
 
-export async function createCvDocument(userId: string, template?: TemplateId) {
+export async function createCvDocument(
+  userId: string,
+  template?: TemplateId,
+  roleTemplate?: RoleTemplateId
+) {
   await ensureAuthTables();
 
   const id = crypto.randomUUID();
-  const data = normaliseCvData({ ...sampleCv, template: template || sampleCv.template });
+  const seed = roleTemplate
+    ? getRoleCvTemplate(roleTemplate, template)
+    : { ...sampleCv, template: template || sampleCv.template };
+  const data = normaliseCvData(seed);
   const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
     `
       INSERT INTO workcv_cv_documents (id, user_id, title, data, template_id)

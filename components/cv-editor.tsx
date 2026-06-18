@@ -63,10 +63,21 @@ export function CvEditor() {
     const loadDocument = async () => {
       const params = new URLSearchParams(window.location.search);
       const templateParam = params.get("template");
+      const roleTemplateParam = params.get("roleTemplate");
+      const shouldCreateNew = params.get("new") === "1" && roleTemplateParam;
       const query = templateParam ? `?template=${encodeURIComponent(templateParam)}` : "";
 
       try {
-        const response = await fetch(`/api/cv/current${query}`);
+        const response = shouldCreateNew
+          ? await fetch("/api/cv/new", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                template: templateParam,
+                roleTemplate: roleTemplateParam,
+              }),
+            })
+          : await fetch(`/api/cv/current${query}`);
         if (response.status === 401) {
           window.location.href = `/login?next=${encodeURIComponent(
             `${window.location.pathname}${window.location.search}`
@@ -85,6 +96,13 @@ export function CvEditor() {
           window.localStorage.setItem(draftIdKey, data.document.id);
           window.localStorage.removeItem(storageKey);
           setCv(data.document.data);
+          if (shouldCreateNew) {
+            params.delete("new");
+            const nextUrl = `${window.location.pathname}${
+              params.toString() ? `?${params.toString()}` : ""
+            }`;
+            window.history.replaceState(null, "", nextUrl);
+          }
           setSaveState("Saved to your account");
           setLoaded(true);
         }

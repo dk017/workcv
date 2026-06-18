@@ -51,6 +51,7 @@ export function Footer({ line = site.summary }: { line?: string }) {
         <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
           <Link href="/pricing">Pricing</Link>
           <Link href="/templates">Templates</Link>
+          <Link href="/how-to-write-a-cv-uk">CV guide</Link>
           <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
           <Link href="/contact">Contact</Link>
           <Link href="/privacy">Privacy</Link>
@@ -426,11 +427,15 @@ export function FaqSection({ faqs, title }: { faqs: Faq[]; title: string }) {
 export function FinalCta({
   heading,
   body,
+  primaryHref = "/editor",
+  primary = "Create my CV, pay at download",
   secondaryHref = "/pricing",
   secondary = "See pricing",
 }: {
   heading: string;
   body: string;
+  primaryHref?: string;
+  primary?: string;
   secondaryHref?: string | null;
   secondary?: string | null;
 }) {
@@ -441,10 +446,10 @@ export function FinalCta({
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">{body}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
           <Link
-            href="/editor"
+            href={primaryHref}
             className="inline-flex min-h-12 items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-bold text-navy"
           >
-            Create my CV, pay at download
+            {primary}
           </Link>
           {secondaryHref && secondary && (
             <Link
