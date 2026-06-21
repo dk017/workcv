@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { getOrCreateCurrentCv, parseTemplate, updateCvDocument } from "@/lib/cv-documents";
+import {
+  getCvDocument,
+  getOrCreateCurrentCv,
+  parseTemplate,
+  updateCvDocument,
+} from "@/lib/cv-documents";
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const documentId = request.nextUrl.searchParams.get("documentId");
+  if (documentId) {
+    const document = await getCvDocument(user.id, documentId);
+    if (!document) return NextResponse.json({ error: "CV not found" }, { status: 404 });
+    return NextResponse.json({ document });
+  }
 
   const template = parseTemplate(request.nextUrl.searchParams.get("template"));
   const document = await getOrCreateCurrentCv(user.id, template);

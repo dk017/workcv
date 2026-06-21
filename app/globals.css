@@ -125,6 +125,12 @@ body {
   word-break: normal;
 }
 
+.print-document .cv-name {
+  hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
 @container (max-width: 794px) {
   .cv-preview-scale {
     zoom: 0.94;
@@ -347,8 +353,35 @@ body {
   }
 
   .print-document[data-template="modern"] .cv-name {
-    font-size: 22pt !important;
-    hyphens: auto;
+    font-size: 18pt !important;
+  }
+
+  .print-document[data-template="compact"] .cv-header {
+    grid-template-columns: 65mm minmax(0, 1fr) !important;
+  }
+
+  .print-document[data-template="compact"] .cv-name {
+    font-size: 20pt !important;
+  }
+
+  .print-document[data-template="compact"] .cv-contact-line {
+    max-width: none !important;
+    width: 100% !important;
+  }
+
+  .print-document[data-template="compact"] .cv-compact-body {
+    grid-template-columns: minmax(0, 1fr) 42mm !important;
+    width: 100% !important;
+  }
+
+  .print-document[data-template="compact"] .cv-entry > div:first-child {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    column-gap: 3mm !important;
+  }
+
+  .print-document[data-template="compact"] .cv-entry-dates {
+    font-size: 8pt !important;
   }
 
   .print-document .cv-header p {
@@ -389,6 +422,11 @@ body {
   .print-document .cv-skills-list li {
     break-inside: avoid-page !important;
     page-break-inside: avoid !important;
+  }
+
+  .print-document[data-template="classic"] .cv-balance-page-break {
+    break-before: page !important;
+    page-break-before: always !important;
   }
 
   .print-document h3 {
@@ -474,6 +512,22 @@ body {
   }
 
   .print-document[data-template="modern"] main {
-    padding: 9mm 10mm !important;
+    padding: 7mm 9mm !important;
+  }
+
+  .print-document[data-template="modern"] section {
+    margin-top: 3.5mm !important;
+  }
+
+  .print-document[data-template="modern"] [class*="space-y-6"] > :not([hidden]) ~ :not([hidden]),
+  .print-document[data-template="modern"] [class*="space-y-5"] > :not([hidden]) ~ :not([hidden]),
+  .print-document[data-template="modern"] [class*="space-y-4"] > :not([hidden]) ~ :not([hidden]) {
+    margin-top: 2.2mm !important;
+  }
+
+  .print-document[data-template="modern"] p,
+  .print-document[data-template="modern"] li {
+    font-size: 8.7pt !important;
+    line-height: 1.28 !important;
   }
 }

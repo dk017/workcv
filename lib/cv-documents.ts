@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-import { ensureAuthTables, getPool } from "@/lib/db";
+import { ensureAuthTables, ensurePaymentTables, getPool } from "@/lib/db";
 import {
   createBlankCv,
   CvData,
@@ -14,6 +14,15 @@ export type CvDocument = {
   id: string;
   data: CvData;
   updatedAt: string;
+};
+
+export type CvDocumentSummary = {
+  id: string;
+  title: string;
+  targetRole: string;
+  template: TemplateId;
+  updatedAt: string;
+  paid: boolean;
 };
 
 function isValidTemplate(value: unknown): value is TemplateId {
@@ -119,6 +128,63 @@ export async function getOrCreateCurrentCv(userId: string, template?: TemplateId
   }
 
   return createCvDocument(userId, template);
+}
+
+export async function getCvDocument(userId: string, documentId: string) {
+  await ensureAuthTables();
+  const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
+    `
+      SELECT id, data, updated_at
+      FROM workcv_cv_documents
+      WHERE id = $1 AND user_id = $2
+      LIMIT 1
+    `,
+    [documentId, userId]
+  );
+
+  const row = result.rows[0];
+  if (!row) return null;
+  return { id: row.id, data: normaliseCvData(row.data), updatedAt: row.updated_at.toISOString() };
+}
+
+export async function listCvDocuments(userId: string): Promise<CvDocumentSummary[]> {
+  await Promise.all([ensureAuthTables(), ensurePaymentTables()]);
+  const result = await getPool().query<{
+    id: string;
+    title: string;
+    data: CvData;
+    template_id: string;
+    updated_at: Date;
+    paid: boolean;
+  }>(
+    `
+      SELECT
+        d.id,
+        d.title,
+        d.data,
+        d.template_id,
+        d.updated_at,
+        EXISTS (
+          SELECT 1 FROM workcv_orders o WHERE o.draft_id = d.id
+        ) AS paid
+      FROM workcv_cv_documents d
+      WHERE d.user_id = $1
+      ORDER BY d.updated_at DESC
+    `,
+    [userId]
+  );
+
+  return result.rows.map((row) => {
+    const data = normaliseCvData(row.data, parseTemplate(row.template_id));
+    return {
+      id: row.id,
+      title: row.title || data.fullName?.trim() || "Untitled CV",
+      targetRole: data.targetRole?.trim() || "No target role added",
+      template: data.template,
+      updatedAt: row.updated_at.toISOString(),
+      paid: row.paid,
+    };
+  });
 }
 
 export async function createCvDocument(

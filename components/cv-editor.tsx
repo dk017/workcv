@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
 import {
   Briefcase,
   Check,
@@ -8,7 +9,6 @@ import {
   GraduationCap,
   LayoutTemplate,
   Plus,
-  RotateCcw,
   Save,
   Sparkles,
   Trash2,
@@ -56,6 +56,7 @@ export function CvEditor() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
   const previewRef = useRef<HTMLDivElement>(null);
 
@@ -66,8 +67,12 @@ export function CvEditor() {
       const params = new URLSearchParams(window.location.search);
       const templateParam = params.get("template");
       const roleTemplateParam = params.get("roleTemplate");
-      const shouldCreateNew = params.get("new") === "1" && roleTemplateParam;
-      const query = templateParam ? `?template=${encodeURIComponent(templateParam)}` : "";
+      const requestedDraftId = params.get("draftId");
+      const shouldCreateNew = params.get("new") === "1";
+      const queryParams = new URLSearchParams();
+      if (requestedDraftId) queryParams.set("documentId", requestedDraftId);
+      else if (templateParam) queryParams.set("template", templateParam);
+      const query = queryParams.toString() ? `?${queryParams.toString()}` : "";
 
       try {
         const response = shouldCreateNew
@@ -100,6 +105,8 @@ export function CvEditor() {
           setCv(data.document.data);
           if (shouldCreateNew) {
             params.delete("new");
+            params.delete("roleTemplate");
+            params.set("draftId", data.document.id);
             const nextUrl = `${window.location.pathname}${
               params.toString() ? `?${params.toString()}` : ""
             }`;
@@ -256,6 +263,8 @@ export function CvEditor() {
   };
 
   const resetDraft = async () => {
+    if (creatingNew) return;
+    setCreatingNew(true);
     setSaveState("Creating a new saved CV...");
     setCheckoutError(null);
 
@@ -280,8 +289,16 @@ export function CvEditor() {
       setCv(data.document.data);
       setActiveTab("profile");
       setSaveState("Saved to your account");
+      const params = new URLSearchParams(window.location.search);
+      params.delete("new");
+      params.delete("roleTemplate");
+      params.delete("payment");
+      params.set("draftId", data.document.id);
+      window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
     } catch (error) {
       setSaveState(error instanceof Error ? error.message : "Could not create a new CV");
+    } finally {
+      setCreatingNew(false);
     }
   };
 
@@ -353,6 +370,12 @@ export function CvEditor() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
+            <Link
+              href="/my-cvs"
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+            >
+              My CVs
+            </Link>
             <button
               type="button"
               onClick={() => setTemplatePickerOpen(true)}
@@ -379,10 +402,11 @@ export function CvEditor() {
             <button
               type="button"
               onClick={resetDraft}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              disabled={creatingNew}
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60"
             >
-              <RotateCcw className="h-4 w-4" />
-              Reset sample
+              <Plus className="h-4 w-4" />
+              {creatingNew ? "Creating..." : "New CV"}
             </button>
             <button
               type="button"
@@ -1389,7 +1413,11 @@ function CvSection({
         : "mb-3 border-b border-line pb-2 text-sm font-bold uppercase tracking-[0.16em] text-navy";
 
   return (
-    <section className={compact ? "mt-6" : "mt-8"}>
+    <section
+      className={`${compact ? "mt-6" : "mt-8"} cv-section cv-section-${title
+        .toLowerCase()
+        .replaceAll(" ", "-")}`}
+    >
       <h3 className={headingClass}>{title}</h3>
       {children}
     </section>
@@ -1397,6 +1425,10 @@ function CvSection({
 }
 
 function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) {
+  const balanceSecondPage =
+    cv.experience.length >= 4 ||
+    cv.experience.reduce((total, item) => total + item.bullets.length, 0) > 900;
+
   return (
     <article
       className={`${baseClass} cv-template-classic border-t-[10px] border-navy px-12 py-12`}
@@ -1411,7 +1443,7 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
         </p>
         <ContactLine cv={cv} align="center" />
       </header>
-      <CvBody cv={cv} template="classic" />
+      <CvBody cv={cv} template="classic" balanceSecondPage={balanceSecondPage} />
     </article>
   );
 }
@@ -1482,7 +1514,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
         </div>
         <ContactLine cv={cv} align="right" compact />
       </header>
-      <div className="grid gap-8 pt-2 md:grid-cols-[minmax(0,1fr)_220px]">
+      <div className="cv-compact-body grid gap-8 pt-2 md:grid-cols-[minmax(0,1fr)_220px]">
         <main className="min-w-0">
           <CvSection title="Profile" compact template="compact">
             <p className="leading-6 text-ink">
@@ -1502,7 +1534,42 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
   );
 }
 
-function CvBody({ cv, template }: { cv: CvData; template: TemplateId }) {
+function CvBody({
+  cv,
+  template,
+  balanceSecondPage = false,
+}: {
+  cv: CvData;
+  template: TemplateId;
+  balanceSecondPage?: boolean;
+}) {
+  if (balanceSecondPage && cv.experience.length > 1) {
+    const pageOneExperience = cv.experience.slice(0, -1);
+    const pageTwoExperience = cv.experience.slice(-1);
+    return (
+      <>
+        <CvSection title="Profile" compact={false} template={template}>
+          <p className="leading-7 text-ink">
+            {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
+          </p>
+        </CvSection>
+        <ExperienceContent cv={cv} template={template} items={pageOneExperience} />
+        <div className="cv-balance-page-break">
+          <ExperienceContent
+            cv={cv}
+            template={template}
+            items={pageTwoExperience}
+            title="Experience continued"
+          />
+          <EducationContent cv={cv} template={template} />
+          <CvSection title="Skills" compact={false} template={template}>
+            <SkillsList cv={cv} />
+          </CvSection>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <CvSection title="Profile" compact={false} template={template}>
@@ -1511,7 +1578,9 @@ function CvBody({ cv, template }: { cv: CvData; template: TemplateId }) {
         </p>
       </CvSection>
       <ExperienceContent cv={cv} template={template} />
-      <EducationContent cv={cv} template={template} />
+      <div className={balanceSecondPage ? "cv-balance-page-break" : ""}>
+        <EducationContent cv={cv} template={template} />
+      </div>
       <CvSection title="Skills" compact={false} template={template}>
         <SkillsList cv={cv} />
       </CvSection>
@@ -1519,12 +1588,22 @@ function CvBody({ cv, template }: { cv: CvData; template: TemplateId }) {
   );
 }
 
-function ExperienceContent({ cv, template }: { cv: CvData; template: TemplateId }) {
+function ExperienceContent({
+  cv,
+  template,
+  items = cv.experience,
+  title = "Experience",
+}: {
+  cv: CvData;
+  template: TemplateId;
+  items?: ExperienceItem[];
+  title?: string;
+}) {
   const compact = template === "compact";
   return (
-    <CvSection title="Experience" compact={compact} template={template}>
+    <CvSection title={title} compact={compact} template={template}>
       <div className={compact ? "space-y-4" : "space-y-6"}>
-        {cv.experience.map((item) => (
+        {items.map((item) => (
           <Entry
             key={item.id}
             title={item.role || <PreviewPlaceholder>Role title</PreviewPlaceholder>}
@@ -1585,7 +1664,7 @@ function SkillsList({ cv, compact = false }: { cv: CvData; compact?: boolean }) 
         skillItems.map((skill) => (
           <li key={skill} className="flex gap-2 text-ink">
             <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" />
-            {skill}
+            <span className="min-w-0">{skill}</span>
           </li>
         ))
       ) : (
@@ -1606,7 +1685,7 @@ function ContactLine({
 }) {
   return (
     <div
-      className={`mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted ${
+      className={`cv-contact-line mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted ${
         align === "center" ? "justify-center" : "justify-start sm:justify-end sm:text-right"
       } ${compact ? "max-w-[260px] text-xs leading-5" : ""}`}
     >
@@ -1667,7 +1746,7 @@ function Entry({
           {bullets.map((bullet) => (
             <li key={bullet} className={`flex gap-2 text-ink ${compact ? "leading-6" : "leading-7"}`}>
               <span className="mt-3 h-1.5 w-1.5 shrink-0 rounded-full bg-navy" />
-              {bullet}
+              <span className="min-w-0">{bullet}</span>
             </li>
           ))}
         </ul>
