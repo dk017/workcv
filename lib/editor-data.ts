@@ -76,6 +76,20 @@ export const emptyEducation = (): EducationItem => ({
   details: "",
 });
 
+export const createBlankCv = (template: TemplateId = "classic"): CvData => ({
+  template,
+  fullName: "",
+  targetRole: "",
+  email: "",
+  phone: "",
+  location: "",
+  linkedin: "",
+  profile: "",
+  skills: "",
+  experience: [emptyExperience()],
+  education: [emptyEducation()],
+});
+
 export const sampleCv: CvData = {
   template: "classic",
   fullName: "Emily Thompson",

@@ -228,6 +228,10 @@ body {
     display: none !important;
   }
 
+  .cv-placeholder {
+    display: none !important;
+  }
+
   main,
   .print-page,
   .print-area {

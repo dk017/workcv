@@ -22,10 +22,10 @@ import {
   EducationItem,
   ExperienceItem,
   TemplateId,
+  createBlankCv,
   emptyEducation,
   emptyExperience,
   lines,
-  sampleCv,
   templates,
 } from "@/lib/editor-data";
 import { site } from "@/lib/site";
@@ -45,7 +45,7 @@ const tabs: Array<{ id: TabId; label: string; icon: typeof User }> = [
 ];
 
 export function CvEditor() {
-  const [cv, setCv] = useState<CvData>(sampleCv);
+  const [cv, setCv] = useState<CvData>(() => createBlankCv());
   const [activeTab, setActiveTab] = useState<TabId>("profile");
   const [saveState, setSaveState] = useState("Loading saved CV...");
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
@@ -927,31 +927,37 @@ function ProfileForm({
           label="Full name"
           value={cv.fullName}
           onChange={(value) => updateField("fullName", value)}
+          placeholder="e.g. Priya Shah"
         />
         <TextField
           label="Target role"
           value={cv.targetRole}
           onChange={(value) => updateField("targetRole", value)}
+          placeholder="e.g. Customer Service Assistant"
         />
         <TextField
           label="Email"
           value={cv.email}
           onChange={(value) => updateField("email", value)}
+          placeholder="e.g. priya.shah@email.co.uk"
         />
         <TextField
           label="Phone"
           value={cv.phone}
           onChange={(value) => updateField("phone", value)}
+          placeholder="e.g. 07123 456 789"
         />
         <TextField
           label="Location"
           value={cv.location}
           onChange={(value) => updateField("location", value)}
+          placeholder="e.g. Leeds, UK"
         />
         <TextField
           label="LinkedIn or portfolio"
           value={cv.linkedin}
           onChange={(value) => updateField("linkedin", value)}
+          placeholder="e.g. linkedin.com/in/priyashah"
         />
       </div>
       <TextArea
@@ -959,6 +965,7 @@ function ProfileForm({
         rows={6}
         value={cv.profile}
         onChange={(value) => updateField("profile", value)}
+        placeholder="Summarise your experience, strengths and the role you are targeting in 3–4 concise sentences."
       />
     </FormSection>
   );
@@ -1007,27 +1014,32 @@ function ExperienceForm({
                 label="Role"
                 value={item.role}
                 onChange={(value) => updateExperience(item.id, "role", value)}
+                placeholder="e.g. Retail Assistant"
               />
               <TextField
                 label="Company"
                 value={item.company}
                 onChange={(value) => updateExperience(item.id, "company", value)}
+                placeholder="e.g. North Street Books"
               />
               <TextField
                 label="Location"
                 value={item.location}
                 onChange={(value) => updateExperience(item.id, "location", value)}
+                placeholder="e.g. Leeds"
               />
               <div className="grid grid-cols-2 gap-3">
                 <TextField
                   label="Start"
                   value={item.start}
                   onChange={(value) => updateExperience(item.id, "start", value)}
+                  placeholder="e.g. Jun 2024"
                 />
                 <TextField
                   label="End"
                   value={item.end}
                   onChange={(value) => updateExperience(item.id, "end", value)}
+                  placeholder="e.g. Present"
                 />
               </div>
             </div>
@@ -1036,6 +1048,7 @@ function ExperienceForm({
               rows={5}
               value={item.bullets}
               onChange={(value) => updateExperience(item.id, "bullets", value)}
+              placeholder="Add one achievement or responsibility per line. Start with a strong action verb."
             />
           </div>
         ))}
@@ -1087,27 +1100,32 @@ function EducationForm({
                 label="Qualification"
                 value={item.qualification}
                 onChange={(value) => updateEducation(item.id, "qualification", value)}
+                placeholder="e.g. BA Business Management"
               />
               <TextField
                 label="Institution"
                 value={item.institution}
                 onChange={(value) => updateEducation(item.id, "institution", value)}
+                placeholder="e.g. University of Leeds"
               />
               <TextField
                 label="Location"
                 value={item.location}
                 onChange={(value) => updateEducation(item.id, "location", value)}
+                placeholder="e.g. Leeds"
               />
               <div className="grid grid-cols-2 gap-3">
                 <TextField
                   label="Start"
                   value={item.start}
                   onChange={(value) => updateEducation(item.id, "start", value)}
+                  placeholder="e.g. 2021"
                 />
                 <TextField
                   label="End"
                   value={item.end}
                   onChange={(value) => updateEducation(item.id, "end", value)}
+                  placeholder="e.g. 2024"
                 />
               </div>
             </div>
@@ -1116,6 +1134,7 @@ function EducationForm({
               rows={4}
               value={item.details}
               onChange={(value) => updateEducation(item.id, "details", value)}
+              placeholder="Add relevant modules, projects, grades or achievements."
             />
           </div>
         ))}
@@ -1141,6 +1160,7 @@ function SkillsForm({
         rows={10}
         value={cv.skills}
         onChange={(value) => updateField("skills", value)}
+        placeholder={"Customer service\nMicrosoft Excel\nTeam communication"}
       />
     </FormSection>
   );
@@ -1218,10 +1238,12 @@ function TextField({
   label,
   value,
   onChange,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  placeholder?: string;
 }) {
   return (
     <label className="block">
@@ -1229,6 +1251,7 @@ function TextField({
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
         className="min-h-11 w-full rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-gold-tint"
       />
     </label>
@@ -1240,11 +1263,13 @@ function TextArea({
   value,
   onChange,
   rows,
+  placeholder,
 }: {
   label: string;
   value: string;
   onChange: (value: string) => void;
   rows: number;
+  placeholder?: string;
 }) {
   return (
     <label className="block">
@@ -1253,6 +1278,7 @@ function TextArea({
         rows={rows}
         value={value}
         onChange={(event) => onChange(event.target.value)}
+        placeholder={placeholder}
         className="w-full resize-y rounded-md border border-line bg-white px-3 py-3 text-sm leading-6 text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-gold-tint"
       />
     </label>
@@ -1333,9 +1359,11 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
     >
       <header className="cv-header border-b-2 border-navy pb-7 text-center">
         <h2 className="font-display text-5xl font-semibold leading-tight text-navy">
-          {cv.fullName || "Your name"}
+          {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
         </h2>
-        <p className="mt-3 text-lg font-bold text-ink">{cv.targetRole || "Target role"}</p>
+        <p className="mt-3 text-lg font-bold text-ink">
+          {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
+        </p>
         <ContactLine cv={cv} align="center" />
       </header>
       <CvBody cv={cv} template="classic" />
@@ -1351,29 +1379,39 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
         <h2 className="font-display text-4xl font-semibold leading-tight">
-          {cv.fullName || "Your name"}
+          {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
         </h2>
         <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-gold-tint">
-          {cv.targetRole || "Target role"}
+          {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
         </p>
         <div className="mt-8 space-y-5 text-sm leading-6 text-white/85">
           <SidebarBlock title="Contact">
-            {[cv.email, cv.phone, cv.location, cv.linkedin].filter(Boolean).map((item) => (
-              <p key={item} className="break-words">{item}</p>
-            ))}
+            {[cv.email, cv.phone, cv.location, cv.linkedin].some(Boolean) ? (
+              [cv.email, cv.phone, cv.location, cv.linkedin].filter(Boolean).map((item) => (
+                <p key={item} className="break-words">{item}</p>
+              ))
+            ) : (
+              <PreviewPlaceholder>Add email, phone and location</PreviewPlaceholder>
+            )}
           </SidebarBlock>
           <SidebarBlock title="Skills">
-            <ul className="space-y-2">
-              {lines(cv.skills).map((skill) => (
-                <li key={skill}>{skill}</li>
-              ))}
-            </ul>
+            {lines(cv.skills).length > 0 ? (
+              <ul className="space-y-2">
+                {lines(cv.skills).map((skill) => (
+                  <li key={skill}>{skill}</li>
+                ))}
+              </ul>
+            ) : (
+              <PreviewPlaceholder>Add role-relevant skills</PreviewPlaceholder>
+            )}
           </SidebarBlock>
         </div>
       </aside>
       <main className="px-10 py-10">
         <CvSection title="Profile" compact={false} template="modern">
-          <p className="leading-7 text-ink">{cv.profile || "Add a concise professional profile."}</p>
+          <p className="leading-7 text-ink">
+            {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
+          </p>
         </CvSection>
         <ExperienceContent cv={cv} template="modern" />
         <EducationContent cv={cv} template="modern" />
@@ -1391,16 +1429,20 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
       <header className="cv-header grid gap-4 border-b-2 border-navy pb-4 sm:grid-cols-[1fr_auto]">
         <div>
           <h2 className="font-display text-4xl font-semibold leading-tight text-navy">
-            {cv.fullName || "Your name"}
+            {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
           </h2>
-          <p className="mt-1 text-base font-bold text-ink">{cv.targetRole || "Target role"}</p>
+          <p className="mt-1 text-base font-bold text-ink">
+            {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
+          </p>
         </div>
         <ContactLine cv={cv} align="right" compact />
       </header>
       <div className="grid gap-8 pt-2 md:grid-cols-[1fr_220px]">
         <main>
           <CvSection title="Profile" compact template="compact">
-            <p className="leading-6 text-ink">{cv.profile || "Add a concise professional profile."}</p>
+            <p className="leading-6 text-ink">
+              {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
+            </p>
           </CvSection>
           <ExperienceContent cv={cv} template="compact" />
           <EducationContent cv={cv} template="compact" />
@@ -1419,7 +1461,9 @@ function CvBody({ cv, template }: { cv: CvData; template: TemplateId }) {
   return (
     <>
       <CvSection title="Profile" compact={false} template={template}>
-        <p className="leading-7 text-ink">{cv.profile || "Add a concise professional profile."}</p>
+        <p className="leading-7 text-ink">
+          {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
+        </p>
       </CvSection>
       <ExperienceContent cv={cv} template={template} />
       <EducationContent cv={cv} template={template} />
@@ -1438,10 +1482,19 @@ function ExperienceContent({ cv, template }: { cv: CvData; template: TemplateId 
         {cv.experience.map((item) => (
           <Entry
             key={item.id}
-            title={item.role || "Role title"}
-            subtitle={[item.company || "Company", item.location].filter(Boolean).join(" | ")}
-            dates={[item.start, item.end].filter(Boolean).join(" - ")}
+            title={item.role || <PreviewPlaceholder>Role title</PreviewPlaceholder>}
+            subtitle={
+              [item.company, item.location].filter(Boolean).join(" | ") || (
+                <PreviewPlaceholder>Company and location</PreviewPlaceholder>
+              )
+            }
+            dates={
+              [item.start, item.end].filter(Boolean).join(" - ") || (
+                <PreviewPlaceholder>Start – End</PreviewPlaceholder>
+              )
+            }
             bullets={lines(item.bullets)}
+            emptyBulletsLabel="Add achievements and responsibilities."
             compact={compact}
           />
         ))}
@@ -1458,12 +1511,19 @@ function EducationContent({ cv, template }: { cv: CvData; template: TemplateId }
         {cv.education.map((item) => (
           <Entry
             key={item.id}
-            title={item.qualification || "Qualification"}
-            subtitle={[item.institution || "Institution", item.location].filter(Boolean).join(
-              " | "
-            )}
-            dates={[item.start, item.end].filter(Boolean).join(" - ")}
+            title={item.qualification || <PreviewPlaceholder>Qualification</PreviewPlaceholder>}
+            subtitle={
+              [item.institution, item.location].filter(Boolean).join(" | ") || (
+                <PreviewPlaceholder>Institution and location</PreviewPlaceholder>
+              )
+            }
+            dates={
+              [item.start, item.end].filter(Boolean).join(" - ") || (
+                <PreviewPlaceholder>Start – End</PreviewPlaceholder>
+              )
+            }
             bullets={item.details ? [item.details] : []}
+            emptyBulletsLabel="Add relevant study details or achievements."
             compact={compact}
           />
         ))}
@@ -1484,7 +1544,7 @@ function SkillsList({ cv, compact = false }: { cv: CvData; compact?: boolean }) 
           </li>
         ))
       ) : (
-        <li className="text-muted">Add your skills in the editor.</li>
+        <li><PreviewPlaceholder>Add your skills in the editor.</PreviewPlaceholder></li>
       )}
     </ul>
   );
@@ -1505,9 +1565,13 @@ function ContactLine({
         align === "center" ? "justify-center" : "justify-start sm:justify-end sm:text-right"
       } ${compact ? "max-w-[260px] text-xs leading-5" : ""}`}
     >
-      {[cv.email, cv.phone, cv.location, cv.linkedin].filter(Boolean).map((item) => (
-        <span key={item}>{item}</span>
-      ))}
+      {[cv.email, cv.phone, cv.location, cv.linkedin].some(Boolean) ? (
+        [cv.email, cv.phone, cv.location, cv.linkedin].filter(Boolean).map((item) => (
+          <span key={item}>{item}</span>
+        ))
+      ) : (
+        <PreviewPlaceholder>Add email, phone and location</PreviewPlaceholder>
+      )}
     </div>
   );
 }
@@ -1534,12 +1598,14 @@ function Entry({
   subtitle,
   dates,
   bullets,
+  emptyBulletsLabel,
   compact = false,
 }: {
-  title: string;
-  subtitle: string;
-  dates: string;
+  title: React.ReactNode;
+  subtitle: React.ReactNode;
+  dates: React.ReactNode;
   bullets: string[];
+  emptyBulletsLabel: string;
   compact?: boolean;
 }) {
   return (
@@ -1549,7 +1615,7 @@ function Entry({
           <h4 className="font-bold text-navy">{title}</h4>
           <p className="text-sm font-bold text-ink">{subtitle}</p>
         </div>
-        {dates && <p className="text-sm text-muted">{dates}</p>}
+        <p className="text-sm text-muted">{dates}</p>
       </div>
       {bullets.length > 0 && (
         <ul className={compact ? "mt-2 space-y-1.5" : "mt-3 space-y-2"}>
@@ -1561,6 +1627,15 @@ function Entry({
           ))}
         </ul>
       )}
+      {bullets.length === 0 && (
+        <p className={compact ? "mt-2" : "mt-3"}>
+          <PreviewPlaceholder>{emptyBulletsLabel}</PreviewPlaceholder>
+        </p>
+      )}
     </div>
   );
+}
+
+function PreviewPlaceholder({ children }: { children: React.ReactNode }) {
+  return <span className="cv-placeholder italic opacity-50">{children}</span>;
 }

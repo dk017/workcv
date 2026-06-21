@@ -405,8 +405,8 @@ export default function CancelEnhancvUkPage() {
       <FinalCta
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
-        secondaryHref="/pricing"
-        secondary="Compare pricing"
+        secondaryHref="/enhancv-alternative-uk"
+        secondary="Compare the Enhancv alternative"
       />
     </>
   );

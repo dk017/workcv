@@ -1,7 +1,13 @@
 import crypto from "crypto";
 
 import { ensureAuthTables, getPool } from "@/lib/db";
-import { CvData, sampleCv, templates, type TemplateId } from "@/lib/editor-data";
+import {
+  createBlankCv,
+  CvData,
+  sampleCv,
+  templates,
+  type TemplateId,
+} from "@/lib/editor-data";
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 
 export type CvDocument = {
@@ -14,18 +20,66 @@ function isValidTemplate(value: unknown): value is TemplateId {
   return typeof value === "string" && templates.some((template) => template.id === value);
 }
 
+function isLegacySampleCv(input: unknown): boolean {
+  if (!input || typeof input !== "object") return false;
+  const source = input as Partial<CvData>;
+  const primitiveKeys: Array<keyof Omit<CvData, "template" | "experience" | "education">> = [
+    "fullName",
+    "targetRole",
+    "email",
+    "phone",
+    "location",
+    "linkedin",
+    "profile",
+    "skills",
+  ];
+  const experienceKeys: Array<keyof CvData["experience"][number]> = [
+    "id",
+    "role",
+    "company",
+    "location",
+    "start",
+    "end",
+    "bullets",
+  ];
+  const educationKeys: Array<keyof CvData["education"][number]> = [
+    "id",
+    "qualification",
+    "institution",
+    "location",
+    "start",
+    "end",
+    "details",
+  ];
+
+  return (
+    primitiveKeys.every((key) => source[key] === sampleCv[key]) &&
+    Array.isArray(source.experience) &&
+    source.experience.length === sampleCv.experience.length &&
+    source.experience.every((item, index) =>
+      experienceKeys.every((key) => item[key] === sampleCv.experience[index][key])
+    ) &&
+    Array.isArray(source.education) &&
+    source.education.length === sampleCv.education.length &&
+    source.education.every((item, index) =>
+      educationKeys.every((key) => item[key] === sampleCv.education[index][key])
+    )
+  );
+}
+
 function normaliseCvData(input: unknown, fallbackTemplate?: TemplateId): CvData {
   const source = typeof input === "object" && input ? (input as Partial<CvData>) : {};
+  const blankCv = createBlankCv(fallbackTemplate);
   const template = isValidTemplate(source.template)
     ? source.template
-    : fallbackTemplate || sampleCv.template;
+    : fallbackTemplate || blankCv.template;
 
   return {
-    ...sampleCv,
+    ...blankCv,
     ...source,
     template,
-    experience: Array.isArray(source.experience) ? source.experience : sampleCv.experience,
-    education: Array.isArray(source.education) ? source.education : sampleCv.education,
+    experience: Array.isArray(source.experience) ? source.experience : blankCv.experience,
+    education: Array.isArray(source.education) ? source.education : blankCv.education,
   };
 }
 
@@ -53,6 +107,10 @@ export async function getOrCreateCurrentCv(userId: string, template?: TemplateId
 
   if (existing.rows[0]) {
     const row = existing.rows[0];
+    if (isLegacySampleCv(row.data)) {
+      const blankCv = createBlankCv(template || row.data.template);
+      return updateCvDocument(userId, row.id, blankCv);
+    }
     const data = normaliseCvData(row.data, template);
     if (template && data.template !== row.data.template) {
       return updateCvDocument(userId, row.id, { ...data, template });
@@ -73,7 +131,7 @@ export async function createCvDocument(
   const id = crypto.randomUUID();
   const seed = roleTemplate
     ? getRoleCvTemplate(roleTemplate, template)
-    : { ...sampleCv, template: template || sampleCv.template };
+    : createBlankCv(template);
   const data = normaliseCvData(seed);
   const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
     `
