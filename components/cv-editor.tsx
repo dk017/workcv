@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Briefcase,
   Check,
@@ -56,6 +56,8 @@ export function CvEditor() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [previewPageCount, setPreviewPageCount] = useState(1);
+  const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -119,6 +121,31 @@ export function CvEditor() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+
+    let frame = 0;
+    const updatePageCount = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const document = preview.querySelector<HTMLElement>(".print-document");
+        if (!document) return;
+        setPreviewPageCount(Math.max(1, Math.ceil(document.scrollHeight / 1123)));
+      });
+    };
+
+    const observer = new ResizeObserver(updatePageCount);
+    const document = preview.querySelector<HTMLElement>(".print-document");
+    if (document) observer.observe(document);
+    updatePageCount();
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
+  }, [cv]);
 
   useEffect(() => {
     if (!draftId) return;
@@ -456,14 +483,30 @@ export function CvEditor() {
                 UK format: no photo, no date of birth, no nationality field.
               </p>
             </div>
-            <div className="hidden items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-success sm:flex">
-              <Save className="h-4 w-4" />
-              Local draft
+            <div className="flex items-center gap-2">
+              <div className="rounded-md border border-line bg-paper px-3 py-2 text-sm font-bold text-navy">
+                {previewPageCount} {previewPageCount === 1 ? "page" : "pages"}
+              </div>
+              <div className="hidden items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-success sm:flex">
+                <Save className="h-4 w-4" />
+                Local draft
+              </div>
             </div>
           </div>
           <div className="cv-preview-viewport rounded-xl border border-line bg-[#eef6f3] p-3 sm:p-5">
-            <div className="cv-preview-scale">
+            <div ref={previewRef} className="cv-preview-scale relative">
               <CvDocument cv={cv} />
+              <div className="cv-page-guides pointer-events-none absolute inset-x-0 top-0" aria-hidden="true">
+                {Array.from({ length: previewPageCount }, (_, index) => (
+                  <div
+                    key={index}
+                    className="cv-page-guide absolute inset-x-0"
+                    style={{ top: index * 1123, height: 1123 }}
+                  >
+                    <span>Page {index + 1}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -832,11 +875,13 @@ function DownloadModal({
           </div>
           <p className="mt-3 leading-7 text-muted">
             Pay once through secure Dodo checkout. After payment, WorkCV returns
-            you to the editor and opens the PDF download dialog.
+            you to the editor, opens the PDF download dialog, and emails your
+            purchase confirmation.
           </p>
           <ul className="mt-5 space-y-3 text-sm font-bold text-navy">
             {[
-              "One-time PDF download",
+              "PDF access for this saved CV",
+              "Purchase confirmation by email",
               "No subscription",
               "No automatic renewal",
               "Payment unlocks this saved CV",
@@ -851,7 +896,7 @@ function DownloadModal({
 
         <label className="mt-5 block">
           <span className="mb-2 block text-sm font-bold text-navy">
-            Email for payment receipt
+            Email for receipt and purchase confirmation
           </span>
           <input
             type="email"
@@ -927,7 +972,7 @@ function ProfileForm({
           label="Full name"
           value={cv.fullName}
           onChange={(value) => updateField("fullName", value)}
-          placeholder="e.g. Priya Shah"
+          placeholder="e.g. Emily Thompson"
         />
         <TextField
           label="Target role"
@@ -939,7 +984,7 @@ function ProfileForm({
           label="Email"
           value={cv.email}
           onChange={(value) => updateField("email", value)}
-          placeholder="e.g. priya.shah@email.co.uk"
+          placeholder="e.g. emily.thompson@email.co.uk"
         />
         <TextField
           label="Phone"
@@ -957,7 +1002,7 @@ function ProfileForm({
           label="LinkedIn or portfolio"
           value={cv.linkedin}
           onChange={(value) => updateField("linkedin", value)}
-          placeholder="e.g. linkedin.com/in/priyashah"
+          placeholder="e.g. linkedin.com/in/emilythompson"
         />
       </div>
       <TextArea
@@ -1358,7 +1403,7 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
       data-template="classic"
     >
       <header className="cv-header border-b-2 border-navy pb-7 text-center">
-        <h2 className="font-display text-5xl font-semibold leading-tight text-navy">
+        <h2 className="cv-name font-display text-5xl font-semibold leading-tight text-navy">
           {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
         </h2>
         <p className="mt-3 text-lg font-bold text-ink">
@@ -1374,11 +1419,11 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
 function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) {
   return (
     <article
-      className={`${baseClass} cv-template-modern grid grid-cols-[230px_1fr] overflow-hidden border-l-[10px] border-gold`}
+      className={`${baseClass} cv-template-modern grid grid-cols-[230px_minmax(0,1fr)] overflow-hidden border-l-[10px] border-gold`}
       data-template="modern"
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
-        <h2 className="font-display text-4xl font-semibold leading-tight">
+        <h2 className="cv-name font-display text-4xl font-semibold leading-tight">
           {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
         </h2>
         <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-gold-tint">
@@ -1407,7 +1452,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
           </SidebarBlock>
         </div>
       </aside>
-      <main className="px-10 py-10">
+      <main className="min-w-0 px-10 py-10">
         <CvSection title="Profile" compact={false} template="modern">
           <p className="leading-7 text-ink">
             {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
@@ -1428,7 +1473,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
     >
       <header className="cv-header grid gap-4 border-b-2 border-navy pb-4 sm:grid-cols-[1fr_auto]">
         <div>
-          <h2 className="font-display text-4xl font-semibold leading-tight text-navy">
+          <h2 className="cv-name font-display text-4xl font-semibold leading-tight text-navy">
             {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
           </h2>
           <p className="mt-1 text-base font-bold text-ink">
@@ -1437,8 +1482,8 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
         </div>
         <ContactLine cv={cv} align="right" compact />
       </header>
-      <div className="grid gap-8 pt-2 md:grid-cols-[1fr_220px]">
-        <main>
+      <div className="grid gap-8 pt-2 md:grid-cols-[minmax(0,1fr)_220px]">
+        <main className="min-w-0">
           <CvSection title="Profile" compact template="compact">
             <p className="leading-6 text-ink">
               {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
@@ -1535,7 +1580,7 @@ function EducationContent({ cv, template }: { cv: CvData; template: TemplateId }
 function SkillsList({ cv, compact = false }: { cv: CvData; compact?: boolean }) {
   const skillItems = lines(cv.skills);
   return (
-    <ul className={compact ? "space-y-2" : "grid gap-2 sm:grid-cols-2"}>
+    <ul className={`cv-skills-list ${compact ? "space-y-2" : "grid gap-2 sm:grid-cols-2"}`}>
       {skillItems.length > 0 ? (
         skillItems.map((skill) => (
           <li key={skill} className="flex gap-2 text-ink">
@@ -1567,7 +1612,7 @@ function ContactLine({
     >
       {[cv.email, cv.phone, cv.location, cv.linkedin].some(Boolean) ? (
         [cv.email, cv.phone, cv.location, cv.linkedin].filter(Boolean).map((item) => (
-          <span key={item}>{item}</span>
+          <span key={item} className="min-w-0 overflow-wrap-anywhere">{item}</span>
         ))
       ) : (
         <PreviewPlaceholder>Add email, phone and location</PreviewPlaceholder>
@@ -1609,13 +1654,13 @@ function Entry({
   compact?: boolean;
 }) {
   return (
-    <div>
+    <div className="cv-entry min-w-0">
       <div className="flex flex-col gap-1 sm:flex-row sm:items-start sm:justify-between">
-        <div>
+        <div className="min-w-0">
           <h4 className="font-bold text-navy">{title}</h4>
           <p className="text-sm font-bold text-ink">{subtitle}</p>
         </div>
-        <p className="text-sm text-muted">{dates}</p>
+        <p className="cv-entry-dates shrink-0 whitespace-nowrap text-sm text-muted">{dates}</p>
       </div>
       {bullets.length > 0 && (
         <ul className={compact ? "mt-2 space-y-1.5" : "mt-3 space-y-2"}>

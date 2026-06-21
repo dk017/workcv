@@ -83,13 +83,46 @@ body {
 
 .cv-preview-viewport {
   container-type: inline-size;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: visible;
 }
 
 .cv-preview-scale {
   width: 794px;
   margin-inline: auto;
   zoom: 1;
+}
+
+.cv-page-guides {
+  height: 100%;
+  z-index: 10;
+}
+
+.cv-page-guide {
+  border-bottom: 2px dashed rgb(15 41 66 / 28%);
+}
+
+.cv-page-guide span {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 1px 4px rgb(15 41 66 / 15%);
+  color: #0f2942;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 9px;
+}
+
+.overflow-wrap-anywhere,
+.print-document h2,
+.print-document h4,
+.print-document p,
+.print-document li,
+.print-document span {
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 @container (max-width: 794px) {
@@ -206,7 +239,7 @@ body {
 
 @page {
   size: A4;
-  margin: 0;
+  margin: 8mm 0;
 }
 
 @media print {
@@ -254,6 +287,10 @@ body {
     zoom: 1 !important;
   }
 
+  .cv-page-guides {
+    display: none !important;
+  }
+
   .print-document {
     box-sizing: border-box !important;
     color: #111827 !important;
@@ -268,6 +305,14 @@ body {
     border-bottom: 0 !important;
     outline: 0 !important;
     ring-width: 0 !important;
+    overflow: visible !important;
+  }
+
+  .print-document *,
+  .print-document main,
+  .print-document aside {
+    min-width: 0 !important;
+    max-width: 100%;
   }
 
   .print-document[data-template="classic"] {
@@ -278,7 +323,7 @@ body {
 
   .print-document[data-template="modern"] {
     display: grid !important;
-    grid-template-columns: 62mm 1fr !important;
+    grid-template-columns: 62mm minmax(0, 1fr) !important;
     border-left: 3mm solid #d4a843 !important;
     border-top: 0 !important;
     padding: 0 !important;
@@ -301,6 +346,11 @@ body {
     line-height: 1.05 !important;
   }
 
+  .print-document[data-template="modern"] .cv-name {
+    font-size: 22pt !important;
+    hyphens: auto;
+  }
+
   .print-document .cv-header p {
     font-size: 10pt !important;
     margin-top: 2mm !important;
@@ -318,9 +368,27 @@ body {
   }
 
   .print-document section {
+    margin-top: 5mm !important;
+  }
+
+  .print-document section > h3 {
+    break-after: avoid-page !important;
+    page-break-after: avoid !important;
+  }
+
+  .print-document .cv-entry {
     break-inside: avoid-page !important;
     page-break-inside: avoid !important;
-    margin-top: 5mm !important;
+  }
+
+  .print-document .cv-entry-dates {
+    overflow-wrap: normal !important;
+    white-space: nowrap !important;
+  }
+
+  .print-document .cv-skills-list li {
+    break-inside: avoid-page !important;
+    page-break-inside: avoid !important;
   }
 
   .print-document h3 {

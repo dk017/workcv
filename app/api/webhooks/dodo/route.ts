@@ -3,11 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 
 import {
   DODO_PRODUCT_ID,
+  getAppUrl,
   getSiteHost,
   metadataString,
   verifyDodoWebhookSignature,
 } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
+import { sendPurchaseConfirmationEmail } from "@/lib/email";
 
 export const runtime = "nodejs";
 
@@ -97,20 +99,24 @@ export async function POST(request: NextRequest) {
 
   const paymentId = data.payment_id || data.id || data.checkout_session_id || randomUUID();
   const checkoutId = data.checkout_session_id || null;
-  const email = data.customer?.email || metadataString(metadata, "email") || null;
+  let email = data.customer?.email || metadataString(metadata, "email") || null;
+  const amountCents = readAmountCents(data);
+  const currency = readCurrency(data);
 
   try {
     await ensurePaymentTables();
 
     if (checkoutId) {
-      await getPool().query(
+      const checkout = await getPool().query<{ email: string | null }>(
         `
           UPDATE workcv_payment_checkouts
           SET completed_at = NOW(), updated_at = NOW()
           WHERE id = $1
+          RETURNING email
         `,
         [checkoutId]
       );
+      email ||= checkout.rows[0]?.email || null;
     }
 
     await getPool().query(
@@ -125,16 +131,65 @@ export async function POST(request: NextRequest) {
         draftId,
         email,
         productId,
-        readAmountCents(data),
-        readCurrency(data),
+        amountCents,
+        currency,
         checkoutId,
         event.type,
       ]
     );
 
+    if (email) {
+      const claimed = await getPool().query<{ id: string }>(
+        `
+          UPDATE workcv_orders
+          SET confirmation_email_attempted_at = NOW()
+          WHERE id = $1
+            AND confirmation_email_sent_at IS NULL
+            AND (
+              confirmation_email_attempted_at IS NULL
+              OR confirmation_email_attempted_at < NOW() - INTERVAL '10 minutes'
+            )
+          RETURNING id
+        `,
+        [paymentId]
+      );
+
+      if (claimed.rows.length > 0) {
+        try {
+          await sendPurchaseConfirmationEmail({
+            to: email,
+            orderId: paymentId,
+            amountCents,
+            currency,
+            editorUrl: `${getAppUrl()}/editor`,
+          });
+          await getPool().query(
+            `
+              UPDATE workcv_orders
+              SET confirmation_email_sent_at = NOW()
+              WHERE id = $1
+            `,
+            [paymentId]
+          );
+        } catch (error) {
+          await getPool().query(
+            `
+              UPDATE workcv_orders
+              SET confirmation_email_attempted_at = NULL
+              WHERE id = $1 AND confirmation_email_sent_at IS NULL
+            `,
+            [paymentId]
+          );
+          throw error;
+        }
+      }
+    } else {
+      console.error("dodo_purchase_confirmation_missing_email", { paymentId, checkoutId });
+    }
+
     return NextResponse.json({ status: "ok" });
   } catch (error) {
-    console.error("dodo_webhook_persist_failed", error);
-    return NextResponse.json({ error: "Webhook persistence failed" }, { status: 500 });
+    console.error("dodo_webhook_processing_failed", error);
+    return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }
 }

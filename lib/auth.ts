@@ -1,9 +1,9 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 import { ensureAuthTables, getPool } from "@/lib/db";
+import { getEmailTransporter, getTransactionalEmailIdentity } from "@/lib/email";
 
 const sessionCookieName = "workcv_session";
 const loginCodeTtlMinutes = 15;
@@ -31,21 +31,6 @@ function generateCode() {
   return String(Math.floor(100000 + Math.random() * 900000));
 }
 
-function getEmailTransporter() {
-  const host = process.env.SMTP_HOST;
-  const port = Number(process.env.SMTP_PORT || 587);
-  const user = process.env.SMTP_USER;
-  const pass = process.env.SMTP_PASS;
-  if (!host || !user || !pass) return null;
-
-  return nodemailer.createTransport({
-    host,
-    port,
-    secure: port === 465,
-    auth: { user, pass },
-  });
-}
-
 export function isValidEmail(email: string) {
   return emailRegex.test(email);
 }
@@ -71,10 +56,7 @@ export async function requestEmailLoginCode(emailInput: string) {
   );
 
   const transporter = getEmailTransporter();
-  const fromEmail = process.env.AUTH_FROM_EMAIL || process.env.SMTP_USER || "contact@werkcv.nl";
-  const fromName = process.env.AUTH_FROM_NAME || "WorkCV";
-  const from = `${fromName} <${fromEmail}>`;
-  const replyTo = process.env.AUTH_REPLY_TO_EMAIL || "contact@workcv.co.uk";
+  const { from, replyTo } = getTransactionalEmailIdentity();
 
   if (transporter) {
     await transporter.sendMail({

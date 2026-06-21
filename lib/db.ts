@@ -55,9 +55,17 @@ export async function ensurePaymentTables() {
           currency TEXT,
           checkout_id TEXT,
           raw_event_type TEXT,
+          confirmation_email_attempted_at TIMESTAMPTZ,
+          confirmation_email_sent_at TIMESTAMPTZ,
           paid_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
+
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS confirmation_email_attempted_at TIMESTAMPTZ;
+
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS confirmation_email_sent_at TIMESTAMPTZ;
 
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
