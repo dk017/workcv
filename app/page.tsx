@@ -1,23 +1,22 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Check, FileText } from "lucide-react";
+import { Check, FileText, ShieldCheck } from "lucide-react";
 
 import {
   ButtonLink,
   CvPreview,
   FaqSection,
   FinalCta,
-  ProblemComparison,
-  ProofSection,
+  TransformationSection,
   SectionLabel,
   TrustStrip,
 } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: `One UK CV. ${site.priceGbp}. Nothing to cancel.`,
+  title: "Turn Your Experience into a Professional UK CV",
   description:
-    `Create your UK CV, preview it, then pay ${site.priceGbp} when you download the final PDF. No subscription and no automatic renewal.`,
+    "Add your experience in your own words, organise it with guided UK CV sections, preview every page, and download a professional CV when it is ready.",
 };
 
 const homepageFaqs = [
@@ -53,18 +52,24 @@ export default function HomePage() {
       <section className="quiet-grid bg-paper py-20 md:py-28">
         <div className="container-page grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr]">
           <div className="min-w-0">
+            <div className="mb-6 inline-flex max-w-full items-center gap-2 rounded-full border border-success/30 bg-greensoft px-4 py-2 text-xs font-bold text-navy sm:text-sm">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-success" />
+              No subscription · Pay once · Download instantly
+            </div>
             <h1 className="max-w-[22rem] font-display text-4xl font-semibold leading-[1.02] text-navy sm:max-w-3xl sm:text-5xl md:text-7xl">
-              <span className="block">One UK CV.</span>
-              <span className="block">{site.price}.</span>
-              <span className="block">Nothing to cancel.</span>
+              Turn what you’ve done into a CV worth sending.
             </h1>
             <p className="mt-7 max-w-[22rem] text-lg leading-8 text-muted sm:max-w-2xl sm:text-xl">
-              Build your CV first, preview the result, then pay {site.price}{" "}
-              when the PDF is ready. No monthly plan. No renewal. No cancellation
-              page to hunt down.
+              Add your experience in your own words. WorkCV gives it a clear,
+              professional UK structure you can preview, refine, and use with
+              confidence.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-3">
-              {[`One-time ${site.price} PDF`, "UK-ready CV structure", "No automatic renewal"].map(
+              {[
+                `Pay ${site.price} once — no monthly subscription`,
+                "Build and preview before paying",
+                "Download as soon as payment is confirmed",
+              ].map(
                 (item) => (
                   <div key={item} className="flex items-center gap-2">
                     <Check className="h-5 w-5 text-success" />
@@ -74,16 +79,19 @@ export default function HomePage() {
               )}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Create my CV, pay at download</ButtonLink>
+              <ButtonLink href="/editor">Create my CV</ButtonLink>
             </div>
+            <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-muted">
+              <ShieldCheck className="h-4 w-4 shrink-0 text-success" />
+              Price shown upfront · No automatic renewal
+            </p>
           </div>
           <CvPreview />
         </div>
       </section>
 
       <TrustStrip />
-      <ProblemComparison />
-      <ProofSection />
+      <TransformationSection />
 
       <section className="bg-paper py-24">
         <div className="container-page">
@@ -102,8 +110,8 @@ export default function HomePage() {
                 "Pick a practical layout that keeps your CV readable, structured, and easy to tailor for real applications.",
               ],
               [
-                "Download when ready",
-                `Build free, then pay ${site.price} when you want the final PDF. No subscription. No monthly fees.`,
+                "Use it when you are ready",
+                "Check every page, unlock the finished PDF, and use it for applications without rebuilding the layout elsewhere.",
               ],
             ].map(([title, body], index) => (
               <div key={title} className="rounded-xl border border-line bg-paper p-6">
@@ -190,8 +198,9 @@ export default function HomePage() {
 
       <FaqSection faqs={homepageFaqs} title="Common questions before you start." />
       <FinalCta
-        heading="One CV. One payment. Nothing to cancel."
-        body={`Create the CV first. Pay ${site.price} only when you want the final PDF. No renewal date waiting for you later.`}
+        heading="Your next application deserves a CV that feels ready."
+        body="Bring your experience. WorkCV helps you shape it into a clear, professional UK CV you can update and use again."
+        primary="Create my CV"
         secondaryHref={null}
         secondary={null}
       />

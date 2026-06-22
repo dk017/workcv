@@ -11,7 +11,7 @@ export const site = {
   price: `£${priceAmount.toFixed(2)}`,
   priceGbp: `${priceCurrency} ${priceAmount.toFixed(2)}`,
   summary:
-    "One UK CV. One payment. Nothing to cancel.",
+    "A clear, professional UK CV—ready when you are.",
 };
 
 export const routes = [

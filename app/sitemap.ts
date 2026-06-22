@@ -7,6 +7,8 @@ const routes = [
   { path: "/pricing", priority: 0.95, changeFrequency: "weekly" },
   { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly" },
   { path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },
+  { path: "/resume-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
+  { path: "/cv-vs-resume-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-22" },
   { path: "/templates", priority: 0.85, changeFrequency: "monthly" },
   { path: "/cv-builder", priority: 0.8, changeFrequency: "monthly" },
   { path: "/student-cv-template", priority: 0.75, changeFrequency: "monthly" },
@@ -47,6 +49,7 @@ const routes = [
   path: string;
   priority: number;
   changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  lastModified?: string;
 }>;
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -54,7 +57,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${site.url}${route.path}`,
-    lastModified,
+    lastModified: route.lastModified ? new Date(route.lastModified) : lastModified,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

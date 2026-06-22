@@ -184,13 +184,29 @@ export function TemplateGallery() {
             <h2 className="font-display text-4xl font-semibold text-navy">
               The template should make your strongest evidence easy to scan.
             </h2>
-            <Link
-              href="/professional-cv-template-uk"
-              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy"
-            >
-              Read the professional CV template guide
-              <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div className="mt-6 flex flex-col items-start gap-3">
+              <Link
+                href="/professional-cv-template-uk"
+                className="inline-flex items-center gap-2 text-sm font-bold text-navy"
+              >
+                Read the professional CV template guide
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/resume-template-uk"
+                className="inline-flex items-center gap-2 text-sm font-bold text-navy"
+              >
+                Use the UK resume template
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/cv-vs-resume-uk"
+                className="inline-flex items-center gap-2 text-sm font-bold text-navy"
+              >
+                Understand CV vs resume
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {[

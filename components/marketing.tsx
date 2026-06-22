@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Check, Minus, ShieldCheck } from "lucide-react";
+import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { routes, site } from "@/lib/site";
 
@@ -95,10 +95,10 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
 
 export function TrustStrip() {
   const items = [
-    "Build free",
-    `Pay ${site.price} when you download`,
-    "No subscription",
-    "No automatic renewal",
+    "Guided UK sections",
+    "Formatting handled",
+    "Preview every page",
+    "Save and update anytime",
   ];
 
   return (
@@ -264,44 +264,94 @@ function PreviewSection({
   );
 }
 
-export function ProblemComparison() {
+const transformationDetails = [
+  "Resolved customer queries and complaints",
+  "Trained two new starters",
+  "Covered high-volume weekend shifts",
+];
+
+function TransformationField({ label, value }: { label: string; value: string }) {
   return (
-    <section className="bg-paper py-24">
-      <div className="container-page">
-        <SectionLabel>The problem</SectionLabel>
-        <h2 className="max-w-3xl font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
-          Most CV builders charge you monthly for something you may only use once.
+    <div>
+      <div className="mb-2 text-sm font-bold text-navy">{label}</div>
+      <div className="rounded-md border border-line-strong bg-paper px-4 py-3 text-sm text-ink">
+        {value}
+      </div>
+    </div>
+  );
+}
+
+export function TransformationSection() {
+  return (
+    <section id="transformation" className="quiet-grid scroll-mt-16 bg-paper py-16">
+      <div className="container-wide">
+        <SectionLabel>From details to document</SectionLabel>
+        <h2 className="max-w-4xl font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
+          Your details go in. A polished UK CV comes out.
         </h2>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-          That model makes sense for platforms that want an ongoing account
-          relationship. It makes less sense for people who simply need one strong
-          CV for the next round of job applications. WorkCV is built for the
-          second group.
+          You add the content. WorkCV takes care of the structure, spacing,
+          hierarchy, and page layout.
         </p>
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
-          <ComparisonPanel
-            title="Typical CV builder"
-            tone="negative"
-            items={[
-              "Low trial price up front",
-              "Renews into a recurring plan",
-              "Requires cancellation to stop billing",
-              "Often bundles more platform than many users need",
-            ]}
+
+        <div className="mt-8 grid items-center gap-8 lg:grid-cols-[0.9fr_auto_1.1fr]">
+          <div>
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-navy">
+              What you add
+            </h3>
+            <div className="space-y-4 rounded-xl border border-line-strong bg-white p-5 shadow-sm sm:p-6">
+              <TransformationField label="Role" value="Customer Service Assistant" />
+              <TransformationField label="Employer" value="Northline Retail" />
+              <TransformationField label="Location" value="Leeds" />
+              <div>
+                <div className="mb-2 text-sm font-bold text-navy">Experience</div>
+                <div className="space-y-2 rounded-md border border-line-strong bg-paper px-4 py-3 text-sm leading-6 text-ink">
+                  {transformationDetails.map((detail) => (
+                    <div key={detail}>{detail}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ArrowRight
+            aria-hidden="true"
+            className="mx-auto h-10 w-10 rotate-90 text-navy lg:rotate-0"
+            strokeWidth={1.75}
           />
-          <ComparisonPanel
-            title="WorkCV"
-            tone="positive"
-            items={[
-              "Build your CV free",
-              `Pay ${site.price} once when you download`,
-              "No subscription to manage",
-              "Focused on helping you finish one strong CV fast",
-            ]}
-          />
+
+          <div>
+            <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-navy">
+              What you get
+            </h3>
+            <div className="rounded-xl border border-line-strong bg-white p-6 shadow-soft sm:p-8">
+              <div className="flex items-center justify-between gap-4">
+                <div className="h-1.5 w-20 bg-gold" />
+                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.14em] text-navy">
+                  Classic UK
+                  <span className="h-2.5 w-2.5 rounded-full bg-gold" />
+                </div>
+              </div>
+              <h3 className="mt-8 font-display text-4xl font-semibold leading-none text-navy sm:text-5xl">
+                Emily Thompson
+              </h3>
+              <p className="mt-3 text-base font-bold text-ink">Customer Service Assistant</p>
+              <p className="mt-1 text-sm text-muted">Leeds, UK</p>
+              <div className="my-6 border-t border-line" />
+              <div className="text-xs font-bold uppercase tracking-[0.14em] text-navy">
+                Experience
+              </div>
+              <ul className="mt-4 space-y-3 text-sm leading-6 text-ink">
+                {transformationDetails.map((detail) => (
+                  <li key={detail}>{detail}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </div>
-        <div className="mt-10">
-          <ButtonLink href="/editor">Build my CV</ButtonLink>
+
+        <div className="mt-8 flex justify-center">
+          <ButtonLink href="/editor">Start with my details</ButtonLink>
         </div>
       </div>
     </section>
@@ -362,39 +412,6 @@ export function ProofSection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function ComparisonPanel({
-  title,
-  items,
-  tone,
-}: {
-  title: string;
-  items: string[];
-  tone: "positive" | "negative";
-}) {
-  const positive = tone === "positive";
-  return (
-    <div
-      className={`rounded-xl border p-6 ${
-        positive ? "border-success/30 bg-greensoft" : "border-line bg-redsoft"
-      }`}
-    >
-      <h3 className="font-display text-2xl font-semibold text-navy">{title}</h3>
-      <ul className="mt-5 space-y-3">
-        {items.map((item) => (
-          <li key={item} className="flex gap-3 text-sm leading-6 text-ink">
-            {positive ? (
-              <Check className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-            ) : (
-              <Minus className="mt-0.5 h-5 w-5 shrink-0 text-navy" />
-            )}
-            {item}
-          </li>
-        ))}
-      </ul>
-    </div>
   );
 }
 
