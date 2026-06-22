@@ -1,14 +1,16 @@
 import type { GenericPageConfig } from "@/components/generic-page";
 
+import { site } from "@/lib/site";
+
 export const pages = {
   cvBuilderUk: {
     title: "UK CV builder",
     description:
-      "Build a UK-ready CV free, then pay GBP 4.99 when you download the final PDF.",
+      `Build a UK-ready CV free, then pay ${site.priceGbp} when you download the final PDF.`,
     label: "CV builder UK",
     heading: "A UK CV builder for finishing one strong CV.",
     intro:
-      "WorkCV gives you a guided structure, clean templates, and a simple one-time download price. Build free, then pay GBP 4.99 when your PDF is ready.",
+      `WorkCV gives you a guided structure, clean templates, and a simple one-time download price. Build free, then pay ${site.priceGbp} when your PDF is ready.`,
     sectionTitle: "Keep the structure focused on what UK employers expect.",
     sectionBody:
       "The standard flow avoids unnecessary personal details and keeps your profile, recent experience, education, and skills easy to scan.",
@@ -40,17 +42,17 @@ export const pages = {
   noSubscription: {
     title: "CV builder with no subscription",
     description:
-      "Build your CV free and pay GBP 4.99 once when you download. No subscription.",
+      `Build your CV free and pay ${site.priceGbp} once when you download. No subscription.`,
     label: "No subscription",
     heading: "Build your CV without a monthly plan.",
     intro:
       "WorkCV is for people who need one strong CV, not another recurring account to remember cancelling.",
     sectionTitle: "Pay once when the CV is ready.",
     sectionBody:
-      "You can work on your CV before paying. The standard flow charges GBP 4.99 only when you download the final PDF.",
+      `You can work on your CV before paying. The standard flow charges ${site.priceGbp} only when you download the final PDF.`,
     points: [
       "Free to build",
-      "GBP 4.99 to download",
+      `${site.priceGbp} to download`,
       "No automatic renewal",
       "Nothing to cancel later",
     ],
@@ -116,13 +118,13 @@ export const pages = {
     label: "MyPerfectCV alternative",
     heading: "A simpler MyPerfectCV alternative for one UK CV.",
     intro:
-      "If you only need one finished CV, WorkCV keeps the model simple: build free, pay GBP 4.99 to download, no subscription.",
+      `If you only need one finished CV, WorkCV keeps the model simple: build free, pay ${site.priceGbp} to download, no subscription.`,
     sectionTitle: "Compare the billing model before you start.",
     sectionBody:
       "Many CV builders use trial pricing that renews. WorkCV is deliberately narrower: one UK CV flow, one clear PDF download price.",
     points: [
       "Free to build",
-      "GBP 4.99 final PDF",
+      `${site.priceGbp} final PDF`,
       "No automatic renewal",
       "No cancellation needed",
     ],
@@ -130,7 +132,7 @@ export const pages = {
   livecareer: {
     title: "LiveCareer alternative UK",
     description:
-      "Compare WorkCV with LiveCareer UK for a one-time GBP 4.99 CV download model.",
+      `Compare WorkCV with LiveCareer UK for a one-time ${site.priceGbp} CV download model.`,
     label: "LiveCareer alternative UK",
     heading: "A LiveCareer alternative without monthly CV billing.",
     intro:
@@ -141,7 +143,7 @@ export const pages = {
     points: [
       "UK-ready CV structure",
       "Build before paying",
-      "GBP 4.99 when downloading",
+      `${site.priceGbp} when downloading`,
       "No recurring billing",
     ],
   },
@@ -152,7 +154,7 @@ export const pages = {
     label: "CVMaker UK alternative",
     heading: "A CVMaker UK alternative with one clear price.",
     intro:
-      "Build your CV free in WorkCV, then pay GBP 4.99 only when you download the final PDF.",
+      `Build your CV free in WorkCV, then pay ${site.priceGbp} only when you download the final PDF.`,
     sectionTitle: "Avoid paying for more platform than you need.",
     sectionBody:
       "WorkCV focuses on a clean UK CV and a finished PDF rather than a larger recurring-plan workflow.",

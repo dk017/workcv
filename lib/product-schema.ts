@@ -34,8 +34,8 @@ export function buildWorkCvProductSchema({ description, url }: WorkCvProductSche
     },
     offers: {
       "@type": "Offer",
-      price: "4.99",
-      priceCurrency: "GBP",
+      price: site.priceAmount.toFixed(2),
+      priceCurrency: site.priceCurrency,
       itemCondition: "https://schema.org/NewCondition",
       availability: "https://schema.org/InStock",
       url,

@@ -22,16 +22,16 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Resume Builder UK No Subscription - £4.99 PDF",
+  title: `Resume Builder UK No Subscription - ${site.price} PDF`,
   description:
-    "Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay £4.99 to unlock your saved CV PDF.",
+    `Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay ${site.price} to unlock your saved CV PDF.`,
   alternates: {
     canonical: "/resume-builder-uk-no-subscription",
   },
   openGraph: {
     title: "Resume Builder UK Without a Subscription - WorkCV",
     description:
-      "Create the document UK employers usually call a CV. Build and preview first, then pay £4.99 to unlock the saved CV with no automatic renewal.",
+      `Create the document UK employers usually call a CV. Build and preview first, then pay ${site.price} to unlock the saved CV with no automatic renewal.`,
     url: "/resume-builder-uk-no-subscription",
   },
 };
@@ -192,7 +192,7 @@ const relatedLinks = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV and resume builder with saved documents, a £4.99 PDF unlock and no monthly subscription in the standard CV flow.",
+    `UK CV and resume builder with saved documents, a ${site.price} PDF unlock and no monthly subscription in the standard CV flow.`,
   url: `${site.url}/resume-builder-uk-no-subscription`,
 });
 

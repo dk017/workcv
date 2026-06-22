@@ -16,7 +16,7 @@ const checkedDate = "13 June 2026";
 export const metadata: Metadata = {
   title: "Zety Alternative UK - No Subscription CV Builder",
   description:
-    "Looking for a Zety alternative in the UK? Compare Zety's trial and renewal pricing with WorkCV's £4.99 PDF download model.",
+    `Looking for a Zety alternative in the UK? Compare Zety's trial and renewal pricing with WorkCV's ${site.price} PDF download model.`,
   alternates: {
     canonical: "/zety-alternative-uk",
   },
@@ -32,7 +32,7 @@ const comparisonRows = [
   ["Entry model", "£2.95 for 14 days", "Free to build"],
   ["Renewal", "£20.95 every 4 weeks", "No monthly renewal"],
   ["Annual option", "£59.40 annual access", "No annual plan needed"],
-  ["PDF download", "Included with paid access", "£4.99 when ready"],
+  ["PDF download", "Included with paid access", `${site.price} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
   ["Cover letters", "Included in Zety tools", "Not included in this version"],
   ["Best fit", "Ongoing CV and cover-letter platform", "One finished UK CV PDF"],
@@ -40,7 +40,7 @@ const comparisonRows = [
 
 const benefits = [
   "Build and preview before paying",
-  "£4.99 PDF download",
+  `${site.price} PDF download`,
   "No monthly CV builder subscription",
   "No automatic renewal",
   "UK-focused CV sections",
@@ -51,7 +51,7 @@ const faqItems = [
   {
     question: "What is a good Zety alternative in the UK?",
     answer:
-      "If you want a CV builder without automatic renewal, WorkCV is a focused UK alternative. You build and preview first, then pay £4.99 when you download the finished CV PDF.",
+      `If you want a CV builder without automatic renewal, WorkCV is a focused UK alternative. You build and preview first, then pay ${site.price} when you download the finished CV PDF.`,
   },
   {
     question: "How is WorkCV different from Zety?",
@@ -125,7 +125,7 @@ export default function ZetyAlternativeUkPage() {
                 "No monthly subscription",
                 "No automatic renewal",
                 "Free to build before paying",
-                "£4.99 PDF download",
+                `${site.price} PDF download`,
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check className="h-5 w-5 shrink-0 text-success" />
@@ -134,7 +134,7 @@ export default function ZetyAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for £4.99</ButtonLink>
+              <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -146,7 +146,7 @@ export default function ZetyAlternativeUkPage() {
               WorkCV at a glance
             </h2>
             <div className="mt-6 font-display text-6xl font-semibold leading-none text-navy">
-              £4.99
+              {site.price}
             </div>
             <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
               when you download your PDF

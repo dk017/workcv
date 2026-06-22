@@ -1,9 +1,15 @@
+const priceAmount = 7.99;
+const priceCurrency = "GBP";
+
 export const site = {
   name: "WorkCV",
   domain: "workcv.co.uk",
   url: "https://workcv.co.uk",
   locale: "en-GB",
-  price: "£4.99",
+  priceAmount,
+  priceCurrency,
+  price: `£${priceAmount.toFixed(2)}`,
+  priceGbp: `${priceCurrency} ${priceAmount.toFixed(2)}`,
   summary:
     "One UK CV. One payment. Nothing to cancel.",
 };

@@ -16,6 +16,7 @@ import {
 import { CvDocument } from "@/components/cv-editor";
 import { NoSubscriptionCtaStrip } from "@/components/marketing";
 import { sampleCv, TemplateId, templates } from "@/lib/editor-data";
+import { site } from "@/lib/site";
 
 const templateDetails: Record<
   TemplateId,
@@ -74,7 +75,7 @@ export function TemplateGallery() {
               changed later inside the editor.
             </p>
             <div className="mt-7 flex flex-wrap gap-3 text-sm font-bold text-navy">
-              {["No photo-first layout", "No date of birth field", "GBP 4.99 PDF download"].map(
+              {["No photo-first layout", "No date of birth field", `${site.priceGbp} PDF download`].map(
                 (item) => (
                   <span
                     key={item}

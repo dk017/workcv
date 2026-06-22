@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { site } from "@/lib/site";
 
 export const runtime = "edge";
-export const alt = "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.";
+export const alt = `WorkCV - One UK CV. ${site.priceGbp}. Nothing to cancel.`;
 export const size = {
   width: 1200,
   height: 630,
@@ -67,7 +67,7 @@ export default function Image() {
               Stop paying monthly for one CV.
             </div>
             <div style={{ fontSize: 34, lineHeight: 1.2, color: "#1a1a1a" }}>
-              Build first. Pay £4.99 when the PDF is ready.
+              Build first. Pay {site.price} when the PDF is ready.
             </div>
           </div>
           <div
@@ -156,7 +156,7 @@ export default function Image() {
                 textAlign: "center",
               }}
             >
-              £4.99 once
+              {site.price} once
             </div>
           </div>
         </div>

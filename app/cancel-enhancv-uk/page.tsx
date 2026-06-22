@@ -345,7 +345,7 @@ export default function CancelEnhancvUkPage() {
               </div>
               {[
                 ["Monthly, quarterly, or semiannual Pro plans", "Free to build"],
-                ["Billed at the start of each period", "GBP 4.99 PDF download"],
+                ["Billed at the start of each period", `${site.priceGbp} PDF download`],
                 ["Cancel from Billing page", "No monthly subscription"],
                 ["AI resume platform", "Focused UK CV builder"],
               ].map(([left, right]) => (
@@ -357,7 +357,7 @@ export default function CancelEnhancvUkPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+            <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
             <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
               See no-subscription details
             </ButtonLink>

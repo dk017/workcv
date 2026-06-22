@@ -24,7 +24,7 @@ const checkedDate = "13 June 2026";
 export const metadata: Metadata = {
   title: "Canva CV Alternative UK - CV Builder for Applications",
   description:
-    "Looking for a Canva CV alternative in the UK? Compare Canva's design-led CV templates with WorkCV's UK CV builder and £4.99 PDF download.",
+    `Looking for a Canva CV alternative in the UK? Compare Canva's design-led CV templates with WorkCV's UK CV builder and ${site.price} PDF download.`,
   alternates: {
     canonical: "/canva-cv-alternative-uk",
   },
@@ -42,7 +42,7 @@ const comparisonRows = [
   ["Starting point", "Choose and edit a design template", "Fill guided UK CV sections"],
   ["Formatting control", "Flexible canvas editing", "Consistent recruiter-readable layout"],
   ["ATS caution", "Depends heavily on template choice and layout", "Clean CV sections by default"],
-  ["Payment model", "Canva Free plus optional paid design plans", "Free to build, £4.99 PDF download"],
+  ["Payment model", "Canva Free plus optional paid design plans", `Free to build, ${site.price} PDF download`],
   ["Best fit", "Creative visual CVs and broader design work", "One practical UK CV PDF"],
 ];
 
@@ -51,7 +51,7 @@ const benefits = [
   "No canvas formatting from scratch",
   "Clean templates for job applications",
   "Build and preview before paying",
-  "£4.99 PDF download",
+  `${site.price} PDF download`,
   "No monthly CV builder subscription",
 ];
 
@@ -73,7 +73,7 @@ const faqItems = [
   {
     question: "What is a good Canva CV alternative in the UK?",
     answer:
-      "If you want a focused UK CV builder rather than a general design tool, WorkCV is a practical alternative. You build and preview your CV first, then pay £4.99 when you download the PDF.",
+      `If you want a focused UK CV builder rather than a general design tool, WorkCV is a practical alternative. You build and preview your CV first, then pay ${site.price} when you download the PDF.`,
   },
   {
     question: "Is Canva good for CVs?",
@@ -147,7 +147,7 @@ export default function CanvaCvAlternativeUkPage() {
                 "Guided UK CV sections",
                 "Clean application templates",
                 "Free to build before paying",
-                "£4.99 PDF download",
+                `${site.price} PDF download`,
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check className="h-5 w-5 shrink-0 text-success" />
@@ -156,7 +156,7 @@ export default function CanvaCvAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for £4.99</ButtonLink>
+              <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -168,7 +168,7 @@ export default function CanvaCvAlternativeUkPage() {
               WorkCV at a glance
             </h2>
             <div className="mt-6 font-display text-6xl font-semibold leading-none text-navy">
-              £4.99
+              {site.price}
             </div>
             <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
               when you download your PDF

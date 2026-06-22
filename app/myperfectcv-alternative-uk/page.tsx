@@ -16,7 +16,7 @@ const checkedDate = "13 June 2026";
 export const metadata: Metadata = {
   title: "Best MyPerfectCV Alternative UK - No Subscription",
   description:
-    "Looking for a MyPerfectCV alternative in the UK? Compare MyPerfectCV's trial-to-renewal pricing with WorkCV's GBP 4.99 PDF download model.",
+    `Looking for a MyPerfectCV alternative in the UK? Compare MyPerfectCV's trial-to-renewal pricing with WorkCV's ${site.priceGbp} PDF download model.`,
   alternates: {
     canonical: "/myperfectcv-alternative-uk",
   },
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
 const comparisonRows = [
   ["Entry model", "GBP 2.95 for 14 days", "Free to build"],
   ["Renewal", "GBP 16.95 every 4 weeks", "No monthly renewal"],
-  ["PDF download", "Included with premium access", "GBP 4.99 when ready"],
+  ["PDF download", "Included with premium access", `${site.priceGbp} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
   ["Cover letters", "Included in premium tools", "Not included in this version"],
   ["Best fit", "Ongoing CV and cover-letter access", "One finished UK CV PDF"],
@@ -39,7 +39,7 @@ const comparisonRows = [
 
 const workCvBenefits = [
   "Build and preview before paying",
-  "GBP 4.99 PDF download",
+  `${site.priceGbp} PDF download`,
   "No monthly CV builder subscription",
   "No automatic renewal",
   "UK-focused CV structure",
@@ -50,7 +50,7 @@ const faqItems = [
   {
     question: "What is a good MyPerfectCV alternative in the UK?",
     answer:
-      "If you want a CV builder without monthly renewal, WorkCV is a focused alternative. You build first and pay GBP 4.99 when you download your finished CV as a PDF.",
+      `If you want a CV builder without monthly renewal, WorkCV is a focused alternative. You build first and pay ${site.priceGbp} when you download your finished CV as a PDF.`,
   },
   {
     question: "How is WorkCV different from MyPerfectCV?",
@@ -124,7 +124,7 @@ export default function MyPerfectCvAlternativeUkPage() {
                 "No monthly subscription",
                 "No automatic renewal",
                 "Free to build before paying",
-                "GBP 4.99 PDF download",
+                `${site.priceGbp} PDF download`,
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check className="h-5 w-5 shrink-0 text-success" />
@@ -133,7 +133,7 @@ export default function MyPerfectCvAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -145,7 +145,7 @@ export default function MyPerfectCvAlternativeUkPage() {
               WorkCV at a glance
             </h2>
             <div className="mt-6 font-display text-6xl font-semibold leading-none text-navy">
-              GBP 4.99
+              {site.priceGbp}
             </div>
             <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
               when you download your PDF

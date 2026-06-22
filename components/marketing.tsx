@@ -311,7 +311,7 @@ export function ProblemComparison() {
 export function ProofSection() {
   const proofPoints = [
     {
-      stat: "£4.99",
+      stat: `${site.price}`,
       title: "shown before the editor",
       body:
         "The price is not saved for the last click. You see the one-time PDF price before you start.",

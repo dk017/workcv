@@ -15,9 +15,9 @@ import {
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "One UK CV. GBP 4.99. Nothing to cancel.",
+  title: `One UK CV. ${site.priceGbp}. Nothing to cancel.`,
   description:
-    "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF. No subscription and no automatic renewal.",
+    `Create your UK CV, preview it, then pay ${site.priceGbp} when you download the final PDF. No subscription and no automatic renewal.`,
 };
 
 const homepageFaqs = [
@@ -55,7 +55,7 @@ export default function HomePage() {
           <div className="min-w-0">
             <h1 className="max-w-[22rem] font-display text-4xl font-semibold leading-[1.02] text-navy sm:max-w-3xl sm:text-5xl md:text-7xl">
               <span className="block">One UK CV.</span>
-              <span className="block">£4.99.</span>
+              <span className="block">{site.price}.</span>
               <span className="block">Nothing to cancel.</span>
             </h1>
             <p className="mt-7 max-w-[22rem] text-lg leading-8 text-muted sm:max-w-2xl sm:text-xl">

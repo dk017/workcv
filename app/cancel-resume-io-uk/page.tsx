@@ -344,7 +344,7 @@ export default function CancelResumeIoUkPage() {
               </div>
               {[
                 ["GBP 2.95 for 7 days", "Free to build"],
-                ["Renews at GBP 20.95 every 4 weeks", "GBP 4.99 PDF download"],
+                ["Renews at GBP 20.95 every 4 weeks", `${site.priceGbp} PDF download`],
                 ["Confirmation email required to cancel", "No monthly subscription"],
                 ["Broad CV and cover-letter tools", "Focused UK CV builder"],
               ].map(([left, right]) => (
@@ -356,7 +356,7 @@ export default function CancelResumeIoUkPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+            <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
             <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
               See no-subscription details
             </ButtonLink>

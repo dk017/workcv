@@ -351,7 +351,7 @@ export default function CancelZetyUkPage() {
               </div>
               {[
                 ["£2.95 for 14 days", "Free to build"],
-                ["Renews at £20.95 every 4 weeks", "£4.99 PDF download"],
+                ["Renews at £20.95 every 4 weeks", `${site.price} PDF download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
               ].map(([left, right]) => (
@@ -363,7 +363,7 @@ export default function CancelZetyUkPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV for £4.99</ButtonLink>
+            <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
             <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
               See no-subscription details
             </ButtonLink>

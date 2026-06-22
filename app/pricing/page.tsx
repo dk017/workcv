@@ -12,16 +12,16 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "CV Builder Pricing UK - GBP 4.99 Once",
+  title: `CV Builder Pricing UK - ${site.priceGbp} Once`,
   description:
-    "Compare UK CV builder costs. WorkCV is GBP 4.99 when you download your PDF, with no monthly subscription or automatic renewal.",
+    `Compare UK CV builder costs. WorkCV is ${site.priceGbp} when you download your PDF, with no monthly subscription or automatic renewal.`,
   alternates: {
     canonical: "/pricing",
   },
   openGraph: {
     title: "CV Builder Pricing UK - WorkCV",
     description:
-      "Build your CV first. Pay GBP 4.99 when you download. Compare WorkCV with UK CV builder trial and renewal pricing.",
+      `Build your CV first. Pay ${site.priceGbp} when you download. Compare WorkCV with UK CV builder trial and renewal pricing.`,
     url: "/pricing",
   },
 };
@@ -64,7 +64,7 @@ const competitors = [
   {
     builder: "WorkCV",
     entry: "Free to build",
-    renewal: "GBP 4.99 when you download",
+    renewal: `${site.priceGbp} when you download`,
     ongoing: "No monthly renewal",
     cancellation: "No",
     source: "/cv-builder-no-subscription-uk",
@@ -76,7 +76,7 @@ const included = [
   "Guided UK CV editor",
   "Clean CV templates",
   "Live preview before paying",
-  "PDF download for GBP 4.99",
+  `PDF download for ${site.priceGbp}`,
   "No monthly CV builder subscription",
   "No automatic renewal",
 ];
@@ -85,7 +85,7 @@ const pricingFaqs = [
   {
     question: "How much does WorkCV cost in the UK?",
     answer:
-      "WorkCV costs GBP 4.99 when you download your final CV as a PDF. You can build and preview your CV before paying.",
+      `WorkCV costs ${site.priceGbp} when you download your final CV as a PDF. You can build and preview your CV before paying.`,
   },
   {
     question: "Is WorkCV a subscription?",
@@ -116,7 +116,7 @@ const pricingFaqs = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder with a GBP 4.99 PDF download price and no monthly subscription in the standard download flow.",
+    `UK CV builder with a ${site.priceGbp} PDF download price and no monthly subscription in the standard download flow.`,
   url: `${site.url}/pricing`,
 });
 
@@ -152,7 +152,7 @@ export default function PricingPage() {
               CV builder pricing UK
             </p>
             <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              GBP 4.99 when your CV is ready.
+              {site.priceGbp} when your CV is ready.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Build your CV first, preview the result, then pay {site.price} to
@@ -173,7 +173,7 @@ export default function PricingPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare prices
               </ButtonLink>
@@ -183,7 +183,7 @@ export default function PricingPage() {
           <div className="rounded-[20px] border-2 border-navy bg-white p-8 shadow-soft">
             <h2 className="font-display text-3xl font-semibold text-navy">WorkCV</h2>
             <div className="mt-6 font-display text-6xl font-semibold leading-none text-navy">
-              GBP 4.99
+              {site.priceGbp}
             </div>
             <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
               one-time PDF download price
@@ -210,7 +210,7 @@ export default function PricingPage() {
       <section className="border-y border-line bg-surface">
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            "GBP 4.99 PDF download",
+            `${site.priceGbp} PDF download`,
             "No monthly plan",
             "No automatic renewal",
             "Nothing to cancel",

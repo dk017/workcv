@@ -21,14 +21,14 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "CV Builder UK Without Subscription - Pay Once",
   description:
-    "Build a UK CV without a monthly subscription. WorkCV lets you build first, then pay GBP 4.99 when you download your CV as a PDF.",
+    `Build a UK CV without a monthly subscription. WorkCV lets you build first, then pay ${site.priceGbp} when you download your CV as a PDF.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
   openGraph: {
     title: "CV Builder UK Without Subscription - WorkCV",
     description:
-      "Build your CV first. Pay GBP 4.99 when you download. No monthly subscription and no automatic renewal.",
+      `Build your CV first. Pay ${site.priceGbp} when you download. No monthly subscription and no automatic renewal.`,
     url: "/cv-builder-no-subscription-uk",
   },
 };
@@ -60,7 +60,7 @@ const comparisonRows = [
   {
     builder: "WorkCV",
     entry: "Free to build",
-    renewal: "GBP 4.99 when you download",
+    renewal: `${site.priceGbp} when you download`,
     annualised: "No monthly renewal",
     source: "/pricing",
     featured: true,
@@ -103,12 +103,12 @@ const faqItems = [
   {
     question: "Is WorkCV a subscription?",
     answer:
-      "No. WorkCV does not use a monthly subscription for the standard CV download flow. You build first and pay GBP 4.99 when you download your final PDF.",
+      `No. WorkCV does not use a monthly subscription for the standard CV download flow. You build first and pay ${site.priceGbp} when you download your final PDF.`,
   },
   {
     question: "How much does WorkCV cost in the UK?",
     answer:
-      "WorkCV costs GBP 4.99 when you download your finished CV as a PDF. You can build your CV before paying.",
+      `WorkCV costs ${site.priceGbp} when you download your finished CV as a PDF. You can build your CV before paying.`,
   },
   {
     question: "Can I build a CV without paying monthly?",
@@ -191,7 +191,7 @@ export default function NoSubscriptionUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare costs
               </ButtonLink>
@@ -428,7 +428,7 @@ export default function NoSubscriptionUkPage() {
         title="Questions about no-subscription CV builders."
       />
       <FinalCta
-        heading="Build free. Pay GBP 4.99 when you download."
+        heading={`Build free. Pay ${site.priceGbp} when you download.`}
         body="No monthly CV builder subscription, no automatic renewal, and no cancellation step after you finish your CV."
         secondaryHref="/pricing"
         secondary="Compare pricing"

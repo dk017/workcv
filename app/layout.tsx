@@ -21,11 +21,11 @@ const fraunces = Fraunces({
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
   title: {
-    default: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+    default: `WorkCV - One UK CV. ${site.priceGbp}. Nothing to cancel.`,
     template: "%s | WorkCV",
   },
   description:
-    "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF. No subscription and no automatic renewal.",
+    `Create your UK CV, preview it, then pay ${site.priceGbp} when you download the final PDF. No subscription and no automatic renewal.`,
   alternates: {
     canonical: "/",
   },
@@ -34,23 +34,23 @@ export const metadata: Metadata = {
     locale: "en_GB",
     url: site.url,
     siteName: site.name,
-    title: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+    title: `WorkCV - One UK CV. ${site.priceGbp}. Nothing to cancel.`,
     description:
-      "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF.",
+      `Create your UK CV, preview it, then pay ${site.priceGbp} when you download the final PDF.`,
     images: [
       {
         url: "/opengraph-image",
         width: 1200,
         height: 630,
-        alt: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+        alt: `WorkCV - One UK CV. ${site.priceGbp}. Nothing to cancel.`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "WorkCV - One UK CV. GBP 4.99. Nothing to cancel.",
+    title: `WorkCV - One UK CV. ${site.priceGbp}. Nothing to cancel.`,
     description:
-      "Create your UK CV, preview it, then pay GBP 4.99 when you download the final PDF.",
+      `Create your UK CV, preview it, then pay ${site.priceGbp} when you download the final PDF.`,
     images: ["/opengraph-image"],
   },
 };

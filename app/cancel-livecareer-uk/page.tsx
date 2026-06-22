@@ -344,7 +344,7 @@ export default function CancelLiveCareerUkPage() {
               </div>
               {[
                 ["GBP 1.95 for 14 days", "Free to build"],
-                ["Renews at GBP 19.85 every 4 weeks", "GBP 4.99 PDF download"],
+                ["Renews at GBP 19.85 every 4 weeks", `${site.priceGbp} PDF download`],
                 ["Cancellation reference needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
               ].map(([left, right]) => (
@@ -356,7 +356,7 @@ export default function CancelLiveCareerUkPage() {
             </div>
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV for GBP 4.99</ButtonLink>
+            <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
             <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
               See no-subscription details
             </ButtonLink>

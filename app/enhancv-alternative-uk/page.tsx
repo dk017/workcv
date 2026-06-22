@@ -24,7 +24,7 @@ const checkedDate = "21 June 2026";
 export const metadata: Metadata = {
   title: "Enhancv Alternative UK - No Subscription CV Builder",
   description:
-    "Compare Enhancv with WorkCV for UK applications. See verified differences in subscriptions, AI tools, cover letters, templates and the £4.99 saved-CV PDF unlock.",
+    `Compare Enhancv with WorkCV for UK applications. See verified differences in subscriptions, AI tools, cover letters, templates and the ${site.price} saved-CV PDF unlock.`,
   alternates: {
     canonical: "/enhancv-alternative-uk",
   },
