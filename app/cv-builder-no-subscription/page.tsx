@@ -1,8 +1,5 @@
-import { GenericMarketingPage, metadataFor } from "@/components/generic-page";
-import { pages } from "@/lib/pages";
+import { permanentRedirect } from "next/navigation";
 
-export const metadata = metadataFor(pages.noSubscription);
-
-export default function Page() {
-  return <GenericMarketingPage config={pages.noSubscription} />;
+export default function LegacyCvBuilderRedirectPage() {
+  permanentRedirect("/cv-builder-no-subscription-uk");
 }

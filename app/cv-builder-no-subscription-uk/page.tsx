@@ -19,14 +19,14 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "CV Builder UK Without Subscription - Pay Once",
+  title: "CV Builder UK and Online CV Maker - Pay Once",
   description:
-    `Build a UK CV without a monthly subscription. WorkCV lets you build first, then pay ${site.priceGbp} when you download your CV as a PDF.`,
+    `Use a professional UK CV builder and online CV maker. Edit and preview your CV, then pay ${site.priceGbp} once for its PDF with no subscription.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
   openGraph: {
-    title: "CV Builder UK Without Subscription - WorkCV",
+    title: "Professional CV Builder UK - WorkCV",
     description:
       `Build your CV first. Pay ${site.priceGbp} when you download. No monthly subscription and no automatic renewal.`,
     url: "/cv-builder-no-subscription-uk",
@@ -88,11 +88,10 @@ const modelSteps = [
 
 const internalLinks = [
   ["Compare CV builder prices", "/pricing"],
-  ["See UK CV templates", "/templates"],
+  ["Editable UK CV templates", "/templates"],
   ["MyPerfectCV alternative UK", "/myperfectcv-alternative"],
   ["CVMaker UK alternative", "/cvmaker-alternative"],
   ["LiveCareer alternative UK", "/livecareer-alternative"],
-  ["UK CV builder", "/cv-builder"],
   ["UK resume builder without subscription", "/resume-builder-uk-no-subscription"],
   ["Student CV template UK", "/student-cv-template"],
   ["CV with no experience", "/cv-with-no-experience"],
@@ -167,15 +166,15 @@ export default function NoSubscriptionUkPage() {
         <div className="container-page grid items-center gap-14 lg:grid-cols-[1.02fr_0.98fr]">
           <div>
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              CV builder UK no subscription
+              Professional CV builder UK · No subscription
             </p>
             <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Build a UK CV without a monthly subscription.
+              A professional UK CV builder, without the subscription.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              WorkCV lets you build your CV first, then pay {site.price} when
-              you download the final PDF. No monthly CV builder plan, no
-              automatic renewal, and no cancellation step later.
+              Use the online CV maker to organise your experience, choose a
+              practical UK template and preview every page. Pay {site.price}{" "}
+              only when this saved CV is ready to download as a PDF.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -191,7 +190,7 @@ export default function NoSubscriptionUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
+              <ButtonLink href="/editor?template=classic&new=1">Build my CV</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare costs
               </ButtonLink>
@@ -306,7 +305,7 @@ export default function NoSubscriptionUkPage() {
             ))}
           </div>
           <div className="mt-10">
-            <ButtonLink href="/editor">Start building my CV</ButtonLink>
+            <ButtonLink href="/editor?template=classic&new=1">Start building my CV</ButtonLink>
           </div>
         </div>
       </section>
@@ -417,7 +416,7 @@ export default function NoSubscriptionUkPage() {
               </div>
             </div>
             <div className="mt-6 shrink-0 sm:mt-0">
-              <ButtonLink href="/editor">Build my CV</ButtonLink>
+              <ButtonLink href="/editor?template=classic&new=1">Build my CV</ButtonLink>
             </div>
           </div>
         </div>
@@ -430,6 +429,8 @@ export default function NoSubscriptionUkPage() {
       <FinalCta
         heading={`Build free. Pay ${site.priceGbp} when you download.`}
         body="No monthly CV builder subscription, no automatic renewal, and no cancellation step after you finish your CV."
+        primaryHref="/editor?template=classic&new=1"
+        primary="Build my CV"
         secondaryHref="/pricing"
         secondary="Compare pricing"
       />

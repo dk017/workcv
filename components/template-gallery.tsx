@@ -1,5 +1,3 @@
-"use client";
-
 import Link from "next/link";
 import {
   ArrowRight,
@@ -30,7 +28,7 @@ const templateDetails: Record<
     bestFor: "Most UK job applications, retail, operations, admin, service roles.",
     structure: "A traditional one-column CV with a centered header and clear section order.",
     guidance: [
-      "Use when you want the safest recruiter-friendly option.",
+      "Use for ATS-sensitive applications when the employer requests a straightforward CV.",
       "Best for reverse-chronological work history.",
       "Strong default when you are unsure which layout to choose.",
     ],
@@ -41,7 +39,7 @@ const templateDetails: Record<
     guidance: [
       "Use when skills and contact details should be easy to scan.",
       "Good for experienced applicants with clear work history.",
-      "Avoid overfilling the sidebar with long text.",
+      "Choose Classic instead when an application specifically asks for a simple single-column format.",
     ],
   },
   compact: {
@@ -50,7 +48,7 @@ const templateDetails: Record<
     guidance: [
       "Use when education, skills, and early experience need equal weight.",
       "Good for limited experience without looking empty.",
-      "Keep bullets short so the layout stays clean.",
+      "Choose Classic instead when an application specifically asks for a simple single-column format.",
     ],
   },
 };
@@ -59,23 +57,38 @@ export function TemplateGallery() {
   return (
     <div className="bg-paper">
       <section className="quiet-grid border-b border-line bg-paper py-20 md:py-24">
-        <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+        <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <div>
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              UK CV templates
+              Editable UK CV templates
             </p>
             <h1 className="font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Choose a CV template built for UK applications.
+              Choose a UK CV template. Then make every line yours.
             </h1>
           </div>
           <div>
             <p className="text-xl leading-8 text-muted">
-              Compare clean, recruiter-friendly layouts before you start. Each
-              template uses the same UK-ready content structure and can be
-              changed later inside the editor.
+              Open any layout in the CV template editor, replace the example
+              with your own evidence and preview every generated page before
+              deciding whether to pay for the PDF.
             </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/editor?template=classic&new=1"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 py-3 text-sm font-bold text-white hover:bg-navy-hover"
+              >
+                Open the CV template editor
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="#template-gallery"
+                className="inline-flex min-h-12 items-center justify-center rounded-md border border-line-strong bg-white px-5 py-3 text-sm font-bold text-navy hover:border-navy"
+              >
+                Compare all three layouts
+              </Link>
+            </div>
             <div className="mt-7 flex flex-wrap gap-3 text-sm font-bold text-navy">
-              {["No photo-first layout", "No date of birth field", `${site.priceGbp} PDF download`].map(
+              {["Edit before paying", "Preview every page", `One-time ${site.price} PDF`].map(
                 (item) => (
                   <span
                     key={item}
@@ -91,7 +104,22 @@ export function TemplateGallery() {
         </div>
       </section>
 
-      <section className="bg-surface py-16 md:py-20">
+      <section className="border-b border-line bg-white">
+        <div className="container-page grid gap-5 py-6 md:grid-cols-3">
+          {[
+            ["1. Choose", "Compare Classic, Modern and Compact using the same sample content."],
+            ["2. Edit", "Replace the wording, add or remove entries and choose your layout; do not submit the sample unchanged."],
+            ["3. Preview", `Inspect the generated pages before choosing whether to unlock this saved CV's PDF for ${site.price}.`],
+          ].map(([title, body]) => (
+            <div key={title} className="border-l-2 border-gold pl-4">
+              <p className="font-bold text-navy">{title}</p>
+              <p className="mt-2 text-sm leading-6 text-muted">{body}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section id="template-gallery" className="scroll-mt-16 bg-surface py-16 md:py-20">
         <div className="container-page">
           <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
             <div>
@@ -103,10 +131,10 @@ export function TemplateGallery() {
               </h2>
             </div>
             <Link
-              href="/editor"
+              href="/editor?template=classic&new=1"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 py-3 text-sm font-bold text-white hover:bg-navy-hover"
             >
-              Start with default
+              Open Classic in editor
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -162,10 +190,10 @@ export function TemplateGallery() {
                   </ul>
 
                   <Link
-                    href={`/editor?template=${template.id}`}
+                    href={`/editor?template=${template.id}&new=1`}
                     className="mt-6 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-5 py-3 text-sm font-bold text-white hover:bg-navy-hover"
                   >
-                    Use this template
+                    Edit this template
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </article>
