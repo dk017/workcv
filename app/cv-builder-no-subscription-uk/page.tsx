@@ -19,16 +19,16 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Professional CV Builder UK and Online CV Maker - Pay Once",
+  title: "CV Builder No Subscription UK - Pay Once",
   description:
-    `Use a professional CV builder for UK jobs. Edit and preview your CV, then pay ${site.priceGbp} once for its PDF with no subscription.`,
+    `Use a UK CV builder without a subscription. Build and preview first, then make a one-time ${site.priceGbp} payment for the PDF. No monthly fee or hidden renewal.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
   openGraph: {
     title: "Professional CV Builder UK - WorkCV",
     description:
-      `Build your CV first. Pay ${site.priceGbp} when you download. No monthly subscription and no automatic renewal.`,
+      `Build your CV first. Pay ${site.priceGbp} when you download. No monthly subscription, no hidden renewal and no automatic renewal.`,
     url: "/cv-builder-no-subscription-uk",
   },
 };
@@ -78,11 +78,11 @@ const modelSteps = [
   },
   {
     title: "Pay when the PDF is ready",
-    body: `The standard WorkCV flow charges ${site.price} when you download the final CV as a PDF.`,
+    body: `The standard WorkCV flow uses a one-time payment of ${site.price} when you download the final CV as a PDF.`,
   },
   {
-    title: "No renewal to manage",
-    body: "There is no monthly CV builder subscription in the standard download flow, so there is no recurring CV-builder plan to cancel.",
+    title: "No monthly fee to manage",
+    body: "There is no monthly CV builder subscription in the standard download flow, so there is no recurring CV-builder plan, renewal date or cancellation step after download.",
   },
 ];
 
@@ -100,7 +100,29 @@ const professionalBuilderSignals = [
   {
     title: "Preview before payment",
     body:
-      "Check the finished PDF pages first, then pay only when the saved CV is ready to download.",
+      "Check the finished PDF pages first, then pay once only when the saved CV is ready to download.",
+  },
+];
+
+const truthChecks = [
+  {
+    title: "Free to build, paid to download",
+    body: `You can write and preview the CV before paying. Downloading the finished PDF costs ${site.priceGbp}.`,
+  },
+  {
+    title: "No subscription, not a free PDF claim",
+    body:
+      "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV PDF purchase.",
+  },
+  {
+    title: "Email-code login, not no-account editing",
+    body:
+      "WorkCV asks you to log in with a one-time email code before editing so your CV can be saved and reopened later.",
+  },
+  {
+    title: "No hidden monthly fees",
+    body:
+      "The standard WorkCV flow shows the one-time PDF price upfront. We do not start a recurring CV builder payment in the background.",
   },
 ];
 
@@ -134,7 +156,22 @@ const faqItems = [
   {
     question: "Can I build a CV without paying monthly?",
     answer:
-      "Yes. WorkCV is designed for people who want one finished UK CV without a recurring monthly CV builder plan.",
+      "Yes. WorkCV is designed for people who want one finished UK CV without a recurring monthly CV builder plan, monthly fee or hidden renewal.",
+  },
+  {
+    question: "Is WorkCV a pay-once CV builder?",
+    answer:
+      `Yes. In the standard WorkCV flow, you build and preview first, then make a one-time ${site.priceGbp} payment when you download the finished PDF.`,
+  },
+  {
+    question: "Are there hidden fees or automatic renewals?",
+    answer:
+      "No. WorkCV does not start a monthly CV builder subscription, hidden renewal or automatic renewal in the standard PDF download flow.",
+  },
+  {
+    question: "Can I use WorkCV without an account or sign up?",
+    answer:
+      "No. WorkCV uses email-code login before the editor so your CV can be saved and reopened. There is no password to remember, but it is not a no-account CV builder.",
   },
   {
     question: "Why do many CV builders use subscriptions?",
@@ -144,7 +181,7 @@ const faqItems = [
   {
     question: "Is there a completely free CV builder in the UK?",
     answer:
-      "Yes, some organisations offer free CV tools. WorkCV is different: it is a paid PDF download product with a clear one-time download price and no monthly CV builder subscription.",
+      "Yes, some organisations offer free CV tools. WorkCV is different: it is free to build and preview, then paid when you download the PDF, with a clear one-time download price and no monthly CV builder subscription.",
   },
   {
     question: "Does WorkCV follow UK CV expectations?",
@@ -155,7 +192,7 @@ const faqItems = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder with a one-time PDF download price and no monthly subscription in the standard download flow.",
+    "UK CV builder with a one-time PDF download price, no monthly fee, no hidden renewal and no subscription in the standard download flow.",
   url: `${site.url}/cv-builder-no-subscription-uk`,
 });
 
@@ -195,16 +232,16 @@ export default function NoSubscriptionUkPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Use the professional CV builder to organise your experience,
-              choose a practical UK template and preview every page. Pay{" "}
-              {site.price} only when this saved CV is ready to download as a
-              PDF.
+              choose a practical UK template and preview every page. Pay once
+              only when this saved CV is ready to download as a PDF. No monthly
+              fee, no hidden renewal and no subscription to cancel.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
                 "Free to build before paying",
-                `${site.price} PDF download`,
+                `One-time ${site.price} PDF download`,
                 "No automatic renewal",
-                "Built for UK CV expectations",
+                "No hidden monthly fees",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check className="h-5 w-5 shrink-0 text-success" />
@@ -227,9 +264,9 @@ export default function NoSubscriptionUkPage() {
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Pay once per PDF download",
-            "No monthly CV plan",
+            "No monthly fee",
             "No automatic renewal",
-            "Prices in GBP",
+            "No hidden renewal",
           ].map((item) => (
             <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
               <ShieldCheck className="h-5 w-5 shrink-0 text-success" />
@@ -364,6 +401,36 @@ export default function NoSubscriptionUkPage() {
 
       <section className="bg-surface py-24">
         <div className="container-page">
+          <SectionLabel>No hidden-fee wording</SectionLabel>
+          <div className="grid gap-10 lg:grid-cols-[0.82fr_1.18fr]">
+            <div>
+              <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
+                What “CV builder without subscription” means here.
+              </h2>
+              <p className="mt-6 text-lg leading-8 text-muted">
+                People search for no-subscription CV builders because they do
+                not want a cheap trial that turns into a monthly fee. WorkCV is
+                direct about the tradeoff: you need an email-code login so the
+                CV can be saved, and you pay once only if you download the PDF.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {truthChecks.map((item) => (
+                <article key={item.title} className="rounded-xl border border-line bg-white p-6">
+                  <ShieldCheck className="h-6 w-6 text-success" />
+                  <h3 className="mt-4 font-display text-2xl font-semibold text-navy">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-muted">{item.body}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-surface py-24">
+        <div className="container-page">
           <SectionLabel>Professional CV builder</SectionLabel>
           <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
             <div>
@@ -480,7 +547,7 @@ export default function NoSubscriptionUkPage() {
       />
       <FinalCta
         heading={`Build free. Pay ${site.priceGbp} when you download.`}
-        body="No monthly CV builder subscription, no automatic renewal, and no cancellation step after you finish your CV."
+        body="No monthly CV builder subscription, no hidden renewal, no automatic renewal, and no cancellation step after you finish your CV."
         primaryHref="/editor?template=classic&new=1"
         primary="Build my CV"
         secondaryHref="/pricing"

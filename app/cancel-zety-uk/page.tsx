@@ -289,7 +289,7 @@ export default function CancelZetyUkPage() {
           <div>
             <SectionLabel>If payments continue</SectionLabel>
             <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
-              Keep proof and use your card provider if needed.
+              Zety charging me after cancellation: keep proof and act quickly.
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted">
               If a recurring card payment continues after cancellation, FCA

@@ -300,7 +300,7 @@ export default function CancelMyPerfectCvUkPage() {
           <div>
             <SectionLabel>If payments continue</SectionLabel>
             <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
-              Know the UK recurring card payment fallback.
+              MyPerfectCV charging me after cancellation: what to check.
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted">
               If you paid by debit or credit card and cannot stop a recurring
