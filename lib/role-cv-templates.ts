@@ -2,6 +2,9 @@ import type { CvData, TemplateId } from "@/lib/editor-data";
 
 export type RoleTemplateId =
   | "general"
+  | "customer-service"
+  | "engineer"
+  | "driver"
   | "nurse"
   | "teacher"
   | "warehouse"
@@ -376,8 +379,145 @@ const generalCv: CvData = {
   ],
 };
 
+const customerServiceCv: CvData = {
+  ...generalCv,
+  fullName: "Emily Thompson",
+  targetRole: "Customer Service Adviser",
+  profile:
+    "Customer service adviser with three years of experience handling retail, telephone and email enquiries in busy UK teams. Confident resolving complaints, keeping CRM records accurate, explaining next steps clearly and protecting customer information. Known for calm communication, reliable follow-through and helping customers avoid repeat contact.",
+  skills:
+    "Customer enquiry handling\nComplaint resolution\nCRM record accuracy\nTelephone and email support\nRetail and order queries\nRefunds and returns process\nMicrosoft 365\nCalm communication under pressure",
+  experience: generalCv.experience.map((item) => ({
+    ...item,
+    id: `customer-service-${item.id}`,
+  })),
+  education: generalCv.education.map((item) => ({
+    ...item,
+    id: `customer-service-${item.id}`,
+  })),
+};
+
+const engineerCv: CvData = {
+  template: "classic",
+  fullName: "Thomas Walker",
+  targetRole: "Mechanical Engineer",
+  email: "thomas.walker@email.co.uk",
+  phone: "07123 456 789",
+  location: "Bristol, UK",
+  linkedin: "linkedin.com/in/thomaswalker",
+  profile:
+    "Mechanical engineer with experience supporting design, testing and continuous-improvement work in manufacturing environments. Confident producing technical documentation, using CAD, analysing root causes and working with production, quality and maintenance colleagues to improve reliability. Focused on safe, practical engineering decisions that can be explained clearly to technical and non-technical stakeholders.",
+  skills:
+    "Mechanical design support\nCAD drawings and model updates\nRoot cause analysis\nManufacturing process improvement\nTechnical documentation\nRisk assessment and safe systems\nSupplier and production liaison\nExcel analysis and reporting",
+  experience: [
+    {
+      id: "engineer-exp-1",
+      role: "Mechanical Engineer",
+      company: "Bristol Precision Components",
+      location: "Bristol",
+      start: "Apr 2024",
+      end: "Present",
+      bullets:
+        "Support design updates for mechanical assemblies, checking drawings, tolerances and manufacturing constraints before release.\nInvestigate recurring production issues with quality and maintenance colleagues, documenting root causes, corrective actions and follow-up checks.\nCreate test records, inspection notes and change-control documentation so decisions are traceable for audits and customer reviews.\nWork with suppliers and production teams to clarify technical requirements, reduce rework and keep improvement actions moving.",
+    },
+    {
+      id: "engineer-exp-2",
+      role: "Graduate Engineering Trainee",
+      company: "South West Manufacturing Group",
+      location: "Bath",
+      start: "Sep 2022",
+      end: "Mar 2024",
+      bullets:
+        "Rotated through design, production, quality and maintenance teams, building practical understanding of manufacturing constraints and safety expectations.\nUpdated CAD models and assembly drawings under senior engineer review, maintaining revision notes and checking part numbers carefully.\nAnalysed downtime and defect data in Excel, summarising trends for weekly improvement meetings.",
+    },
+  ],
+  education: [
+    {
+      id: "engineer-edu-1",
+      qualification: "BEng Mechanical Engineering",
+      institution: "University of Bath",
+      location: "Bath",
+      start: "2019",
+      end: "2022",
+      details:
+        "Relevant study included design, materials, thermodynamics, manufacturing systems, engineering maths and a final-year design project.",
+    },
+    {
+      id: "engineer-edu-2",
+      qualification: "Training: CAD, Risk Assessment, Lean Awareness",
+      institution: "Employer Training",
+      location: "UK",
+      start: "2023",
+      end: "2026",
+      details:
+        "Replace with accurate discipline-specific tools, safety training, professional registration progress or certifications you actually hold.",
+    },
+  ],
+};
+
+const driverCv: CvData = {
+  template: "classic",
+  fullName: "James Wilson",
+  targetRole: "Delivery Driver",
+  email: "james.wilson@email.co.uk",
+  phone: "07123 456 789",
+  location: "Sheffield, UK",
+  linkedin: "",
+  profile:
+    "Reliable delivery driver with experience completing multi-drop routes, checking parcels, keeping customers updated and following safe driving and manual handling procedures. Confident using route-planning apps, handheld scanners and delivery records. Known for punctual starts, calm customer communication and careful vehicle checks.",
+  skills:
+    "Full UK driving licence\nMulti-drop deliveries\nRoute planning apps\nHandheld scanners and POD records\nVehicle checks and defect reporting\nSafe manual handling\nCustomer communication\nTimekeeping and reliability",
+  experience: [
+    {
+      id: "driver-exp-1",
+      role: "Delivery Driver",
+      company: "Yorkshire Home Deliveries",
+      location: "Sheffield",
+      start: "May 2024",
+      end: "Present",
+      bullets:
+        "Complete multi-drop delivery routes across South Yorkshire, checking parcels, addresses and delivery instructions before leaving the depot.\nUse handheld scanners to record proof of delivery, failed attempts and customer notes accurately at each stop.\nCarry out basic vehicle checks before shifts and report defects, delays or safety concerns promptly to the transport coordinator.\nCommunicate politely with customers about access issues, delivery windows and next steps when a delivery cannot be completed.",
+    },
+    {
+      id: "driver-exp-2",
+      role: "Warehouse and Driver Assistant",
+      company: "North Sheffield Furniture",
+      location: "Sheffield",
+      start: "Sep 2022",
+      end: "Apr 2024",
+      bullets:
+        "Loaded and secured goods for local deliveries, checking labels, route order and fragile-item handling requirements.\nSupported two-person deliveries, safe lifting, customer handovers and return paperwork.\nHelped the warehouse team with goods-in, stock checks and dispatch during quieter delivery periods.",
+    },
+  ],
+  education: [
+    {
+      id: "driver-edu-1",
+      qualification: "GCSEs including English and Maths",
+      institution: "Sheffield Community School",
+      location: "Sheffield",
+      start: "2016",
+      end: "2021",
+      details:
+        "Include relevant licences, CPC, forklift, first aid, food delivery or logistics training where accurate.",
+    },
+    {
+      id: "driver-edu-2",
+      qualification: "Training: Manual Handling, Vehicle Checks, Customer Delivery Process",
+      institution: "Employer Training",
+      location: "UK",
+      start: "2023",
+      end: "2026",
+      details:
+        "Replace with current licence categories, Driver CPC, tachograph, ADR or other role-specific training you actually hold.",
+    },
+  ],
+};
+
 export function parseRoleTemplate(value: string | null): RoleTemplateId | undefined {
   return value === "general" ||
+    value === "customer-service" ||
+    value === "engineer" ||
+    value === "driver" ||
     value === "nurse" ||
     value === "teacher" ||
     value === "warehouse" ||
@@ -391,6 +531,12 @@ export function getRoleCvTemplate(role: RoleTemplateId, template?: TemplateId): 
   const source =
     role === "general"
       ? generalCv
+      : role === "customer-service"
+      ? customerServiceCv
+      : role === "engineer"
+      ? engineerCv
+      : role === "driver"
+      ? driverCv
       : role === "teacher"
       ? teacherCv
       : role === "warehouse"

@@ -19,9 +19,9 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "CV Builder UK and Online CV Maker - Pay Once",
+  title: "Professional CV Builder UK and Online CV Maker - Pay Once",
   description:
-    `Use a professional UK CV builder and online CV maker. Edit and preview your CV, then pay ${site.priceGbp} once for its PDF with no subscription.`,
+    `Use a professional CV builder for UK jobs. Edit and preview your CV, then pay ${site.priceGbp} once for its PDF with no subscription.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
@@ -86,9 +86,31 @@ const modelSteps = [
   },
 ];
 
+const professionalBuilderSignals = [
+  {
+    title: "Professional structure",
+    body:
+      "Start from a clear UK CV layout with familiar headings, readable spacing and a recruiter-friendly order.",
+  },
+  {
+    title: "Evidence-led writing",
+    body:
+      "Use the editor to turn duties into specific examples of customers, systems, responsibilities and outcomes.",
+  },
+  {
+    title: "Preview before payment",
+    body:
+      "Check the finished PDF pages first, then pay only when the saved CV is ready to download.",
+  },
+];
+
 const internalLinks = [
   ["Compare CV builder prices", "/pricing"],
   ["Editable UK CV templates", "/templates"],
+  ["Customer service CV template", "/cv-template-customer-service-uk"],
+  ["Engineer CV template", "/cv-template-engineer-uk"],
+  ["Driver CV template", "/cv-template-driver-uk"],
+  ["UK CV examples", "/cv-examples-uk"],
   ["MyPerfectCV alternative UK", "/myperfectcv-alternative"],
   ["CVMaker UK alternative", "/cvmaker-alternative"],
   ["LiveCareer alternative UK", "/livecareer-alternative"],
@@ -172,9 +194,10 @@ export default function NoSubscriptionUkPage() {
               A professional UK CV builder, without the subscription.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Use the online CV maker to organise your experience, choose a
-              practical UK template and preview every page. Pay {site.price}{" "}
-              only when this saved CV is ready to download as a PDF.
+              Use the professional CV builder to organise your experience,
+              choose a practical UK template and preview every page. Pay{" "}
+              {site.price} only when this saved CV is ready to download as a
+              PDF.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -335,6 +358,35 @@ export default function NoSubscriptionUkPage() {
                 <p className="mt-3 text-sm leading-6 text-muted">{step.body}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-surface py-24">
+        <div className="container-page">
+          <SectionLabel>Professional CV builder</SectionLabel>
+          <div className="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
+            <div>
+              <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
+                A professional CV is not just a nicer-looking document.
+              </h2>
+              <p className="mt-6 text-lg leading-8 text-muted">
+                It should help a recruiter find your fit quickly, understand
+                what you have actually done and trust that the details are
+                accurate. WorkCV keeps the builder focused on those basics
+                instead of locking one CV behind a recurring plan.
+              </p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {professionalBuilderSignals.map((item) => (
+                <article key={item.title} className="rounded-xl border border-line bg-white p-5">
+                  <h3 className="font-display text-2xl font-semibold text-navy">
+                    {item.title}
+                  </h3>
+                  <p className="mt-3 text-sm leading-6 text-muted">{item.body}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </section>
