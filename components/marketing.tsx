@@ -44,19 +44,51 @@ export function Header() {
 export function Footer({ line = site.summary }: { line?: string }) {
   return (
     <footer className="border-t border-line bg-surface">
-      <div className="container-page flex flex-col gap-6 py-10 md:flex-row md:items-center md:justify-between">
-        <p className="max-w-2xl font-display text-2xl font-semibold leading-tight text-navy">
-          {line}
-        </p>
-        <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
-          <Link href="/pricing">Pricing</Link>
-          <Link href="/templates">Templates</Link>
-          <Link href="/how-to-write-a-cv-uk">CV guide</Link>
-          <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
-          <Link href="/contact">Contact</Link>
-          <Link href="/privacy">Privacy</Link>
-          <Link href="/terms">Terms</Link>
-          <Link href="/refund-policy">Refunds</Link>
+      <div className="container-page flex flex-col gap-8 py-10">
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <p className="max-w-2xl font-display text-2xl font-semibold leading-tight text-navy">
+            {line}
+          </p>
+          <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
+            <Link href="/pricing">Pricing</Link>
+            <Link href="/templates">Templates</Link>
+            <Link href="/how-to-write-a-cv-uk">CV guide</Link>
+            <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
+            <Link href="/contact">Contact</Link>
+            <Link href="/privacy">Privacy</Link>
+            <Link href="/terms">Terms</Link>
+            <Link href="/refund-policy">Refunds</Link>
+          </div>
+        </div>
+        <div className="flex flex-wrap items-center gap-4">
+          <a
+            href="https://dang.ai"
+            target="_blank"
+            rel="dofollow noopener"
+            className="inline-block no-underline"
+            aria-label="Verified on DANG"
+          >
+            <img
+              src="https://assets.dang.ai/badges/dang-verified-dark.png"
+              alt="Verified on DANG!"
+              width={260}
+              height={94}
+              className="block h-auto max-w-full border-0"
+            />
+          </a>
+          <a
+            href="https://www.scrolllaunch.com/products/workcv?ref=badge"
+            target="_blank"
+            rel="noopener"
+            className="inline-block"
+            aria-label="WorkCV featured on ScrollLaunch"
+          >
+            <img
+              src="https://www.scrolllaunch.com/api/badge/workcv?variant=launched&theme=light"
+              alt="WorkCV - Featured on ScrollLaunch"
+              className="block h-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>

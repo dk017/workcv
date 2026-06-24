@@ -67,7 +67,7 @@ export default function Image() {
               Stop paying monthly for one CV.
             </div>
             <div style={{ fontSize: 34, lineHeight: 1.2, color: "#1a1a1a" }}>
-              Build first. Pay {site.price} when the PDF is ready.
+              {`Build first. Pay ${site.price} when the PDF is ready.`}
             </div>
           </div>
           <div
@@ -147,16 +147,18 @@ export default function Image() {
             <div
               style={{
                 marginTop: "auto",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
                 background: "#f5e6c0",
                 color: "#0f2942",
                 borderRadius: 12,
                 padding: "16px 18px",
                 fontSize: 28,
                 fontWeight: 900,
-                textAlign: "center",
               }}
             >
-              {site.price} once
+              {`${site.price} once`}
             </div>
           </div>
         </div>
