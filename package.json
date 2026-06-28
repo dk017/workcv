@@ -9,7 +9,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test:ats": "node --no-warnings --test --experimental-strip-types tests/ats-keyword-checker.test.ts",
+    "test:tools": "node --no-warnings --test --experimental-strip-types tests/*.test.ts"
   },
   "dependencies": {
     "@napi-rs/canvas": "^1.0.0",
