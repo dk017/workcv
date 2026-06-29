@@ -59,6 +59,7 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <Link href="/tools/personal-statement-generator">Statement generator</Link>
             <Link href="/tools/notice-period-calculator">Notice calculator</Link>
             <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
+            <Link href="/cv-builder-scams-uk">CV builder charges</Link>
             <Link href="/contact">Contact</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>

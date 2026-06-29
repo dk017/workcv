@@ -5,6 +5,7 @@ import { site } from "@/lib/site";
 const routes = [
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.95, changeFrequency: "weekly" },
+  { path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-29" },
   { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-06-22" },
   { path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },
   { path: "/resume-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },

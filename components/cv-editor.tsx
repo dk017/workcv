@@ -345,7 +345,6 @@ export function CvEditor() {
 
   const applyImportedCv = (importedCv: CvData) => {
     setCv(importedCv);
-    setPdfUnlocked(false);
     setActiveTab("profile");
     setImportOpen(false);
     setSaveState("Saving imported CV...");
@@ -417,6 +416,17 @@ export function CvEditor() {
               Download CV
             </button>
           </div>
+        </div>
+      </section>
+
+      <section className="border-b border-line bg-greensoft">
+        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-start gap-3 py-4 sm:w-[min(1540px,calc(100%-48px))]">
+          <Check className="mt-0.5 h-5 w-5 shrink-0 text-success" />
+          <p className="text-sm font-bold leading-6 text-navy">
+            {pdfUnlocked
+              ? "This saved CV is unlocked. Edit it anytime and download the updated PDF without paying again."
+              : `Your work is saved. Pay ${site.price} once to unlock this saved CV; later edits and PDF downloads stay unlocked.`}
+          </p>
         </div>
       </section>
 
@@ -905,10 +915,10 @@ function DownloadModal({
           <ul className="mt-5 space-y-3 text-sm font-bold text-navy">
             {[
               "PDF access for this saved CV",
+              "Future edits and PDF downloads for this saved CV",
               "Purchase confirmation by email",
               "No subscription",
               "No automatic renewal",
-              "Payment unlocks this saved CV",
             ].map((item) => (
               <li key={item} className="flex gap-2">
                 <Check className="h-5 w-5 text-success" />

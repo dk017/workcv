@@ -42,7 +42,7 @@ const homepageFaqs = [
   {
     question: "Can I edit my CV later?",
     answer:
-      "Yes. The product flow is designed so you can return to the same CV, update it, and work on it again later.",
+      "Yes. Return to the same saved CV, edit it, and download the updated PDF without paying again. A separate new CV has its own one-time unlock.",
   },
 ];
 
@@ -66,9 +66,9 @@ export default function HomePage() {
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-3">
               {[
-                `Pay ${site.price} once — no monthly subscription`,
+                `Pay ${site.price} once for this saved CV`,
                 "Build and preview before paying",
-                "Download as soon as payment is confirmed",
+                "Edit and redownload without paying again",
               ].map(
                 (item) => (
                   <div key={item} className="flex items-center gap-2">
@@ -92,6 +92,31 @@ export default function HomePage() {
 
       <TrustStrip />
       <TransformationSection />
+
+      <section className="border-y border-line bg-surface py-20">
+        <div className="container-page grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
+          <div>
+            <SectionLabel>Edit your CV anytime</SectionLabel>
+            <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
+              One payment keeps this saved CV unlocked.
+            </h2>
+          </div>
+          <div>
+            <p className="text-lg leading-8 text-muted">
+              Jobs change and your CV should change with them. After you unlock
+              a saved CV, return to it, update your experience or skills, and
+              download the revised PDF without paying again. A separate new CV
+              has its own one-time unlock.
+            </p>
+            <Link
+              href="/pricing"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
+            >
+              See the no-hidden-fees guarantee
+            </Link>
+          </div>
+        </div>
+      </section>
 
       <section className="bg-paper py-24">
         <div className="container-page">

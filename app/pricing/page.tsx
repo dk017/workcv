@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   },
 };
 
-const checkedDate = "12 June 2026";
+const checkedDate = "29 June 2026";
 
 const competitors = [
   {
@@ -77,6 +77,7 @@ const included = [
   "Clean CV templates",
   "Live preview before paying",
   `PDF download for ${site.priceGbp}`,
+  "Edit and redownload this saved CV without paying again",
   "No monthly CV builder subscription",
   "No automatic renewal",
 ];
@@ -100,12 +101,12 @@ const pricingFaqs = [
   {
     question: "How much does MyPerfectCV cost?",
     answer:
-      "On its official pricing page checked 12 June 2026, MyPerfectCV listed a 14-day premium plan at GBP 2.95 that automatically renews at GBP 16.95 every 4 weeks.",
+      "On its official pricing page checked 29 June 2026, MyPerfectCV listed a 14-day premium plan at GBP 2.95 that automatically renews at GBP 16.95 every 4 weeks.",
   },
   {
     question: "How much does Resume.io cost in the UK?",
     answer:
-      "On its UK pricing page checked 12 June 2026, Resume.io listed a 7-day trial at GBP 2.95 that auto-renews to GBP 20.95 billed every 4 weeks.",
+      "On its UK pricing page checked 29 June 2026, Resume.io listed a 7-day trial at GBP 2.95 that auto-renews to GBP 20.95 billed every 4 weeks.",
   },
   {
     question: "Do I need to pay monthly for a CV builder?",
@@ -223,6 +224,46 @@ export default function PricingPage() {
         </div>
       </section>
 
+      <section className="bg-navy py-20 text-white">
+        <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-gold">
+              No hidden fees guarantee
+            </p>
+            <h2 className="mt-4 font-display text-4xl font-semibold md:text-5xl">
+              The price you see is the price you pay.
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
+              WorkCV charges {site.price} once to unlock this saved CV. There
+              is no discounted trial, subscription conversion, automatic
+              renewal, or cancellation task. Return to the same CV, edit it,
+              and download the updated PDF without another payment.
+            </p>
+            <Link
+              href="/cv-builder-scams-uk"
+              className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-white underline decoration-white/40 underline-offset-4"
+            >
+              How CV builder trial renewals work
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid gap-px overflow-hidden rounded-xl border border-white/15 bg-white/15 sm:grid-cols-2">
+            {[
+              ["Build first", "Write and preview your CV before paying."],
+              ["Pay once", `${site.price} unlocks this saved CV.`],
+              ["Keep editing", "Later edits and downloads stay unlocked."],
+              ["No renewal", "We do not start a recurring card payment."],
+            ].map(([title, body]) => (
+              <div key={title} className="bg-navy p-6">
+                <Check className="h-5 w-5 text-gold" />
+                <h3 className="mt-4 text-lg font-bold">{title}</h3>
+                <p className="mt-2 leading-7 text-white/70">{body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Compare pricing</SectionLabel>
@@ -233,8 +274,10 @@ export default function PricingPage() {
               </h2>
               <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
                 Several UK CV builders advertise a low trial price, then renew
-                every month or every 4 weeks unless cancelled. WorkCV uses a
-                narrower model: build the CV, pay once for the PDF, and move on.
+                every month or every 4 weeks unless cancelled. Current official
+                examples include GBP 1.95 for 14 days followed by GBP 19.85
+                every 4 weeks, and GBP 2.95 for 14 days followed by GBP 16.95
+                every 4 weeks. WorkCV uses a narrower one-time model.
               </p>
             </div>
             <div className="rounded-xl border border-line bg-paper p-5">
