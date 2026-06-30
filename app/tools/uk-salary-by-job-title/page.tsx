@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { BarChart3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { UkSalaryChecker } from "@/components/uk-salary-checker";
@@ -220,8 +221,27 @@ export default function UkSalaryByJobTitlePage() {
         </div>
       </section>
 
+      <section className="border-y border-line bg-[#edf4f8] py-14">
+        <div className="container-page grid gap-6 sm:grid-cols-[1fr_auto] sm:items-center">
+          <div>
+            <h2 className="font-display text-3xl font-semibold text-navy">
+              Found the gross salary? Calculate what reaches your bank.
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-muted">
+              Use current 2026/27 Income Tax, National Insurance, pension and
+              student-loan thresholds.
+            </p>
+          </div>
+          <Link
+            href="/tools/salary-calculator"
+            className="inline-flex min-h-12 items-center justify-center rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover"
+          >
+            Calculate take-home pay
+          </Link>
+        </div>
+      </section>
+
       <FaqSection faqs={faqItems} title="UK salary benchmark questions." />
     </>
   );
 }
-

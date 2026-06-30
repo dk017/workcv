@@ -131,10 +131,10 @@ const mistakes = [
 ];
 
 const relatedLinks = [
+  ["UK take-home pay calculator", "/tools/salary-calculator"],
   ["CV with no experience UK", "/cv-no-experience-uk"],
   ["Student CV template", "/student-cv-template"],
   ["School leaver CV example", "/school-leaver-cv-example"],
-  ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
   ["Pricing", "/pricing"],
 ];
 

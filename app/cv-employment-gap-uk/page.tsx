@@ -118,10 +118,10 @@ const mistakes = [
 ];
 
 const relatedLinks = [
+  ["Redundancy pay calculator", "/tools/redundancy-pay-calculator"],
   ["Return to work CV UK", "/return-to-work-cv-uk"],
   ["Career change CV UK", "/career-change-cv-uk"],
   ["CV with no experience UK", "/cv-no-experience-uk"],
-  ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
   ["Pricing", "/pricing"],
 ];
 
