@@ -114,6 +114,23 @@ test("rejects model evidence that is not an exact CV snippet", () => {
   assert.equal(result.requirements[0].cvEvidence, null);
 });
 
+test("accepts faithful evidence with punctuation-only differences", () => {
+  const result = scoreCvFit(input, {
+    ...validAiOutput,
+    requirements: [
+      {
+        ...validAiOutput.requirements[0],
+        cvEvidence: "Manage 45 customer queries per day — by phone and email",
+      },
+      validAiOutput.requirements[1],
+      validAiOutput.requirements[2],
+    ],
+  });
+
+  assert.equal(result.requirements[0].status, "supported");
+  assert.ok(result.requirements[0].cvEvidence);
+});
+
 test("removes vague-phrase findings that are not quoted from the CV", () => {
   const result = scoreCvFit(input, {
     ...validAiOutput,

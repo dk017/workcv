@@ -124,19 +124,42 @@ function normaliseForEvidence(value: string) {
   return value
     .toLocaleLowerCase("en-GB")
     .replace(/[’‘]/g, "'")
+    .replace(/[^a-z0-9£%']+/g, " ")
     .replace(/\s+/g, " ")
     .trim();
 }
 
 function exactSourceEvidence(source: string, evidence: string | null) {
   if (!evidence) return false;
-  return normaliseForEvidence(source).includes(normaliseForEvidence(evidence));
+  const sourceTokens = normaliseForEvidence(source).split(" ").filter(Boolean);
+  const evidenceTokens = normaliseForEvidence(evidence).split(" ").filter(Boolean);
+  if (evidenceTokens.length < 3) return false;
+
+  const normalisedSource = sourceTokens.join(" ");
+  const normalisedEvidence = evidenceTokens.join(" ");
+  if (normalisedSource.includes(normalisedEvidence)) return true;
+
+  const sourceNumbers = new Set(sourceTokens.filter((token) => /\d/.test(token)));
+  if (
+    evidenceTokens.some((token) => /\d/.test(token) && !sourceNumbers.has(token))
+  ) {
+    return false;
+  }
+
+  const windowSize = Math.min(sourceTokens.length, evidenceTokens.length + 8);
+  const requiredMatches = Math.ceil(evidenceTokens.length * 0.8);
+  for (let index = 0; index <= sourceTokens.length - windowSize; index += 1) {
+    const window = new Set(sourceTokens.slice(index, index + windowSize));
+    const matches = evidenceTokens.filter((token) => window.has(token)).length;
+    if (matches >= requiredMatches) return true;
+  }
+  return false;
 }
 
 function countQuantifiedEvidence(value: string) {
   return (
     value.match(
-      /(?:£\s?\d[\d,.]*|\b\d+(?:[.,]\d+)?\s?(?:%|per cent|people|customers|cases|projects|days|weeks|months|years|hours|minutes)\b)/gi,
+      /(?:£\s?\d[\d,.]*|\b\d+(?:[.,]\d+)?\s?(?:%|per cent|people|customers?|customer queries|queries|cases|projects|days|weeks|months|years|hours|minutes)\b)/gi,
     )?.length ?? 0
   );
 }
