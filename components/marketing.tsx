@@ -98,6 +98,20 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-auto max-w-full border-0"
             />
           </a>
+          <a
+            href="https://mediapronet.com/?utm_source=workcv.co.uk&utm_medium=badge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV promoted on MEDIAPRONET"
+          >
+            <img
+              src="https://mediapronet.com/api/badge?style=classic"
+              alt="Promoted on MEDIAPRONET"
+              height={54}
+              className="block h-[54px] w-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
