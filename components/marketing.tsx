@@ -112,6 +112,20 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-[54px] w-auto max-w-full border-0"
             />
           </a>
+          <a
+            href="https://sitepatent.com/?utm_source=workcv.co.uk&utm_medium=badge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV promoted on SitePatent"
+          >
+            <img
+              src="https://sitepatent.com/api/badge?style=classic"
+              alt="Promoted on SitePatent"
+              height={54}
+              className="block h-[54px] w-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
