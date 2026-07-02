@@ -32,7 +32,9 @@ function isValidTemplate(value: unknown): value is TemplateId {
 function isLegacySampleCv(input: unknown): boolean {
   if (!input || typeof input !== "object") return false;
   const source = input as Partial<CvData>;
-  const primitiveKeys: Array<keyof Omit<CvData, "template" | "experience" | "education">> = [
+  const primitiveKeys: Array<
+    keyof Omit<CvData, "template" | "experience" | "education" | "targeting">
+  > = [
     "fullName",
     "targetRole",
     "email",

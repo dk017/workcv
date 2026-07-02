@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import {
+  AlertTriangle,
   Briefcase,
   Check,
   Download,
@@ -18,7 +19,12 @@ import {
 } from "lucide-react";
 
 import {
+  readCvFitHandoff,
+  removeCvSourceFromHandoff,
+} from "@/lib/cv-fit-handoff";
+import {
   CvData,
+  CvTargeting,
   EducationItem,
   ExperienceItem,
   TemplateId,
@@ -58,7 +64,13 @@ export function CvEditor() {
   const [loaded, setLoaded] = useState(false);
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
+  const [pendingTargeting, setPendingTargeting] = useState<CvTargeting | null>(null);
+  const [fitImportState, setFitImportState] = useState<
+    "idle" | "importing" | "complete" | "error"
+  >("idle");
+  const [fitImportError, setFitImportError] = useState<string | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
+  const handoffStartedRef = useRef(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -128,6 +140,77 @@ export function CvEditor() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!loaded || !draftId || handoffStartedRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "cv-fit-assessment") return;
+
+    handoffStartedRef.current = true;
+    const handoff = readCvFitHandoff();
+    if (!handoff) {
+      setFitImportState("error");
+      setFitImportError(
+        "The assessment handoff expired. Your saved CV is still available to edit.",
+      );
+      return;
+    }
+
+    const targeting: CvTargeting = {
+      role: handoff.targetRole,
+      jobDescription: handoff.jobDescription,
+      priorities: handoff.priorities,
+    };
+    setPendingTargeting(targeting);
+
+    if (!handoff.cvText) {
+      setFitImportState("complete");
+      return;
+    }
+
+    const importAssessmentCv = async () => {
+      setFitImportState("importing");
+      setFitImportError(null);
+      try {
+        const response = await fetch("/api/cv/import-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: handoff.cvText, template: cv.template }),
+        });
+        const data = (await response.json().catch(() => null)) as
+          | { cv?: CvData; error?: string }
+          | null;
+        if (!response.ok || !data?.cv) {
+          throw new Error(data?.error || "The assessed CV could not be imported.");
+        }
+
+        setCv({
+          ...data.cv,
+          targetRole: handoff.targetRole || data.cv.targetRole,
+          targeting,
+        });
+        setActiveTab("profile");
+        setSaveState("Saving assessed CV...");
+        removeCvSourceFromHandoff();
+        setFitImportState("complete");
+        params.delete("from");
+        window.history.replaceState(
+          null,
+          "",
+          `${window.location.pathname}?${params.toString()}`,
+        );
+      } catch (error) {
+        setFitImportState("error");
+        setFitImportError(
+          error instanceof Error
+            ? error.message
+            : "The assessed CV could not be imported.",
+        );
+      }
+    };
+
+    void importAssessmentCv();
+  }, [cv.template, draftId, loaded]);
 
   useEffect(() => {
     const preview = previewRef.current;
@@ -351,6 +434,7 @@ export function CvEditor() {
   };
 
   const selectedTemplate = templates.find((template) => template.id === cv.template);
+  const fitTargeting = cv.targeting || pendingTargeting;
 
   return (
     <div className="print-page bg-paper">
@@ -429,6 +513,46 @@ export function CvEditor() {
           </p>
         </div>
       </section>
+
+      {(fitTargeting || fitImportState === "importing" || fitImportError) && (
+        <section className="editor-chrome border-b border-line bg-[#edf4f8]">
+          <div className="mx-auto w-[min(1540px,calc(100%-32px))] py-5 sm:w-[min(1540px,calc(100%-48px))]">
+            {fitImportState === "importing" ? (
+              <div className="flex items-center gap-3 text-sm font-bold text-navy">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/25 border-t-navy" />
+                Turning your assessed CV into editable fields...
+              </div>
+            ) : fitImportError ? (
+              <div className="flex items-start gap-3 text-sm font-bold leading-6 text-[#8d3030]">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                {fitImportError}
+              </div>
+            ) : fitTargeting ? (
+              <div className="grid gap-5 xl:grid-cols-[240px_1fr]">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-[0.12em] text-muted">
+                    Target vacancy
+                  </p>
+                  <p className="mt-2 font-display text-2xl font-semibold text-navy">
+                    {fitTargeting.role}
+                  </p>
+                </div>
+                <div className="grid gap-4 md:grid-cols-3">
+                  {fitTargeting.priorities.map((priority, index) => (
+                    <div key={`${priority.category}-${priority.title}`}>
+                      <p className="text-xs font-bold uppercase tracking-[0.1em] text-success">
+                        Fix {index + 1}
+                      </p>
+                      <p className="mt-1 text-sm font-bold text-navy">{priority.title}</p>
+                      <p className="mt-1 text-xs leading-5 text-muted">{priority.action}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto grid w-[min(1540px,calc(100%-32px))] gap-6 py-6 sm:w-[min(1540px,calc(100%-48px))] lg:grid-cols-[minmax(480px,0.92fr)_minmax(0,1.08fr)] xl:grid-cols-[minmax(560px,0.95fr)_minmax(0,1.15fr)]">
         <div className="editor-form min-w-0">

@@ -8,15 +8,19 @@ import {
   Check,
   ClipboardCheck,
   FileSearch,
+  Loader2,
   RotateCcw,
   ShieldCheck,
+  Target,
 } from "lucide-react";
 
 import {
   analyseAtsKeywords,
-  AtsAnalysis,
-  AtsKeyword,
+  type AtsAnalysis,
+  type AtsKeyword,
 } from "@/lib/ats-keyword-checker";
+import type { CvFitAssessment } from "@/lib/cv-fit-assessment";
+import { writeCvFitHandoff } from "@/lib/cv-fit-handoff";
 import { site } from "@/lib/site";
 
 const examples = {
@@ -31,18 +35,26 @@ Essential requirements:
 - Ability to manage a busy workload and achieve key performance indicators (KPIs)
 
 You will resolve customer queries, update Salesforce records, monitor open cases and work with internal teams.`,
-  cv: `CUSTOMER SERVICE ASSISTANT
+  cv: `JORDAN TAYLOR
+jordan.taylor@example.co.uk | 07123 456 789 | Leeds
 
-Three years of experience supporting retail and online customers by phone and email. Resolved delivery and payment complaints, updated customer records in Salesforce CRM and used Excel to monitor weekly cases.
+CUSTOMER SERVICE ASSISTANT
+
+Profile
+Customer service professional with three years of experience supporting retail and online customers by phone and email. Experienced in complaint resolution, customer records and working across busy service teams.
 
 Key skills
-Customer service, communication, problem solving, Salesforce, cash handling
+Customer service, communication, problem solving, Salesforce CRM, Microsoft Excel
 
 Experience
-Managed 40 to 50 customer queries per day and achieved team response targets. Supported new colleagues and reported recurring issues to the team leader. Coordinated with delivery teams to resolve complex cases and created clear follow-up notes for customers.
+Customer Service Assistant, North Retail, 2023–Present
+- Manage 40 to 50 customer queries per day by phone and email.
+- Resolved delivery and payment complaints and achieved team response targets.
+- Updated Salesforce records and used Excel to monitor weekly open cases.
+- Coordinated with delivery teams to resolve complex cases.
 
 Education and training
-Five GCSEs including English and Maths. Completed annual data protection, complaint handling and communication training.`,
+Five GCSEs including English and Maths. Annual data protection and complaint handling training.`,
 };
 
 const categoryStyles: Record<AtsKeyword["category"], string> = {
@@ -51,6 +63,21 @@ const categoryStyles: Record<AtsKeyword["category"], string> = {
   Qualification: "border-[#ead39c] bg-[#fff8e8] text-[#76530b]",
   "Action verb": "border-[#d7c5df] bg-[#f7f0fa] text-[#62416f]",
 };
+
+const requirementStyles = {
+  supported: {
+    label: "Evidenced",
+    className: "bg-greensoft text-success",
+  },
+  "partly-supported": {
+    label: "Partly evidenced",
+    className: "bg-[#fff5e7] text-[#8a5a00]",
+  },
+  "not-evidenced": {
+    label: "Not evidenced",
+    className: "bg-redsoft text-[#963c3c]",
+  },
+} as const;
 
 function countWords(value: string) {
   return value.trim() ? value.trim().split(/\s+/).length : 0;
@@ -113,61 +140,96 @@ function KeywordList({
 export function AtsScoreChecker() {
   const [jobDescription, setJobDescription] = useState("");
   const [cvText, setCvText] = useState("");
-  const [analysis, setAnalysis] = useState<AtsAnalysis | null>(null);
+  const [assessment, setAssessment] = useState<CvFitAssessment | null>(null);
+  const [fallback, setFallback] = useState<AtsAnalysis | null>(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
   const resultsRef = useRef<HTMLDivElement>(null);
   const jobWords = useMemo(() => countWords(jobDescription), [jobDescription]);
   const cvWords = useMemo(() => countWords(cvText), [cvText]);
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError("");
+    setAssessment(null);
+    setFallback(null);
 
     if (jobWords < 40) {
-      setAnalysis(null);
       setError("Paste at least 40 words from the job advert so there is enough detail to compare.");
       return;
     }
     if (cvWords < 80) {
-      setAnalysis(null);
-      setError("Paste at least 80 words from your CV so the result reflects more than one short section.");
+      setError("Paste at least 80 words from your CV so the assessment can review more than one section.");
       return;
     }
 
-    const result = analyseAtsKeywords(jobDescription, cvText);
-    if (result.totalKeywords < 3) {
-      setAnalysis(null);
+    setLoading(true);
+    try {
+      const response = await fetch("/api/tools/cv-fit-assessment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ jobDescription, cvText }),
+      });
+      const data = (await response.json().catch(() => null)) as
+        | CvFitAssessment
+        | { error?: string }
+        | null;
+      if (!response.ok || !data || !("score" in data)) {
+        throw new Error(
+          data && "error" in data && data.error
+            ? data.error
+            : "The full assessment is temporarily unavailable.",
+        );
+      }
+      setAssessment(data);
+    } catch (requestError) {
+      const keywordResult = analyseAtsKeywords(jobDescription, cvText);
+      setFallback(keywordResult);
       setError(
-        "Only a few useful requirements could be extracted. Include the responsibilities and person specification from the full advert.",
+        `${requestError instanceof Error ? requestError.message : "The full assessment is temporarily unavailable."} A local keyword comparison is shown instead.`,
       );
-      return;
+    } finally {
+      setLoading(false);
+      window.setTimeout(
+        () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+        0,
+      );
     }
-
-    setAnalysis(result);
-    window.setTimeout(
-      () => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
-      0,
-    );
   }
 
   function loadExample() {
     setJobDescription(examples.job);
     setCvText(examples.cv);
-    setAnalysis(null);
+    setAssessment(null);
+    setFallback(null);
     setError("");
   }
 
   function reset() {
     setJobDescription("");
     setCvText("");
-    setAnalysis(null);
+    setAssessment(null);
+    setFallback(null);
     setError("");
   }
 
+  function prepareEditorHandoff() {
+    if (!assessment) return;
+    writeCvFitHandoff({
+      version: 1,
+      createdAt: Date.now(),
+      cvText,
+      jobDescription,
+      targetRole: assessment.targetRole,
+      priorities: assessment.priorities,
+      source: "cv-fit-assessment",
+    });
+  }
+
   const resultColour =
-    analysis?.score && analysis.score >= 70
+    assessment && assessment.score >= 75
       ? "#2D7D52"
-      : analysis?.score && analysis.score >= 45
+      : assessment && assessment.score >= 50
         ? "#B7791F"
         : "#B54242";
 
@@ -190,7 +252,7 @@ export function AtsScoreChecker() {
               onChange={(event) => setJobDescription(event.target.value)}
               placeholder="Paste the full job advert here..."
               className="mt-3 min-h-[300px] w-full resize-y rounded-md border border-line-strong bg-white p-4 text-[16px] leading-7 text-ink outline-none transition placeholder:text-muted/70 focus:border-navy focus:ring-2 focus:ring-navy/15"
-              maxLength={20000}
+              maxLength={20_000}
               aria-describedby="privacy-note"
             />
           </label>
@@ -210,7 +272,7 @@ export function AtsScoreChecker() {
               onChange={(event) => setCvText(event.target.value)}
               placeholder="Paste your CV text here..."
               className="mt-3 min-h-[300px] w-full resize-y rounded-md border border-line-strong bg-white p-4 text-[16px] leading-7 text-ink outline-none transition placeholder:text-muted/70 focus:border-navy focus:ring-2 focus:ring-navy/15"
-              maxLength={30000}
+              maxLength={30_000}
               aria-describedby="privacy-note"
             />
           </label>
@@ -227,15 +289,18 @@ export function AtsScoreChecker() {
         ) : null}
 
         <div className="flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
-          <p id="privacy-note" className="flex max-w-xl gap-2 text-xs leading-5 text-muted">
+          <p id="privacy-note" className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            Private by design: this comparison runs in your browser. The text is not uploaded or saved.
+            Your text is sent securely to OpenAI to generate this assessment. WorkCV
+            does not save it or include its contents in analytics. OpenAI API data is
+            not used to train models by default.
           </p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={loadExample}
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              disabled={loading}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:opacity-60"
             >
               Try an example
             </button>
@@ -243,7 +308,8 @@ export function AtsScoreChecker() {
               <button
                 type="button"
                 onClick={reset}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line-strong bg-white text-navy hover:bg-paper"
+                disabled={loading}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line-strong bg-white text-navy hover:bg-paper disabled:opacity-60"
                 title="Clear both fields"
                 aria-label="Clear both fields"
               >
@@ -252,33 +318,43 @@ export function AtsScoreChecker() {
             )}
             <button
               type="submit"
-              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-navy-hover"
+              disabled={loading}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-navy-hover disabled:translate-y-0 disabled:cursor-wait disabled:opacity-70"
             >
-              Check keyword match
-              <ArrowRight className="h-4 w-4" />
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Assessing your CV...
+                </>
+              ) : (
+                <>
+                  Assess my CV fit
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              )}
             </button>
           </div>
         </div>
       </form>
 
-      {analysis ? (
+      {assessment ? (
         <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
           <div className="overflow-hidden rounded-lg border border-line-strong bg-white shadow-soft">
-            <div className="grid gap-8 border-b border-line bg-paper p-6 md:p-8 lg:grid-cols-[260px_1fr] lg:items-center">
+            <div className="grid gap-8 border-b border-line bg-paper p-6 md:p-8 lg:grid-cols-[240px_1fr] lg:items-center">
               <div className="flex justify-center">
                 <div
-                  className="relative grid h-48 w-48 place-items-center rounded-full"
+                  className="relative grid h-44 w-44 place-items-center rounded-full"
                   style={{
-                    background: `conic-gradient(${resultColour} ${analysis.score * 3.6}deg, #e5e2db 0deg)`,
+                    background: `conic-gradient(${resultColour} ${assessment.score * 3.6}deg, #e5e2db 0deg)`,
                   }}
                 >
-                  <div className="grid h-40 w-40 place-items-center rounded-full bg-white text-center">
+                  <div className="grid h-36 w-36 place-items-center rounded-full bg-white text-center">
                     <div>
                       <p className="font-display text-6xl font-semibold leading-none text-navy">
-                        {analysis.score}
+                        {assessment.score}
                       </p>
                       <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">
-                        keyword match
+                        out of 100
                       </p>
                     </div>
                   </div>
@@ -287,64 +363,153 @@ export function AtsScoreChecker() {
 
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: resultColour }}>
-                  {analysis.verdict}
+                  {assessment.band} fit communication
                 </p>
                 <h2 className="mt-3 font-display text-3xl font-semibold text-navy md:text-4xl">
-                  {analysis.score >= 70
-                    ? "Your CV covers most of the terms this advert emphasises."
-                    : analysis.score >= 45
-                      ? "Your CV matches part of the advert, with clear gaps to review."
-                      : "The advert and CV currently use substantially different language."}
+                  {assessment.summary}
                 </h2>
-                <p className="mt-4 max-w-2xl text-sm leading-7 text-muted">
-                  Found {analysis.found.length} of {analysis.totalKeywords} extracted terms
-                  {analysis.essentialTotal > 0
-                    ? `, including ${analysis.essentialFound} of ${analysis.essentialTotal} terms found near essential or required wording`
-                    : ""}
-                  . Review the missing list against your real experience before changing anything.
+                <p className="mt-4 max-w-3xl text-sm leading-7 text-muted">
+                  The vacancy appears to target <strong className="text-navy">{assessment.targetRole}</strong>.
+                  Your CV currently communicates <strong className="text-navy">{assessment.communicatedRole}</strong>{" "}
+                  at <strong className="text-navy">{assessment.seniority}</strong> level.
                 </p>
-                <div className="mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs font-bold text-muted">
-                  <span>Green: 70–100</span>
-                  <span>Amber: 45–69</span>
-                  <span>Red: 0–44</span>
-                </div>
               </div>
             </div>
 
-            <div className="grid gap-8 p-6 md:p-8 lg:grid-cols-2">
+            <section className="border-b border-line p-6 md:p-8">
+              <h3 className="font-display text-2xl font-semibold text-navy">
+                Where the score comes from
+              </h3>
+              <div className="mt-6 grid gap-x-10 gap-y-5 lg:grid-cols-2">
+                {assessment.dimensions.map((dimension) => (
+                  <div key={dimension.id}>
+                    <div className="flex items-baseline justify-between gap-4 text-sm font-bold text-navy">
+                      <span>{dimension.label}</span>
+                      <span>{dimension.score}/{dimension.maximum}</span>
+                    </div>
+                    <div className="mt-2 h-2 overflow-hidden rounded-full bg-line">
+                      <div
+                        className="h-full rounded-full bg-navy"
+                        style={{ width: `${(dimension.score / dimension.maximum) * 100}%` }}
+                      />
+                    </div>
+                    <p className="mt-2 text-xs leading-5 text-muted">{dimension.explanation}</p>
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <section className="border-b border-line p-6 md:p-8">
+              <div className="flex items-start gap-3">
+                <Target className="mt-1 h-6 w-6 shrink-0 text-gold" />
+                <div>
+                  <h3 className="font-display text-2xl font-semibold text-navy">
+                    Vacancy requirements
+                  </h3>
+                  <p className="mt-1 text-sm leading-6 text-muted">
+                    “Not evidenced” means the supplied CV does not make it clear. It
+                    does not mean you lack the skill.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 divide-y divide-line border-y border-line">
+                {assessment.requirements.map((requirement) => {
+                  const status = requirementStyles[requirement.status];
+                  return (
+                    <article
+                      key={`${requirement.requirement}-${requirement.status}`}
+                      className="grid gap-3 py-5 md:grid-cols-[1fr_170px]"
+                    >
+                      <div>
+                        <h4 className="font-bold text-navy">{requirement.requirement}</h4>
+                        <p className="mt-2 text-sm leading-6 text-muted">
+                          {requirement.explanation}
+                        </p>
+                        {requirement.cvEvidence ? (
+                          <p className="mt-2 border-l-2 border-gold pl-3 text-sm italic leading-6 text-ink">
+                            “{requirement.cvEvidence}”
+                          </p>
+                        ) : null}
+                      </div>
+                      <div className="md:text-right">
+                        <span className={`inline-flex rounded-md px-3 py-2 text-xs font-bold ${status.className}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </section>
+
+            <section className="border-b border-line bg-[#f7faf8] p-6 md:p-8">
+              <p className="flex items-center gap-2 text-sm font-bold text-navy">
+                <ClipboardCheck className="h-5 w-5 text-success" />
+                Your three highest-impact fixes
+              </p>
+              <div className="mt-5 grid gap-6 lg:grid-cols-3">
+                {assessment.priorities.map((priority, index) => (
+                  <article key={`${priority.category}-${priority.title}`}>
+                    <span className="text-xs font-bold uppercase tracking-[0.12em] text-success">
+                      Priority {index + 1}
+                    </span>
+                    <h3 className="mt-2 font-display text-xl font-semibold text-navy">
+                      {priority.title}
+                    </h3>
+                    <p className="mt-2 text-sm leading-6 text-muted">{priority.action}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            {assessment.vaguePhrases.length > 0 ? (
+              <section className="border-b border-line p-6 md:p-8">
+                <h3 className="font-display text-2xl font-semibold text-navy">
+                  Phrases that need stronger evidence
+                </h3>
+                <div className="mt-5 grid gap-4 md:grid-cols-2">
+                  {assessment.vaguePhrases.map((item) => (
+                    <div key={item.phrase} className="border-l-2 border-[#c88c32] pl-4">
+                      <p className="font-bold text-navy">“{item.phrase}”</p>
+                      <p className="mt-1 text-sm leading-6 text-muted">{item.reason}</p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
+
+            <section className="grid gap-8 p-6 md:p-8 lg:grid-cols-2">
               <KeywordList
                 title="Keywords found"
-                description="These advertised terms also appear in your CV, including recognised word variations."
-                keywords={analysis.found}
+                description="Advertised terms that also appear in your CV, including recognised word variations."
+                keywords={assessment.keywords.found}
                 found
               />
               <KeywordList
                 title="Keywords to review"
-                description="Missing does not mean you should add it. Add a term only when your experience supports it."
-                keywords={analysis.missing}
+                description="Add a term only when your real experience supports it, preferably inside evidence."
+                keywords={assessment.keywords.missing}
                 found={false}
               />
-            </div>
+            </section>
 
             <div className="border-t border-line bg-[#edf4f8] p-6 md:p-8">
               <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
-                  <p className="flex items-center gap-2 text-sm font-bold text-navy">
-                    <ClipboardCheck className="h-5 w-5 text-success" />
-                    Best next action
+                  <p className="font-display text-2xl font-semibold text-navy">
+                    Fix these issues in an editable UK CV.
                   </p>
-                  <p className="mt-3 max-w-3xl text-sm leading-7 text-ink">
-                    Check the highest-priority missing terms first. Where they are true,
-                    show the term in a specific achievement or responsibility. Then put
-                    the finished content into a clean, text-based CV and follow the
-                    employer&apos;s requested file format.
+                  <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+                    Your CV, target vacancy and three priorities will carry into a new
+                    saved draft after email-code login. The one-off PDF price is {site.price}.
                   </p>
                 </div>
                 <Link
-                  href="/editor?template=classic&new=1"
+                  href="/editor?template=classic&new=1&from=cv-fit-assessment"
+                  onClick={prepareEditorHandoff}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-navy-hover"
                 >
-                  Build my CV for {site.price}
+                  Fix these issues in my CV
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </div>
@@ -354,11 +519,40 @@ export function AtsScoreChecker() {
           <div className="mt-5 flex items-start gap-3 rounded-md border border-line bg-white p-5 text-sm leading-6 text-muted">
             <FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-gold" />
             <p>
-              <strong className="text-navy">What this score means:</strong> a
-              transparent estimate of exact keyword coverage between these two text
-              inputs. It does not test your PDF layout, verify claims, assess years of
-              experience or reproduce any employer&apos;s ATS configuration.
+              <strong className="text-navy">What this assessment means:</strong>{" "}
+              a fixed-weight estimate of how clearly this CV communicates fit for this
+              vacancy. It does not reproduce an employer&apos;s ATS, verify claims,
+              inspect the original file layout or predict an interview.
             </p>
+          </div>
+        </div>
+      ) : fallback ? (
+        <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
+          <div className="rounded-lg border border-line-strong bg-white p-6 shadow-soft md:p-8">
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
+              Local keyword comparison
+            </p>
+            <h2 className="mt-3 font-display text-4xl font-semibold text-navy">
+              {fallback.score}% keyword coverage
+            </h2>
+            <p className="mt-3 text-sm leading-7 text-muted">
+              Found {fallback.found.length} of {fallback.totalKeywords} extracted terms.
+              This fallback does not include evidence, role-clarity or requirement analysis.
+            </p>
+            <div className="mt-8 grid gap-8 lg:grid-cols-2">
+              <KeywordList
+                title="Keywords found"
+                description="Advertised terms also present in the CV."
+                keywords={fallback.found}
+                found
+              />
+              <KeywordList
+                title="Keywords to review"
+                description="Only add terms that truthfully describe your experience."
+                keywords={fallback.missing}
+                found={false}
+              />
+            </div>
           </div>
         </div>
       ) : null}

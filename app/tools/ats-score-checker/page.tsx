@@ -13,28 +13,28 @@ import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Free ATS Score Checker UK - Match Your CV to a Job",
+  title: "Free AI CV Fit Checker UK - Match Your CV to a Job",
   description:
-    "Paste a UK job description and your CV to check exact keyword coverage. See matched and missing skills, qualifications, job titles and action verbs.",
+    "See how clearly your CV communicates fit for a UK vacancy. Get a fixed-weight score, requirement evidence, keyword gaps and three priority improvements.",
   alternates: { canonical: "/tools/ats-score-checker" },
   openGraph: {
-    title: "Free UK ATS Keyword Match Checker",
+    title: "Free UK AI CV Fit Checker",
     description:
-      "Compare your CV with a job advert in your browser. Get a transparent keyword match score and a prioritised gap list.",
+      "Compare your CV with a vacancy. Get an evidence-led fit assessment, transparent score and three priority improvements.",
     url: "/tools/ats-score-checker",
   },
 };
 
 const faqItems = [
   {
-    question: "Is this a real ATS score?",
+    question: "Is this a real employer ATS score?",
     answer:
-      "It is a transparent keyword-coverage estimate, not a score from an employer's applicant tracking system. ATS products and recruiter settings differ, so no public checker can guarantee the score or decision an employer will produce.",
+      "No. It is a fixed-weight WorkCV assessment of how clearly your supplied CV communicates fit for one vacancy. Employer systems, configurations and human decisions differ, so it does not predict an interview or reproduce a particular ATS.",
   },
   {
     question: "How is the match percentage calculated?",
     answer:
-      "The checker extracts recognised job titles, skills and tools, qualifications, certifications and action verbs from the advert. Terms near words such as essential, required or must, and terms repeated in the advert, receive more weight. It then checks for those terms and common word variations in your CV.",
+      "The application awards up to 35 points for vacancy relevance, 25 for evidence and achievements, 20 for role clarity, 10 for ATS-readable content structure and 10 for completeness. AI supplies bounded classifications and exact evidence snippets; application code calculates the score.",
   },
   {
     question: "Should I add every missing keyword?",
@@ -44,12 +44,12 @@ const faqItems = [
   {
     question: "Does WorkCV save the text I paste?",
     answer:
-      "No. This checker runs in your browser and does not upload or save either text input. Clearing the page removes the pasted content.",
+      "WorkCV sends the text securely to OpenAI to generate the assessment but does not save the text or include its contents in analytics. OpenAI API data is not used for model training by default. If you choose to carry the result into the editor, the resulting CV draft and vacancy context are saved to your WorkCV account.",
   },
   {
-    question: "Does this check whether my CV file can be parsed?",
+    question: "Does this inspect my CV file layout?",
     answer:
-      "No. Pasted text cannot reveal layout or file-format problems. Follow the vacancy instructions and use a clean text-based file. If the employer requires DOCX, do not submit a PDF instead.",
+      "No. Pasted text cannot reveal columns, images, tables or file-format problems. Follow the vacancy instructions and use a clean text-based file. If the employer requires DOCX, do not submit a PDF instead.",
   },
 ];
 
@@ -66,12 +66,12 @@ const faqSchema = {
 const appSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "WorkCV ATS Score Checker",
+  name: "WorkCV AI CV Fit Checker",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Any",
   url: `${site.url}/tools/ats-score-checker`,
   description:
-    "A private browser-based tool that compares the keyword coverage of a CV with a job description.",
+    "An evidence-led tool that assesses how clearly a UK CV communicates fit for a job description.",
   offers: {
     "@type": "Offer",
     price: "0",
@@ -98,17 +98,17 @@ export default function AtsScoreCheckerPage() {
               Free UK CV tool
             </p>
             <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">
-              Check how closely your CV matches the job advert.
+              Will your CV make your fit clear for this vacancy?
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-              Get a transparent keyword match score, then see the job titles,
-              skills, qualifications and action verbs found or missing. No
-              account, upload or AI analysis.
+              Get a transparent five-part score, see which vacancy requirements
+              are evidenced, and leave with three specific improvements. No
+              account required.
             </p>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-success" />
-                Runs in your browser
+                No CV text saved
               </span>
               <span className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-gold" />
@@ -132,21 +132,21 @@ export default function AtsScoreCheckerPage() {
           <div>
             <SectionLabel>How to use the result</SectionLabel>
             <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
-              Treat the score as a coverage check, not a pass mark.
+              Treat the score as a clarity diagnostic, not a pass mark.
             </h2>
             <p className="mt-6 text-base leading-8 text-muted">
               Employers configure recruitment systems differently, and people
-              still assess the strength and truth of your evidence. This tool
-              deliberately shows its inputs and outputs instead of claiming to
-              predict an interview.
+              still assess the truth and strength of your evidence. This tool
+              combines transparent checks with one structured AI review instead
+              of claiming to predict an interview.
             </p>
           </div>
           <div className="divide-y divide-line border-y border-line">
             {[
               {
                 icon: Search,
-                title: "Start with essential gaps",
-                body: "Review terms marked Essential first. The checker assigns this label when a term appears near wording such as essential, required, must or proven.",
+                title: "Start with the three priorities",
+                body: "They identify the highest-impact issues across relevance, evidence, role clarity, structure and completeness. Address only those supported by your real experience.",
               },
               {
                 icon: Check,
@@ -183,18 +183,18 @@ export default function AtsScoreCheckerPage() {
           <div>
             <SectionLabel>Evidence checked</SectionLabel>
             <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
-              Why the checker focuses on these terms.
+              Why the assessment focuses on relevance and evidence.
             </h2>
             <p className="mt-6 max-w-3xl text-base leading-8 text-muted">
-              UK careers guidance recommends tailoring a CV to the job advert
-              and naming relevant qualifications. Recruiter and ATS guidance
-              also identifies job titles, skills, certifications and exact
-              terminology as searchable information. The sources below support
-              the method; WorkCV&apos;s score bands are guidance, not an industry
+              UK careers guidance recommends tailoring a CV to the job advert,
+              giving evidence of achievements and naming relevant qualifications.
+              Recruiter and ATS guidance also identifies job titles, skills,
+              certifications and exact terminology as searchable information.
+              WorkCV&apos;s weights and score bands are guidance, not an industry
               standard.
             </p>
             <p className="mt-4 text-sm font-bold text-navy">
-              Research reviewed 28 June 2026.
+              Research reviewed 2 July 2026.
             </p>
           </div>
           <div className="grid content-start gap-3 text-sm font-bold text-navy">
@@ -234,8 +234,7 @@ export default function AtsScoreCheckerPage() {
         </div>
       </section>
 
-      <FaqSection faqs={faqItems} title="ATS keyword checker questions." />
+      <FaqSection faqs={faqItems} title="AI CV fit checker questions." />
     </>
   );
 }
-

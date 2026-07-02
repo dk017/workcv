@@ -20,6 +20,21 @@ export type EducationItem = {
   details: string;
 };
 
+export type CvTargeting = {
+  role: string;
+  jobDescription: string;
+  priorities: Array<{
+    category:
+      | "vacancy-relevance"
+      | "evidence"
+      | "role-clarity"
+      | "structure"
+      | "completeness";
+    title: string;
+    action: string;
+  }>;
+};
+
 export type CvData = {
   template: TemplateId;
   fullName: string;
@@ -32,6 +47,7 @@ export type CvData = {
   skills: string;
   experience: ExperienceItem[];
   education: EducationItem[];
+  targeting?: CvTargeting;
 };
 
 export const templates: Array<{

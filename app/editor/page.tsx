@@ -19,6 +19,7 @@ export default async function EditorPage({
     draftId?: string;
     roleTemplate?: string;
     new?: string;
+    from?: string;
   };
 }) {
   const user = await getCurrentUser();
@@ -30,6 +31,7 @@ export default async function EditorPage({
     if (searchParams.draftId) editorParams.set("draftId", searchParams.draftId);
     if (searchParams.roleTemplate) editorParams.set("roleTemplate", searchParams.roleTemplate);
     if (searchParams.new) editorParams.set("new", searchParams.new);
+    if (searchParams.from) editorParams.set("from", searchParams.from);
     params.set("next", `/editor${editorParams.toString() ? `?${editorParams}` : ""}`);
     redirect(`/login?${params.toString()}`);
   }
