@@ -71,6 +71,21 @@ export function CvEditor() {
   const [fitImportError, setFitImportError] = useState<string | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const handoffStartedRef = useRef(false);
+  const modalOpen = templatePickerOpen || importOpen || checkoutOpen;
+
+  useEffect(() => {
+    if (!modalOpen) return;
+
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
+    };
+  }, [modalOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -781,14 +796,23 @@ function ImportCvModal({
     : [];
 
   return (
-    <div className="download-modal fixed inset-0 z-50 flex items-center justify-center bg-navy/45 p-4">
-      <div className="w-full max-w-2xl rounded-xl border border-line bg-white p-6 shadow-soft">
+    <div className="download-modal fixed inset-0 z-50 flex items-start justify-center overflow-y-auto overscroll-contain bg-navy/45 p-4 sm:items-center">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="import-cv-title"
+        data-testid="import-cv-modal"
+        className="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-xl border border-line bg-white p-6 shadow-soft"
+      >
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
               Import CV
             </p>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-navy">
+            <h2
+              id="import-cv-title"
+              className="mt-2 font-display text-3xl font-semibold text-navy"
+            >
               Turn an existing CV into editable fields.
             </h2>
             <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
