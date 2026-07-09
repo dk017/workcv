@@ -3,6 +3,8 @@ import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { routes, site } from "@/lib/site";
 
+const startEditorHref = "/login?next=%2Feditor";
+
 type Faq = {
   question: string;
   answer: string;
@@ -30,10 +32,10 @@ export function Header() {
             See example
           </Link>
           <Link
-            href="/editor"
+            href={startEditorHref}
             className="rounded-md bg-navy px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-navy-hover"
           >
-            Build my CV
+            Start free
           </Link>
         </div>
       </div>
@@ -420,7 +422,7 @@ export function TransformationSection() {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <ButtonLink href="/editor">Start with my details</ButtonLink>
+          <ButtonLink href={startEditorHref}>Start free with email code</ButtonLink>
         </div>
       </div>
     </section>

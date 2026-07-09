@@ -13,6 +13,8 @@ import {
 } from "@/components/marketing";
 import { site } from "@/lib/site";
 
+const startHref = "/login?next=%2Feditor";
+
 export const metadata: Metadata = {
   title: "Turn Your Experience into a Professional UK CV",
   description:
@@ -32,7 +34,7 @@ const homepageFaqs = [
   {
     question: "Do I need to log in before using the editor?",
     answer:
-      "Yes. WorkCV asks you to log in with a one-time email code before the editor so your CV can be saved and reopened later. There is no password to remember.",
+      "Yes. WorkCV asks for a one-time email code first so your CV can be saved, reopened, and connected to the PDF you unlock. There is no password and no payment until download.",
   },
   {
     question: "Is the format right for UK jobs?",
@@ -66,8 +68,8 @@ export default function HomePage() {
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-3">
               {[
-                `Pay ${site.price} once for this saved CV`,
-                "Build and preview before paying",
+                `Pay ${site.price} once at download`,
+                "Email code first, then build free",
                 "Edit and redownload without paying again",
               ].map(
                 (item) => (
@@ -79,11 +81,11 @@ export default function HomePage() {
               )}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Create my CV</ButtonLink>
+              <ButtonLink href={startHref}>Start free with email code</ButtonLink>
             </div>
             <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-muted">
               <ShieldCheck className="h-4 w-4 shrink-0 text-success" />
-              Price shown upfront · No automatic renewal
+              One-time email code first · No payment until download
             </p>
           </div>
           <CvPreview />
@@ -127,16 +129,16 @@ export default function HomePage() {
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {[
               [
-                "Fill in your details",
+                "Verify your email",
+                "Start with a one-time code so your CV is saved safely. No password and no payment at this stage.",
+              ],
+              [
+                "Build and preview",
                 "Add your profile, work history, education, and skills in a guided editor built for UK CVs.",
               ],
               [
-                "Choose a clean template",
-                "Pick a practical layout that keeps your CV readable, structured, and easy to tailor for real applications.",
-              ],
-              [
-                "Use it when you are ready",
-                "Check every page, unlock the finished PDF, and use it for applications without rebuilding the layout elsewhere.",
+                "Download when ready",
+                `Check every page, then pay ${site.price} once to unlock this saved CV as a PDF.`,
               ],
             ].map(([title, body], index) => (
               <div key={title} className="rounded-xl border border-line bg-paper p-6">
@@ -171,7 +173,24 @@ export default function HomePage() {
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
-            {["Professional", "Early career", "Student", "No experience"].map((name) => (
+            {[
+              {
+                name: "Professional",
+                body: "For experienced applicants who need a clear profile, recent roles, and measurable achievements.",
+              },
+              {
+                name: "Early career",
+                body: "For graduates and career starters balancing education, projects, placements, and first roles.",
+              },
+              {
+                name: "Student",
+                body: "For part-time work, societies, coursework, and transferable skills without overcomplicating the layout.",
+              },
+              {
+                name: "No experience",
+                body: "For first-job applications where education, volunteering, personal projects, and skills need more space.",
+              },
+            ].map(({ name, body }) => (
               <Link
                 key={name}
                 href="/templates"
@@ -180,7 +199,7 @@ export default function HomePage() {
                 <FileText className="h-7 w-7 text-gold" />
                 <h3 className="mt-5 font-display text-2xl font-semibold text-navy">{name}</h3>
                 <p className="mt-3 text-sm leading-6 text-muted">
-                  Practical spacing, clear section order, and UK-friendly defaults.
+                  {body}
                 </p>
               </Link>
             ))}
@@ -225,7 +244,8 @@ export default function HomePage() {
       <FinalCta
         heading="Your next application deserves a CV that feels ready."
         body="Bring your experience. WorkCV helps you shape it into a clear, professional UK CV you can update and use again."
-        primary="Create my CV"
+        primaryHref={startHref}
+        primary="Start free with email code"
         secondaryHref={null}
         secondary={null}
       />

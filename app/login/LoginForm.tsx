@@ -72,17 +72,18 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
       <div className="container-page grid gap-10 lg:grid-cols-[1fr_0.85fr] lg:items-center">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-            Save your CV
+            One-time email code
           </p>
           <h1 className="mt-4 max-w-2xl break-words font-display text-4xl font-semibold leading-tight text-navy sm:text-5xl md:text-6xl">
-            Log in before the editor.
+            Save your CV before you start.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
             WorkCV uses a one-time email code so your CV can be saved, reopened,
-            and linked to your PDF payment. No password to remember.
+            and linked to your PDF payment later. No password and no payment
+            before the editor.
           </p>
           <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
-            {["Save your CV details", "Return and keep editing", "Secure email-code login", "No monthly subscription"].map(
+            {["Build free first", "Return and keep editing", "Secure email-code login", "No monthly subscription"].map(
               (item) => (
                 <div key={item} className="flex items-center gap-2">
                   <ShieldCheck className="h-5 w-5 text-success" />
