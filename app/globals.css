@@ -102,28 +102,6 @@ body {
   zoom: 1;
 }
 
-.cv-page-guides {
-  height: 100%;
-  z-index: 10;
-}
-
-.cv-page-guide {
-  border-bottom: 2px dashed rgb(15 41 66 / 28%);
-}
-
-.cv-page-guide span {
-  position: absolute;
-  right: 10px;
-  bottom: 8px;
-  border-radius: 999px;
-  background: rgb(255 255 255 / 92%);
-  box-shadow: 0 1px 4px rgb(15 41 66 / 15%);
-  color: #0f2942;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 4px 9px;
-}
-
 .overflow-wrap-anywhere,
 .print-document h2,
 .print-document h4,
@@ -136,8 +114,8 @@ body {
 
 .print-document .cv-name {
   hyphens: none;
-  overflow-wrap: normal;
-  word-break: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 @container (max-width: 794px) {
@@ -302,10 +280,6 @@ body {
     zoom: 1 !important;
   }
 
-  .cv-page-guides {
-    display: none !important;
-  }
-
   .print-document {
     box-sizing: border-box !important;
     color: #111827 !important;
@@ -431,11 +405,6 @@ body {
   .print-document .cv-skills-list li {
     break-inside: avoid-page !important;
     page-break-inside: avoid !important;
-  }
-
-  .print-document[data-template="classic"] .cv-balance-page-break {
-    break-before: page !important;
-    page-break-before: always !important;
   }
 
   .print-document h3 {

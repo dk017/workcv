@@ -7,6 +7,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 
 import type { CvData, TemplateId } from "@/lib/editor-data";
+import { parseCvData } from "@/lib/cv-schema";
 
 const maxExtractedCharacters = 24000;
 
@@ -184,7 +185,7 @@ function toEditorData(parsed: ParsedCv, template: TemplateId): CvData {
     details: compactLines(item.details, 4).join("\n"),
   }));
 
-  return {
+  return parseCvData({
     template,
     fullName: cleanText(parsed.fullName),
     targetRole: cleanText(parsed.targetRole),
@@ -222,7 +223,7 @@ function toEditorData(parsed: ParsedCv, template: TemplateId): CvData {
               details: "",
             },
           ],
-  };
+  });
 }
 
 export async function parseCvTextWithAi(text: string, template: TemplateId) {

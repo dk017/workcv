@@ -70,7 +70,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
   }
 
-  if (event.type !== "payment.succeeded") {
+  const supportedEventTypes = new Set([
+    "payment.succeeded",
+    "payment.failed",
+    "payment.cancelled",
+  ]);
+  if (!event.type || !supportedEventTypes.has(event.type)) {
     return NextResponse.json({ status: "ignored" });
   }
 
@@ -106,24 +111,50 @@ export async function POST(request: NextRequest) {
   try {
     await ensurePaymentTables();
 
+    if (event.type !== "payment.succeeded") {
+      if (checkoutId) {
+        await getPool().query(
+          `
+            UPDATE workcv_payment_checkouts
+            SET status = $2, updated_at = NOW()
+            WHERE id = $1
+          `,
+          [checkoutId, event.type === "payment.failed" ? "failed" : "cancelled"],
+        );
+      }
+      return NextResponse.json({ status: "ok" });
+    }
+
+    let checkoutUserId: string | null = null;
+    let consentAt: Date | null = null;
+    let consentVersion: string | null = null;
     if (checkoutId) {
-      const checkout = await getPool().query<{ email: string | null }>(
+      const checkout = await getPool().query<{
+        email: string | null;
+        user_id: string | null;
+        consent_at: Date | null;
+        consent_version: string | null;
+      }>(
         `
           UPDATE workcv_payment_checkouts
-          SET completed_at = NOW(), updated_at = NOW()
+          SET completed_at = NOW(), status = 'paid', updated_at = NOW()
           WHERE id = $1
-          RETURNING email
+          RETURNING email, user_id, consent_at, consent_version
         `,
         [checkoutId]
       );
       email ||= checkout.rows[0]?.email || null;
+      checkoutUserId = checkout.rows[0]?.user_id || null;
+      consentAt = checkout.rows[0]?.consent_at || null;
+      consentVersion = checkout.rows[0]?.consent_version || null;
     }
 
     await getPool().query(
       `
         INSERT INTO workcv_orders
-          (id, draft_id, email, product_id, amount_cents, currency, checkout_id, raw_event_type)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          (id, draft_id, email, product_id, amount_cents, currency, checkout_id,
+           raw_event_type, user_id, consent_at, consent_version)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
         ON CONFLICT (id) DO NOTHING
       `,
       [
@@ -135,6 +166,9 @@ export async function POST(request: NextRequest) {
         currency,
         checkoutId,
         event.type,
+        checkoutUserId,
+        consentAt,
+        consentVersion,
       ]
     );
 
@@ -161,7 +195,7 @@ export async function POST(request: NextRequest) {
             orderId: paymentId,
             amountCents,
             currency,
-            editorUrl: `${getAppUrl()}/editor`,
+            editorUrl: `${getAppUrl()}/editor?draftId=${encodeURIComponent(draftId)}`,
           });
           await getPool().query(
             `

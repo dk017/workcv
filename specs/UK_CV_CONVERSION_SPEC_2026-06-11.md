@@ -4,6 +4,10 @@ Research date: June 11, 2026
 
 Status: validated planning spec for UK launch
 
+> Production pricing update (July 5, 2026): the live one-time price is GBP 7.99.
+> This supersedes the GBP 4.99 planning assumptions below. Runtime pricing is
+> defined in `lib/commerce.ts` and must match the configured Dodo product.
+
 This document combines:
 
 - UK_CV_SPEC.md

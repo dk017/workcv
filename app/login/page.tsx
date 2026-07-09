@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import LoginForm from "@/app/login/LoginForm";
 import { getCurrentUser } from "@/lib/auth";
+import { safeInternalRedirect } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = {
   title: "Log in",
@@ -15,10 +16,7 @@ export default async function LoginPage({
   searchParams: { next?: string };
 }) {
   const user = await getCurrentUser();
-  const next =
-    typeof searchParams.next === "string" && searchParams.next.startsWith("/")
-      ? searchParams.next
-      : "/editor";
+  const next = safeInternalRedirect(searchParams.next);
 
   if (user) redirect(next);
 

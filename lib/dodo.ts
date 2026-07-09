@@ -1,12 +1,8 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-const DEFAULT_PRODUCT_ID = "pdt_0NgvxNXDilMTh3bpfLPq2";
+import { WORKCV_PRICE, WORKCV_PRODUCT_ID } from "@/lib/commerce";
 
-export const DODO_PRODUCT_ID =
-  process.env.DODO_PRODUCT_ID ||
-  process.env.DODO_WORKCV_PRODUCT_ID ||
-  process.env.DODO_PAYMENTS_PRODUCT_ID ||
-  DEFAULT_PRODUCT_ID;
+export const DODO_PRODUCT_ID = WORKCV_PRODUCT_ID;
 
 const DODO_API_KEY = process.env.DODO_API_KEY || process.env.DODO_PAYMENTS_API_KEY;
 const DODO_ENVIRONMENT =
@@ -44,7 +40,7 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
   const body: Record<string, unknown> = {
     product_cart: [{ product_id: DODO_PRODUCT_ID, quantity: 1 }],
     allowed_payment_method_types: ["credit", "debit", "apple_pay", "google_pay"],
-    billing_currency: "GBP",
+    billing_currency: WORKCV_PRICE.currency,
     return_url: `${getAppUrl()}/editor?payment=success&draftId=${encodeURIComponent(
       input.draftId
     )}`,
@@ -67,11 +63,7 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
       allow_discount_code: false,
       allow_phone_number_collection: false,
     },
-    minimal_address: true,
-    billing_address: {
-      country: "GB",
-      zipcode: "SW1A 1AA",
-    },
+    minimal_address: false,
   };
 
   if (input.email) {

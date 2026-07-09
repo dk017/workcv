@@ -250,7 +250,7 @@ export function CvPreview() {
         {sampleCards.map((sample, index) => (
           <Link
             key={sample.name}
-            href={`/editor?template=${sample.template === "Classic UK" ? "classic" : sample.template.toLowerCase()}`}
+            href={`/editor?template=${sample.template === "Classic UK" ? "classic" : sample.template.toLowerCase()}&new=1`}
             className={`hero-template-card hero-template-card-${index + 1} group absolute block rounded-lg border border-line-strong bg-white p-4 shadow-soft transition hover:border-navy`}
           >
             <div className="mb-3 flex items-center justify-between gap-3">

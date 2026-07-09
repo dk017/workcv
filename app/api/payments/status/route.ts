@@ -39,9 +39,29 @@ export async function GET(request: NextRequest) {
       [draftId]
     );
 
+    if (result.rows.length > 0) {
+      return NextResponse.json({
+        paid: true,
+        status: "paid",
+        paidAt: result.rows[0]?.paid_at ?? null,
+      });
+    }
+
+    const checkout = await getPool().query<{ status: string }>(
+      `
+        SELECT status
+        FROM workcv_payment_checkouts
+        WHERE draft_id = $1
+        ORDER BY created_at DESC
+        LIMIT 1
+      `,
+      [draftId],
+    );
+    const status = checkout.rows[0]?.status;
     return NextResponse.json({
-      paid: result.rows.length > 0,
-      paidAt: result.rows[0]?.paid_at ?? null,
+      paid: false,
+      status:
+        status === "failed" || status === "cancelled" ? status : "pending",
     });
   } catch (error) {
     console.error("payment_status_check_failed", error);

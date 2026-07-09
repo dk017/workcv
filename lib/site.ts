@@ -1,5 +1,7 @@
-const priceAmount = 7.99;
-const priceCurrency = "GBP";
+import { WORKCV_PRICE } from "@/lib/commerce";
+
+const priceAmount = WORKCV_PRICE.amount;
+const priceCurrency = WORKCV_PRICE.currency;
 
 export const site = {
   name: "WorkCV",
@@ -10,6 +12,7 @@ export const site = {
   priceCurrency,
   price: `£${priceAmount.toFixed(2)}`,
   priceGbp: `${priceCurrency} ${priceAmount.toFixed(2)}`,
+  priceTaxInclusive: WORKCV_PRICE.taxInclusive,
   summary:
     "A clear, professional UK CV—ready when you are.",
 };

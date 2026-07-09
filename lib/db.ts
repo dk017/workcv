@@ -3,6 +3,7 @@ import { Pool } from "pg";
 let pool: Pool | null = null;
 let paymentSetupPromise: Promise<void> | null = null;
 let authSetupPromise: Promise<void> | null = null;
+let analyticsSetupPromise: Promise<void> | null = null;
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -37,6 +38,10 @@ export async function ensurePaymentTables() {
           provider TEXT NOT NULL DEFAULT 'dodo',
           checkout_url TEXT,
           site_host TEXT,
+          user_id TEXT,
+          status TEXT NOT NULL DEFAULT 'pending',
+          consent_at TIMESTAMPTZ,
+          consent_version TEXT,
           completed_at TIMESTAMPTZ,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -55,6 +60,9 @@ export async function ensurePaymentTables() {
           currency TEXT,
           checkout_id TEXT,
           raw_event_type TEXT,
+          user_id TEXT,
+          consent_at TIMESTAMPTZ,
+          consent_version TEXT,
           confirmation_email_attempted_at TIMESTAMPTZ,
           confirmation_email_sent_at TIMESTAMPTZ,
           paid_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -66,6 +74,21 @@ export async function ensurePaymentTables() {
 
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS confirmation_email_sent_at TIMESTAMPTZ;
+
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS user_id TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'pending';
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS consent_at TIMESTAMPTZ;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS consent_version TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS user_id TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS consent_at TIMESTAMPTZ;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS consent_version TEXT;
 
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
@@ -97,11 +120,33 @@ export async function ensureAuthTables() {
           code_hash TEXT NOT NULL,
           expires_at TIMESTAMPTZ NOT NULL,
           used_at TIMESTAMPTZ,
+          attempt_count INTEGER NOT NULL DEFAULT 0,
+          locked_until TIMESTAMPTZ,
+          request_ip TEXT,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
         CREATE INDEX IF NOT EXISTS workcv_login_codes_email_idx
           ON workcv_login_codes (email, created_at DESC);
+
+        ALTER TABLE workcv_login_codes
+          ADD COLUMN IF NOT EXISTS attempt_count INTEGER NOT NULL DEFAULT 0;
+        ALTER TABLE workcv_login_codes
+          ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
+        ALTER TABLE workcv_login_codes
+          ADD COLUMN IF NOT EXISTS request_ip TEXT;
+
+        CREATE TABLE IF NOT EXISTS workcv_auth_rate_events (
+          id BIGSERIAL PRIMARY KEY,
+          kind TEXT NOT NULL,
+          email TEXT NOT NULL,
+          ip TEXT NOT NULL,
+          succeeded BOOLEAN NOT NULL DEFAULT FALSE,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_auth_rate_events_lookup_idx
+          ON workcv_auth_rate_events (kind, email, ip, created_at DESC);
 
         CREATE TABLE IF NOT EXISTS workcv_sessions (
           token_hash TEXT PRIMARY KEY,
@@ -134,4 +179,29 @@ export async function ensureAuthTables() {
   }
 
   return authSetupPromise;
+}
+
+export async function ensureAnalyticsTables() {
+  if (!analyticsSetupPromise) {
+    analyticsSetupPromise = getPool()
+      .query(`
+        CREATE TABLE IF NOT EXISTS workcv_editor_events (
+          id BIGSERIAL PRIMARY KEY,
+          user_id TEXT NOT NULL,
+          document_id TEXT,
+          event_name TEXT NOT NULL,
+          metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_editor_events_funnel_idx
+          ON workcv_editor_events (event_name, created_at DESC);
+      `)
+      .then(() => undefined)
+      .catch((error) => {
+        analyticsSetupPromise = null;
+        throw error;
+      });
+  }
+  return analyticsSetupPromise;
 }

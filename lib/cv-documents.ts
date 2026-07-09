@@ -9,6 +9,7 @@ import {
   type TemplateId,
 } from "@/lib/editor-data";
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
+import { parseCvData, repairCvData } from "@/lib/cv-schema";
 
 export type CvDocument = {
   id: string;
@@ -78,22 +79,6 @@ function isLegacySampleCv(input: unknown): boolean {
   );
 }
 
-function normaliseCvData(input: unknown, fallbackTemplate?: TemplateId): CvData {
-  const source = typeof input === "object" && input ? (input as Partial<CvData>) : {};
-  const blankCv = createBlankCv(fallbackTemplate);
-  const template = isValidTemplate(source.template)
-    ? source.template
-    : fallbackTemplate || blankCv.template;
-
-  return {
-    ...blankCv,
-    ...source,
-    template,
-    experience: Array.isArray(source.experience) ? source.experience : blankCv.experience,
-    education: Array.isArray(source.education) ? source.education : blankCv.education,
-  };
-}
-
 export function parseTemplate(value: string | null): TemplateId | undefined {
   return isValidTemplate(value) ? value : undefined;
 }
@@ -122,7 +107,7 @@ export async function getOrCreateCurrentCv(userId: string, template?: TemplateId
       const blankCv = createBlankCv(template || row.data.template);
       return updateCvDocument(userId, row.id, blankCv);
     }
-    const data = normaliseCvData(row.data, template);
+    const data = repairCvData(row.data, template || row.data.template);
     if (template && data.template !== row.data.template) {
       return updateCvDocument(userId, row.id, { ...data, template });
     }
@@ -146,7 +131,7 @@ export async function getCvDocument(userId: string, documentId: string) {
 
   const row = result.rows[0];
   if (!row) return null;
-  return { id: row.id, data: normaliseCvData(row.data), updatedAt: row.updated_at.toISOString() };
+  return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
 }
 
 export async function listCvDocuments(userId: string): Promise<CvDocumentSummary[]> {
@@ -177,7 +162,7 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
   );
 
   return result.rows.map((row) => {
-    const data = normaliseCvData(row.data, parseTemplate(row.template_id));
+    const data = repairCvData(row.data, parseTemplate(row.template_id));
     return {
       id: row.id,
       title: row.title || data.fullName?.trim() || "Untitled CV",
@@ -200,7 +185,7 @@ export async function createCvDocument(
   const seed = roleTemplate
     ? getRoleCvTemplate(roleTemplate, template)
     : createBlankCv(template);
-  const data = normaliseCvData(seed);
+  const data = parseCvData(seed);
   const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
     `
       INSERT INTO workcv_cv_documents (id, user_id, title, data, template_id)
@@ -211,13 +196,25 @@ export async function createCvDocument(
   );
 
   const row = result.rows[0];
-  return { id: row.id, data: normaliseCvData(row.data), updatedAt: row.updated_at.toISOString() };
+  return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
 }
 
-export async function updateCvDocument(userId: string, documentId: string, dataInput: unknown) {
+export class CvUpdateConflictError extends Error {
+  constructor() {
+    super("This CV was changed in another tab.");
+    this.name = "CvUpdateConflictError";
+  }
+}
+
+export async function updateCvDocument(
+  userId: string,
+  documentId: string,
+  dataInput: unknown,
+  expectedUpdatedAt?: string,
+) {
   await ensureAuthTables();
 
-  const data = normaliseCvData(dataInput);
+  const data = parseCvData(dataInput);
   const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
     `
       UPDATE workcv_cv_documents
@@ -225,7 +222,9 @@ export async function updateCvDocument(userId: string, documentId: string, dataI
           template_id = $4,
           title = $5,
           updated_at = NOW()
-      WHERE id = $1 AND user_id = $2
+      WHERE id = $1
+        AND user_id = $2
+        AND ($6::timestamptz IS NULL OR updated_at = $6::timestamptz)
       RETURNING id, data, updated_at
     `,
     [
@@ -234,12 +233,17 @@ export async function updateCvDocument(userId: string, documentId: string, dataI
       JSON.stringify(data),
       data.template,
       data.fullName?.trim() || "My CV",
+      expectedUpdatedAt || null,
     ]
   );
 
   const row = result.rows[0];
-  if (!row) return null;
-  return { id: row.id, data: normaliseCvData(row.data), updatedAt: row.updated_at.toISOString() };
+  if (!row) {
+    const owned = await userOwnsCvDocument(userId, documentId);
+    if (owned && expectedUpdatedAt) throw new CvUpdateConflictError();
+    return null;
+  }
+  return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
 }
 
 export async function userOwnsCvDocument(userId: string, documentId: string) {

@@ -74,7 +74,7 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
           <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
             Save your CV
           </p>
-          <h1 className="mt-4 max-w-2xl font-display text-5xl font-semibold leading-tight text-navy md:text-6xl">
+          <h1 className="mt-4 max-w-2xl break-words font-display text-4xl font-semibold leading-tight text-navy sm:text-5xl md:text-6xl">
             Log in before the editor.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">

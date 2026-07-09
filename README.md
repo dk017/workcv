@@ -1,6 +1,6 @@
 # WorkCV UK
 
-WorkCV UK is a Next.js CV builder for UK job seekers. The launch offer is simple: log in with an email code, build for free, and pay GBP 4.99 once to unlock the PDF download with no subscription.
+WorkCV UK is a Next.js CV builder for UK job seekers. The production offer is simple: log in with an email code, build for free, and pay GBP 7.99 once to unlock the PDF download with no subscription.
 
 ## Structure
 
@@ -23,7 +23,7 @@ WorkCV UK is a Next.js CV builder for UK job seekers. The launch offer is simple
 - Brand/domain: `workcv.co.uk`
 - Launch path: separate UK domain
 - Editor access: email-code login required so CVs can be saved and reopened
-- UK price: `GBP 4.99`
+- UK price: `GBP 7.99` (defined in `lib/commerce.ts` and verified against Dodo product `pdt_0NgvxNXDilMTh3bpfLPq2` on July 5, 2026)
 - Payment provider: Dodo Payments
 - Dodo product ID: `pdt_0NgvxNXDilMTh3bpfLPq2`
 
