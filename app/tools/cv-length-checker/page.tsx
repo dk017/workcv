@@ -12,15 +12,15 @@ import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Free CV Length Checker UK - Word and Page Estimate",
+  title: "Free CV Word Count Checker UK - No Signup",
   description:
     "Paste your CV to count its words, estimate A4 pages and get a UK-focused Too Short, Good Length or Too Long verdict with practical editing steps.",
-  alternates: { canonical: "/tools/cv-length-checker" },
+  alternates: { canonical: "/tools/cv-word-count-checker" },
   openGraph: {
-    title: "Free UK CV Length Checker",
+    title: "Free UK CV Word Count Checker",
     description:
       "Count your CV words, estimate its A4 page length and get practical UK-focused editing guidance.",
-    url: "/tools/cv-length-checker",
+    url: "/tools/cv-word-count-checker",
   },
 };
 
@@ -65,10 +65,10 @@ const faqSchema = {
 const appSchema = {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  name: "WorkCV UK CV Length Checker",
+  name: "WorkCV UK CV Word Count Checker",
   applicationCategory: "BusinessApplication",
   operatingSystem: "Any",
-  url: `${site.url}/tools/cv-length-checker`,
+  url: `${site.url}/tools/cv-word-count-checker`,
   description:
     "A private browser-based tool that counts CV words, estimates A4 pages and provides UK-focused length guidance.",
   offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
@@ -93,7 +93,7 @@ export default function CvLengthCheckerPage() {
               Free UK CV tool
             </p>
             <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">
-              Is your CV too short, too long or ready to send?
+              Free CV word count checker.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
               Paste your CV to get its exact word count, an estimated A4 page

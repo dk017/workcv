@@ -42,6 +42,41 @@ const nextConfig = {
         destination: "/cvmaker-alternative",
         permanent: true,
       },
+      {
+        source: "/tools/salary-calculator",
+        destination: "/tools/take-home-pay-calculator-uk",
+        permanent: true,
+      },
+      {
+        source: "/tools/free-cover-letter-maker-uk",
+        destination: "/tools/cover-letter-generator-uk",
+        permanent: true,
+      },
+      {
+        source: "/tools/personal-statement-generator",
+        destination: "/tools/cv-summary-generator-uk",
+        permanent: true,
+      },
+      {
+        source: "/tools/cv-length-checker",
+        destination: "/tools/cv-word-count-checker",
+        permanent: true,
+      },
+      {
+        source: "/tools/ats-cv-checker-uk",
+        destination: "/tools/ats-score-checker",
+        permanent: true,
+      },
+      {
+        source: "/tools/cv-builder-no-subscription",
+        destination: "/cv-builder-no-subscription-uk",
+        permanent: true,
+      },
+      {
+        source: "/tools/resume-builder-no-subscription-uk",
+        destination: "/resume-builder-uk-no-subscription",
+        permanent: true,
+      },
     ];
   },
 };

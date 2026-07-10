@@ -11,12 +11,12 @@ export const metadata: Metadata = {
   title: "UK Take-Home Pay Calculator 2026/27",
   description:
     "Calculate salary after Income Tax, National Insurance, student loans and salary-sacrifice pension using current UK 2026/27 rates.",
-  alternates: { canonical: "/tools/salary-calculator" },
+  alternates: { canonical: "/tools/take-home-pay-calculator-uk" },
   openGraph: {
     title: "UK Take-Home Pay Calculator 2026/27",
     description:
       "Estimate annual, monthly and weekly take-home pay with current UK and Scottish tax bands.",
-    url: "/tools/salary-calculator",
+    url: "/tools/take-home-pay-calculator-uk",
   },
 };
 
@@ -54,7 +54,7 @@ const appSchema = {
   name: "WorkCV UK Take-Home Pay Calculator",
   applicationCategory: "FinanceApplication",
   operatingSystem: "Any",
-  url: `${site.url}/tools/salary-calculator`,
+  url: `${site.url}/tools/take-home-pay-calculator-uk`,
   description:
     "A browser-based UK salary after tax estimator using 2026/27 Income Tax, National Insurance and student-loan thresholds.",
   offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
