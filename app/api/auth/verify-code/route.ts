@@ -17,11 +17,12 @@ export async function POST(request: NextRequest) {
     const payload = typeof body === "object" && body ? (body as Record<string, unknown>) : {};
     const email = typeof payload.email === "string" ? payload.email : "";
     const code = typeof payload.code === "string" ? payload.code : "";
+    const nextPath = typeof payload.nextPath === "string" ? payload.nextPath : undefined;
     const ip =
       request.headers.get("x-real-ip") ||
       request.headers.get("x-forwarded-for")?.split(",")[0] ||
       "unknown";
-    const session = await verifyEmailLoginCode(email, code, ip);
+    const session = await verifyEmailLoginCode(email, code, ip, nextPath);
 
     if (!session) {
       return NextResponse.json({ error: "Invalid or expired code." }, { status: 401 });

@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureAuthTables, getPool } from "@/lib/db";
 import { getEmailTransporter, getTransactionalEmailIdentity } from "@/lib/email";
 import { AUTH_LIMITS, exceedsAuthLimit } from "@/lib/auth-policy";
+import { sanitizeSignupAttribution, SignupAttribution } from "@/lib/attribution";
 
 const sessionCookieName = "workcv_session";
 const loginCodeTtlMinutes = 15;
@@ -46,6 +47,33 @@ export class AuthRateLimitError extends Error {
 
 function normaliseIp(ip: string) {
   return ip.trim().slice(0, 64) || "unknown";
+}
+
+function sanitizeNextPath(value: unknown) {
+  if (typeof value !== "string" || value.length > 2_000) return null;
+  if (!value.startsWith("/") || value.startsWith("//") || value.includes("\\")) return null;
+  return value;
+}
+
+async function recordSignupEvent(
+  eventName: "code_requested" | "verification_failed" | "signup_completed" | "login_completed",
+  email: string,
+  attribution: SignupAttribution = {},
+  nextPath: string | null = null,
+  userId: string | null = null,
+) {
+  try {
+    await getPool().query(
+      `
+        INSERT INTO workcv_signup_events
+          (event_name, email_hash, user_id, next_path, attribution)
+        VALUES ($1, $2, $3, $4, $5::jsonb)
+      `,
+      [eventName, hashValue(email), userId, nextPath, JSON.stringify(attribution)],
+    );
+  } catch (error) {
+    console.error("workcv_signup_event_failed", { eventName, error });
+  }
 }
 
 async function assertWithinRateLimit(
@@ -96,9 +124,16 @@ export function isValidEmail(email: string) {
   return emailRegex.test(email);
 }
 
-export async function requestEmailLoginCode(emailInput: string, ipInput = "unknown") {
+export async function requestEmailLoginCode(
+  emailInput: string,
+  ipInput = "unknown",
+  attributionInput?: unknown,
+  nextPathInput?: unknown,
+) {
   const email = normalizeEmail(emailInput);
   const ip = normaliseIp(ipInput);
+  const attribution = sanitizeSignupAttribution(attributionInput);
+  const nextPath = sanitizeNextPath(nextPathInput);
   if (!isValidEmail(email)) {
     throw new Error("INVALID_EMAIL");
   }
@@ -124,10 +159,10 @@ export async function requestEmailLoginCode(emailInput: string, ipInput = "unkno
     await client.query(
       `
         INSERT INTO workcv_login_codes
-          (id, email, code_hash, expires_at, request_ip)
-        VALUES ($1, $2, $3, $4, $5)
+          (id, email, code_hash, expires_at, request_ip, attribution, next_path)
+        VALUES ($1, $2, $3, $4, $5, $6::jsonb, $7)
       `,
-      [id, email, hashValue(code), expiresAt, ip],
+      [id, email, hashValue(code), expiresAt, ip, JSON.stringify(attribution), nextPath],
     );
     await client.query(
       `
@@ -156,11 +191,13 @@ export async function requestEmailLoginCode(emailInput: string, ipInput = "unkno
       text: `Your WorkCV login code is ${code}. This code expires in ${loginCodeTtlMinutes} minutes.`,
       html: `<p>Your WorkCV login code is <strong>${code}</strong>.</p><p>This code expires in ${loginCodeTtlMinutes} minutes.</p>`,
     });
+    await recordSignupEvent("code_requested", email, attribution, nextPath);
     return {};
   }
 
   if (process.env.NODE_ENV !== "production") {
     console.log(`workcv_auth_dev_code ${email} ${code}`);
+    await recordSignupEvent("code_requested", email, attribution, nextPath);
     return { devCode: code };
   }
   throw new Error("SMTP is required for email login in production");
@@ -170,11 +207,13 @@ export async function verifyEmailLoginCode(
   emailInput: string,
   codeInput: string,
   ipInput = "unknown",
+  nextPathInput?: unknown,
 ) {
   const email = normalizeEmail(emailInput);
   const code = codeInput.trim();
   if (!isValidEmail(email) || !/^\d{6}$/.test(code)) return null;
   const ip = normaliseIp(ipInput);
+  const requestedNextPath = sanitizeNextPath(nextPathInput);
 
   await ensureAuthTables();
   await assertWithinRateLimit("verify", email, ip);
@@ -184,9 +223,11 @@ export async function verifyEmailLoginCode(
     code_hash: string;
     attempt_count: number;
     locked_until: Date | null;
+    attribution: SignupAttribution;
+    next_path: string | null;
   }>(
     `
-      SELECT id, code_hash, attempt_count, locked_until
+      SELECT id, code_hash, attempt_count, locked_until, attribution, next_path
       FROM workcv_login_codes
       WHERE email = $1
         AND used_at IS NULL
@@ -206,6 +247,12 @@ export async function verifyEmailLoginCode(
     crypto.timingSafeEqual(Buffer.from(record.code_hash), Buffer.from(suppliedHash));
   if (!record || !validHash) {
     await recordAuthEvent("verify", email, ip, false);
+    await recordSignupEvent(
+      "verification_failed",
+      email,
+      record?.attribution || {},
+      requestedNextPath || record?.next_path || null,
+    );
     if (record) {
       await getPool().query(
         `
@@ -228,17 +275,32 @@ export async function verifyEmailLoginCode(
     await getPool().query<User>("SELECT id, email FROM workcv_users WHERE email = $1", [email])
   ).rows[0];
   const isNewUser = !user;
+  const attribution = sanitizeSignupAttribution(record.attribution);
+  const nextPath = requestedNextPath || record.next_path;
 
   if (!user) {
     const userId = crypto.randomUUID();
     user = (
       await getPool().query<User>(
         `
-          INSERT INTO workcv_users (id, email)
-          VALUES ($1, $2)
+          INSERT INTO workcv_users
+            (id, email, first_landing_path, first_referrer, utm_source, utm_medium,
+             utm_campaign, utm_term, utm_content, signup_next_path)
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
           RETURNING id, email
         `,
-        [userId, email]
+        [
+          userId,
+          email,
+          attribution.landingPath || null,
+          attribution.referrer || null,
+          attribution.utmSource || null,
+          attribution.utmMedium || null,
+          attribution.utmCampaign || null,
+          attribution.utmTerm || null,
+          attribution.utmContent || null,
+          nextPath,
+        ]
       )
     ).rows[0];
   }
@@ -248,6 +310,13 @@ export async function verifyEmailLoginCode(
     [email],
   );
   await recordAuthEvent("verify", email, ip, true);
+  await recordSignupEvent(
+    isNewUser ? "signup_completed" : "login_completed",
+    email,
+    attribution,
+    nextPath,
+    user.id,
+  );
 
   const token = crypto.randomBytes(32).toString("hex");
   await getPool().query(

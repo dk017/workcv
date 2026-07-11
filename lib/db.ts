@@ -90,6 +90,22 @@ export async function ensurePaymentTables() {
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS consent_version TEXT;
 
+        DO $backfill$
+        BEGIN
+          IF to_regclass('public.workcv_cv_documents') IS NOT NULL THEN
+            UPDATE workcv_payment_checkouts p
+            SET user_id = d.user_id
+            FROM workcv_cv_documents d
+            WHERE p.user_id IS NULL AND p.draft_id = d.id;
+
+            UPDATE workcv_orders o
+            SET user_id = d.user_id
+            FROM workcv_cv_documents d
+            WHERE o.user_id IS NULL AND o.draft_id = d.id;
+          END IF;
+        END
+        $backfill$;
+
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
       `)
@@ -114,6 +130,15 @@ export async function ensureAuthTables() {
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS first_landing_path TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS first_referrer TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_source TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_medium TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_campaign TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_term TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_content TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS signup_next_path TEXT;
+
         CREATE TABLE IF NOT EXISTS workcv_login_codes (
           id TEXT PRIMARY KEY,
           email TEXT NOT NULL,
@@ -123,6 +148,8 @@ export async function ensureAuthTables() {
           attempt_count INTEGER NOT NULL DEFAULT 0,
           locked_until TIMESTAMPTZ,
           request_ip TEXT,
+          attribution JSONB NOT NULL DEFAULT '{}'::jsonb,
+          next_path TEXT,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
@@ -135,6 +162,23 @@ export async function ensureAuthTables() {
           ADD COLUMN IF NOT EXISTS locked_until TIMESTAMPTZ;
         ALTER TABLE workcv_login_codes
           ADD COLUMN IF NOT EXISTS request_ip TEXT;
+        ALTER TABLE workcv_login_codes
+          ADD COLUMN IF NOT EXISTS attribution JSONB NOT NULL DEFAULT '{}'::jsonb;
+        ALTER TABLE workcv_login_codes
+          ADD COLUMN IF NOT EXISTS next_path TEXT;
+
+        CREATE TABLE IF NOT EXISTS workcv_signup_events (
+          id BIGSERIAL PRIMARY KEY,
+          event_name TEXT NOT NULL,
+          email_hash TEXT NOT NULL,
+          user_id TEXT,
+          next_path TEXT,
+          attribution JSONB NOT NULL DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_signup_events_funnel_idx
+          ON workcv_signup_events (event_name, created_at DESC);
 
         CREATE TABLE IF NOT EXISTS workcv_auth_rate_events (
           id BIGSERIAL PRIMARY KEY,

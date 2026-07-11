@@ -4,6 +4,7 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, ShieldCheck } from "lucide-react";
+import { readFirstTouchAttribution } from "@/components/attribution-capture";
 
 export default function LoginForm({ initialNext }: { initialNext: string }) {
   const router = useRouter();
@@ -24,7 +25,11 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
       const response = await fetch("/api/auth/request-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({
+          email,
+          nextPath: initialNext,
+          attribution: readFirstTouchAttribution(),
+        }),
       });
       const data = (await response.json().catch(() => null)) as
         | { error?: string; devCode?: string }
@@ -51,7 +56,7 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
       const response = await fetch("/api/auth/verify-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
+        body: JSON.stringify({ email, code, nextPath: initialNext }),
       });
       const data = (await response.json().catch(() => null)) as { error?: string } | null;
 

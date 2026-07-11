@@ -3,6 +3,7 @@ import { DM_Sans, Fraunces } from "next/font/google";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
+import { AttributionCapture } from "@/components/attribution-capture";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
       <body className="font-sans antialiased">
+        <AttributionCapture />
         <Header />
         <main>{children}</main>
         <Footer />

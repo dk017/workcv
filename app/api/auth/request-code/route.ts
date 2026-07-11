@@ -12,11 +12,12 @@ export async function POST(request: NextRequest) {
     }
     const payload = typeof body === "object" && body ? (body as Record<string, unknown>) : {};
     const email = typeof payload.email === "string" ? payload.email : "";
+    const nextPath = typeof payload.nextPath === "string" ? payload.nextPath : undefined;
     const ip =
       request.headers.get("x-real-ip") ||
       request.headers.get("x-forwarded-for")?.split(",")[0] ||
       "unknown";
-    const result = await requestEmailLoginCode(email, ip);
+    const result = await requestEmailLoginCode(email, ip, payload.attribution, nextPath);
     return NextResponse.json({ ok: true, ...result });
   } catch (error) {
     if (error instanceof Error && error.message === "INVALID_EMAIL") {
