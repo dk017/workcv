@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { CSSProperties, memo } from "react";
 
 import {
   CvData,
@@ -9,6 +9,7 @@ import {
   TemplateId,
   lines,
 } from "@/lib/editor-data";
+import { getCvNameTypography } from "@/lib/cv-typography";
 
 export function CvDocument({
   cv,
@@ -71,9 +72,7 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
       data-template="classic"
     >
       <header className="cv-header border-b-2 border-navy pb-7 text-center">
-        <h2 className="cv-name font-display text-5xl font-semibold leading-tight text-navy">
-          {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
-        </h2>
+        <CvName cv={cv} template="classic" className="text-navy" />
         <p className="mt-3 text-lg font-bold text-ink">
           {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
         </p>
@@ -91,9 +90,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
       data-template="modern"
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
-        <h2 className="cv-name font-display text-4xl font-semibold leading-tight">
-          {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
-        </h2>
+        <CvName cv={cv} template="modern" />
         <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-gold-tint">
           {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
         </p>
@@ -143,9 +140,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
     >
       <header className="cv-header grid grid-cols-[1fr_auto] gap-4 border-b-2 border-navy pb-4">
         <div>
-          <h2 className="cv-name font-display text-4xl font-semibold leading-tight text-navy">
-            {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
-          </h2>
+          <CvName cv={cv} template="compact" className="text-navy" />
           <p className="mt-1 text-base font-bold text-ink">
             {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
           </p>
@@ -169,6 +164,32 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
         </aside>
       </div>
     </article>
+  );
+}
+
+function CvName({
+  cv,
+  template,
+  className = "",
+}: {
+  cv: CvData;
+  template: TemplateId;
+  className?: string;
+}) {
+  const typography = getCvNameTypography(cv.fullName || "Your name", template);
+  const style = {
+    "--cv-name-preview-size": `${typography.previewPx}px`,
+    "--cv-name-print-size": `${typography.printPt}pt`,
+  } as CSSProperties;
+
+  return (
+    <h2
+      className={`cv-name font-display font-semibold leading-tight ${className}`}
+      data-emergency-break={typography.emergencyBreak ? "true" : "false"}
+      style={style}
+    >
+      {cv.fullName || <PreviewPlaceholder>Your name</PreviewPlaceholder>}
+    </h2>
   );
 }
 

@@ -853,17 +853,6 @@ export function CvEditor() {
         </section>
       )}
 
-      <section className="border-b border-line bg-greensoft">
-        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-start gap-3 py-4 sm:w-[min(1540px,calc(100%-48px))]">
-          <Check className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-          <p className="text-sm font-bold leading-6 text-navy">
-            {pdfUnlocked
-              ? "This saved CV is unlocked. Edit it anytime and download the updated PDF without paying again."
-              : `Your work is saved. Pay ${site.price} once to unlock this saved CV; later edits and PDF downloads stay unlocked.`}
-          </p>
-        </div>
-      </section>
-
       {paymentState && (
         <section
           className={`editor-chrome border-b border-line ${

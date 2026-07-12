@@ -144,9 +144,14 @@ main section.py-24 {
 }
 
 .print-document .cv-name {
+  font-size: var(--cv-name-preview-size);
   hyphens: none;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.print-document .cv-name[data-emergency-break="true"] {
   overflow-wrap: anywhere;
-  word-break: break-word;
 }
 
 @container (max-width: 794px) {
@@ -362,21 +367,14 @@ main section.py-24 {
   }
 
   .print-document .cv-header h2 {
-    font-size: 28pt !important;
+    font-size: var(--cv-name-print-size, 28pt) !important;
     line-height: 1.05 !important;
-  }
-
-  .print-document[data-template="modern"] .cv-name {
-    font-size: 18pt !important;
   }
 
   .print-document[data-template="compact"] .cv-header {
     grid-template-columns: 65mm minmax(0, 1fr) !important;
   }
 
-  .print-document[data-template="compact"] .cv-name {
-    font-size: 20pt !important;
-  }
 
   .print-document[data-template="compact"] .cv-contact-line {
     max-width: none !important;
