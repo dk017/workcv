@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { DebouncedSaveManager } from "../lib/save-manager.ts";
+import { DebouncedSaveManager, SaveConflictError } from "../lib/save-manager.ts";
 
 function deferred<T>() {
   let resolve!: (value: T) => void;
@@ -57,8 +57,30 @@ test("failed saves remain unsaved and retry succeeds", async () => {
   manager.setValue("latest");
   assert.equal(await manager.flush(), false);
   assert.equal(manager.snapshot().status, "error");
+  assert.equal(manager.snapshot().errorKind, "general");
   assert.equal(manager.hasUnsavedChanges(), true);
   assert.equal(await manager.retry(), true);
   assert.equal(manager.snapshot().status, "saved");
+  manager.dispose();
+});
+
+test("conflicts are identified so the UI does not offer a futile retry", async () => {
+  const manager = new DebouncedSaveManager(
+    "initial",
+    "2026-01-01T00:00:00.000Z",
+    async () => {
+      throw new SaveConflictError("A newer version is already saved.");
+    },
+    60_000,
+  );
+
+  manager.setValue("local edit");
+  assert.equal(await manager.flush(), false);
+  assert.deepEqual(manager.snapshot(), {
+    status: "error",
+    error: "A newer version is already saved.",
+    errorKind: "conflict",
+    version: 1,
+  });
   manager.dispose();
 });

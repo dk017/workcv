@@ -80,6 +80,7 @@ export function CvEditor() {
   const [saveSnapshot, setSaveSnapshot] = useState<SaveSnapshot>({
     status: "saving",
     error: null,
+    errorKind: null,
     version: 0,
   });
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
@@ -190,6 +191,7 @@ export function CvEditor() {
           setSaveSnapshot({
             status: "error",
             error: "Could not load your saved CV.",
+            errorKind: "general",
             version: 0,
           });
           setLoaded(true);
@@ -511,7 +513,12 @@ export function CvEditor() {
     }
     if (manager?.hasUnsavedChanges() && !(await manager.flush())) return;
     setCreatingNew(true);
-    setSaveSnapshot((current) => ({ ...current, status: "saving", error: null }));
+    setSaveSnapshot((current) => ({
+      ...current,
+      status: "saving",
+      error: null,
+      errorKind: null,
+    }));
     setCheckoutError(null);
 
     try {
@@ -553,6 +560,7 @@ export function CvEditor() {
         ...current,
         status: "error",
         error: error instanceof Error ? error.message : "Could not create a new CV",
+        errorKind: "general",
       }));
     } finally {
       setCreatingNew(false);
@@ -789,10 +797,16 @@ export function CvEditor() {
               {saveSnapshot.status === "error" && (
                 <button
                   type="button"
-                  onClick={() => void saveManagerRef.current?.retry()}
+                  onClick={() => {
+                    if (saveSnapshot.errorKind === "conflict") {
+                      window.location.reload();
+                      return;
+                    }
+                    void saveManagerRef.current?.retry();
+                  }}
                   className="ml-2 underline"
                 >
-                  Retry
+                  {saveSnapshot.errorKind === "conflict" ? "Reload latest" : "Retry"}
                 </button>
               )}
             </div>

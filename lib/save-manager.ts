@@ -3,6 +3,7 @@ export type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 export type SaveSnapshot = {
   status: SaveStatus;
   error: string | null;
+  errorKind: "conflict" | "general" | null;
   version: number;
 };
 
@@ -22,6 +23,7 @@ export class DebouncedSaveManager<T> {
   private savedVersion = 0;
   private status: SaveStatus = "saved";
   private error: string | null = null;
+  private errorKind: SaveSnapshot["errorKind"] = null;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private activeSave: Promise<boolean> | null = null;
   private disposed = false;
@@ -56,7 +58,12 @@ export class DebouncedSaveManager<T> {
   }
 
   snapshot(): SaveSnapshot {
-    return { status: this.status, error: this.error, version: this.version };
+    return {
+      status: this.status,
+      error: this.error,
+      errorKind: this.errorKind,
+      version: this.version,
+    };
   }
 
   setValue(value: T) {
@@ -65,6 +72,7 @@ export class DebouncedSaveManager<T> {
     this.version += 1;
     this.status = "unsaved";
     this.error = null;
+    this.errorKind = null;
     this.emit();
     this.schedule();
   }
@@ -89,6 +97,7 @@ export class DebouncedSaveManager<T> {
     const savingRevision = this.revision;
     this.status = "saving";
     this.error = null;
+    this.errorKind = null;
     this.emit();
 
     const operation = this.save(savingValue, savingRevision, options)
@@ -98,6 +107,7 @@ export class DebouncedSaveManager<T> {
         if (this.version === savingVersion) {
           this.status = "saved";
           this.error = null;
+          this.errorKind = null;
         } else {
           this.status = "unsaved";
           this.schedule();
@@ -109,6 +119,7 @@ export class DebouncedSaveManager<T> {
         this.status = "error";
         this.error =
           error instanceof Error ? error.message : "Your changes could not be saved.";
+        this.errorKind = error instanceof SaveConflictError ? "conflict" : "general";
         this.emit();
         return false;
       })

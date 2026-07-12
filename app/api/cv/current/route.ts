@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isDeepStrictEqual } from "node:util";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import {
@@ -11,6 +12,7 @@ import {
 import {
   CvValidationError,
   formatCvValidationError,
+  parseCvData,
 } from "@/lib/cv-schema";
 
 export async function GET(request: NextRequest) {
@@ -61,10 +63,17 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ document });
   } catch (error) {
     if (error instanceof CvUpdateConflictError) {
+      const currentDocument = await getCvDocument(user.id, documentId);
+      if (currentDocument) {
+        const submittedData = parseCvData(body.data);
+        if (isDeepStrictEqual(currentDocument.data, submittedData)) {
+          return NextResponse.json({ document: currentDocument });
+        }
+      }
       return NextResponse.json(
         {
           error:
-            "This CV was updated in another tab. Reload before saving so newer work is not overwritten.",
+            "A newer version of this CV is already saved, usually from another open editor tab. Reload to use the latest version.",
           code: "CV_CONFLICT",
         },
         { status: 409 },
