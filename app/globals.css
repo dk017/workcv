@@ -44,6 +44,37 @@ body {
   margin-inline: auto;
 }
 
+/* Keep long editorial and tool pages dense enough to scan without changing editor or print spacing. */
+main section.py-14 {
+  padding-block: 2.75rem;
+}
+
+main section.py-16 {
+  padding-block: 3rem;
+}
+
+main section.py-20 {
+  padding-block: 3.75rem;
+}
+
+main section.py-24 {
+  padding-block: 4.5rem;
+}
+
+@media (min-width: 768px) {
+  main section.md\:py-20 {
+    padding-block: 4rem;
+  }
+
+  main section.md\:py-24 {
+    padding-block: 4.5rem;
+  }
+
+  main section.md\:py-28 {
+    padding-block: 5rem;
+  }
+}
+
 :root {
   --preview-scale: 0.36;
   --preview-frame-width: calc((794px * var(--preview-scale)) + 32px);

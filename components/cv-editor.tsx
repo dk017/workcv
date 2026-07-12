@@ -83,7 +83,6 @@ export function CvEditor() {
     version: 0,
   });
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -111,7 +110,7 @@ export function CvEditor() {
   const previousSaveStatusRef = useRef<SaveSnapshot["status"]>("saving");
   const trackedMilestonesRef = useRef(new Set<number>());
   const trackedSectionsRef = useRef(new Set<string>());
-  const modalOpen = templatePickerOpen || importOpen || checkoutOpen || reviewOpen;
+  const modalOpen = templatePickerOpen || importOpen || reviewOpen;
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -581,12 +580,12 @@ export function CvEditor() {
   };
 
   const continueFromReview = () => {
-    setReviewOpen(false);
     if (pdfUnlocked) {
+      setReviewOpen(false);
       window.print();
     } else {
       trackEditorEvent("checkout_opened", draftId);
-      setCheckoutOpen(true);
+      void startCheckout(cv.email);
     }
   };
 
@@ -817,7 +816,7 @@ export function CvEditor() {
             <button
               type="button"
               onClick={startDownload}
-              disabled={paymentState === "checking" || paymentState === "pending"}
+              disabled={checkoutLoading || paymentState === "checking" || paymentState === "pending"}
               className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60"
             >
               <Download className="h-4 w-4" />
@@ -908,11 +907,13 @@ export function CvEditor() {
                 onClick={() => {
                   setPaymentState(null);
                   setForceNewCheckout(true);
-                  setCheckoutOpen(true);
+                  trackEditorEvent("checkout_opened", draftId, { retry: true });
+                  void startCheckout(cv.email);
                 }}
-                className="inline-flex min-h-10 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white"
+                disabled={checkoutLoading}
+                className="inline-flex min-h-10 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
               >
-                Return to checkout
+                {checkoutLoading ? "Opening checkout..." : "Return to checkout"}
               </button>
             )}
           </div>
@@ -1086,21 +1087,14 @@ export function CvEditor() {
           onEvent={(event) => trackEditorEvent(event, draftId)}
         />
       )}
-      {checkoutOpen && (
-        <DownloadModal
-          defaultEmail={cv.email}
-          error={checkoutError}
-          loading={checkoutLoading}
-          onClose={() => setCheckoutOpen(false)}
-          onCheckout={startCheckout}
-        />
-      )}
       {reviewOpen && (
         <FinalReviewModal
           cv={cv}
           issues={readiness.issues.map((issue) => issue.message)}
           pageCount={previewPageCount}
           pdfUnlocked={pdfUnlocked}
+          checkoutError={checkoutError}
+          checkoutLoading={checkoutLoading}
           onClose={() => setReviewOpen(false)}
           onContinue={continueFromReview}
           onTemplateChange={(template) => updateField("template", template)}
@@ -1131,6 +1125,8 @@ function FinalReviewModal({
   issues,
   pageCount,
   pdfUnlocked,
+  checkoutError,
+  checkoutLoading,
   onClose,
   onContinue,
   onTemplateChange,
@@ -1139,11 +1135,14 @@ function FinalReviewModal({
   issues: string[];
   pageCount: number;
   pdfUnlocked: boolean;
+  checkoutError: string | null;
+  checkoutLoading: boolean;
   onClose: () => void;
   onContinue: () => void;
   onTemplateChange: (template: TemplateId) => void;
 }) {
-  const dialogRef = useAccessibleDialog(onClose);
+  const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
+  const dialogRef = useAccessibleDialog(onClose, !checkoutLoading);
   return (
     <div className="download-modal fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/50 p-4">
       <div
@@ -1215,14 +1214,45 @@ function FinalReviewModal({
             )}
           </div>
 
+          {!pdfUnlocked && (
+            <label className="mt-4 flex gap-3 rounded-md border border-line bg-surface p-3 text-xs leading-5 text-muted">
+              <input
+                type="checkbox"
+                checked={digitalAccessAccepted}
+                onChange={(event) => setDigitalAccessAccepted(event.target.checked)}
+                className="mt-0.5 h-4 w-4 shrink-0 accent-navy"
+              />
+              <span>
+                I want immediate digital access after payment and understand that once
+                access starts my cancellation rights may be affected. Statutory rights
+                for faulty or misdescribed content still apply. See the{" "}
+                <a className="font-bold text-navy underline" href="/refund-policy">
+                  refund policy
+                </a>
+                .
+              </span>
+            </label>
+          )}
+
+          {checkoutError && (
+            <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">
+              {checkoutError}
+            </p>
+          )}
+
           <div className="mt-5 flex flex-col gap-3">
             <button
               type="button"
               onClick={onContinue}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white"
+              disabled={checkoutLoading || (!pdfUnlocked && !digitalAccessAccepted)}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"
             >
               <Download className="h-4 w-4" />
-              {pdfUnlocked ? "Download PDF" : `Continue to pay ${site.price}`}
+              {checkoutLoading
+                ? "Opening secure checkout..."
+                : pdfUnlocked
+                  ? "Download PDF"
+                  : `Pay ${site.price} securely`}
             </button>
             <button
               type="button"
@@ -1558,152 +1588,6 @@ function TemplatePickerModal({
               );
             })}
           </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DownloadModal({
-  defaultEmail,
-  error,
-  loading,
-  onClose,
-  onCheckout,
-}: {
-  defaultEmail: string;
-  error: string | null;
-  loading: boolean;
-  onClose: () => void;
-  onCheckout: (email: string) => void;
-}) {
-  const [email, setEmail] = useState(defaultEmail);
-  const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
-  const canSubmit =
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && digitalAccessAccepted;
-  const dialogRef = useAccessibleDialog(onClose, !loading);
-
-  return (
-    <div className="download-modal fixed inset-0 z-50 flex items-center justify-center bg-navy/45 p-4">
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="download-modal-title"
-        className="w-full max-w-lg rounded-xl border border-line bg-white p-6 shadow-soft"
-      >
-        <div className="mb-5 flex items-start justify-between gap-4">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              Final PDF
-            </p>
-            <h2 id="download-modal-title" className="mt-2 font-display text-3xl font-semibold text-navy">
-              Unlock your CV download.
-            </h2>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-md border border-line px-3 py-1 text-sm font-bold text-muted hover:text-navy"
-          >
-            Close
-          </button>
-        </div>
-
-        <div className="rounded-xl border-2 border-navy bg-paper p-5">
-          <div className="flex items-end gap-3">
-            <span className="font-display text-5xl font-semibold text-navy">
-              {site.price}
-            </span>
-            <span className="pb-2 text-sm font-bold uppercase tracking-[0.12em] text-muted">
-              once
-            </span>
-          </div>
-          <p className="mt-3 leading-7 text-muted">
-            Pay once through secure Dodo checkout. After payment, WorkCV returns
-            you to the editor, confirms access, and emails your purchase confirmation.
-          </p>
-          <p className="mt-2 text-sm leading-6 text-muted">
-            For a clean PDF, choose “Save as PDF” and turn off browser headers
-            and footers in the print dialog.
-          </p>
-          {!site.priceTaxInclusive && (
-            <p className="mt-2 text-sm font-bold leading-6 text-navy">
-              {site.price} is the base price. Any applicable tax is calculated and
-              shown by Dodo before you pay.
-            </p>
-          )}
-          <ul className="mt-5 space-y-3 text-sm font-bold text-navy">
-            {[
-              "PDF access for this saved CV",
-              "Future edits and PDF downloads for this saved CV",
-              "Purchase confirmation by email",
-              "No subscription",
-              "No automatic renewal",
-            ].map((item) => (
-              <li key={item} className="flex gap-2">
-                <Check className="h-5 w-5 text-success" />
-                {item}
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <label className="mt-5 block">
-          <span className="mb-2 block text-sm font-bold text-navy">
-            Email for receipt and purchase confirmation
-          </span>
-          <input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            className="min-h-11 w-full rounded-md border border-line bg-white px-3 text-sm text-ink outline-none transition focus:border-navy focus:ring-2 focus:ring-gold-tint"
-          />
-        </label>
-
-        <label className="mt-4 flex gap-3 rounded-md border border-line bg-surface p-4 text-sm leading-6 text-muted">
-          <input
-            type="checkbox"
-            checked={digitalAccessAccepted}
-            onChange={(event) => setDigitalAccessAccepted(event.target.checked)}
-            className="mt-1 h-4 w-4 shrink-0 accent-navy"
-          />
-          <span>
-            I want immediate digital access after payment and understand that
-            once PDF access starts my cancellation rights may be affected. This
-            does not affect statutory rights for faulty or misdescribed digital
-            content. See the{" "}
-            <a className="font-bold text-navy underline" href="/refund-policy">
-              refund policy
-            </a>
-            .
-          </span>
-        </label>
-
-        {error && (
-          <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">
-            {error}
-          </p>
-        )}
-
-        <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-          <button
-            type="button"
-            onClick={() => onCheckout(email)}
-            disabled={!canSubmit || loading}
-            className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-not-allowed disabled:opacity-55"
-          >
-            <Download className="h-4 w-4" />
-            {loading ? "Opening checkout..." : "Pay and unlock PDF"}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex min-h-12 items-center justify-center rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy hover:bg-paper"
-          >
-            Keep editing
-          </button>
         </div>
       </div>
     </div>
