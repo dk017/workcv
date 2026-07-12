@@ -538,3 +538,9 @@ main section.py-24 {
     line-height: 1.28 !important;
   }
 }
+
+.pdf-render-shell {
+  width: 794px;
+  margin: 0 auto;
+  background: white;
+}

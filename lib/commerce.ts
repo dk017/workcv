@@ -2,7 +2,7 @@ export const WORKCV_PRICE = {
   amountMinor: 799,
   amount: 7.99,
   currency: "GBP",
-  taxInclusive: false,
+  taxInclusive: true,
   billing: "one_time",
 } as const;
 

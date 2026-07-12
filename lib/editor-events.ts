@@ -12,6 +12,7 @@ export const editorEventNames = [
   "template_selected",
   "final_review_opened",
   "pdf_clicked",
+  "pdf_downloaded",
   "checkout_opened",
   "payment_started",
   "payment_pending",

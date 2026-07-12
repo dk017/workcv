@@ -2,6 +2,7 @@
 const nextConfig = {
   output: "standalone",
   experimental: {
+    serverComponentsExternalPackages: ["playwright-core"],
     outputFileTracingIncludes: {
       "/api/cv/import": [
         "./node_modules/pdfjs-dist/legacy/build/**/*",

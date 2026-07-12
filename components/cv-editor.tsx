@@ -87,6 +87,7 @@ export function CvEditor() {
   const [draftId, setDraftId] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [pdfDownloading, setPdfDownloading] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [forceNewCheckout, setForceNewCheckout] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -96,6 +97,8 @@ export function CvEditor() {
   const [readinessOverride, setReadinessOverride] = useState(false);
   const [undoLabel, setUndoLabel] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
+  const [recoveryCv, setRecoveryCv] = useState<CvData | null>(null);
+  const [otherTabUpdated, setOtherTabUpdated] = useState(false);
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
   const [pendingTargeting, setPendingTargeting] = useState<CvTargeting | null>(null);
@@ -168,7 +171,14 @@ export function CvEditor() {
         if (!cancelled) {
           setDraftId(data.document.id);
           window.localStorage.setItem(draftIdKey, data.document.id);
-          window.localStorage.removeItem(storageKey);
+          const localKey = `${storageKey}:${data.document.id}`;
+          const stored = window.localStorage.getItem(localKey);
+          if (stored) {
+            try {
+              const recovery = JSON.parse(stored) as { cv: CvData; savedAt: number };
+              if (recovery.cv && recovery.savedAt > Date.parse(data.document.updatedAt) && JSON.stringify(recovery.cv) !== JSON.stringify(data.document.data)) setRecoveryCv(recovery.cv);
+            } catch { window.localStorage.removeItem(localKey); }
+          }
           lastManagedCvRef.current = data.document.data;
           setCv(data.document.data);
           saveManagerRef.current?.dispose();
@@ -204,6 +214,26 @@ export function CvEditor() {
       cancelled = true;
     };
   }, []);
+
+  useEffect(() => {
+    if (!loaded || !draftId) return;
+    const key = `${storageKey}:${draftId}`;
+    window.localStorage.setItem(key, JSON.stringify({ cv, savedAt: Date.now() }));
+  }, [cv, draftId, loaded]);
+
+  useEffect(() => {
+    if (!draftId) return;
+    const key = `${storageKey}:${draftId}`;
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== key || !event.newValue) return;
+      try {
+        const incoming = JSON.parse(event.newValue) as { cv: CvData };
+        if (JSON.stringify(incoming.cv) !== JSON.stringify(cv)) setOtherTabUpdated(true);
+      } catch { /* Ignore malformed browser storage. */ }
+    };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, [cv, draftId]);
 
   useEffect(() => {
     if (!loaded || !draftId || handoffStartedRef.current) return;
@@ -587,10 +617,39 @@ export function CvEditor() {
     setReviewOpen(true);
   };
 
+  const downloadPdf = async () => {
+    if (!draftId || pdfDownloading) return;
+    setPdfDownloading(true);
+    setCheckoutError(null);
+    try {
+      const saved = await saveManagerRef.current?.flush();
+      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      const response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "PDF generation failed");
+      }
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `${cv.fullName.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "workcv"}-cv.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setReviewOpen(false);
+      trackEditorEvent("pdf_downloaded", draftId);
+    } catch (error) {
+      setCheckoutError(error instanceof Error ? error.message : "PDF generation failed");
+    } finally {
+      setPdfDownloading(false);
+    }
+  };
+
   const continueFromReview = () => {
     if (pdfUnlocked) {
-      setReviewOpen(false);
-      window.print();
+      void downloadPdf();
     } else {
       trackEditorEvent("checkout_opened", draftId);
       void startCheckout(cv.email);
@@ -782,9 +841,15 @@ export function CvEditor() {
               <span className="hidden sm:inline">Template:</span>
               {selectedTemplate?.name ?? "Template"}
             </button>
-            <div className="rounded-md border border-line bg-paper px-4 py-2 text-sm font-bold text-navy">
-              {readiness.score}% ready
-            </div>
+            <button
+              type="button"
+              onClick={() => setReadinessPrompt(true)}
+              className="rounded-md border border-line bg-paper px-4 py-2 text-sm font-bold text-navy hover:border-navy"
+            >
+              {readiness.issues.length === 0
+                ? "Review complete"
+                : `Review · ${readiness.fixCount} ${readiness.fixCount === 1 ? "fix" : "fixes"}`}
+            </button>
             <div
               className={`rounded-md border px-4 py-2 text-sm ${
                 saveSnapshot.status === "error"
@@ -842,12 +907,14 @@ export function CvEditor() {
         </div>
       </section>
 
-      {readinessPrompt && !readiness.ready && (
+      {readinessPrompt && readiness.issues.length > 0 && (
         <section className="editor-chrome border-b border-line bg-gold-tint">
           <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-3 py-4 sm:w-[min(1540px,calc(100%-48px))] sm:flex-row sm:items-center sm:justify-between">
             <div>
               <p className="font-bold text-navy">Your CV needs one more review.</p>
-              <p className="mt-1 text-sm text-muted">{readiness.issues[0]?.message}</p>
+              <div className="mt-2 space-y-1 text-sm text-muted">
+                {readiness.issues.slice(0, 4).map((issue) => <button key={issue.id} type="button" onClick={() => setActiveTab(issue.section)} className="block text-left underline underline-offset-2">{issue.severity === "fix" ? "Fix: " : "Improve: "}{issue.message}</button>)}
+              </div>
             </div>
             <button
               type="button"
@@ -863,6 +930,18 @@ export function CvEditor() {
             >
               Review and continue anyway
             </button>
+          </div>
+        </section>
+      )}
+
+      {(recoveryCv || otherTabUpdated) && (
+        <section className="editor-chrome border-b border-line bg-[#edf4f8]" aria-live="polite">
+          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-3 py-4 sm:w-[min(1540px,calc(100%-48px))] sm:flex-row sm:items-center sm:justify-between">
+            <div><p className="font-bold text-navy">{recoveryCv ? "We recovered newer edits from this browser." : "This CV is open and changing in another tab."}</p><p className="mt-1 text-sm text-muted">{recoveryCv ? "Restore them, or keep the version loaded from your account." : "Reload the latest version before continuing here to avoid competing edits."}</p></div>
+            <div className="flex gap-2">
+              {recoveryCv && <button type="button" onClick={() => { setCv(recoveryCv); setRecoveryCv(null); }} className="min-h-10 rounded-md bg-navy px-4 text-sm font-bold text-white">Restore edits</button>}
+              <button type="button" onClick={() => { if (otherTabUpdated) window.location.reload(); else setRecoveryCv(null); }} className="min-h-10 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy">{otherTabUpdated ? "Reload latest" : "Keep account version"}</button>
+            </div>
           </div>
         </section>
       )}
@@ -991,6 +1070,12 @@ export function CvEditor() {
             </div>
 
             <div className="rounded-xl border border-line bg-white p-5 shadow-sm xl:p-6">
+              {readiness.issues.some((issue) => issue.section === activeTab) && (
+                <div className="mb-5 rounded-md border border-gold bg-gold-tint p-4" role="status">
+                  <p className="text-sm font-bold text-navy">Checks for this section</p>
+                  <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">{readiness.issues.filter((issue) => issue.section === activeTab).map((issue) => <li key={issue.id}><strong className="text-navy">{issue.severity === "fix" ? "Fix:" : "Improve:"}</strong> {issue.message}</li>)}</ul>
+                </div>
+              )}
               {activeTab === "profile" && (
                 <ProfileForm cv={cv} updateField={updateField} />
               )}
@@ -1098,6 +1183,7 @@ export function CvEditor() {
           pdfUnlocked={pdfUnlocked}
           checkoutError={checkoutError}
           checkoutLoading={checkoutLoading}
+          pdfDownloading={pdfDownloading}
           onClose={() => setReviewOpen(false)}
           onContinue={continueFromReview}
           onTemplateChange={(template) => updateField("template", template)}
@@ -1130,6 +1216,7 @@ function FinalReviewModal({
   pdfUnlocked,
   checkoutError,
   checkoutLoading,
+  pdfDownloading,
   onClose,
   onContinue,
   onTemplateChange,
@@ -1140,6 +1227,7 @@ function FinalReviewModal({
   pdfUnlocked: boolean;
   checkoutError: string | null;
   checkoutLoading: boolean;
+  pdfDownloading: boolean;
   onClose: () => void;
   onContinue: () => void;
   onTemplateChange: (template: TemplateId) => void;
@@ -1167,7 +1255,7 @@ function FinalReviewModal({
           </h2>
           <p className="mt-3 text-sm leading-6 text-muted">
             Estimated length: about {pageCount} {pageCount === 1 ? "page" : "pages"}.
-            Final pagination is controlled by your browser print dialog.
+            The downloaded PDF uses the same layout as this preview.
           </p>
 
           <div className="mt-5">
@@ -1210,11 +1298,11 @@ function FinalReviewModal({
             <p className="mt-1 text-sm font-bold text-navy">
               No subscription. No automatic renewal.
             </p>
-            {!site.priceTaxInclusive && (
-              <p className="mt-2 text-xs leading-5 text-muted">
-                Base price; any applicable tax is shown before payment.
-              </p>
-            )}
+            <p className="mt-2 text-xs leading-5 text-muted">
+              {site.priceTaxInclusive
+                ? `${site.price} is the final total, including any applicable tax.`
+                : "Any applicable tax is calculated before payment."}
+            </p>
           </div>
 
           {!pdfUnlocked && (
@@ -1247,14 +1335,14 @@ function FinalReviewModal({
             <button
               type="button"
               onClick={onContinue}
-              disabled={checkoutLoading || (!pdfUnlocked && !digitalAccessAccepted)}
+              disabled={checkoutLoading || pdfDownloading || (!pdfUnlocked && !digitalAccessAccepted)}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"
             >
               <Download className="h-4 w-4" />
               {checkoutLoading
                 ? "Opening secure checkout..."
                 : pdfUnlocked
-                  ? "Download PDF"
+                  ? pdfDownloading ? "Generating PDF…" : "Download PDF"
                   : `Pay ${site.price} securely`}
             </button>
             <button
