@@ -40,8 +40,18 @@ test("readiness checks stay out of creation and remain minimal at download", () 
   assert.doesNotMatch(editorSource, /Your CV needs one more review/);
   assert.doesNotMatch(editorSource, /Review complete/);
   assert.match(editorSource, /issue\.severity === "fix"/);
-  assert.match(editorSource, /Before downloading:/);
-  assert.match(editorSource, /You can keep editing or continue with this version/);
+  assert.match(editorSource, /Missing detail:/);
+  assert.match(editorSource, />Edit CV</);
+});
+
+test("checkout stays focused and unlocked CVs download directly", () => {
+  assert.match(editorSource, /if \(pdfUnlocked\) \{\s*void downloadPdf\(\)/);
+  assert.match(editorSource, /function CheckoutSheet/);
+  assert.match(editorSource, /Continue to checkout/);
+  assert.match(editorSource, /No subscription or renewal/);
+  assert.doesNotMatch(editorSource, /Check your CV before download/);
+  assert.doesNotMatch(editorSource, /Estimated length:/);
+  assert.doesNotMatch(editorSource, /\[zoom:0\.68\]/);
 });
 
 test("P1 funnel events are allowlisted", () => {
@@ -54,6 +64,8 @@ test("P1 funnel events are allowlisted", () => {
     "mobile_view_changed",
     "pdf_generation_retried",
     "pdf_generation_failed",
+    "checkout_sheet_opened",
+    "checkout_consent_accepted",
   ]) {
     assert.match(eventsSource, new RegExp(`"${eventName}"`));
   }

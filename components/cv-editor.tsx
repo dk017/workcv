@@ -671,9 +671,18 @@ export function CvEditor() {
   };
 
   const startDownload = () => {
-    trackEditorEvent("pdf_clicked", draftId, { ready: readiness.ready });
+    trackEditorEvent("pdf_clicked", draftId, {
+      ready: readiness.ready,
+      access: pdfUnlocked ? "unlocked" : "checkout",
+    });
     if (paymentState === "checking" || paymentState === "pending") return;
-    trackEditorEvent("final_review_opened", draftId);
+    if (pdfUnlocked) {
+      void downloadPdf();
+      return;
+    }
+    trackEditorEvent("checkout_sheet_opened", draftId, {
+      missing_essential_details: readiness.fixCount,
+    });
     setReviewOpen(true);
   };
 
@@ -714,12 +723,8 @@ export function CvEditor() {
   };
 
   const continueFromReview = () => {
-    if (pdfUnlocked) {
-      void downloadPdf();
-    } else {
-      trackEditorEvent("checkout_opened", draftId);
-      void startCheckout(cv.email);
-    }
+    trackEditorEvent("checkout_opened", draftId);
+    void startCheckout(cv.email);
   };
 
   const startCheckout = async (email: string) => {
@@ -1215,19 +1220,17 @@ export function CvEditor() {
         />
       )}
       {reviewOpen && (
-        <FinalReviewModal
-          cv={cv}
+        <CheckoutSheet
           issues={readiness.issues
             .filter((issue) => issue.severity === "fix")
             .map((issue) => issue.message)}
-          pageCount={previewPageCount}
-          pdfUnlocked={pdfUnlocked}
           checkoutError={checkoutError}
           checkoutLoading={checkoutLoading}
-          pdfDownloading={pdfDownloading}
           onClose={() => setReviewOpen(false)}
           onContinue={continueFromReview}
-          onTemplateChange={(template) => updateField("template", template)}
+          onConsentAccepted={() =>
+            trackEditorEvent("checkout_consent_accepted", draftId)
+          }
         />
       )}
       {aiReview && (
@@ -1278,150 +1281,76 @@ function AiReviewModal({ review, onClose, onApply }: { review: AiReview; onClose
   );
 }
 
-function FinalReviewModal({
-  cv,
+function CheckoutSheet({
   issues,
-  pageCount,
-  pdfUnlocked,
   checkoutError,
   checkoutLoading,
-  pdfDownloading,
   onClose,
   onContinue,
-  onTemplateChange,
+  onConsentAccepted,
 }: {
-  cv: CvData;
   issues: string[];
-  pageCount: number;
-  pdfUnlocked: boolean;
   checkoutError: string | null;
   checkoutLoading: boolean;
-  pdfDownloading: boolean;
   onClose: () => void;
   onContinue: () => void;
-  onTemplateChange: (template: TemplateId) => void;
+  onConsentAccepted: () => void;
 }) {
   const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
   const dialogRef = useAccessibleDialog(onClose, !checkoutLoading);
   return (
-    <div className="download-modal fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/50 p-4">
+    <div className="download-modal fixed inset-0 z-50 flex items-end justify-center overflow-y-auto bg-navy/50 p-0 sm:items-center sm:p-4">
       <div
         ref={dialogRef}
         role="dialog"
         aria-modal="true"
-        aria-labelledby="final-review-title"
-        className="my-auto grid max-h-[calc(100dvh-2rem)] w-full max-w-6xl gap-5 overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-soft lg:grid-cols-[360px_minmax(0,1fr)]"
+        aria-labelledby="checkout-sheet-title"
+        className="w-full max-w-lg overflow-y-auto rounded-t-lg border border-line bg-white p-5 shadow-soft sm:max-h-[calc(100dvh-2rem)] sm:rounded-lg sm:p-6"
       >
-        <div>
-          <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-            Final review
-          </p>
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-success">One-time purchase</p>
           <h2
-            id="final-review-title"
-            className="mt-2 font-display text-3xl font-semibold text-navy"
+              id="checkout-sheet-title"
+              className="mt-1 font-display text-3xl font-semibold text-navy"
           >
-            Check your CV before download.
+              Download your CV
           </h2>
-          <p className="mt-3 text-sm leading-6 text-muted">
-            Estimated length: about {pageCount} {pageCount === 1 ? "page" : "pages"}.
-            The downloaded PDF uses the same layout as this preview.
-          </p>
-
-          <div className="mt-5">
-            <p className="text-sm font-bold text-navy">Template</p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {templates.map((template) => (
-                <button
-                  key={template.id}
-                  type="button"
-                  onClick={() => onTemplateChange(template.id)}
-                  className={`rounded-md border px-3 py-2 text-sm font-bold ${
-                    cv.template === template.id
-                      ? "border-navy bg-greensoft text-navy"
-                      : "border-line bg-white text-muted"
-                  }`}
-                >
-                  {template.name}
-                </button>
-              ))}
-            </div>
           </div>
-
-          {issues.length > 0 && (
-            <div className="mt-5 rounded-md border border-gold bg-gold-tint px-4 py-3 text-sm leading-6 text-navy" role="note">
-              <strong>Before downloading:</strong>{" "}
-              {issues.slice(0, 3).join(" ")}
-              {issues.length > 3 ? ` Plus ${issues.length - 3} more missing ${issues.length - 3 === 1 ? "detail" : "details"}.` : ""}
-              <span className="block text-muted">You can keep editing or continue with this version.</span>
-            </div>
-          )}
-
-          <div className="mt-5 rounded-md border border-line bg-paper p-4">
-            <p className="font-display text-3xl font-semibold text-navy">{site.price} once</p>
-            <p className="mt-1 text-sm font-bold text-navy">
-              No subscription. No automatic renewal.
-            </p>
-            <p className="mt-2 text-xs leading-5 text-muted">
-              {site.priceTaxInclusive
-                ? `${site.price} is the final total, including any applicable tax.`
-                : "Any applicable tax is calculated before payment."}
-            </p>
-          </div>
-
-          {!pdfUnlocked && (
-            <label className="mt-4 flex gap-3 rounded-md border border-line bg-surface p-3 text-xs leading-5 text-muted">
-              <input
-                type="checkbox"
-                checked={digitalAccessAccepted}
-                onChange={(event) => setDigitalAccessAccepted(event.target.checked)}
-                className="mt-0.5 h-4 w-4 shrink-0 accent-navy"
-              />
-              <span>
-                I want immediate digital access after payment and understand that once
-                access starts my cancellation rights may be affected. Statutory rights
-                for faulty or misdescribed content still apply. See the{" "}
-                <a className="font-bold text-navy underline" href="/refund-policy">
-                  refund policy
-                </a>
-                .
-              </span>
-            </label>
-          )}
-
-          {checkoutError && (
-            <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">
-              {checkoutError}
-            </p>
-          )}
-
-          <div className="mt-5 flex flex-col gap-3">
-            <button
-              type="button"
-              onClick={onContinue}
-              disabled={checkoutLoading || pdfDownloading || (!pdfUnlocked && !digitalAccessAccepted)}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"
-            >
-              <Download className="h-4 w-4" />
-              {checkoutLoading
-                ? "Opening secure checkout..."
-                : pdfUnlocked
-                  ? pdfDownloading ? "Generating PDF…" : "Download PDF"
-                  : `Pay ${site.price} securely`}
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy"
-            >
-              Keep editing
-            </button>
-          </div>
+          <button type="button" onClick={onClose} aria-label="Close checkout" disabled={checkoutLoading} className="rounded border border-line p-2 text-muted hover:text-navy disabled:opacity-50"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="min-w-0 overflow-auto rounded-xl border border-line bg-[#eef6f3] p-4">
-          <div className="mx-auto w-[794px] origin-top-left [zoom:0.68]">
-            <MemoCvDocument cv={cv} />
+        <div className="mt-5 flex items-end justify-between gap-4 border-y border-line py-4">
+          <div><p className="font-display text-4xl font-semibold text-navy">{site.price}</p><p className="mt-1 text-sm font-bold text-navy">No subscription or renewal</p></div>
+          <p className="max-w-44 text-right text-xs leading-5 text-muted">{site.priceTaxInclusive ? "Final total, including applicable tax." : "Applicable tax is calculated and shown by Dodo before payment."}</p>
+        </div>
+
+        {issues.length > 0 && (
+          <div className="mt-4 rounded-md border border-gold bg-gold-tint px-3 py-2 text-xs leading-5 text-navy" role="note">
+            <strong>Missing detail:</strong> {issues[0]}
+            {issues.length > 1 ? ` Plus ${issues.length - 1} more.` : ""}
+            <button type="button" onClick={onClose} className="ml-1 font-bold underline underline-offset-2">Edit CV</button>
           </div>
+        )}
+
+        <label className="mt-4 flex gap-3 text-xs leading-5 text-muted">
+          <input
+            type="checkbox"
+            checked={digitalAccessAccepted}
+            onChange={(event) => {
+              setDigitalAccessAccepted(event.target.checked);
+              if (event.target.checked) onConsentAccepted();
+            }}
+            className="mt-0.5 h-4 w-4 shrink-0 accent-navy"
+          />
+          <span>I want immediate digital access after payment and understand that once access starts my cancellation rights may be affected. Statutory rights still apply. <a className="font-bold text-navy underline" href="/refund-policy">Refund policy</a>.</span>
+        </label>
+
+        {checkoutError && <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">{checkoutError}</p>}
+
+        <div className="mt-5 flex flex-col gap-3">
+          <button type="button" onClick={onContinue} disabled={checkoutLoading || !digitalAccessAccepted} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"><Download className="h-4 w-4" />{checkoutLoading ? "Opening secure checkout..." : `Continue to checkout · ${site.price}`}</button>
+          <button type="button" onClick={onClose} disabled={checkoutLoading} className="inline-flex min-h-10 items-center justify-center text-sm font-bold text-muted hover:text-navy disabled:opacity-50">Keep editing</button>
         </div>
       </div>
     </div>

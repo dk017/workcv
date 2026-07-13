@@ -11,6 +11,8 @@ export const editorEventNames = [
   "template_chooser_opened",
   "template_selected",
   "final_review_opened",
+  "checkout_sheet_opened",
+  "checkout_consent_accepted",
   "pdf_clicked",
   "pdf_downloaded",
   "pdf_generation_retried",
