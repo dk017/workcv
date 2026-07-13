@@ -28,6 +28,13 @@ test("mobile editing and page-count guidance remain available", () => {
   assert.match(editorSource, /Use Compact/);
 });
 
+test("preview uses the available column without redundant chrome", () => {
+  assert.doesNotMatch(editorSource, />\s*Live preview\s*</);
+  assert.doesNotMatch(editorSource, /Local draft/);
+  assert.match(editorSource, /availableWidth \/ 794/);
+  assert.match(editorSource, /Math\.min\(1, availableWidth \/ 794\)/);
+});
+
 test("readiness checks stay out of creation and remain minimal at download", () => {
   assert.doesNotMatch(editorSource, /Checks for this section/);
   assert.doesNotMatch(editorSource, /Your CV needs one more review/);

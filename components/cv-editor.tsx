@@ -10,7 +10,6 @@ import {
   GraduationCap,
   LayoutTemplate,
   Plus,
-  Save,
   Sparkles,
   Undo2,
   Upload,
@@ -323,19 +322,29 @@ export function CvEditor() {
     if (!preview) return;
 
     let frame = 0;
-    const updatePageCount = () => {
+    const updatePreview = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
         const document = preview.querySelector<HTMLElement>(".print-document");
         if (!document) return;
+        const viewport = preview.parentElement;
+        if (viewport) {
+          const styles = window.getComputedStyle(viewport);
+          const availableWidth =
+            viewport.clientWidth -
+            Number.parseFloat(styles.paddingLeft) -
+            Number.parseFloat(styles.paddingRight);
+          preview.style.zoom = String(Math.min(1, availableWidth / 794));
+        }
         setPreviewPageCount(Math.max(1, Math.ceil(document.scrollHeight / 1123)));
       });
     };
 
-    const observer = new ResizeObserver(updatePageCount);
+    const observer = new ResizeObserver(updatePreview);
     const document = preview.querySelector<HTMLElement>(".print-document");
     if (document) observer.observe(document);
-    updatePageCount();
+    if (preview.parentElement) observer.observe(preview.parentElement);
+    updatePreview();
 
     return () => {
       window.cancelAnimationFrame(frame);
@@ -1173,30 +1182,10 @@ export function CvEditor() {
         </div>
 
         <div className={`print-area min-w-0 ${mobileView === "edit" ? "hidden lg:block" : "block"}`}>
-          <div className="editor-preview-heading mb-4 flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h2 className="font-display text-2xl font-semibold text-navy">
-                Live preview
-              </h2>
-              <p className="text-sm text-muted">
-                UK format. Page count is an estimate; the browser print dialog
-                controls final pagination.
-              </p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="rounded-md border border-line bg-paper px-3 py-2 text-sm font-bold text-navy">
-                About {previewPageCount} {previewPageCount === 1 ? "page" : "pages"}
-              </div>
-              <div className="hidden items-center gap-2 rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-success sm:flex">
-                <Save className="h-4 w-4" />
-                Local draft
-              </div>
-            </div>
-          </div>
           {previewPageCount > 2 && (
             <div className="editor-chrome mb-4 flex flex-col gap-3 rounded-md border border-gold bg-gold-tint p-4 sm:flex-row sm:items-center sm:justify-between" role="status"><div><p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p><p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p></div>{cv.template !== "compact" && <button type="button" onClick={() => updateField("template", "compact")} className="min-h-10 shrink-0 rounded-md bg-navy px-4 text-sm font-bold text-white">Use Compact</button>}</div>
           )}
-          <div className="cv-preview-viewport rounded-xl border border-line bg-[#eef6f3] p-3 sm:p-5">
+          <div className="cv-preview-viewport rounded-md border border-line bg-[#eef6f3] p-2">
             <div ref={previewRef} className="cv-preview-scale relative">
               <MemoCvDocument cv={cv} />
             </div>

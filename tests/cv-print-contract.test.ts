@@ -32,5 +32,6 @@ test("fixed-format CV documents do not use viewport layout breakpoints", () => {
 
 test("preview does not render misleading page guide boundaries", () => {
   assert.doesNotMatch(editorSource, /cv-page-guide/);
-  assert.match(editorSource, /Page count is an estimate/);
+  assert.doesNotMatch(editorSource, /Page count is an estimate/);
+  assert.match(editorSource, /Math\.ceil\(document\.scrollHeight \/ 1123\)/);
 });
