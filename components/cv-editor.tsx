@@ -41,6 +41,7 @@ import {
   type PaymentStatusResult,
 } from "@/lib/payment-polling";
 import { calculateCvReadiness } from "@/lib/cv-readiness";
+import { analyseAtsKeywords } from "@/lib/ats-keyword-checker";
 import {
   trackEditorEvent,
   type EditorEventName,
@@ -65,6 +66,14 @@ export { CvDocument } from "@/components/editor/cv-document";
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
 type TabId = "profile" | "experience" | "education" | "skills" | "template";
+type AiReview = {
+  kind: "profile" | "bullets" | "skills";
+  title: string;
+  targetId?: string;
+  original: string;
+  options: Array<{ label: string; value: string }>;
+  questions?: string[];
+};
 
 const tabs: Array<{ id: TabId; label: string; icon: typeof User }> = [
   { id: "profile", label: "Profile", icon: User },
@@ -99,8 +108,14 @@ export function CvEditor() {
   const [loaded, setLoaded] = useState(false);
   const [recoveryCv, setRecoveryCv] = useState<CvData | null>(null);
   const [otherTabUpdated, setOtherTabUpdated] = useState(false);
+  const [aiLoading, setAiLoading] = useState<AiReview["kind"] | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiReview, setAiReview] = useState<AiReview | null>(null);
+  const [tailoringOpen, setTailoringOpen] = useState(false);
+  const [jobDescriptionDraft, setJobDescriptionDraft] = useState("");
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
+  const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pendingTargeting, setPendingTargeting] = useState<CvTargeting | null>(null);
   const [fitImportState, setFitImportState] = useState<
     "idle" | "importing" | "complete" | "error"
@@ -114,7 +129,7 @@ export function CvEditor() {
   const previousSaveStatusRef = useRef<SaveSnapshot["status"]>("saving");
   const trackedMilestonesRef = useRef(new Set<number>());
   const trackedSectionsRef = useRef(new Set<string>());
-  const modalOpen = templatePickerOpen || importOpen || reviewOpen;
+  const modalOpen = templatePickerOpen || importOpen || reviewOpen || Boolean(aiReview);
 
   useEffect(() => {
     if (!modalOpen) return;
@@ -455,6 +470,57 @@ export function CvEditor() {
     }));
   };
 
+  const cvEvidenceText = () => [
+    cv.profile,
+    cv.skills,
+    ...cv.experience.flatMap((item) => [item.role, item.company, item.bullets]),
+    ...cv.education.flatMap((item) => [item.qualification, item.institution, item.details]),
+  ].filter(Boolean).join("\n");
+
+  const improveProfile = async () => {
+    if (aiLoading) return;
+    setAiLoading("profile"); setAiError(null);
+    try {
+      const background = [...cv.experience.map((item) => `${item.role} at ${item.company}`), ...cv.education.map((item) => `${item.qualification} at ${item.institution}`)].filter((value) => value.replace(/\s+at\s*$/, "").trim()).join(". ");
+      const evidence = [cv.skills, ...cv.experience.map((item) => item.bullets), ...cv.education.map((item) => item.details)].filter(Boolean).join("\n");
+      if (!cv.targetRole.trim() || background.length < 40 || evidence.length < 40) throw new Error("Add a target role and more evidence in experience, education or skills first.");
+      const response = await fetch("/api/tools/cv-summary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ background, targetRole: cv.targetRole, evidence, jobDescription: cv.targeting?.jobDescription || "", careerStage: cv.experience.some((item) => item.role.trim()) ? "experienced" : "early" }) });
+      const data = await response.json() as { variants?: Array<{ label: string; summary: string }>; followUpQuestions?: string[]; error?: string };
+      if (!response.ok || !data.variants) throw new Error(data.error || "Profile suggestions are unavailable.");
+      setAiReview({ kind: "profile", title: "Choose an improved profile", original: cv.profile, options: data.variants.map((item) => ({ label: item.label, value: item.summary })), questions: data.followUpQuestions });
+      trackEditorEvent("ai_suggestion_generated", draftId, { section: "profile" });
+    } catch (error) { setAiError(error instanceof Error ? error.message : "Profile suggestions are unavailable."); }
+    finally { setAiLoading(null); }
+  };
+
+  const improveBullets = async (id: string) => {
+    if (aiLoading) return;
+    const item = cv.experience.find((entry) => entry.id === id); if (!item) return;
+    setAiLoading("bullets"); setAiError(null);
+    try {
+      const rawExperience = [item.bullets, item.company && `Employer: ${item.company}`, item.location && `Location: ${item.location}`].filter(Boolean).join("\n");
+      if (!item.role.trim() || rawExperience.length < 50) throw new Error("Add the role and at least 50 characters of truthful experience notes first.");
+      const response = await fetch("/api/tools/cv-bullet-points", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, employmentStatus: /present|current/i.test(item.end) ? "current" : "previous", rawExperience, targetRole: cv.targetRole, jobDescription: cv.targeting?.jobDescription || "" }) });
+      const data = await response.json() as { bullets?: string[]; followUpQuestions?: string[]; error?: string };
+      if (!response.ok || !data.bullets) throw new Error(data.error || "Bullet suggestions are unavailable.");
+      setAiReview({ kind: "bullets", targetId: id, title: `Review suggestions for ${item.role}`, original: item.bullets, options: data.bullets.map((value, index) => ({ label: `Suggestion ${index + 1}`, value })), questions: data.followUpQuestions });
+      trackEditorEvent("ai_suggestion_generated", draftId, { section: "experience" });
+    } catch (error) { setAiError(error instanceof Error ? error.message : "Bullet suggestions are unavailable."); }
+    finally { setAiLoading(null); }
+  };
+
+  const suggestSkills = () => {
+    if (aiLoading) return;
+    setAiError(null);
+    const jobDescription = cv.targeting?.jobDescription || "";
+    if (jobDescription.length < 80) { setAiError("Add a job description with Tailor to job before requesting skills."); setTailoringOpen(true); return; }
+    const analysis = analyseAtsKeywords(jobDescription, cvEvidenceText());
+    const options = analysis.missing.filter((item) => item.category === "Skill or tool" || item.category === "Qualification").slice(0, 10).map((item) => ({ label: item.importance, value: item.term }));
+    if (!options.length) { setAiError("No additional supported skill terms were found in this vacancy."); return; }
+    setAiReview({ kind: "skills", title: "Confirm skills you genuinely possess", original: cv.skills, options });
+    trackEditorEvent("skill_suggestions_opened", draftId, { count: options.length });
+  };
+
   const updateEducation = (
     id: string,
     key: keyof EducationItem,
@@ -624,7 +690,12 @@ export function CvEditor() {
     try {
       const saved = await saveManagerRef.current?.flush();
       if (saved === false) throw new Error("Save your latest changes before downloading.");
-      const response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
+      let response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
+      if (response.status === 503) {
+        trackEditorEvent("pdf_generation_retried", draftId);
+        await new Promise((resolve) => window.setTimeout(resolve, 900));
+        response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
+      }
       if (!response.ok) {
         const data = (await response.json().catch(() => null)) as { error?: string } | null;
         throw new Error(data?.error || "PDF generation failed");
@@ -641,6 +712,7 @@ export function CvEditor() {
       setReviewOpen(false);
       trackEditorEvent("pdf_downloaded", draftId);
     } catch (error) {
+      trackEditorEvent("pdf_generation_failed", draftId);
       setCheckoutError(error instanceof Error ? error.message : "PDF generation failed");
     } finally {
       setPdfDownloading(false);
@@ -843,6 +915,13 @@ export function CvEditor() {
             </button>
             <button
               type="button"
+              onClick={() => { setJobDescriptionDraft(cv.targeting?.jobDescription || ""); setTailoringOpen((open) => !open); }}
+              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+            >
+              <Sparkles className="h-4 w-4" />Tailor to job
+            </button>
+            <button
+              type="button"
               onClick={() => setReadinessPrompt(true)}
               className="rounded-md border border-line bg-paper px-4 py-2 text-sm font-bold text-navy hover:border-navy"
             >
@@ -906,6 +985,28 @@ export function CvEditor() {
           </div>
         </div>
       </section>
+
+      {tailoringOpen && (
+        <section className="editor-chrome border-b border-line bg-[#edf4f8]">
+          <div className="mx-auto grid w-[min(1540px,calc(100%-32px))] gap-4 py-5 sm:w-[min(1540px,calc(100%-48px))] lg:grid-cols-[1fr_auto] lg:items-end">
+            <label className="block"><span className="text-sm font-bold text-navy">Job description</span><span className="mt-1 block text-xs leading-5 text-muted">Paste the duties and essential criteria. Suggestions only use claims already supported by your CV.</span><textarea value={jobDescriptionDraft} onChange={(event) => setJobDescriptionDraft(event.target.value)} maxLength={5000} rows={5} className="mt-2 w-full rounded-md border border-line bg-white px-3 py-3 text-sm leading-6 text-ink outline-none focus:border-navy focus:ring-2 focus:ring-gold-tint" placeholder="Paste the vacancy here..." /></label>
+            <div className="flex gap-2"><button type="button" onClick={() => setTailoringOpen(false)} className="min-h-11 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy">Cancel</button><button type="button" onClick={() => {
+              if (jobDescriptionDraft.trim().length < 80) { setAiError("Paste at least 80 characters from the vacancy."); return; }
+              const analysis = analyseAtsKeywords(jobDescriptionDraft, cvEvidenceText());
+              const missing = analysis.missing.slice(0, 3);
+              setCv((current) => ({ ...current, targeting: { role: current.targetRole, jobDescription: jobDescriptionDraft.trim(), priorities: missing.map((item) => ({ category: item.category === "Skill or tool" ? "vacancy-relevance" : "evidence", title: item.term, action: `Add this only where your real experience supports it (${item.importance.toLowerCase()} requirement).` })) } }));
+              setTailoringOpen(false); setAiError(null); trackEditorEvent("job_tailoring_saved", draftId, { score: analysis.score, missing: analysis.missing.length });
+            }} className="min-h-11 rounded-md bg-navy px-4 text-sm font-bold text-white">Analyse vacancy</button></div>
+          </div>
+        </section>
+      )}
+
+      {aiError && (
+        <section className="editor-chrome border-b border-red-200 bg-redsoft" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 sm:w-[min(1540px,calc(100%-48px))]"><p className="text-sm font-bold text-navy">{aiError}</p><button type="button" onClick={() => setAiError(null)} aria-label="Dismiss message" className="text-navy"><X className="h-5 w-5" /></button></div></section>
+      )}
+      {aiLoading && (
+        <section className="editor-chrome border-b border-line bg-gold-tint" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center gap-3 py-3 sm:w-[min(1540px,calc(100%-48px))]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-navy/20 border-t-navy" /><p className="text-sm font-bold text-navy">Preparing fact-checked {aiLoading === "profile" ? "profile versions" : "bullet suggestions"}...</p></div></section>
+      )}
 
       {readinessPrompt && readiness.issues.length > 0 && (
         <section className="editor-chrome border-b border-line bg-gold-tint">
@@ -1042,8 +1143,9 @@ export function CvEditor() {
         </section>
       )}
 
+      <div className="editor-chrome mx-auto mt-4 flex w-[min(1540px,calc(100%-32px))] rounded-md border border-line bg-white p-1 sm:w-[min(1540px,calc(100%-48px))] lg:hidden" role="group" aria-label="Editor view"><button type="button" onClick={() => { setMobileView("edit"); trackEditorEvent("mobile_view_changed", draftId, { view: "edit" }); }} className={`min-h-10 flex-1 rounded px-3 text-sm font-bold ${mobileView === "edit" ? "bg-navy text-white" : "text-muted"}`}>Edit CV</button><button type="button" onClick={() => { setMobileView("preview"); trackEditorEvent("mobile_view_changed", draftId, { view: "preview" }); }} className={`min-h-10 flex-1 rounded px-3 text-sm font-bold ${mobileView === "preview" ? "bg-navy text-white" : "text-muted"}`}>Preview</button></div>
       <section className="mx-auto grid w-[min(1540px,calc(100%-32px))] gap-6 py-6 sm:w-[min(1540px,calc(100%-48px))] lg:grid-cols-[minmax(480px,0.92fr)_minmax(0,1.08fr)] xl:grid-cols-[minmax(560px,0.95fr)_minmax(0,1.15fr)]">
-        <div className="editor-form min-w-0">
+        <div className={`editor-form min-w-0 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
           <div className="sticky top-20 space-y-5">
             <div className="overflow-x-auto rounded-xl border border-line bg-white p-2">
               <div className="flex min-w-max gap-2 xl:grid xl:min-w-0 xl:grid-cols-5">
@@ -1077,7 +1179,7 @@ export function CvEditor() {
                 </div>
               )}
               {activeTab === "profile" && (
-                <ProfileForm cv={cv} updateField={updateField} />
+                <ProfileForm cv={cv} updateField={updateField} onImproveProfile={() => void improveProfile()} assistanceBusy={Boolean(aiLoading)} />
               )}
               {activeTab === "experience" && (
                 <ExperienceForm
@@ -1095,6 +1197,8 @@ export function CvEditor() {
                   moveExperience={(index, direction) =>
                     moveEntry("experience", index, direction)
                   }
+                  onImproveBullets={(id) => void improveBullets(id)}
+                  assistanceBusy={Boolean(aiLoading)}
                 />
               )}
               {activeTab === "education" && (
@@ -1116,7 +1220,7 @@ export function CvEditor() {
                 />
               )}
               {activeTab === "skills" && (
-                <SkillsForm cv={cv} updateField={updateField} />
+                <SkillsForm cv={cv} updateField={updateField} onSuggestSkills={suggestSkills} assistanceBusy={Boolean(aiLoading)} />
               )}
               {activeTab === "template" && (
                 <TemplateForm cv={cv} updateField={updateField} />
@@ -1125,7 +1229,7 @@ export function CvEditor() {
           </div>
         </div>
 
-        <div className="print-area min-w-0">
+        <div className={`print-area min-w-0 ${mobileView === "edit" ? "hidden lg:block" : "block"}`}>
           <div className="editor-preview-heading mb-4 flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="font-display text-2xl font-semibold text-navy">
@@ -1146,6 +1250,9 @@ export function CvEditor() {
               </div>
             </div>
           </div>
+          {previewPageCount > 2 && (
+            <div className="editor-chrome mb-4 flex flex-col gap-3 rounded-md border border-gold bg-gold-tint p-4 sm:flex-row sm:items-center sm:justify-between" role="status"><div><p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p><p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p></div>{cv.template !== "compact" && <button type="button" onClick={() => updateField("template", "compact")} className="min-h-10 shrink-0 rounded-md bg-navy px-4 text-sm font-bold text-white">Use Compact</button>}</div>
+          )}
           <div className="cv-preview-viewport rounded-xl border border-line bg-[#eef6f3] p-3 sm:p-5">
             <div ref={previewRef} className="cv-preview-scale relative">
               <MemoCvDocument cv={cv} />
@@ -1189,6 +1296,17 @@ export function CvEditor() {
           onTemplateChange={(template) => updateField("template", template)}
         />
       )}
+      {aiReview && (
+        <AiReviewModal review={aiReview} onClose={() => {
+          trackEditorEvent("ai_suggestion_rejected", draftId, { section: aiReview.kind });
+          setAiReview(null);
+        }} onApply={(values) => {
+          if (aiReview.kind === "profile") updateField("profile", values[0] || aiReview.original);
+          if (aiReview.kind === "bullets" && aiReview.targetId) updateExperience(aiReview.targetId, "bullets", values.join("\n"));
+          if (aiReview.kind === "skills") updateField("skills", Array.from(new Set([...lines(cv.skills), ...values])).join("\n"));
+          trackEditorEvent("ai_suggestion_applied", draftId, { section: aiReview.kind, count: values.length }); setAiReview(null);
+        }} />
+      )}
       {undoLabel && (
         <div
           className="editor-chrome fixed bottom-4 left-1/2 z-40 flex -translate-x-1/2 items-center gap-3 rounded-md bg-navy px-4 py-3 text-sm font-bold text-white shadow-soft"
@@ -1205,6 +1323,23 @@ export function CvEditor() {
           </button>
         </div>
       )}
+    </div>
+  );
+}
+
+function AiReviewModal({ review, onClose, onApply }: { review: AiReview; onClose: () => void; onApply: (values: string[]) => void }) {
+  const [selected, setSelected] = useState<number[]>(review.kind === "profile" ? [0] : []);
+  const dialogRef = useAccessibleDialog(onClose);
+  const toggle = (index: number) => setSelected((current) => review.kind === "profile" ? [index] : current.includes(index) ? current.filter((item) => item !== index) : [...current, index]);
+  return (
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/50 p-4">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="ai-review-title" className="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
+        <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-success">Fact-safe suggestion</p><h2 id="ai-review-title" className="mt-1 font-display text-3xl font-semibold text-navy">{review.title}</h2><p className="mt-2 text-sm leading-6 text-muted">Compare before applying. WorkCV will never apply AI text without your confirmation.</p></div><button type="button" onClick={onClose} aria-label="Close suggestions" className="rounded border border-line p-2 text-muted hover:text-navy"><X className="h-5 w-5" /></button></div>
+        {review.original && <div className="mt-5 rounded-md border border-line bg-paper p-4"><p className="text-xs font-bold uppercase tracking-[0.1em] text-muted">Current text</p><p className="mt-2 whitespace-pre-line text-sm leading-6 text-ink">{review.original}</p></div>}
+        <fieldset className="mt-5 space-y-3"><legend className="text-sm font-bold text-navy">{review.kind === "profile" ? "Choose one version" : "Select only accurate suggestions"}</legend>{review.options.map((option, index) => <label key={`${option.label}-${index}`} className={`flex cursor-pointer gap-3 rounded-md border p-4 ${selected.includes(index) ? "border-navy bg-greensoft" : "border-line bg-white"}`}><input type={review.kind === "profile" ? "radio" : "checkbox"} name="ai-option" checked={selected.includes(index)} onChange={() => toggle(index)} className="mt-1 h-4 w-4 accent-navy" /><span><strong className="text-sm text-navy">{option.label}</strong><span className="mt-1 block text-sm leading-6 text-ink">{option.value}</span></span></label>)}</fieldset>
+        {review.questions?.length ? <div className="mt-5 rounded-md border border-gold bg-gold-tint p-4"><p className="text-sm font-bold text-navy">Evidence that would strengthen this section</p><ul className="mt-2 space-y-1 text-sm leading-6 text-muted">{review.questions.map((question) => <li key={question}>{question}</li>)}</ul></div> : null}
+        <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={onClose} className="min-h-11 rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy">Keep current text</button><button type="button" disabled={!selected.length} onClick={() => onApply(selected.map((index) => review.options[index].value))} className="min-h-11 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:opacity-50">Apply selected</button></div>
+      </div>
     </div>
   );
 }

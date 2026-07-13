@@ -23,6 +23,25 @@ test("rejects invented numbers and first-person clichés", () => {
   assert.ok(quality.issues.includes("Do not introduce numbers that were not supplied."));
 });
 
+test("does not treat vacancy numbers as candidate evidence", () => {
+  const quality = assessCvSummaryQuality(
+    [
+      {
+        label: "Balanced",
+        summary:
+          "Customer service team leader experienced in managing retail support across phone and email channels. Led eight advisers and used Salesforce to coordinate service delivery. Ready to meet a vacancy requiring 5 years of leadership experience. Now targeting a Customer Experience Manager role focused on service improvement.",
+      },
+      variants[1],
+      variants[2],
+    ],
+    {
+      ...input,
+      jobDescription: "Customer Experience Manager role requiring 5 years of leadership experience.",
+    },
+  );
+  assert.ok(quality.issues.includes("Do not introduce numbers that were not supplied."));
+});
+
 test("retries once and returns word counts", async () => {
   let calls = 0;
   const result = await generateCvSummaries(input, async (_input, correction) => {

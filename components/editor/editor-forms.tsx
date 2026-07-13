@@ -5,6 +5,7 @@ import {
   ArrowUp,
   Check,
   Plus,
+  Sparkles,
   Trash2,
 } from "lucide-react";
 
@@ -18,14 +19,19 @@ import {
 export function ProfileForm({
   cv,
   updateField,
+  onImproveProfile,
+  assistanceBusy = false,
 }: {
   cv: CvData;
   updateField: <K extends keyof CvData>(key: K, value: CvData[K]) => void;
+  onImproveProfile: () => void;
+  assistanceBusy?: boolean;
 }) {
   return (
     <FormSection
       title="Profile and contact"
       description="Use UK-friendly contact details. Keep the profile direct and role-focused."
+      action={<SmallButton onClick={onImproveProfile} disabled={assistanceBusy}><Sparkles className="h-4 w-4" />Improve profile</SmallButton>}
     >
       <div className="grid gap-4 sm:grid-cols-2">
         <TextField
@@ -82,12 +88,16 @@ export function ExperienceForm({
   addExperience,
   removeExperience,
   moveExperience,
+  onImproveBullets,
+  assistanceBusy = false,
 }: {
   cv: CvData;
   updateExperience: (id: string, key: keyof ExperienceItem, value: string) => void;
   addExperience: () => void;
   removeExperience: (id: string) => void;
   moveExperience: (index: number, direction: -1 | 1) => void;
+  onImproveBullets: (id: string) => void;
+  assistanceBusy?: boolean;
 }) {
   return (
     <FormSection
@@ -106,6 +116,9 @@ export function ExperienceForm({
             <div className="mb-4 flex items-center justify-between gap-3">
               <h3 className="font-bold text-navy">Role {index + 1}</h3>
               <div className="flex items-center gap-1">
+                <button type="button" onClick={() => onImproveBullets(item.id)} disabled={assistanceBusy} className="mr-2 inline-flex min-h-8 items-center gap-1 rounded border border-line bg-white px-2 text-xs font-bold text-navy hover:border-navy disabled:cursor-not-allowed disabled:opacity-50">
+                  <Sparkles className="h-3.5 w-3.5" />Improve
+                </button>
                 <IconButton
                   label="Move role up"
                   disabled={index === 0}
@@ -284,14 +297,19 @@ export function EducationForm({
 export function SkillsForm({
   cv,
   updateField,
+  onSuggestSkills,
+  assistanceBusy = false,
 }: {
   cv: CvData;
   updateField: <K extends keyof CvData>(key: K, value: CvData[K]) => void;
+  onSuggestSkills: () => void;
+  assistanceBusy?: boolean;
 }) {
   return (
     <FormSection
       title="Skills"
       description="Add one skill per line. Keep them concrete and relevant to the role."
+      action={<SmallButton onClick={onSuggestSkills} disabled={assistanceBusy}><Sparkles className="h-4 w-4" />Suggest skills</SmallButton>}
     >
       <TextArea
         label="Skills"
@@ -533,15 +551,18 @@ function TextArea({
 function SmallButton({
   children,
   onClick,
+  disabled = false,
 }: {
   children: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-md bg-navy px-3 text-sm font-bold text-white hover:bg-navy-hover"
+      disabled={disabled}
+      className="inline-flex min-h-10 shrink-0 items-center gap-2 rounded-md bg-navy px-3 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </button>

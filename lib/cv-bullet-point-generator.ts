@@ -127,9 +127,7 @@ export function assessBulletPointQuality(
     issues.push("Use a different opening action verb for every bullet point.");
   }
 
-  const sourceNumbers = numericTokens(
-    `${input.jobTitle} ${input.rawExperience} ${input.targetRole} ${input.jobDescription}`,
-  );
+  const sourceNumbers = numericTokens(`${input.jobTitle} ${input.rawExperience}`);
   const inventedNumbers = Array.from(numericTokens(bullets.join(" "))).filter(
     (number) => !sourceNumbers.has(number),
   );

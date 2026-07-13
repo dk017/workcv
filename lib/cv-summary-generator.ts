@@ -60,7 +60,7 @@ export function assessCvSummaryQuality(variants: Array<{ label: string; summary:
     issues.push("Return Balanced, Achievement-led and Concise variants once each.");
   }
 
-  const sourceNumbers = numericTokens(`${input.background} ${input.evidence} ${input.jobDescription}`);
+  const sourceNumbers = numericTokens(`${input.background} ${input.evidence}`);
   for (const variant of variants) {
     const count = words(variant.summary);
     const sentenceCount = sentences(variant.summary);

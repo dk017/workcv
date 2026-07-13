@@ -70,6 +70,20 @@ test("flags pronouns, weak openings, repeated verbs and invented numbers", () =>
   assert.ok(quality.issues.includes("Do not introduce numbers that were not supplied."));
 });
 
+test("does not allow job advert numbers as bullet evidence", () => {
+  const quality = assessBulletPointQuality(
+    [
+      "Led customer service advisers while coordinating workloads and maintaining clear ownership of escalated cases",
+      "Coached new starters on complaint handling and Salesforce workflows, supporting consistent service across the team",
+      "Introduced complaint triage methods that clarified escalation priorities and improved overdue case handling",
+      "Reviewed service quality data to identify recurring issues and guide practical customer support improvements",
+      "Supported a vacancy requirement for 5 years of leadership experience through structured team coordination",
+    ],
+    { ...input, jobDescription: "The role requires 5 years of leadership experience." },
+  );
+  assert.ok(quality.issues.includes("Do not introduce numbers that were not supplied."));
+});
+
 test("retries once when generated bullets fail quality checks", async () => {
   let calls = 0;
   const result = await generateCvBulletPoints(input, async (_details, correction) => {
