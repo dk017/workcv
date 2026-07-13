@@ -102,8 +102,6 @@ export function CvEditor() {
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
   const [reviewOpen, setReviewOpen] = useState(false);
-  const [readinessPrompt, setReadinessPrompt] = useState(false);
-  const [readinessOverride, setReadinessOverride] = useState(false);
   const [undoLabel, setUndoLabel] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [recoveryCv, setRecoveryCv] = useState<CvData | null>(null);
@@ -666,19 +664,6 @@ export function CvEditor() {
   const startDownload = () => {
     trackEditorEvent("pdf_clicked", draftId, { ready: readiness.ready });
     if (paymentState === "checking" || paymentState === "pending") return;
-    if (!readiness.ready && !readinessOverride) {
-      setReadinessPrompt(true);
-      if (readiness.nextSection) {
-        setActiveTab(readiness.nextSection);
-        window.requestAnimationFrame(() => {
-          document.querySelector(".editor-form")?.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-          });
-        });
-      }
-      return;
-    }
     trackEditorEvent("final_review_opened", draftId);
     setReviewOpen(true);
   };
@@ -920,15 +905,6 @@ export function CvEditor() {
             >
               <Sparkles className="h-4 w-4" />Tailor to job
             </button>
-            <button
-              type="button"
-              onClick={() => setReadinessPrompt(true)}
-              className="rounded-md border border-line bg-paper px-4 py-2 text-sm font-bold text-navy hover:border-navy"
-            >
-              {readiness.issues.length === 0
-                ? "Review complete"
-                : `Review · ${readiness.fixCount} ${readiness.fixCount === 1 ? "fix" : "fixes"}`}
-            </button>
             <div
               className={`rounded-md border px-4 py-2 text-sm ${
                 saveSnapshot.status === "error"
@@ -1006,33 +982,6 @@ export function CvEditor() {
       )}
       {aiLoading && (
         <section className="editor-chrome border-b border-line bg-gold-tint" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center gap-3 py-3 sm:w-[min(1540px,calc(100%-48px))]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-navy/20 border-t-navy" /><p className="text-sm font-bold text-navy">Preparing fact-checked {aiLoading === "profile" ? "profile versions" : "bullet suggestions"}...</p></div></section>
-      )}
-
-      {readinessPrompt && readiness.issues.length > 0 && (
-        <section className="editor-chrome border-b border-line bg-gold-tint">
-          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-3 py-4 sm:w-[min(1540px,calc(100%-48px))] sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="font-bold text-navy">Your CV needs one more review.</p>
-              <div className="mt-2 space-y-1 text-sm text-muted">
-                {readiness.issues.slice(0, 4).map((issue) => <button key={issue.id} type="button" onClick={() => setActiveTab(issue.section)} className="block text-left underline underline-offset-2">{issue.severity === "fix" ? "Fix: " : "Improve: "}{issue.message}</button>)}
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                setReadinessOverride(true);
-                setReadinessPrompt(false);
-                trackEditorEvent("final_review_opened", draftId, {
-                  readiness_override: true,
-                });
-                setReviewOpen(true);
-              }}
-              className="inline-flex min-h-10 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy"
-            >
-              Review and continue anyway
-            </button>
-          </div>
-        </section>
       )}
 
       {(recoveryCv || otherTabUpdated) && (
@@ -1172,12 +1121,6 @@ export function CvEditor() {
             </div>
 
             <div className="rounded-xl border border-line bg-white p-5 shadow-sm xl:p-6">
-              {readiness.issues.some((issue) => issue.section === activeTab) && (
-                <div className="mb-5 rounded-md border border-gold bg-gold-tint p-4" role="status">
-                  <p className="text-sm font-bold text-navy">Checks for this section</p>
-                  <ul className="mt-2 space-y-1 text-sm leading-6 text-muted">{readiness.issues.filter((issue) => issue.section === activeTab).map((issue) => <li key={issue.id}><strong className="text-navy">{issue.severity === "fix" ? "Fix:" : "Improve:"}</strong> {issue.message}</li>)}</ul>
-                </div>
-              )}
               {activeTab === "profile" && (
                 <ProfileForm cv={cv} updateField={updateField} onImproveProfile={() => void improveProfile()} assistanceBusy={Boolean(aiLoading)} />
               )}
@@ -1285,7 +1228,9 @@ export function CvEditor() {
       {reviewOpen && (
         <FinalReviewModal
           cv={cv}
-          issues={readiness.issues.map((issue) => issue.message)}
+          issues={readiness.issues
+            .filter((issue) => issue.severity === "fix")
+            .map((issue) => issue.message)}
           pageCount={previewPageCount}
           pdfUnlocked={pdfUnlocked}
           checkoutError={checkoutError}
@@ -1413,19 +1358,13 @@ function FinalReviewModal({
             </div>
           </div>
 
-          {issues.length > 0 ? (
-            <div className="mt-5 rounded-md border border-gold bg-gold-tint p-4">
-              <p className="font-bold text-navy">Readiness issues</p>
-              <ul className="mt-2 list-disc space-y-1 pl-5 text-sm leading-6 text-muted">
-                {issues.map((issue, index) => (
-                  <li key={`${index}-${issue}`}>{issue}</li>
-                ))}
-              </ul>
+          {issues.length > 0 && (
+            <div className="mt-5 rounded-md border border-gold bg-gold-tint px-4 py-3 text-sm leading-6 text-navy" role="note">
+              <strong>Before downloading:</strong>{" "}
+              {issues.slice(0, 3).join(" ")}
+              {issues.length > 3 ? ` Plus ${issues.length - 3} more missing ${issues.length - 3 === 1 ? "detail" : "details"}.` : ""}
+              <span className="block text-muted">You can keep editing or continue with this version.</span>
             </div>
-          ) : (
-            <p className="mt-5 rounded-md border border-green-200 bg-greensoft p-4 text-sm font-bold text-navy">
-              Minimum readiness checks passed.
-            </p>
           )}
 
           <div className="mt-5 rounded-md border border-line bg-paper p-4">

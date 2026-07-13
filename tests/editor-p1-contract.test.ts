@@ -28,6 +28,15 @@ test("mobile editing and page-count guidance remain available", () => {
   assert.match(editorSource, /Use Compact/);
 });
 
+test("readiness checks stay out of creation and remain minimal at download", () => {
+  assert.doesNotMatch(editorSource, /Checks for this section/);
+  assert.doesNotMatch(editorSource, /Your CV needs one more review/);
+  assert.doesNotMatch(editorSource, /Review complete/);
+  assert.match(editorSource, /issue\.severity === "fix"/);
+  assert.match(editorSource, /Before downloading:/);
+  assert.match(editorSource, /You can keep editing or continue with this version/);
+});
+
 test("P1 funnel events are allowlisted", () => {
   for (const eventName of [
     "ai_suggestion_generated",
