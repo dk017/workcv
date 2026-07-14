@@ -128,6 +128,19 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-[54px] w-auto max-w-full border-0"
             />
           </a>
+          <a
+            href="https://www.aidirectori.es"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV listed on AI Directories"
+          >
+            <img
+              src="https://cdn.aidirectori.es/ai-tools/badges/dark-mode.png"
+              alt="AI Directories Badge"
+              className="block h-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
