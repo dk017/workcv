@@ -17,6 +17,7 @@ WorkCV UK is a Next.js CV builder for UK job seekers. The production offer is si
 - `npm run dev` starts the local Next.js dev server
 - `npm run type-check` runs TypeScript validation
 - `npm run build` builds the production app
+- `npm run indexnow:submit` submits every URL in the production sitemap to IndexNow after deployment
 
 ## Confirmed decisions
 

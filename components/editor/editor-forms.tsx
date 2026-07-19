@@ -113,10 +113,10 @@ export function ExperienceForm({
       <div className="space-y-5">
         {cv.experience.map((item, index) => (
           <div key={item.id} className="rounded-lg border border-line bg-paper p-4">
-            <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="font-bold text-navy">Role {index + 1}</h3>
-              <div className="flex items-center gap-1">
-                <button type="button" onClick={() => onImproveBullets(item.id)} disabled={assistanceBusy} className="mr-2 inline-flex min-h-8 items-center gap-1 rounded border border-line bg-white px-2 text-xs font-bold text-navy hover:border-navy disabled:cursor-not-allowed disabled:opacity-50">
+              <div className="flex flex-wrap items-center gap-1 sm:justify-end">
+                <button type="button" onClick={() => onImproveBullets(item.id)} disabled={assistanceBusy} className="mr-1 inline-flex min-h-11 items-center gap-1 rounded border border-line bg-white px-2 text-xs font-bold text-navy hover:border-navy disabled:cursor-not-allowed disabled:opacity-50 sm:mr-2 sm:min-h-8">
                   <Sparkles className="h-3.5 w-3.5" />Improve
                 </button>
                 <IconButton
@@ -217,9 +217,9 @@ export function EducationForm({
       <div className="space-y-5">
         {cv.education.map((item, index) => (
           <div key={item.id} className="rounded-lg border border-line bg-paper p-4">
-            <div className="mb-4 flex items-center justify-between gap-3">
+            <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <h3 className="font-bold text-navy">Education {index + 1}</h3>
-              <div className="flex items-center gap-1">
+              <div className="flex flex-wrap items-center gap-1 sm:justify-end">
                 <IconButton
                   label="Move education up"
                   disabled={index === 0}
@@ -378,7 +378,7 @@ function FormSection({
 }) {
   return (
     <div>
-      <div className="mb-5 flex items-start justify-between gap-4">
+      <div className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <h2 className="font-display text-2xl font-semibold text-navy">{title}</h2>
           <p className="mt-2 text-sm leading-6 text-muted">{description}</p>
@@ -418,8 +418,8 @@ function BulletEditor({
       <div className="space-y-2">
         {bullets.map((bullet, index) => (
           <div
-            key={`${index}-${bullet.slice(0, 24)}`}
-            className="grid grid-cols-[minmax(0,1fr)_auto] gap-2"
+            key={index}
+            className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]"
           >
             <input
               value={bullet}
@@ -431,7 +431,7 @@ function BulletEditor({
               placeholder="Achievement or responsibility"
               className="min-h-10 min-w-0 rounded-md border border-line bg-white px-3 text-sm text-ink outline-none focus:border-navy focus:ring-2 focus:ring-gold-tint"
             />
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center justify-end gap-1">
               <IconButton label="Insert bullet above" onClick={() => insert(index)}>
                 <Plus className="h-3.5 w-3.5" />
                 <ArrowUp className="h-3.5 w-3.5" />
@@ -490,7 +490,7 @@ function IconButton({
       title={label}
       disabled={disabled}
       onClick={onClick}
-      className="inline-flex h-8 min-w-8 items-center justify-center gap-0.5 rounded border border-line bg-white px-1 text-muted hover:text-navy disabled:cursor-not-allowed disabled:opacity-35"
+      className="inline-flex h-11 min-w-11 items-center justify-center gap-0.5 rounded border border-line bg-white px-1 text-muted hover:text-navy disabled:cursor-not-allowed disabled:opacity-35 sm:h-8 sm:min-w-8"
     >
       {children}
     </button>

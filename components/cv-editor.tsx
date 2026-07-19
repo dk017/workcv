@@ -873,7 +873,7 @@ export function CvEditor() {
   return (
     <div className="print-page bg-paper">
       <section className="editor-chrome border-b border-line bg-surface">
-        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-5 py-7 sm:w-[min(1540px,calc(100%-48px))] lg:flex-row lg:items-center lg:justify-between">
+        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-5 py-5 sm:w-[min(1540px,calc(100%-48px))] sm:py-7 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
               CV editor
@@ -886,7 +886,7 @@ export function CvEditor() {
               preview to keep your CV focused.
             </p>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
+          <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
             <Link
               href="/my-cvs"
               onClick={(event) => {
@@ -896,7 +896,7 @@ export function CvEditor() {
                   if (saved) window.location.href = "/my-cvs";
                 });
               }}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
             >
               My CVs
             </Link>
@@ -906,7 +906,7 @@ export function CvEditor() {
                 trackEditorEvent("template_chooser_opened", draftId);
                 setTemplatePickerOpen(true);
               }}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
             >
               <LayoutTemplate className="h-4 w-4" />
               <span className="hidden sm:inline">Template:</span>
@@ -915,7 +915,7 @@ export function CvEditor() {
             <button
               type="button"
               onClick={() => { setJobDescriptionDraft(cv.targeting?.jobDescription || ""); setTailoringOpen((open) => !open); }}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
             >
               <Sparkles className="h-4 w-4" />Tailor to job
             </button>
@@ -924,7 +924,7 @@ export function CvEditor() {
                 saveSnapshot.status === "error"
                   ? "border-red-200 bg-redsoft font-bold text-[#8d3030]"
                   : "border-line bg-paper text-muted"
-              }`}
+              } flex min-h-11 w-full items-center justify-center text-center sm:min-h-0 sm:w-auto`}
               aria-live="polite"
             >
               {saveLabel}
@@ -947,7 +947,7 @@ export function CvEditor() {
             <button
               type="button"
               onClick={() => setImportOpen(true)}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
             >
               <Upload className="h-4 w-4" />
               Import CV
@@ -956,7 +956,7 @@ export function CvEditor() {
               type="button"
               onClick={resetDraft}
               disabled={creatingNew}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60"
+              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60 sm:min-h-10 sm:w-auto sm:px-4"
             >
               <Plus className="h-4 w-4" />
               {creatingNew ? "Creating..." : "New CV"}
@@ -965,7 +965,7 @@ export function CvEditor() {
               type="button"
               onClick={startDownload}
               disabled={checkoutLoading || paymentState === "checking" || paymentState === "pending"}
-              className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60"
+              className="col-span-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60 sm:min-h-10 sm:w-auto"
             >
               <Download className="h-4 w-4" />
               {paymentState === "checking" || paymentState === "pending"
