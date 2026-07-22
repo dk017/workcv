@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
+import Script from "next/script";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
@@ -59,6 +60,15 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
+      <head>
+        <Script
+          defer
+          data-site="hq2xtnu4"
+          data-domain="werkcv.nl"
+          src="https://piqo.app/piqo.js"
+          strategy="beforeInteractive"
+        />
+      </head>
       <body className="font-sans antialiased">
         <AttributionCapture />
         <Header />

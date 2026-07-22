@@ -129,6 +129,35 @@ export function Footer({ line = site.summary }: { line?: string }) {
             />
           </a>
           <a
+            href="https://codetrendy.com/?utm_source=workcv.co.uk&utm_medium=badge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV promoted on CodeTrendy"
+          >
+            <img
+              src="https://codetrendy.com/api/badge?style=classic"
+              alt="Promoted on CodeTrendy"
+              height={54}
+              className="block h-[54px] w-auto max-w-full border-0"
+            />
+          </a>
+          <a
+            href="https://marketingdb.live"
+            target="_blank"
+            rel="noopener noreferrer nofollow sponsored"
+            className="inline-block"
+            aria-label="WorkCV listed on MarketingDB"
+          >
+            <img
+              src="https://marketingdb.live/badge.svg"
+              alt="Listed on MarketingDB"
+              width={190}
+              height={44}
+              className="block h-11 w-auto max-w-full border-0"
+            />
+          </a>
+          <a
             href="https://www.aidirectori.es"
             target="_blank"
             rel="noopener noreferrer"
@@ -138,7 +167,9 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <img
               src="https://cdn.aidirectori.es/ai-tools/badges/dark-mode.png"
               alt="AI Directories Badge"
-              className="block h-auto max-w-full border-0"
+              width={208}
+              height={44}
+              className="block h-11 w-auto max-w-[208px] border-0"
             />
           </a>
         </div>
