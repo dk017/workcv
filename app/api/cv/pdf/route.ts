@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
+import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { getCvDocument } from "@/lib/cv-documents";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { createPdfRenderToken } from "@/lib/pdf-render-token";
@@ -45,6 +46,14 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("cv_pdf_render_failed", error);
+    await reportConversionFailure({
+      category: "pdf_generation_failure",
+      title: "A paid CV PDF could not be generated",
+      userId: user.id,
+      documentId,
+      error,
+      context: { route: "/api/cv/pdf" },
+    });
     return NextResponse.json({ error: "PDF generation is temporarily unavailable" }, { status: 503 });
   }
 }

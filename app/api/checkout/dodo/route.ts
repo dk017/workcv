@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
+import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
 import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
@@ -125,6 +126,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ checkoutUrl: checkout.checkoutUrl });
   } catch (error) {
     console.error("dodo_checkout_create_failed", error);
+    await reportConversionFailure({
+      category: "checkout_creation_failure",
+      title: "Dodo checkout could not be created",
+      userId: user.id,
+      documentId: draftId,
+      error,
+      context: {
+        route: "/api/checkout/dodo",
+        force_new: forceNew,
+      },
+    });
     return NextResponse.json({ error: "Checkout unavailable" }, { status: 502 });
   }
 }

@@ -435,7 +435,9 @@ export function CvEditor() {
   useEffect(() => {
     const previous = previousSaveStatusRef.current;
     if (saveSnapshot.status === "error" && previous !== "error") {
-      trackEditorEvent("save_failed", draftId);
+      trackEditorEvent("save_failed", draftId, {
+        error_kind: saveSnapshot.errorKind || "unknown",
+      });
     }
     if (saveSnapshot.status === "saving" && previous === "error") {
       trackEditorEvent("save_retried", draftId);

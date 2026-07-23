@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isDeepStrictEqual } from "node:util";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
+import { reportConversionFailure } from "@/lib/conversion-alerts";
 import {
   CvUpdateConflictError,
   getCvDocument,
@@ -85,6 +86,14 @@ export async function PUT(request: NextRequest) {
         { status: 400 },
       );
     }
+    await reportConversionFailure({
+      category: "cv_save_server_failure",
+      title: "CV save failed on the server",
+      userId: user.id,
+      documentId,
+      error,
+      context: { route: "/api/cv/current" },
+    });
     throw error;
   }
 }

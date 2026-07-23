@@ -240,6 +240,23 @@ export async function ensureAnalyticsTables() {
 
         CREATE INDEX IF NOT EXISTS workcv_editor_events_funnel_idx
           ON workcv_editor_events (event_name, created_at DESC);
+
+        CREATE TABLE IF NOT EXISTS workcv_conversion_alerts (
+          fingerprint TEXT PRIMARY KEY,
+          category TEXT NOT NULL,
+          user_id TEXT,
+          document_id TEXT,
+          occurrence_count INTEGER NOT NULL DEFAULT 1,
+          first_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          last_seen_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          last_error TEXT,
+          last_alert_attempt_at TIMESTAMPTZ,
+          last_alert_sent_at TIMESTAMPTZ,
+          last_delivery_error TEXT
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_conversion_alerts_last_seen_idx
+          ON workcv_conversion_alerts (last_seen_at DESC);
       `)
       .then(() => undefined)
       .catch((error) => {

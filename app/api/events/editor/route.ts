@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
+import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { ensureAnalyticsTables, getPool } from "@/lib/db";
 import { editorEventNames } from "@/lib/editor-events";
 
@@ -49,5 +50,43 @@ export async function POST(request: NextRequest) {
     `,
     [user.id, documentId, eventName, JSON.stringify(metadata)],
   );
+
+  if (eventName === "save_failed") {
+    await reportConversionFailure({
+      category: "repeated_cv_save_failure",
+      title: "Repeated CV saves failed",
+      userId: user.id,
+      documentId,
+      error:
+        typeof metadata.error_kind === "string"
+          ? `Client save error: ${metadata.error_kind}`
+          : "The editor reported a failed save.",
+      context: {
+        route: "/api/events/editor",
+        error_kind:
+          typeof metadata.error_kind === "string"
+            ? metadata.error_kind
+            : "unknown",
+      },
+      threshold: 3,
+      windowMinutes: 15,
+      cooldownMinutes: 60,
+    });
+  }
+
+  if (eventName === "pdf_generation_failed") {
+    await reportConversionFailure({
+      category: "repeated_pdf_generation_failure",
+      title: "Repeated paid PDF downloads failed",
+      userId: user.id,
+      documentId,
+      error: "The editor reported a failed PDF generation attempt.",
+      context: { route: "/api/events/editor" },
+      threshold: 2,
+      windowMinutes: 15,
+      cooldownMinutes: 60,
+    });
+  }
+
   return NextResponse.json({ ok: true });
 }

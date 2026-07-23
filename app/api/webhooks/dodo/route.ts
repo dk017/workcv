@@ -8,6 +8,7 @@ import {
   metadataString,
   verifyDodoWebhookSignature,
 } from "@/lib/dodo";
+import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
 
@@ -47,6 +48,12 @@ function readCurrency(data: DodoPaymentPayload) {
 export async function POST(request: NextRequest) {
   if (!WEBHOOK_SECRET) {
     console.error("DODO_WEBHOOK_SECRET is not configured");
+    await reportConversionFailure({
+      category: "payment_webhook_configuration_failure",
+      title: "Dodo payment webhook is not configured",
+      error: "DODO_WEBHOOK_SECRET is not configured",
+      context: { route: "/api/webhooks/dodo" },
+    });
     return NextResponse.json({ error: "Webhook not configured" }, { status: 500 });
   }
 
@@ -99,6 +106,17 @@ export async function POST(request: NextRequest) {
   }
 
   if (!draftId || !/^[a-zA-Z0-9_-]{12,80}$/.test(draftId)) {
+    if (event.type === "payment.succeeded") {
+      await reportConversionFailure({
+        category: "payment_webhook_metadata_failure",
+        title: "Successful payment is missing its CV identifier",
+        error: "A payment.succeeded webhook had no valid draft_id metadata.",
+        context: {
+          route: "/api/webhooks/dodo",
+          has_checkout_id: Boolean(data.checkout_session_id),
+        },
+      });
+    }
     return NextResponse.json({ error: "Missing draft_id metadata" }, { status: 400 });
   }
 
@@ -224,6 +242,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "ok" });
   } catch (error) {
     console.error("dodo_webhook_processing_failed", error);
+    await reportConversionFailure({
+      category: "payment_webhook_processing_failure",
+      title: "Successful payment could not unlock its CV",
+      documentId: draftId,
+      error,
+      context: {
+        route: "/api/webhooks/dodo",
+        event_type: event.type,
+        has_checkout_id: Boolean(checkoutId),
+      },
+    });
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
   }
 }
