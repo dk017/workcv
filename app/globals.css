@@ -84,11 +84,11 @@ main section.py-24 {
 
 @media (max-width: 640px) {
   .container-page {
-    width: min(100% - 32px, 1120px);
+    width: min(1120px, calc(100% - 32px));
   }
 
   .container-wide {
-    width: min(100% - 32px, 1360px);
+    width: min(1360px, calc(100% - 32px));
   }
 }
 

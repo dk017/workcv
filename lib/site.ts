@@ -11,7 +11,7 @@ export const site = {
   priceAmount,
   priceCurrency,
   price: `£${priceAmount.toFixed(2)}`,
-  priceGbp: `${priceCurrency} ${priceAmount.toFixed(2)}`,
+  priceGbp: `£${priceAmount.toFixed(2)}`,
   priceTaxInclusive: WORKCV_PRICE.taxInclusive,
   summary:
     "A clear, professional UK CV—ready when you are.",

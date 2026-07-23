@@ -9,6 +9,7 @@ import {
   Download,
   GraduationCap,
   LayoutTemplate,
+  MoreHorizontal,
   Plus,
   Sparkles,
   Undo2,
@@ -873,18 +874,14 @@ export function CvEditor() {
   return (
     <div className="print-page bg-paper">
       <section className="editor-chrome border-b border-line bg-surface">
-        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-5 py-5 sm:w-[min(1540px,calc(100%-48px))] sm:py-7 lg:flex-row lg:items-center lg:justify-between">
-          <div>
+        <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-4 py-4 sm:w-[min(1540px,calc(100%-48px))] lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
             <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
               CV editor
             </p>
-            <h1 className="mt-2 font-display text-4xl font-semibold text-navy md:text-5xl">
+            <h1 className="mt-1 font-display text-3xl font-semibold text-navy">
               Build your UK CV.
             </h1>
-            <p className="mt-3 max-w-2xl text-muted">
-              Fill the guided sections, choose a clean template, and use the live
-              preview to keep your CV focused.
-            </p>
           </div>
           <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:flex-wrap sm:items-center sm:gap-3">
             <Link
@@ -900,27 +897,8 @@ export function CvEditor() {
             >
               My CVs
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                trackEditorEvent("template_chooser_opened", draftId);
-                setTemplatePickerOpen(true);
-              }}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
-            >
-              <LayoutTemplate className="h-4 w-4" />
-              <span className="hidden sm:inline">Template:</span>
-              {selectedTemplate?.name ?? "Template"}
-            </button>
-            <button
-              type="button"
-              onClick={() => { setJobDescriptionDraft(cv.targeting?.jobDescription || ""); setTailoringOpen((open) => !open); }}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
-            >
-              <Sparkles className="h-4 w-4" />Tailor to job
-            </button>
             <div
-              className={`rounded-md border px-4 py-2 text-sm ${
+              className={`order-2 col-span-2 rounded-md border px-4 py-2 text-sm sm:order-none ${
                 saveSnapshot.status === "error"
                   ? "border-red-200 bg-redsoft font-bold text-[#8d3030]"
                   : "border-line bg-paper text-muted"
@@ -942,30 +920,68 @@ export function CvEditor() {
                 >
                   {saveSnapshot.errorKind === "conflict" ? "Reload latest" : "Retry"}
                 </button>
-              )}
+                )}
             </div>
-            <button
-              type="button"
-              onClick={() => setImportOpen(true)}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4"
-            >
-              <Upload className="h-4 w-4" />
-              Import CV
-            </button>
-            <button
-              type="button"
-              onClick={resetDraft}
-              disabled={creatingNew}
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60 sm:min-h-10 sm:w-auto sm:px-4"
-            >
-              <Plus className="h-4 w-4" />
-              {creatingNew ? "Creating..." : "New CV"}
-            </button>
+            <details className="relative order-1 sm:order-none">
+              <summary className="inline-flex min-h-11 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper sm:min-h-10 sm:w-auto sm:px-4 [&::-webkit-details-marker]:hidden">
+                <MoreHorizontal className="h-4 w-4" />
+                More
+              </summary>
+              <div className="absolute right-0 z-30 mt-2 w-60 overflow-hidden rounded-md border border-line bg-white p-1 shadow-soft">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                    trackEditorEvent("template_chooser_opened", draftId);
+                    setTemplatePickerOpen(true);
+                  }}
+                  className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper"
+                >
+                  <LayoutTemplate className="h-4 w-4" />
+                  Template: {selectedTemplate?.name ?? "Choose"}
+                </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                    setJobDescriptionDraft(cv.targeting?.jobDescription || "");
+                    setTailoringOpen(true);
+                  }}
+                  className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  Tailor to job
+                </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                    setImportOpen(true);
+                  }}
+                  className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper"
+                >
+                  <Upload className="h-4 w-4" />
+                  Import CV
+                </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                    resetDraft();
+                  }}
+                  disabled={creatingNew}
+                  className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60"
+                >
+                  <Plus className="h-4 w-4" />
+                  {creatingNew ? "Creating..." : "New CV"}
+                </button>
+              </div>
+            </details>
             <button
               type="button"
               onClick={startDownload}
               disabled={checkoutLoading || paymentState === "checking" || paymentState === "pending"}
-              className="col-span-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60 sm:min-h-10 sm:w-auto"
+              className="order-3 col-span-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60 sm:order-none sm:min-h-10 sm:w-auto"
             >
               <Download className="h-4 w-4" />
               {paymentState === "checking" || paymentState === "pending"

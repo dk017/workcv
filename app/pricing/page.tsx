@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Check, ExternalLink, ShieldCheck } from "lucide-react";
+import { ArrowRight, Check, ExternalLink } from "lucide-react";
 
 import {
   ButtonLink,
@@ -208,62 +208,6 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <section className="border-y border-line bg-surface">
-        <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            `${site.priceGbp} PDF download`,
-            "No monthly plan",
-            "No automatic renewal",
-            "Nothing to cancel",
-          ].map((item) => (
-            <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
-              <ShieldCheck className="h-5 w-5 shrink-0 text-success" />
-              {item}
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-navy py-20 text-white">
-        <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.14em] text-gold">
-              No hidden fees guarantee
-            </p>
-            <h2 className="mt-4 font-display text-4xl font-semibold md:text-5xl">
-              The price you see is the price you pay.
-            </h2>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75">
-              WorkCV charges {site.price} once to unlock this saved CV. There
-              is no discounted trial, subscription conversion, automatic
-              renewal, or cancellation task. Return to the same CV, edit it,
-              and download the updated PDF without another payment.
-            </p>
-            <Link
-              href="/cv-builder-scams-uk"
-              className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-white underline decoration-white/40 underline-offset-4"
-            >
-              How CV builder trial renewals work
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-          <div className="grid gap-px overflow-hidden rounded-xl border border-white/15 bg-white/15 sm:grid-cols-2">
-            {[
-              ["Build first", "Write and preview your CV before paying."],
-              ["Pay once", `${site.price} unlocks this saved CV.`],
-              ["Keep editing", "Later edits and downloads stay unlocked."],
-              ["No renewal", "We do not start a recurring card payment."],
-            ].map(([title, body]) => (
-              <div key={title} className="bg-navy p-6">
-                <Check className="h-5 w-5 text-gold" />
-                <h3 className="mt-4 text-lg font-bold">{title}</h3>
-                <p className="mt-2 leading-7 text-white/70">{body}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Compare pricing</SectionLabel>
@@ -366,33 +310,6 @@ export default function PricingPage() {
                 <p className="mt-4 text-sm font-bold leading-6 text-navy">{item}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-surface py-24">
-        <div className="container-page grid gap-10 lg:grid-cols-2">
-          <div className="rounded-xl border border-line bg-paper p-6">
-            <h2 className="font-display text-3xl font-semibold text-navy">
-              When a subscription might make sense
-            </h2>
-            <p className="mt-4 leading-7 text-muted">
-              If you need ongoing access to many career tools, cover letters,
-              repeated downloads, job tracking, or expert writing services, a
-              larger subscription product may be useful.
-            </p>
-          </div>
-          <div className="rounded-xl border-2 border-navy bg-white p-6 shadow-sm">
-            <h2 className="font-display text-3xl font-semibold text-navy">
-              When WorkCV is the better fit
-            </h2>
-            <p className="mt-4 leading-7 text-muted">
-              If you mainly need one clean UK CV PDF for applications, a
-              one-time download price is simpler and easier to understand.
-            </p>
-            <div className="mt-6">
-              <ButtonLink href="/editor">Create my CV</ButtonLink>
-            </div>
           </div>
         </div>
       </section>

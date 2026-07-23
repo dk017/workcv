@@ -221,10 +221,17 @@ export async function updateCvDocument(
       SET data = $3::jsonb,
           template_id = $4,
           title = $5,
-          updated_at = NOW()
+          updated_at = GREATEST(
+            date_trunc('milliseconds', NOW()),
+            date_trunc('milliseconds', updated_at) + INTERVAL '1 millisecond'
+          )
       WHERE id = $1
         AND user_id = $2
-        AND ($6::timestamptz IS NULL OR updated_at = $6::timestamptz)
+        AND (
+          $6::timestamptz IS NULL
+          OR date_trunc('milliseconds', updated_at) =
+             date_trunc('milliseconds', $6::timestamptz)
+        )
       RETURNING id, data, updated_at
     `,
     [
