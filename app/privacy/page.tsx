@@ -13,6 +13,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       intro="This policy explains what personal data WorkCV handles, why we use it, and how to contact us about your data."
+      lastUpdated="23 July 2026"
       sections={[
         {
           title: "Who this applies to",
@@ -55,11 +56,31 @@ export default function PrivacyPage() {
               <p>
                 We use your data to provide the CV builder, generate your PDF,
                 process payment status, respond to support requests, prevent abuse,
-                and keep basic operational records.
+                improve the product through limited user research, and keep basic
+                operational records.
               </p>
               <p>
                 Our usual lawful bases are contract, legitimate interests, legal
                 obligation, and consent where a specific consent is requested.
+              </p>
+            </>
+          ),
+        },
+        {
+          title: "Product research communications",
+          body: (
+            <>
+              <p>
+                We may send a limited, non-promotional email to ask about your
+                experience using WorkCV. We use legitimate interests to understand
+                product problems and improve the service. These research emails do
+                not enrol you in a marketing subscription.
+              </p>
+              <p>
+                We send no more than one initial research email for an outreach
+                round and do not include tracking pixels. Every research email
+                provides an opt-out. We keep a suppression record so that we can
+                honour your preference.
               </p>
             </>
           ),

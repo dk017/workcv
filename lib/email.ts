@@ -180,3 +180,59 @@ export async function sendConversionAlertEmail(input: {
     `,
   });
 }
+
+export async function sendFeedbackResearchEmail(input: {
+  to: string;
+  unsubscribeUrl: string;
+}) {
+  const transporter = getEmailTransporter();
+  if (!transporter) {
+    throw new Error("SMTP is not configured for feedback research email");
+  }
+
+  const { from, replyTo } = getTransactionalEmailIdentity();
+  const safeUnsubscribeUrl = escapeHtml(input.unsubscribeUrl);
+
+  await transporter.sendMail({
+    from,
+    replyTo,
+    to: input.to,
+    subject: "Could you share your experience with WorkCV?",
+    text: [
+      "Hi,",
+      "",
+      "You recently used WorkCV to create or edit a CV. We are trying to understand what worked and where people encountered difficulty.",
+      "",
+      "If you have a moment, could you reply with any of the following?",
+      "",
+      "- What were you trying to accomplish?",
+      "- Did anything confuse you or stop you?",
+      "- What single improvement would make WorkCV more useful?",
+      "",
+      "A short or critical response is completely welcome. Please do not include CV content, payment details, authentication codes, or other sensitive information.",
+      "",
+      "This is a one-time product-research email, not a marketing subscription.",
+      `To opt out of future WorkCV research emails, use this link: ${input.unsubscribeUrl}`,
+      "",
+      "Thanks,",
+      "WorkCV",
+      "contact@workcv.co.uk",
+    ].join("\n"),
+    html: `
+      <div style="font-family:Arial,sans-serif;line-height:1.6;color:#17202a;max-width:620px">
+        <p>Hi,</p>
+        <p>You recently used WorkCV to create or edit a CV. We are trying to understand what worked and where people encountered difficulty.</p>
+        <p>If you have a moment, could you reply with any of the following?</p>
+        <ul>
+          <li>What were you trying to accomplish?</li>
+          <li>Did anything confuse you or stop you?</li>
+          <li>What single improvement would make WorkCV more useful?</li>
+        </ul>
+        <p>A short or critical response is completely welcome. Please do not include CV content, payment details, authentication codes, or other sensitive information.</p>
+        <p>This is a one-time product-research email, not a marketing subscription.</p>
+        <p><a href="${safeUnsubscribeUrl}">Opt out of future WorkCV research emails</a></p>
+        <p>Thanks,<br>WorkCV<br>contact@workcv.co.uk</p>
+      </div>
+    `,
+  });
+}

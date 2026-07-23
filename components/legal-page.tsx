@@ -9,10 +9,12 @@ export function LegalPage({
   title,
   intro,
   sections,
+  lastUpdated = "13 June 2026",
 }: {
   title: string;
   intro: string;
   sections: LegalSection[];
+  lastUpdated?: string;
 }) {
   return (
     <section className="bg-paper py-16 md:py-24">
@@ -25,7 +27,9 @@ export function LegalPage({
             {title}
           </h1>
           <p className="mt-6 text-lg leading-8 text-muted">{intro}</p>
-          <p className="mt-4 text-sm font-bold text-navy">Last updated: 13 June 2026</p>
+          <p className="mt-4 text-sm font-bold text-navy">
+            Last updated: {lastUpdated}
+          </p>
         </div>
 
         <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_280px]">

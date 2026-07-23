@@ -4,6 +4,7 @@ let pool: Pool | null = null;
 let paymentSetupPromise: Promise<void> | null = null;
 let authSetupPromise: Promise<void> | null = null;
 let analyticsSetupPromise: Promise<void> | null = null;
+let feedbackSetupPromise: Promise<void> | null = null;
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -265,4 +266,40 @@ export async function ensureAnalyticsTables() {
       });
   }
   return analyticsSetupPromise;
+}
+
+export async function ensureFeedbackOutreachTables() {
+  if (!feedbackSetupPromise) {
+    feedbackSetupPromise = getPool()
+      .query(`
+        CREATE TABLE IF NOT EXISTS workcv_feedback_preferences (
+          email_normalized TEXT PRIMARY KEY,
+          feedback_opted_out_at TIMESTAMPTZ,
+          source TEXT NOT NULL DEFAULT 'unsubscribe',
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE TABLE IF NOT EXISTS workcv_feedback_outreach (
+          user_id TEXT PRIMARY KEY,
+          email_normalized TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'sending',
+          attempt_count INTEGER NOT NULL DEFAULT 1,
+          last_attempt_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          sent_at TIMESTAMPTZ,
+          last_error TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_feedback_outreach_status_idx
+          ON workcv_feedback_outreach (status, updated_at DESC);
+      `)
+      .then(() => undefined)
+      .catch((error) => {
+        feedbackSetupPromise = null;
+        throw error;
+      });
+  }
+  return feedbackSetupPromise;
 }
