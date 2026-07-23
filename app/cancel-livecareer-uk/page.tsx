@@ -10,15 +10,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "How to Cancel LiveCareer UK - Step by Step",
@@ -92,7 +97,7 @@ const faqItems = [
   {
     question: "How much does LiveCareer UK cost after the trial?",
     answer:
-      "On the UK pricing page checked 13 June 2026, LiveCareer listed a 14-day access plan at GBP 1.95 that automatically renews at GBP 19.85 billed every four weeks if you do not cancel.",
+      `On the official pricing page checked ${checkedDate}, LiveCareer listed ${competitorPricing.liveCareer.entry}, followed by automatic renewal at ${competitorPricing.liveCareer.renewal}.`,
   },
   {
     question: "Does LiveCareer send cancellation proof?",
@@ -111,21 +116,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel LiveCareer UK",
-  description:
-    "Step-by-step guide to cancelling a LiveCareer UK subscription and stopping automatic renewal.",
-  totalTime: "PT10M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -142,10 +132,6 @@ const faqSchema = {
 export default function CancelLiveCareerUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -170,8 +156,9 @@ export default function CancelLiveCareerUkPage() {
                 How to cancel LiveCareer in the UK.
               </h1>
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-                LiveCareer UK currently lists 14-day access at GBP 1.95,
-                followed by automatic renewal at GBP 19.85 every four weeks.
+                LiveCareer&apos;s official pricing page listed{" "}
+                {competitorPricing.liveCareer.entry}, followed by automatic renewal
+                at {competitorPricing.liveCareer.renewal} when checked.
                 This guide shows the account settings route, support options,
                 and the proof to keep after cancelling.
               </p>
@@ -337,23 +324,16 @@ export default function CancelLiveCareerUkPage() {
                 job seekers who need one clean CV PDF and no monthly renewal.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>LiveCareer UK</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["GBP 1.95 for 14 days", "Free to build"],
-                ["Renews at GBP 19.85 every 4 weeks", `${site.priceGbp} PDF download`],
-                ["Cancellation reference needed", "No monthly subscription"],
+            <ComparisonTable
+              caption={`LiveCareer UK and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["LiveCareer UK", "WorkCV"]}
+              rows={[
+                [competitorPricing.liveCareer.entry, "Free to build"],
+                [`Renews at ${competitorPricing.liveCareer.renewal}`, `${site.priceGbp} PDF download`],
+                ["Cancellation reference listed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
@@ -404,8 +384,8 @@ export default function CancelLiveCareerUkPage() {
       <FinalCta
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
-        secondaryHref="/pricing"
-        secondary="Compare pricing"
+        secondaryHref="/livecareer-alternative"
+        secondary="Compare the LiveCareer alternative"
       />
     </>
   );

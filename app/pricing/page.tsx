@@ -8,6 +8,10 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
@@ -26,38 +30,38 @@ export const metadata: Metadata = {
   },
 };
 
-const checkedDate = "29 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 const competitors = [
   {
     builder: "MyPerfectCV",
-    entry: "GBP 2.95 for 14 days",
-    renewal: "GBP 16.95 every 4 weeks",
-    ongoing: "Approx. GBP 220.35 over 52 weeks",
+    entry: competitorPricing.myPerfectCv.entry,
+    renewal: competitorPricing.myPerfectCv.renewal,
+    ongoing: "Check the current total for your intended access period",
     cancellation: "Yes",
     source: "https://www.myperfectcv.co.uk/pricing",
   },
   {
     builder: "Resume.io UK",
-    entry: "GBP 2.95 for 7 days",
-    renewal: "GBP 20.95 every 4 weeks",
-    ongoing: "Approx. GBP 272.35 over 52 weeks",
+    entry: competitorPricing.resumeIo.entry,
+    renewal: competitorPricing.resumeIo.renewal,
+    ongoing: "Check the current total for your intended access period",
     cancellation: "Yes",
     source: "https://resume.io/uk/pricing",
   },
   {
     builder: "LiveCareer UK",
-    entry: "GBP 1.95 for 14 days",
-    renewal: "GBP 19.85 every 4 weeks",
-    ongoing: "Approx. GBP 258.05 over 52 weeks",
+    entry: competitorPricing.liveCareer.entry,
+    renewal: competitorPricing.liveCareer.renewal,
+    ongoing: "Check the current total for your intended access period",
     cancellation: "Yes",
     source: "https://www.livecareer.co.uk/pricing",
   },
   {
     builder: "CVMaker UK",
-    entry: "GBP 0.99 for 7 days",
-    renewal: "GBP 19.99 per month",
-    ongoing: "Approx. GBP 239.88 over 12 months",
+    entry: competitorPricing.cvMaker.entry,
+    renewal: competitorPricing.cvMaker.renewal,
+    ongoing: "Check the current total for your intended access period",
     cancellation: "Yes",
     source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
   },
@@ -101,12 +105,12 @@ const pricingFaqs = [
   {
     question: "How much does MyPerfectCV cost?",
     answer:
-      "On its official pricing page checked 29 June 2026, MyPerfectCV listed a 14-day premium plan at GBP 2.95 that automatically renews at GBP 16.95 every 4 weeks.",
+      `On its official pricing page checked ${checkedDate}, MyPerfectCV listed ${competitorPricing.myPerfectCv.entry}, followed by automatic renewal at ${competitorPricing.myPerfectCv.renewal}.`,
   },
   {
     question: "How much does Resume.io cost in the UK?",
     answer:
-      "On its UK pricing page checked 29 June 2026, Resume.io listed a 7-day trial at GBP 2.95 that auto-renews to GBP 20.95 billed every 4 weeks.",
+      `On its pricing page checked ${checkedDate}, Resume.io listed ${competitorPricing.resumeIo.entry}, followed by automatic renewal at ${competitorPricing.resumeIo.renewal}.`,
   },
   {
     question: "Do I need to pay monthly for a CV builder?",
@@ -174,7 +178,7 @@ export default function PricingPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
+              <ButtonLink href="/editor">Start building free</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare prices
               </ButtonLink>
@@ -219,9 +223,11 @@ export default function PricingPage() {
               <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
                 Several UK CV builders advertise a low trial price, then renew
                 every month or every 4 weeks unless cancelled. Current official
-                examples include GBP 1.95 for 14 days followed by GBP 19.85
-                every 4 weeks, and GBP 2.95 for 14 days followed by GBP 16.95
-                every 4 weeks. WorkCV uses a narrower one-time model.
+                examples include {competitorPricing.liveCareer.entry} followed
+                by {competitorPricing.liveCareer.renewal}, and{" "}
+                {competitorPricing.myPerfectCv.entry} followed by{" "}
+                {competitorPricing.myPerfectCv.renewal}. WorkCV uses a narrower
+                one-time model.
               </p>
             </div>
             <div className="rounded-xl border border-line bg-paper p-5">

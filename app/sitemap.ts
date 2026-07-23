@@ -23,7 +23,7 @@ const routes = [
   { path: "/ats-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
   { path: "/tools", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-07-10" },
   { path: "/tools/take-home-pay-calculator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/uk-living-wage-checker-2026", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
+  { path: "/tools/uk-living-wage-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-23" },
   { path: "/tools/cover-letter-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/cv-bullet-point-generator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/cv-summary-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
@@ -66,7 +66,6 @@ const routes = [
   { path: "/privacy", priority: 0.35, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.35, changeFrequency: "yearly" },
   { path: "/refund-policy", priority: 0.45, changeFrequency: "yearly" },
-  { path: "/editor", priority: 0.65, changeFrequency: "monthly" },
 ] satisfies Array<{
   path: string;
   priority: number;

@@ -381,7 +381,7 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
               </p>
               <a
                 href="https://nationalcareers.service.gov.uk/careers-advice/cv-sections"
-                rel="nofollow noopener noreferrer"
+                rel="noopener noreferrer"
                 target="_blank"
                 className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
               >

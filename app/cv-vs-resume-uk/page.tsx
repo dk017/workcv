@@ -187,7 +187,7 @@ export default function CvVsResumeUkPage() {
               ["Prospects: How to write a CV", "https://www.prospects.ac.uk/careers-advice/cvs-and-cover-letters/how-to-write-a-cv"],
               ["National Careers Service: CV sections", "https://nationalcareers.service.gov.uk/careers-advice/cv-sections"],
               ["GOV.UK: Recruitment and discrimination", "https://www.gov.uk/employer-preventing-discrimination/recruitment"],
-            ].map(([label, href]) => <a key={href} href={href} target="_blank" rel="nofollow noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-paper p-5 font-bold text-navy transition hover:border-navy">{label}<ArrowRight className="h-5 w-5 shrink-0 transition group-hover:translate-x-1" /></a>)}
+            ].map(([label, href]) => <a key={href} href={href} target="_blank" rel="noopener noreferrer" className="group flex items-center justify-between gap-4 rounded-xl border border-line bg-paper p-5 font-bold text-navy transition hover:border-navy">{label}<ArrowRight className="h-5 w-5 shrink-0 transition group-hover:translate-x-1" /></a>)}
           </div>
         </div>
       </section>

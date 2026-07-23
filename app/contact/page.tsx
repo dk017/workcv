@@ -7,6 +7,12 @@ import { ButtonLink } from "@/components/marketing";
 export const metadata: Metadata = {
   title: "Contact",
   description: "Contact WorkCV for support, billing, payment, and CV download help.",
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title: "Contact WorkCV",
+    description: "Contact WorkCV for support, billing, payment, and CV download help.",
+    url: "/contact",
+  },
 };
 
 export default function ContactPage() {

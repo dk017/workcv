@@ -20,12 +20,23 @@ export type GenericPageConfig = {
   points: string[];
   sectionTitle: string;
   sectionBody: string;
+  canonical?: string;
 };
 
 export function metadataFor(config: GenericPageConfig): Metadata {
   return {
     title: config.title,
     description: config.description,
+    ...(config.canonical
+      ? {
+          alternates: { canonical: config.canonical },
+          openGraph: {
+            title: config.title,
+            description: config.description,
+            url: config.canonical,
+          },
+        }
+      : {}),
   };
 }
 

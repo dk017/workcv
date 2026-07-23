@@ -6,6 +6,12 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Terms of Use",
   description: "Terms for using WorkCV and buying a one-time CV PDF download.",
+  alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms of Use | WorkCV",
+    description: "Terms for using WorkCV and buying a one-time CV PDF download.",
+    url: "/terms",
+  },
 };
 
 export default function TermsPage() {

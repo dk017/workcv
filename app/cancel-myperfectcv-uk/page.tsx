@@ -10,15 +10,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "How to Cancel MyPerfectCV UK - Step by Step",
@@ -73,7 +78,7 @@ const cancellationSteps = [
   },
   {
     title: "Contact MyPerfectCV support if needed",
-    body: "MyPerfectCV's FAQ says you can cancel by contacting its team. The UK phone number listed is 0808 189 0676, and the FAQ lists customerservice@myperfectcv.co.uk.",
+    body: `MyPerfectCV's contact page listed 0808 189 0676 and an online contact form when checked ${checkedDate}. Verify the live page before relying on third-party contact details.`,
   },
   {
     title: "Keep the cancellation confirmation",
@@ -92,8 +97,8 @@ const supportOptions = [
     icon: Phone,
   },
   {
-    title: "Email",
-    body: "customerservice@myperfectcv.co.uk is listed in the cancellation FAQ. Include your account email and a clear cancellation request.",
+    title: "Written support",
+    body: "Use the official contact form so you have a written record. Include your account email and a clear cancellation request.",
     icon: Mail,
   },
   {
@@ -107,12 +112,12 @@ const faqItems = [
   {
     question: "How do I cancel MyPerfectCV in the UK?",
     answer:
-      "Start by logging into your MyPerfectCV account and checking My accounts or My settings for cancellation options. MyPerfectCV also says you can cancel by contacting support on 0808 189 0676 or by email at customerservice@myperfectcv.co.uk.",
+      `Start by logging into your MyPerfectCV account and checking My accounts or My settings for cancellation options. Its contact page listed 0808 189 0676 and a web form when checked ${checkedDate}.`,
   },
   {
     question: "How much does MyPerfectCV cost after the trial?",
     answer:
-      "On the official pricing page checked 13 June 2026, MyPerfectCV listed Premium - 14 days at GBP 2.95, then automatic renewal at GBP 16.95 charged every 4 weeks.",
+      `On the official pricing page checked ${checkedDate}, MyPerfectCV listed ${competitorPricing.myPerfectCv.entry}, followed by automatic renewal at ${competitorPricing.myPerfectCv.renewal}.`,
   },
   {
     question: "What proof should I keep after cancelling?",
@@ -131,21 +136,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel MyPerfectCV UK",
-  description:
-    "Step-by-step guide to cancelling a MyPerfectCV UK subscription and stopping automatic renewal.",
-  totalTime: "PT15M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -162,10 +152,6 @@ const faqSchema = {
 export default function CancelMyPerfectCvUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -190,8 +176,9 @@ export default function CancelMyPerfectCvUkPage() {
                 How to cancel MyPerfectCV in the UK.
               </h1>
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-                MyPerfectCV currently lists a 14-day premium plan at GBP 2.95,
-                followed by automatic renewal at GBP 16.95 every 4 weeks. This
+                MyPerfectCV&apos;s official pricing page listed{" "}
+                {competitorPricing.myPerfectCv.entry}, followed by automatic
+                renewal at {competitorPricing.myPerfectCv.renewal} when checked. This
                 guide shows the official cancellation routes and what to check
                 after cancelling.
               </p>
@@ -356,23 +343,16 @@ export default function CancelMyPerfectCvUkPage() {
                 then pay {site.price} when you download your PDF.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>MyPerfectCV</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["GBP 2.95 for 14 days", "Free to build"],
-                ["Renews at GBP 16.95 every 4 weeks", `${site.priceGbp} PDF download`],
+            <ComparisonTable
+              caption={`MyPerfectCV and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["MyPerfectCV", "WorkCV"]}
+              rows={[
+                [competitorPricing.myPerfectCv.entry, "Free to build"],
+                [`Renews at ${competitorPricing.myPerfectCv.renewal}`, `${site.priceGbp} PDF download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["PDF download needs premium access", "PDF download paid once"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
@@ -417,8 +397,8 @@ export default function CancelMyPerfectCvUkPage() {
       <FinalCta
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
-        secondaryHref="/pricing"
-        secondary="Compare pricing"
+        secondaryHref="/myperfectcv-alternative-uk"
+        secondary="Compare the MyPerfectCV alternative"
       />
     </>
   );

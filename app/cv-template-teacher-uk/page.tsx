@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Teacher CV Template UK - QTS and Classroom Example",
   description:
     "Use a UK teacher CV template with QTS, classroom impact, safeguarding, assessment, behaviour and curriculum examples you can edit.",
+  alternates: { canonical: "/cv-template-teacher-uk" },
+  openGraph: {
+    title: "Teacher CV Template UK - WorkCV",
+    description:
+      "An editable UK teacher CV with QTS, safeguarding, assessment and classroom-impact examples.",
+    url: "/cv-template-teacher-uk",
+  },
 };
 
 const editorHref = "/editor?template=classic&roleTemplate=teacher&new=1";
@@ -363,9 +370,9 @@ export default function TeacherCvTemplateUkPage() {
 
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">
               What to avoid
-            </h2>
+            </h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -431,9 +438,18 @@ export default function TeacherCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Teacher CV template questions."
+      />
       <FinalCta
         heading="Start with a teacher CV that already knows the classroom."
         body={`Use the editable teacher template, adapt it to the vacancy, then pay ${site.price} only when you download the final PDF.`}
+        primaryHref={editorHref}
+        primary="Use teacher CV template"
         secondaryHref="/career-change-cv-uk"
         secondary="Career change guidance"
       />

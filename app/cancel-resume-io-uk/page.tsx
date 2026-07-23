@@ -9,15 +9,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "How to Cancel Resume.io UK - Stop Subscription",
@@ -91,7 +96,7 @@ const faqItems = [
   {
     question: "How much does Resume.io cost in the UK?",
     answer:
-      "On the UK pricing page checked 13 June 2026, Resume.io listed a 7-day trial at GBP 2.95 that auto-renews to GBP 20.95 billed every 4 weeks.",
+      `On the pricing page checked ${checkedDate}, Resume.io listed ${competitorPricing.resumeIo.entry}, followed by automatic renewal at ${competitorPricing.resumeIo.renewal}.`,
   },
   {
     question: "Why did Resume.io charge me after I tried to cancel?",
@@ -110,21 +115,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel Resume.io UK",
-  description:
-    "Step-by-step guide to cancelling a Resume.io UK subscription and stopping automatic renewal.",
-  totalTime: "PT10M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -141,10 +131,6 @@ const faqSchema = {
 export default function CancelResumeIoUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -169,8 +155,9 @@ export default function CancelResumeIoUkPage() {
                 How to cancel Resume.io in the UK.
               </h1>
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-                Resume.io currently lists a GBP 2.95 7-day trial in the UK,
-                followed by automatic renewal at GBP 20.95 every 4 weeks. This
+                Resume.io&apos;s official pricing page listed{" "}
+                {competitorPricing.resumeIo.entry}, followed by automatic renewal
+                at {competitorPricing.resumeIo.renewal} when checked. This
                 guide focuses on the official cancellation form, email
                 confirmation, and account settings fallback.
               </p>
@@ -337,23 +324,16 @@ export default function CancelResumeIoUkPage() {
                 when you download.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>Resume.io UK</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["GBP 2.95 for 7 days", "Free to build"],
-                ["Renews at GBP 20.95 every 4 weeks", `${site.priceGbp} PDF download`],
-                ["Confirmation email required to cancel", "No monthly subscription"],
+            <ComparisonTable
+              caption={`Resume.io UK and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["Resume.io UK", "WorkCV"]}
+              rows={[
+                [competitorPricing.resumeIo.entry, "Free to build"],
+                [`Renews at ${competitorPricing.resumeIo.renewal}`, `${site.priceGbp} PDF download`],
+                ["Confirmation step listed for cancellation", "No monthly subscription"],
                 ["Broad CV and cover-letter tools", "Focused UK CV builder"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
@@ -404,8 +384,8 @@ export default function CancelResumeIoUkPage() {
       <FinalCta
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
-        secondaryHref="/pricing"
-        secondary="Compare pricing"
+        secondaryHref="/resume-io-alternative-uk"
+        secondary="Compare the Resume.io alternative"
       />
     </>
   );

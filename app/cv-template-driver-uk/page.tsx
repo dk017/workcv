@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -323,7 +323,7 @@ export default function DriverCvTemplateUkPage() {
           </div>
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">What to avoid</h2>
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">What to avoid</h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -377,6 +377,13 @@ export default function DriverCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Driver CV template questions."
+      />
       <FinalCta
         heading="Start with a driver CV that makes the practical checks clear."
         body={`Use the editable driver template, tailor it to the advert, then pay ${site.price} only when you download the final PDF.`}

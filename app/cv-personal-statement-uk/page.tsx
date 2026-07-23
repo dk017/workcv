@@ -11,13 +11,14 @@ import {
   Target,
 } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "CV Personal Statement UK - Examples and Template",
   description:
     "Write a stronger UK CV personal statement with a simple formula, examples for common situations, and a no-subscription CV builder.",
+  alternates: { canonical: "/cv-personal-statement-uk" },
 };
 
 const jsonLd = {
@@ -372,6 +373,13 @@ export default function CvPersonalStatementUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="CV personal statement questions."
+      />
       <FinalCta
         heading="Write the opening, then build the full CV around it."
         body={`Start with a guided UK CV structure and pay ${site.price} only when the final PDF is ready.`}

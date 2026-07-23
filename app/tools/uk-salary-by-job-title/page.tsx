@@ -233,7 +233,7 @@ export default function UkSalaryByJobTitlePage() {
             </p>
           </div>
           <Link
-            href="/tools/salary-calculator"
+            href="/tools/take-home-pay-calculator-uk"
             className="inline-flex min-h-12 items-center justify-center rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover"
           >
             Calculate take-home pay

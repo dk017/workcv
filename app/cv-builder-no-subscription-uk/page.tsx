@@ -15,6 +15,10 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
@@ -33,28 +37,28 @@ export const metadata: Metadata = {
   },
 };
 
-const checkedDate = "12 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 const comparisonRows = [
   {
     builder: "MyPerfectCV",
-    entry: "GBP 2.95 for 14 days",
-    renewal: "GBP 16.95 every 4 weeks",
-    annualised: "GBP 220.35 over 52 weeks",
+    entry: competitorPricing.myPerfectCv.entry,
+    renewal: competitorPricing.myPerfectCv.renewal,
+    annualised: "Check the total for your intended access period",
     source: "https://www.myperfectcv.co.uk/pricing",
   },
   {
     builder: "Resume.io UK",
-    entry: "GBP 2.95 for 7 days",
-    renewal: "GBP 20.95 every 4 weeks",
-    annualised: "GBP 272.35 over 52 weeks",
+    entry: competitorPricing.resumeIo.entry,
+    renewal: competitorPricing.resumeIo.renewal,
+    annualised: "Check the total for your intended access period",
     source: "https://resume.io/uk/pricing",
   },
   {
     builder: "CVMaker UK",
-    entry: "GBP 0.99 for 7 days",
-    renewal: "GBP 19.99 per month",
-    annualised: "GBP 239.88 over 12 months",
+    entry: competitorPricing.cvMaker.entry,
+    renewal: competitorPricing.cvMaker.renewal,
+    annualised: "Check the total for your intended access period",
     source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
   },
   {
@@ -133,12 +137,12 @@ const internalLinks = [
   ["Engineer CV template", "/cv-template-engineer-uk"],
   ["Driver CV template", "/cv-template-driver-uk"],
   ["UK CV examples", "/cv-examples-uk"],
-  ["MyPerfectCV alternative UK", "/myperfectcv-alternative"],
+  ["MyPerfectCV alternative UK", "/myperfectcv-alternative-uk"],
   ["CVMaker UK alternative", "/cvmaker-alternative"],
   ["LiveCareer alternative UK", "/livecareer-alternative"],
   ["UK resume builder without subscription", "/resume-builder-uk-no-subscription"],
   ["Student CV template UK", "/student-cv-template"],
-  ["CV with no experience", "/cv-with-no-experience"],
+  ["CV with no experience", "/cv-no-experience-uk"],
   ["School leaver CV example", "/school-leaver-cv-example"],
 ];
 
@@ -474,7 +478,7 @@ export default function NoSubscriptionUkPage() {
             <a
               href="https://nationalcareers.service.gov.uk/careers-advice/cv-sections"
               className="mt-7 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
-              rel="nofollow noopener noreferrer"
+              rel="noopener noreferrer"
               target="_blank"
             >
               Read the National Careers Service CV guidance

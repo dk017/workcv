@@ -3,15 +3,23 @@ import Link from "next/link";
 import { ArrowRight, Check, ExternalLink, ShieldCheck } from "lucide-react";
 
 import {
+  ComparisonTable,
+  OfficialSourcesSection,
+} from "@/components/comparison-table";
+import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "Best MyPerfectCV Alternative UK - No Subscription",
@@ -29,8 +37,8 @@ export const metadata: Metadata = {
 };
 
 const comparisonRows = [
-  ["Entry model", "GBP 2.95 for 14 days", "Free to build"],
-  ["Renewal", "GBP 16.95 every 4 weeks", "No monthly renewal"],
+  ["Entry model", competitorPricing.myPerfectCv.entry, "Free to build"],
+  ["Renewal", competitorPricing.myPerfectCv.renewal, "No monthly renewal"],
   ["PDF download", "Included with premium access", `${site.priceGbp} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
   ["Cover letters", "Included in premium tools", "Not included in this version"],
@@ -60,7 +68,7 @@ const faqItems = [
   {
     question: "How much does MyPerfectCV cost?",
     answer:
-      "On the official pricing page checked 13 June 2026, MyPerfectCV listed GBP 2.95 for 14 days, then automatic renewal at GBP 16.95 every 4 weeks.",
+      `On the official pricing page checked ${checkedDate}, MyPerfectCV listed ${competitorPricing.myPerfectCv.entry}, followed by automatic renewal at ${competitorPricing.myPerfectCv.renewal}.`,
   },
   {
     question: "Does WorkCV include cover letters?",
@@ -112,12 +120,12 @@ export default function MyPerfectCvAlternativeUkPage() {
               MyPerfectCV alternative UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              A MyPerfectCV alternative without monthly CV billing.
+              MyPerfectCV is a renewable CV platform. WorkCV unlocks one saved CV.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              MyPerfectCV may suit people who need ongoing CV and cover-letter
-              tools. If you only need one clean UK CV PDF, WorkCV keeps the
-              pricing simpler: build first, pay {site.price} when you download.
+              MyPerfectCV combines CV and cover-letter tools with account support
+              and renewable access. WorkCV is narrower: build one UK CV, inspect
+              it, then pay {site.price} to unlock that saved document.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -133,7 +141,7 @@ export default function MyPerfectCvAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
+              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -210,23 +218,11 @@ export default function MyPerfectCvAlternativeUkPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="grid grid-cols-[0.8fr_1fr_1fr] bg-navy px-5 py-4 text-sm font-bold text-white">
-              <span>Area</span>
-              <span>MyPerfectCV</span>
-              <span>WorkCV</span>
-            </div>
-            {comparisonRows.map(([area, myperfectcv, workcv]) => (
-              <div
-                key={area}
-                className="grid grid-cols-1 border-t border-line text-sm md:grid-cols-[0.8fr_1fr_1fr]"
-              >
-                <div className="bg-paper p-5 font-bold text-navy">{area}</div>
-                <div className="p-5 text-muted">{myperfectcv}</div>
-                <div className="bg-greensoft p-5 font-bold text-navy">{workcv}</div>
-              </div>
-            ))}
-          </div>
+          <ComparisonTable
+            caption={`MyPerfectCV vs WorkCV pricing, checked ${checkedDate}`}
+            headers={["Area", "MyPerfectCV", "WorkCV"]}
+            rows={comparisonRows}
+          />
         </div>
       </section>
 
@@ -287,6 +283,15 @@ export default function MyPerfectCvAlternativeUkPage() {
         </div>
       </section>
 
+      <OfficialSourcesSection
+        brand="MyPerfectCV"
+        sources={[
+          ["MyPerfectCV pricing", "https://www.myperfectcv.co.uk/pricing"],
+          ["MyPerfectCV FAQ", "https://www.myperfectcv.co.uk/faq"],
+          ["MyPerfectCV contact", "https://www.myperfectcv.co.uk/contact-us"],
+          ["MyPerfectCV terms", "https://www.myperfectcv.co.uk/terms-of-use"],
+        ]}
+      />
       <FaqSection faqs={faqItems} title="Questions about MyPerfectCV alternatives." />
       <FinalCta
         heading="Build your CV without the monthly renewal."

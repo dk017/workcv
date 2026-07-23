@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Nurse CV Template UK - NMC-Ready Example",
   description:
     "Use a UK nurse CV template with NMC-focused sections, clinical bullet examples, NHS/private care guidance, and an editable CV draft.",
+  alternates: { canonical: "/cv-template-nurse-uk" },
+  openGraph: {
+    title: "Nurse CV Template UK - WorkCV",
+    description:
+      "An editable UK nurse CV with NMC-focused sections and clinical evidence examples.",
+    url: "/cv-template-nurse-uk",
+  },
 };
 
 const editorHref = "/editor?template=classic&roleTemplate=nurse&new=1";
@@ -176,7 +183,7 @@ const relatedLinks = [
   ["CV personal statement UK", "/cv-personal-statement-uk"],
   ["Career change CV", "/career-change-cv-uk"],
   ["Return to work CV", "/return-to-work-cv-uk"],
-  ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
+  ["Care worker CV template", "/cv-template-care-worker-uk"],
 ];
 
 export default function NurseCvTemplateUkPage() {
@@ -364,9 +371,9 @@ export default function NurseCvTemplateUkPage() {
 
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">
               What to avoid
-            </h2>
+            </h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -432,9 +439,18 @@ export default function NurseCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Nurse CV template questions."
+      />
       <FinalCta
         heading="Start with a nurse CV that already knows the role."
         body={`Use the editable nurse template, adapt it to the advert, then pay ${site.price} only when you download the final PDF.`}
+        primaryHref={editorHref}
+        primary="Use nurse CV template"
         secondaryHref="/ats-cv-template-uk"
         secondary="Check ATS format"
       />

@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -20,6 +20,13 @@ export const metadata: Metadata = {
   title: "Warehouse CV Template UK - Operative, Picker and Packer",
   description:
     "Use a UK warehouse CV template with picking, packing, goods-in, dispatch, scanner, manual handling and shift-work examples you can edit.",
+  alternates: { canonical: "/cv-template-warehouse-uk" },
+  openGraph: {
+    title: "Warehouse CV Template UK - WorkCV",
+    description:
+      "An editable UK warehouse CV with picking, dispatch, scanner and safe-working examples.",
+    url: "/cv-template-warehouse-uk",
+  },
 };
 
 const editorHref = "/editor?template=classic&roleTemplate=warehouse&new=1";
@@ -173,7 +180,7 @@ const sourceNotes = [
 
 const relatedLinks = [
   ["CV no experience UK", "/cv-no-experience-uk"],
-  ["School leaver CV", "/school-leaver-cv-example"],
+  ["Driver CV template", "/cv-template-driver-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Right to work CV", "/right-to-work-cv-uk"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
@@ -364,9 +371,9 @@ export default function WarehouseCvTemplateUkPage() {
 
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">
               What to avoid
-            </h2>
+            </h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -432,9 +439,18 @@ export default function WarehouseCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Warehouse CV template questions."
+      />
       <FinalCta
         heading="Start with a warehouse CV that already knows the shift."
         body={`Use the editable warehouse template, adapt it to the vacancy, then pay ${site.price} only when you download the final PDF.`}
+        primaryHref={editorHref}
+        primary="Use warehouse CV template"
         secondaryHref="/cv-no-experience-uk"
         secondary="No-experience CV help"
       />

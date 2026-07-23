@@ -5,9 +5,10 @@ import { CvEditor } from "@/components/cv-editor";
 import { getCurrentUser } from "@/lib/auth";
 
 export const metadata: Metadata = {
-  title: "CV editor",
+  title: "CV Editor",
   description:
     "Build a UK CV with guided sections, clean templates, and a live preview.",
+  robots: { index: false, follow: false },
 };
 
 export default async function EditorPage({

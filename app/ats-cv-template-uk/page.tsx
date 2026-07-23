@@ -381,9 +381,9 @@ export default function AtsCvTemplateUkPage() {
 
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <SlidersHorizontal className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">
               Keyword rule
-            </h2>
+            </h3>
             <p className="mt-4 text-sm leading-7 text-muted">
               Use the employer's words where they are accurate. Do not add skills
               you cannot prove. If the advert asks for customer complaints, stock

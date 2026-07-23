@@ -9,6 +9,7 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
@@ -110,21 +111,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel Enhancv UK",
-  description:
-    "Step-by-step guide to cancelling an Enhancv Pro subscription and stopping future charges.",
-  totalTime: "PT10M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -141,10 +127,6 @@ const faqSchema = {
 export default function CancelEnhancvUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -338,23 +320,16 @@ export default function CancelEnhancvUkPage() {
                 {site.price} when you download the PDF.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>Enhancv Pro</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["Monthly, quarterly, or semiannual Pro plans", "Free to build"],
+            <ComparisonTable
+              caption={`Enhancv Pro and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["Enhancv Pro", "WorkCV"]}
+              rows={[
+                ["Monthly, quarterly or semiannual Pro plans", "Free to build"],
                 ["Billed at the start of each period", `${site.priceGbp} PDF download`],
-                ["Cancel from Billing page", "No monthly subscription"],
+                ["Cancel from the Billing page", "No monthly subscription"],
                 ["AI resume platform", "Focused UK CV builder"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>

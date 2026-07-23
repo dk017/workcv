@@ -33,7 +33,7 @@ const categories: Category[] = [
   ] },
   { title: "Salary and employment tools", description: "Check pay, employment dates and market benchmarks using current published UK rules and data.", tools: [
     { title: "UK Take-Home Pay Calculator", href: "/tools/take-home-pay-calculator-uk", description: "Estimate pay after 2026/27 tax, National Insurance, student loans and salary sacrifice.", icon: Banknote },
-    { title: "UK Living Wage Checker 2026", href: "/tools/uk-living-wage-checker-2026", description: "Compare hourly pay or salary with current statutory and voluntary UK Living Wage rates.", icon: Scale },
+    { title: "UK Living Wage Checker 2026", href: "/tools/uk-living-wage-checker", description: "Compare hourly pay or salary with current statutory and voluntary UK Living Wage rates.", icon: Scale },
     { title: "Redundancy Pay Calculator", href: "/tools/redundancy-pay-calculator", description: "Calculate statutory redundancy pay with current GB and Northern Ireland limits.", icon: Scale },
     { title: "Notice Period Calculator", href: "/tools/notice-period-calculator", description: "Find your earliest new-job start date and the UK statutory notice minimum.", icon: CalendarCheck },
     { title: "UK Salary by Job Title", href: "/tools/uk-salary-by-job-title", description: "Compare lower-quartile, median and upper-quartile gross pay for 60 roles using ONS data.", icon: BarChart3 },

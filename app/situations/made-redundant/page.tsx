@@ -64,8 +64,13 @@ const articleSchema = {
   "@type": "Article",
   headline: "Made Redundant UK: What to Do Next",
   datePublished: "2026-06-30",
-  dateModified: "2026-06-30",
-  author: { "@type": "Organization", name: site.name, url: site.url },
+  dateModified: "2026-07-23",
+  author: { "@type": "Organization", name: "WorkCV Editorial Team", url: site.url },
+  reviewedBy: {
+    "@type": "Organization",
+    name: "WorkCV Editorial Team",
+    url: site.url,
+  },
   publisher: { "@type": "Organization", name: site.name, url: site.url },
   mainEntityOfPage: `${site.url}/situations/made-redundant`,
 };
@@ -83,8 +88,6 @@ export default function MadeRedundantPage() {
           <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
             <Link href="/" className="hover:text-navy">Home</Link>
             <span>/</span>
-            <Link href="/tools" className="hover:text-navy">Tools</Link>
-            <span>/</span>
             <span className="text-navy">Made redundant</span>
           </div>
           <div className="max-w-4xl">
@@ -98,6 +101,9 @@ export default function MadeRedundantPage() {
               Separate what you are owed, what support may be available and
               what your next application needs. This checklist gives each task
               a clear place instead of treating redundancy as one large problem.
+            </p>
+            <p className="mt-5 text-sm font-bold text-navy">
+              Reviewed by the WorkCV Editorial Team · 23 July 2026
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/tools/redundancy-pay-calculator">

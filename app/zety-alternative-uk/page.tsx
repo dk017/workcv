@@ -3,15 +3,23 @@ import Link from "next/link";
 import { ArrowRight, Check, ExternalLink, ShieldCheck } from "lucide-react";
 
 import {
+  ComparisonTable,
+  OfficialSourcesSection,
+} from "@/components/comparison-table";
+import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "Zety Alternative UK - No Subscription CV Builder",
@@ -29,9 +37,9 @@ export const metadata: Metadata = {
 };
 
 const comparisonRows = [
-  ["Entry model", "£2.95 for 14 days", "Free to build"],
-  ["Renewal", "£20.95 every 4 weeks", "No monthly renewal"],
-  ["Annual option", "£59.40 annual access", "No annual plan needed"],
+  ["Entry model", competitorPricing.zety.entry, "Free to build"],
+  ["Renewal", competitorPricing.zety.renewal, "No monthly renewal"],
+  ["UK price check", competitorPricing.zety.note, "Price is shown before checkout"],
   ["PDF download", "Included with paid access", `${site.price} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
   ["Cover letters", "Included in Zety tools", "Not included in this version"],
@@ -61,7 +69,7 @@ const faqItems = [
   {
     question: "How much does Zety cost in the UK?",
     answer:
-      "On Zety's official UK pricing page checked 13 June 2026, Zety listed a £2.95 14-day trial, automatic renewal at £20.95 every 4 weeks, and annual access at £59.40.",
+      `Checked ${checkedDate}: ${competitorPricing.zety.note} Verify the live Zety checkout before paying.`,
   },
   {
     question: "Does WorkCV include cover letters?",
@@ -113,12 +121,12 @@ export default function ZetyAlternativeUkPage() {
               Zety alternative UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              A Zety alternative without automatic CV renewal.
+              Zety pairs CV and cover-letter tools with renewable access. WorkCV does not.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Zety may suit people who want a broader CV and cover-letter
-              platform. If you only need one clean UK CV PDF, WorkCV keeps the
-              model simpler: build first, pay {site.price} when you download.
+              Zety provides guided CV content and cover-letter tools through
+              renewable access. WorkCV removes that wider platform: build one
+              UK CV, preview it and pay {site.price} when you download.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -134,7 +142,7 @@ export default function ZetyAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
+              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -211,23 +219,11 @@ export default function ZetyAlternativeUkPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="grid grid-cols-[0.8fr_1fr_1fr] bg-navy px-5 py-4 text-sm font-bold text-white">
-              <span>Area</span>
-              <span>Zety UK</span>
-              <span>WorkCV</span>
-            </div>
-            {comparisonRows.map(([area, zety, workcv]) => (
-              <div
-                key={area}
-                className="grid grid-cols-1 border-t border-line text-sm md:grid-cols-[0.8fr_1fr_1fr]"
-              >
-                <div className="bg-paper p-5 font-bold text-navy">{area}</div>
-                <div className="p-5 text-muted">{zety}</div>
-                <div className="bg-greensoft p-5 font-bold text-navy">{workcv}</div>
-              </div>
-            ))}
-          </div>
+          <ComparisonTable
+            caption={`Zety UK vs WorkCV pricing, checked ${checkedDate}`}
+            headers={["Area", "Zety UK", "WorkCV"]}
+            rows={comparisonRows}
+          />
         </div>
       </section>
 
@@ -289,6 +285,15 @@ export default function ZetyAlternativeUkPage() {
         </div>
       </section>
 
+      <OfficialSourcesSection
+        brand="Zety"
+        sources={[
+          ["Zety UK pricing", "https://zety.com/uk/pricing"],
+          ["Zety UK FAQ", "https://zety.com/uk/faq"],
+          ["Zety UK contact", "https://zety.com/uk/contact"],
+          ["Zety terms", "https://zety.com/uk/terms-of-use"],
+        ]}
+      />
       <FaqSection faqs={faqItems} title="Questions about Zety alternatives." />
       <FinalCta
         heading="Build your CV without the automatic renewal."

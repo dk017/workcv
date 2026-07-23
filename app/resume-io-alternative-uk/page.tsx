@@ -3,15 +3,23 @@ import Link from "next/link";
 import { ArrowRight, Check, ExternalLink, ShieldCheck } from "lucide-react";
 
 import {
+  ComparisonTable,
+  OfficialSourcesSection,
+} from "@/components/comparison-table";
+import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "Resume.io Alternative UK - No Subscription CV Builder",
@@ -29,8 +37,8 @@ export const metadata: Metadata = {
 };
 
 const comparisonRows = [
-  ["Entry model", "GBP 2.95 for 7 days", "Free to build"],
-  ["Renewal", "GBP 20.95 every 4 weeks", "No monthly renewal"],
+  ["Entry model", competitorPricing.resumeIo.entry, "Free to build"],
+  ["Renewal", competitorPricing.resumeIo.renewal, "No monthly renewal"],
   ["Download access", "Trial includes download formats", `${site.priceGbp} when ready`],
   ["Cancellation", "Needed before renewal", "Nothing to cancel"],
   ["Cover letters", "Included in trial/premium tools", "Not included in this version"],
@@ -60,7 +68,7 @@ const faqItems = [
   {
     question: "How much does Resume.io cost in the UK?",
     answer:
-      "On the UK pricing page checked 13 June 2026, Resume.io listed a 7-day trial at GBP 2.95 that auto-renews to GBP 20.95 billed every 4 weeks.",
+      `On the pricing page checked ${checkedDate}, Resume.io listed ${competitorPricing.resumeIo.entry}, followed by automatic renewal at ${competitorPricing.resumeIo.renewal}.`,
   },
   {
     question: "Does WorkCV include cover letters?",
@@ -112,12 +120,12 @@ export default function ResumeIoAlternativeUkPage() {
               Resume.io alternative UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              A Resume.io alternative without monthly CV billing.
+              Resume.io offers a wider document suite. WorkCV stays with one UK CV.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Resume.io may suit people who want broader CV, resume, and
-              cover-letter tools. If you only need one UK CV PDF, WorkCV keeps
-              the model simpler: build first, pay {site.price} when you download.
+              Resume.io includes multiple resume formats, cover letters and
+              renewable access. WorkCV focuses on a saved UK CV and a{" "}
+              {site.price} PDF unlock without a monthly WorkCV plan.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -133,7 +141,7 @@ export default function ResumeIoAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
+              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -210,23 +218,11 @@ export default function ResumeIoAlternativeUkPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="grid grid-cols-[0.8fr_1fr_1fr] bg-navy px-5 py-4 text-sm font-bold text-white">
-              <span>Area</span>
-              <span>Resume.io UK</span>
-              <span>WorkCV</span>
-            </div>
-            {comparisonRows.map(([area, resumeIo, workcv]) => (
-              <div
-                key={area}
-                className="grid grid-cols-1 border-t border-line text-sm md:grid-cols-[0.8fr_1fr_1fr]"
-              >
-                <div className="bg-paper p-5 font-bold text-navy">{area}</div>
-                <div className="p-5 text-muted">{resumeIo}</div>
-                <div className="bg-greensoft p-5 font-bold text-navy">{workcv}</div>
-              </div>
-            ))}
-          </div>
+          <ComparisonTable
+            caption={`Resume.io UK vs WorkCV pricing, checked ${checkedDate}`}
+            headers={["Area", "Resume.io UK", "WorkCV"]}
+            rows={comparisonRows}
+          />
         </div>
       </section>
 
@@ -287,6 +283,14 @@ export default function ResumeIoAlternativeUkPage() {
         </div>
       </section>
 
+      <OfficialSourcesSection
+        brand="Resume.io"
+        sources={[
+          ["Resume.io UK pricing", "https://resume.io/uk/pricing"],
+          ["Resume.io cancellation help", "https://help.resume.io/article/31-how-can-i-cancel-my-subscription"],
+          ["Resume.io terms", "https://resume.io/terms-of-service"],
+        ]}
+      />
       <FaqSection faqs={faqItems} title="Questions about Resume.io alternatives." />
       <FinalCta
         heading="Build your CV without the monthly renewal."

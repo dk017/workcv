@@ -5,6 +5,7 @@ import Script from "next/script";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
 import { AttributionCapture } from "@/components/attribution-capture";
+import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -57,6 +58,32 @@ export const metadata: Metadata = {
   },
 };
 
+const brandSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${site.url}/#organization`,
+      name: site.name,
+      url: site.url,
+      logo: {
+        "@type": "ImageObject",
+        url: `${site.url}/opengraph-image`,
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${site.url}/#website`,
+      name: site.name,
+      url: site.url,
+      publisher: {
+        "@id": `${site.url}/#organization`,
+      },
+      inLanguage: site.locale,
+    },
+  ],
+};
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
@@ -64,10 +91,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Script
           defer
           data-site="hq2xtnu4"
-          data-domain="werkcv.nl"
+          data-domain="workcv.co.uk"
           src="https://piqo.app/piqo.js"
           strategy="beforeInteractive"
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
+        />
+        <BreadcrumbSchema />
       </head>
       <body className="font-sans antialiased">
         <AttributionCapture />

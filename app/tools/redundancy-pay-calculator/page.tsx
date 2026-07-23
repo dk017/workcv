@@ -6,6 +6,7 @@ import { FaqSection, SectionLabel } from "@/components/marketing";
 import { RedundancyPayCalculator } from "@/components/redundancy-pay-calculator";
 import { site } from "@/lib/site";
 
+// Annual refresh: recheck the GB and Northern Ireland weekly caps and maximum awards each April.
 export const metadata: Metadata = {
   title: "Redundancy Pay Calculator UK 2026",
   description:

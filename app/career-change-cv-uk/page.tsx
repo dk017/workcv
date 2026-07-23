@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, Check, FileText, Search, Shuffle, Target } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Career Change CV UK - Template and Examples",
   description:
     "Writing a UK CV for a career change? Learn how to position transferable skills, explain your move, and build a focused CV without a subscription.",
+  alternates: { canonical: "/career-change-cv-uk" },
 };
 
 const jsonLd = {
@@ -131,11 +132,11 @@ const mistakes = [
 ];
 
 const relatedLinks = [
-  ["UK take-home pay calculator", "/tools/salary-calculator"],
+  ["How to write a CV", "/how-to-write-a-cv-uk"],
   ["CV with no experience UK", "/cv-no-experience-uk"],
   ["Student CV template", "/student-cv-template"],
   ["School leaver CV example", "/school-leaver-cv-example"],
-  ["Pricing", "/pricing"],
+  ["CV personal statement", "/cv-personal-statement-uk"],
 ];
 
 export default function CareerChangeCvUkPage() {
@@ -156,9 +157,9 @@ export default function CareerChangeCvUkPage() {
               Change career without making your CV look junior.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              A career change CV needs to bridge what you have done with what you
-              want next. WorkCV helps you turn previous roles into relevant UK CV
-              evidence, then download for {site.price} when ready.
+              A career change CV bridges what you have done with what you want
+              next, reframing previous roles as relevant, honest evidence for
+              the target job.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/editor">Build my career change CV</ButtonLink>
@@ -352,6 +353,13 @@ export default function CareerChangeCvUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Career change CV questions."
+      />
       <FinalCta
         heading="Build a CV that makes the career change make sense."
         body={`Log in with an email code, save your CV, and pay ${site.price} only when you download the final PDF.`}

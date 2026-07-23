@@ -10,6 +10,7 @@ import {
   Wand2,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
@@ -41,7 +42,7 @@ const comparisonRows = [
   ["Best strength", "Visual design freedom", "CV structure and application flow"],
   ["Starting point", "Choose and edit a design template", "Fill guided UK CV sections"],
   ["Formatting control", "Flexible canvas editing", "Consistent recruiter-readable layout"],
-  ["ATS caution", "Depends heavily on template choice and layout", "Clean CV sections by default"],
+  ["ATS formatting", "Multi-column or graphic templates can reduce parsing; simple layouts can parse cleanly", "Clean CV sections by default"],
   ["Payment model", "Canva Free plus optional paid design plans", `Free to build, ${site.price} PDF download`],
   ["Best fit", "Creative visual CVs and broader design work", "One practical UK CV PDF"],
 ];
@@ -156,7 +157,7 @@ export default function CanvaCvAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
+              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
               <ButtonLink href="#compare" variant="secondary">
                 Compare options
               </ButtonLink>
@@ -235,23 +236,11 @@ export default function CanvaCvAlternativeUkPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="grid grid-cols-[0.8fr_1fr_1fr] bg-navy px-5 py-4 text-sm font-bold text-white">
-              <span>Area</span>
-              <span>Canva</span>
-              <span>WorkCV</span>
-            </div>
-            {comparisonRows.map(([area, canva, workcv]) => (
-              <div
-                key={area}
-                className="grid grid-cols-1 border-t border-line text-sm md:grid-cols-[0.8fr_1fr_1fr]"
-              >
-                <div className="bg-paper p-5 font-bold text-navy">{area}</div>
-                <div className="p-5 text-muted">{canva}</div>
-                <div className="bg-greensoft p-5 font-bold text-navy">{workcv}</div>
-              </div>
-            ))}
-          </div>
+          <ComparisonTable
+            caption={`Canva vs WorkCV product comparison, checked ${checkedDate}`}
+            headers={["Area", "Canva", "WorkCV"]}
+            rows={comparisonRows}
+          />
         </div>
       </section>
 
@@ -355,6 +344,10 @@ export default function CanvaCvAlternativeUkPage() {
           <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
             Verify Canva's latest CV and pricing details.
           </h2>
+          <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
+            This is an independent comparison. Canva is not affiliated with
+            WorkCV. Product names and trademarks belong to their respective owners.
+          </p>
           <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {[
               ["Canva CV maker", "https://www.canva.com/create/cv/"],

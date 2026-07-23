@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -33,6 +34,11 @@ export const metadata: Metadata = {
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const professionalCv = getRoleCvTemplate("general");
+const productSchema = buildWorkCvProductSchema({
+  description:
+    "Editable professional UK CV template with clear sections and evidence-led wording.",
+  url: `${site.url}/professional-cv-template-uk`,
+});
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -187,6 +193,10 @@ export default function ProfessionalCvTemplateUkPage() {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
       />
 
       <section className="quiet-grid bg-paper py-20 md:py-28">
@@ -353,9 +363,9 @@ export default function ProfessionalCvTemplateUkPage() {
           </div>
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">
               What to avoid
-            </h2>
+            </h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -420,6 +430,13 @@ export default function ProfessionalCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Professional CV template questions."
+      />
       <FinalCta
         heading="Build a professional CV from evidence you can stand behind."
         body={`Log in by email code, replace the editable example with your own details, then pay ${site.price} to unlock the selected saved CV PDF.`}

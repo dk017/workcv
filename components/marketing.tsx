@@ -57,11 +57,11 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <Link href="/how-to-write-a-cv-uk">CV guide</Link>
             <Link href="/tools">Free tools</Link>
             <Link href="/tools/ats-score-checker">ATS checker</Link>
-            <Link href="/tools/cv-length-checker">CV length checker</Link>
+            <Link href="/tools/cv-word-count-checker">CV length checker</Link>
             <Link href="/tools/uk-salary-by-job-title">UK salary checker</Link>
-            <Link href="/tools/personal-statement-generator">Statement generator</Link>
+            <Link href="/tools/cv-summary-generator-uk">Statement generator</Link>
             <Link href="/tools/notice-period-calculator">Notice calculator</Link>
-            <Link href="/tools/salary-calculator">Take-home pay</Link>
+            <Link href="/tools/take-home-pay-calculator-uk">Take-home pay</Link>
             <Link href="/tools/redundancy-pay-calculator">Redundancy pay</Link>
             <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
             <Link href="/cv-builder-scams-uk">CV builder charges</Link>
@@ -549,6 +549,33 @@ export function FaqSection({ faqs, title }: { faqs: Faq[]; title: string }) {
               </summary>
               <p className="mt-4 max-w-3xl leading-7 text-muted">{faq.answer}</p>
             </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function RelatedLinksSection({
+  title,
+  links,
+}: {
+  title: string;
+  links: Array<[string, string]>;
+}) {
+  return (
+    <section className="bg-surface py-16">
+      <div className="container-page">
+        <h2 className="font-display text-3xl font-semibold text-navy">{title}</h2>
+        <div className="mt-6 flex flex-wrap gap-3">
+          {links.map(([label, href]) => (
+            <Link
+              key={href}
+              href={href}
+              className="rounded-md border border-line-strong bg-white px-4 py-3 text-sm font-bold text-navy hover:border-navy"
+            >
+              {label}
+            </Link>
           ))}
         </div>
       </div>

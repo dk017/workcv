@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarCheck, FileSearch, Scale, ShieldCheck } from "lucide-react";
 
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
 
@@ -35,7 +35,7 @@ const faqItems = [
       "No. This calculator treats a month as a calendar month, not 28 days. Official DWP guidance gives an example where notice on 14 June expires on 14 July and applies a special month-end rule: notice on 29 February expires on 31 March.",
   },
   {
-    question: "Do weekends and bank holidays count? ",
+    question: "Do weekends and bank holidays count?",
     answer:
       "Notice stated in calendar days, weeks or months continues across weekends and bank holidays. If the contractual end date falls on a day you do not normally work, your final day physically worked may be earlier. Check contracts that use a specific working-day rule.",
   },
@@ -230,8 +230,16 @@ export default function NoticePeriodCalculatorPage() {
         </div>
       </section>
 
+      <RelatedLinksSection
+        title="Plan the change in work and pay."
+        links={[
+          ["Estimate redundancy pay", "/tools/redundancy-pay-calculator"],
+          ["What to do after redundancy", "/situations/made-redundant"],
+          ["Calculate take-home pay", "/tools/take-home-pay-calculator-uk"],
+          ["Compare salaries by job", "/tools/uk-salary-by-job-title"],
+        ]}
+      />
       <FaqSection faqs={faqItems} title="UK notice period questions." />
     </>
   );
 }
-

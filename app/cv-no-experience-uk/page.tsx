@@ -11,13 +11,14 @@ import {
   Search,
 } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "CV No Experience UK - First Job CV Template",
   description:
     "Write a UK CV with no work experience. Learn what to include, how to show transferable skills, and build a first-job CV without a subscription.",
+  alternates: { canonical: "/cv-no-experience-uk" },
 };
 
 const jsonLd = {
@@ -378,6 +379,13 @@ export default function CvNoExperienceUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="No-experience CV questions."
+      />
       <FinalCta
         heading="Build a first CV that does not feel empty."
         body={`Start with guided sections, preview your CV, and pay ${site.price} only when you download.`}

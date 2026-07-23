@@ -9,7 +9,9 @@ export type RoleTemplateId =
   | "teacher"
   | "warehouse"
   | "graduate"
-  | "care-worker";
+  | "care-worker"
+  | "student"
+  | "school-leaver";
 
 const nurseCv: CvData = {
   template: "classic",
@@ -311,6 +313,122 @@ const careWorkerCv: CvData = {
   ],
 };
 
+const studentCv: CvData = {
+  template: "classic",
+  fullName: "Sophie Clarke",
+  targetRole: "Part-time Retail Assistant",
+  email: "sophie.clarke@email.co.uk",
+  phone: "07123 456 789",
+  location: "Nottingham, UK",
+  linkedin: "",
+  profile:
+    "Second-year business student seeking a part-time retail role, with customer-facing volunteering, group-project and student-society experience. Confident explaining information clearly, organising competing deadlines and using Microsoft 365. Available for evening and weekend shifts during term time.",
+  skills:
+    "Customer communication\nTeamwork\nMicrosoft 365\nCash-handling awareness\nEvent organisation\nWritten communication\nTime management\nReliable evening and weekend availability",
+  experience: [
+    {
+      id: "student-exp-1",
+      role: "Volunteer Shop Assistant",
+      company: "Nottingham Community Bookshop",
+      location: "Nottingham",
+      start: "Oct 2025",
+      end: "Present",
+      bullets:
+        "Welcome customers, answer book and donation queries, organise displays and keep the shop floor tidy during a weekly four-hour shift.\nSort donated stock by category and condition, label items accurately and flag unusual donations to the supervisor.\nSupport cash and card transactions under supervision and follow the shop's opening, closing and data-protection procedures.",
+    },
+    {
+      id: "student-exp-2",
+      role: "Events Representative",
+      company: "University Business Society",
+      location: "Nottingham",
+      start: "Sep 2025",
+      end: "Present",
+      bullets:
+        "Coordinate room bookings, attendee messages and sign-in lists for careers talks with 40 to 80 students.\nWork with a five-person committee to divide tasks, confirm deadlines and resolve last-minute speaker or venue changes.",
+    },
+  ],
+  education: [
+    {
+      id: "student-edu-1",
+      qualification: "BA Business Management",
+      institution: "Nottingham Trent University",
+      location: "Nottingham",
+      start: "2024",
+      end: "Expected 2027",
+      details:
+        "Relevant study includes marketing, business analytics, operations and a group project evaluating service improvements for a local organisation.",
+    },
+    {
+      id: "student-edu-2",
+      qualification: "A levels: Business, English Language and Sociology",
+      institution: "Nottingham Sixth Form College",
+      location: "Nottingham",
+      start: "2022",
+      end: "2024",
+      details:
+        "Add grades only when requested or when they strengthen the application. Include GCSE English and maths where the advert asks for them.",
+    },
+  ],
+};
+
+const schoolLeaverCv: CvData = {
+  template: "classic",
+  fullName: "Aisha Khan",
+  targetRole: "Business Administration Apprentice",
+  email: "aisha.khan@email.co.uk",
+  phone: "07123 456 789",
+  location: "Manchester, UK",
+  linkedin: "",
+  profile:
+    "Reliable school leaver applying for a business administration apprenticeship, with evidence from GCSE coursework, a school enterprise project, volunteering and Duke of Edinburgh activities. Confident using Word, PowerPoint and spreadsheets, communicating with different people and completing agreed tasks on time.",
+  skills:
+    "Microsoft Word and PowerPoint\nBasic spreadsheet use\nClear written communication\nTeamwork\nOrganisation\nFollowing instructions\nCustomer service\nPunctuality and reliability",
+  experience: [
+    {
+      id: "school-leaver-exp-1",
+      role: "School Enterprise Project Member",
+      company: "East Manchester Academy",
+      location: "Manchester",
+      start: "Sep 2025",
+      end: "Dec 2025",
+      bullets:
+        "Worked in a six-person team to plan and run a fundraising stall, agreeing roles, tracking costs in a spreadsheet and preparing signs and price lists.\nSpoke with pupils, staff and visitors during the event and helped reconcile cash against the sales record with a teacher.",
+    },
+    {
+      id: "school-leaver-exp-2",
+      role: "Volunteer",
+      company: "Local Food Bank Collection",
+      location: "Manchester",
+      start: "Nov 2024",
+      end: "Mar 2025",
+      bullets:
+        "Sorted donated items by category and use-by date, followed hygiene instructions and kept the work area organised.\nWelcomed donors, explained which items were needed and worked reliably during scheduled weekend collection sessions.",
+    },
+  ],
+  education: [
+    {
+      id: "school-leaver-edu-1",
+      qualification: "GCSEs including English Language, Mathematics and Combined Science",
+      institution: "East Manchester Academy",
+      location: "Manchester",
+      start: "2021",
+      end: "2026",
+      details:
+        "List confirmed subjects and grades accurately. Add relevant coursework, school awards or practical projects only when they support the application.",
+    },
+    {
+      id: "school-leaver-edu-2",
+      qualification: "Duke of Edinburgh Bronze Award",
+      institution: "East Manchester Academy",
+      location: "Manchester",
+      start: "2024",
+      end: "2025",
+      details:
+        "Completed volunteering, physical and skills sections and a supervised expedition, building planning, teamwork and resilience.",
+    },
+  ],
+};
+
 const generalCv: CvData = {
   template: "classic",
   fullName: "Emily Thompson",
@@ -387,10 +505,22 @@ const customerServiceCv: CvData = {
     "Customer service adviser with three years of experience handling retail, telephone and email enquiries in busy UK teams. Confident resolving complaints, keeping CRM records accurate, explaining next steps clearly and protecting customer information. Known for calm communication, reliable follow-through and helping customers avoid repeat contact.",
   skills:
     "Customer enquiry handling\nComplaint resolution\nCRM record accuracy\nTelephone and email support\nRetail and order queries\nRefunds and returns process\nMicrosoft 365\nCalm communication under pressure",
-  experience: generalCv.experience.map((item) => ({
-    ...item,
-    id: `customer-service-${item.id}`,
-  })),
+  experience: [
+    {
+      id: "customer-service-exp-1",
+      role: "Customer Contact Adviser",
+      company: "Yorkshire Energy Support",
+      location: "Leeds",
+      start: "Mar 2023",
+      end: "Present",
+      bullets:
+        "Handle 45 to 60 telephone, email and live-chat enquiries per shift, explaining account changes, payment options and next steps clearly.\nResolve complaints at first contact where possible and record agreed actions in Salesforce so customers do not need to repeat information.\nUse identity-checking and data-protection procedures before discussing accounts, escalating vulnerable-customer or complex billing cases to the right team.\nHelped update live-chat response templates and coached two new starters on tone, CRM notes and escalation routes.",
+    },
+    ...generalCv.experience.slice(1).map((item) => ({
+      ...item,
+      id: `customer-service-${item.id}`,
+    })),
+  ],
   education: generalCv.education.map((item) => ({
     ...item,
     id: `customer-service-${item.id}`,
@@ -522,7 +652,9 @@ export function parseRoleTemplate(value: string | null): RoleTemplateId | undefi
     value === "teacher" ||
     value === "warehouse" ||
     value === "graduate" ||
-    value === "care-worker"
+    value === "care-worker" ||
+    value === "student" ||
+    value === "school-leaver"
     ? value
     : undefined;
 }
@@ -545,7 +677,11 @@ export function getRoleCvTemplate(role: RoleTemplateId, template?: TemplateId): 
           ? graduateCv
           : role === "care-worker"
             ? careWorkerCv
-            : nurseCv;
+            : role === "student"
+              ? studentCv
+              : role === "school-leaver"
+                ? schoolLeaverCv
+                : nurseCv;
   return {
     ...source,
     template: template || source.template,

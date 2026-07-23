@@ -8,6 +8,10 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -25,7 +29,7 @@ export const metadata: Metadata = {
   },
 };
 
-const checkedDate = "29 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 const faqItems = [
   {
@@ -52,10 +56,15 @@ const articleSchema = {
   description:
     "A factual UK guide to CV builder introductory prices, automatic renewals, cancellation evidence, and one-time alternatives.",
   datePublished: "2026-06-29",
-  dateModified: "2026-06-29",
+  dateModified: "2026-07-23",
   author: {
     "@type": "Organization",
-    name: site.name,
+    name: "WorkCV Editorial Team",
+    url: site.url,
+  },
+  reviewedBy: {
+    "@type": "Organization",
+    name: "WorkCV Editorial Team",
     url: site.url,
   },
   publisher: {
@@ -112,6 +121,9 @@ export default function CvBuilderScamsUkPage() {
                 model works, what current official prices show, and how to
                 avoid paying for access you no longer need.
               </p>
+              <p className="mt-5 text-sm font-bold text-navy">
+                Reviewed by the WorkCV Editorial Team · 23 July 2026
+              </p>
             </div>
           </div>
         </section>
@@ -154,10 +166,10 @@ export default function CvBuilderScamsUkPage() {
                     below publish subscription terms on official pages. The
                     problem arises when a shopper notices the introductory
                     price but misses what happens next. Government research
-                    published in April 2026 estimated that 3.6 million unwanted
-                    UK subscriptions resulted from free or discounted trial
-                    rollovers, with £1.6 billion spent annually on unwanted
-                    subscriptions overall.
+                    cited in the government&apos;s April 2026 response estimated
+                    that 3.6 million unwanted UK subscriptions resulted from free
+                    or discounted trial rollovers, with £1.6 billion spent
+                    annually on unwanted subscriptions overall.
                   </p>
                 </div>
               </section>
@@ -167,12 +179,15 @@ export default function CvBuilderScamsUkPage() {
                   What current CV builder prices show.
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-muted">
-                  Official pages checked {checkedDate} listed MyPerfectCV at
-                  GBP 2.95 for 14 days, then GBP 16.95 every four weeks;
-                  LiveCareer UK at GBP 1.95 for 14 days, then GBP 19.85 every
-                  four weeks; Resume.io UK at GBP 2.95 for seven days, then GBP
-                  20.95 every four weeks; and CVMaker UK at GBP 0.99 for seven
-                  days, then GBP 19.99 per month. Prices can change, so verify
+                  Official pages checked {checkedDate} listed MyPerfectCV at{" "}
+                  {competitorPricing.myPerfectCv.entry}, then{" "}
+                  {competitorPricing.myPerfectCv.renewal}; LiveCareer UK at{" "}
+                  {competitorPricing.liveCareer.entry}, then{" "}
+                  {competitorPricing.liveCareer.renewal}; Resume.io at{" "}
+                  {competitorPricing.resumeIo.entry}, then{" "}
+                  {competitorPricing.resumeIo.renewal}; and CVMaker UK at{" "}
+                  {competitorPricing.cvMaker.entry}, then{" "}
+                  {competitorPricing.cvMaker.renewal}. Prices can change, so verify
                   the checkout yourself before entering card details.
                 </p>
                 <p className="mt-5 text-lg leading-8 text-muted">
@@ -194,15 +209,15 @@ export default function CvBuilderScamsUkPage() {
                     clearer. The measures include reminders before discounted
                     trials end, a straightforward way to cancel, and a new
                     cooling-off period after certain renewals. The government
-                    estimated the changes could save consumers around GBP 400
+                    estimated the changes could save consumers around £400
                     million each year.
                   </p>
                   <p>
                     Those subscription-contract provisions are not a reason to
                     ignore today&apos;s checkout terms. Government guidance
-                    says they are expected to come into force no earlier than
-                    autumn 2026, with implementation details still being
-                    developed when this guide was checked. Until they apply,
+                    says they are expected to come into force in spring 2027,
+                    with implementation details still being developed when this
+                    guide was checked. Until they apply,
                     the safest approach is practical: read the renewal summary,
                     note the end of any trial, cancel through the provider&apos;s
                     stated route, and retain proof. A legitimate subscription
@@ -265,7 +280,7 @@ export default function CvBuilderScamsUkPage() {
               </h2>
               <div className="mt-5 space-y-4">
                 {[
-                  ["UK government subscription research", "https://www.gov.uk/government/consultations/consultation-on-the-implementation-of-the-new-subscription-contracts-regime/consultation-on-the-implementation-of-the-new-subscription-contracts-regime-web-accessible-version"],
+                  ["UK government subscription response", "https://www.gov.uk/government/news/consumers-to-save-around-400-million-every-year-from-government-crackdown-on-costly-subscription-traps"],
                   ["MoneyHelper payment guidance", "https://www.moneyhelper.org.uk/en/everyday-money/banking/direct-debits-and-standing-orders"],
                   ["MyPerfectCV pricing", "https://www.myperfectcv.co.uk/pricing"],
                   ["LiveCareer UK pricing", "https://www.livecareer.co.uk/pricing"],

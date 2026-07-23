@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -19,6 +19,13 @@ export const metadata: Metadata = {
   title: "Care Worker CV Template UK - Care Assistant Example",
   description:
     "Use an editable UK care worker CV template with person-centred care, safeguarding, home care, care home, records and training examples.",
+  alternates: { canonical: "/cv-template-care-worker-uk" },
+  openGraph: {
+    title: "Care Worker CV Template UK - WorkCV",
+    description:
+      "An editable UK care worker CV with person-centred care, safeguarding and training examples.",
+    url: "/cv-template-care-worker-uk",
+  },
 };
 
 const editorHref = "/editor?template=classic&roleTemplate=care-worker&new=1";
@@ -180,7 +187,7 @@ const relatedLinks = [
   ["Return to work CV", "/return-to-work-cv-uk"],
   ["Employment gap CV", "/cv-employment-gap-uk"],
   ["Right to work CV", "/right-to-work-cv-uk"],
-  ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
+  ["Nurse CV template", "/cv-template-nurse-uk"],
 ];
 
 export default function CareWorkerCvTemplateUkPage() {
@@ -198,7 +205,7 @@ export default function CareWorkerCvTemplateUkPage() {
               Care worker CV template UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Show safe, person-centred care with evidence employers can trust.
+              Build a care worker CV around safe, person-centred evidence.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Start with an editable care worker CV for care homes, home care
@@ -353,7 +360,7 @@ export default function CareWorkerCvTemplateUkPage() {
           </div>
           <aside className="h-fit rounded-xl border border-line bg-white p-6">
             <FileText className="h-7 w-7 text-gold" />
-            <h2 className="mt-5 font-display text-2xl font-semibold text-navy">What to avoid</h2>
+            <h3 className="mt-5 font-display text-2xl font-semibold text-navy">What to avoid</h3>
             <ul className="mt-5 space-y-4">
               {mistakes.map((mistake) => (
                 <li key={mistake} className="flex gap-3 text-sm leading-6 text-ink">
@@ -405,9 +412,18 @@ export default function CareWorkerCvTemplateUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Care worker CV template questions."
+      />
       <FinalCta
         heading="Start with a care worker CV grounded in real practice."
         body={`Edit the care-worker draft for your setting and experience, then pay ${site.price} only when you download the final PDF.`}
+        primaryHref={editorHref}
+        primary="Use care worker CV template"
         secondaryHref="/cv-no-experience-uk"
         secondary="Build without care experience"
       />

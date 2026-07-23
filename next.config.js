@@ -22,7 +22,16 @@ const nextConfig = {
   async redirects() {
     return [
       { source: "/cv-template-uk", destination: "/templates", permanent: true },
-      { source: "/cv-builder-uk", destination: "/cv-builder", permanent: true },
+      {
+        source: "/cv-builder-uk",
+        destination: "/cv-builder-no-subscription-uk",
+        permanent: true,
+      },
+      {
+        source: "/myperfectcv-alternative",
+        destination: "/myperfectcv-alternative-uk",
+        permanent: true,
+      },
       {
         source: "/cv-with-no-experience",
         destination: "/cv-no-experience-uk",
@@ -66,6 +75,11 @@ const nextConfig = {
       {
         source: "/tools/ats-cv-checker-uk",
         destination: "/tools/ats-score-checker",
+        permanent: true,
+      },
+      {
+        source: "/tools/uk-living-wage-checker-2026",
+        destination: "/tools/uk-living-wage-checker",
         permanent: true,
       },
       {

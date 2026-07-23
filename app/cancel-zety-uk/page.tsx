@@ -10,15 +10,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "How to Cancel Zety UK - Stop Subscription",
@@ -62,7 +67,7 @@ const cancellationSteps = [
   {
     title: "Use phone, chat, or email if the account route fails",
     body:
-      "Zety says the easiest way to cancel is to call support or contact them on chat. The UK contact page lists support@zety.com and 0808 196 5805.",
+      "Use the support route shown inside your Zety account or on its live contact page. Regional support details can change, and the former UK pages currently redirect, so verify the route before acting.",
   },
   {
     title: "Save proof of cancellation",
@@ -84,7 +89,7 @@ const supportCards = [
   },
   {
     title: "Phone",
-    body: "Zety UK contact page lists 0808 196 5805. Working hours are listed in CET on the official contact page.",
+    body: "Use the phone number displayed on Zety's live regional contact page. Do not rely on an older number copied into a third-party guide.",
     icon: Phone,
   },
   {
@@ -98,12 +103,12 @@ const faqItems = [
   {
     question: "How do I cancel Zety in the UK?",
     answer:
-      "Start by signing in to your Zety account and checking the dashboard's My Plan section. Zety also says you can cancel by calling support or contacting support on chat. The UK contact page lists support@zety.com and 0808 196 5805.",
+      "Start by signing in to your Zety account and checking the dashboard's My Plan section. If the control is unavailable, use the live contact or chat route displayed for your region and keep written confirmation.",
   },
   {
     question: "How much does Zety cost in the UK?",
     answer:
-      "On the official UK pricing page checked 13 June 2026, Zety listed a £2.95 14-day trial and automatic renewal at £20.95 every 4 weeks. It also listed annual access at £59.40.",
+      `Checked ${checkedDate}: ${competitorPricing.zety.note} Confirm the current amount and renewal terms in Zety's live checkout.`,
   },
   {
     question: "What billing names should I look for?",
@@ -122,21 +127,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel Zety UK",
-  description:
-    "Step-by-step guide to cancelling a Zety UK subscription and stopping automatic renewal.",
-  totalTime: "PT15M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -153,10 +143,6 @@ const faqSchema = {
 export default function CancelZetyUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -181,8 +167,7 @@ export default function CancelZetyUkPage() {
                 How to cancel Zety in the UK.
               </h1>
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-                Zety UK currently lists a £2.95 14-day trial, followed by
-                automatic renewal at £20.95 every 4 weeks. This guide shows the
+                {competitorPricing.zety.note} This guide shows the
                 official account, support, and statement-check routes.
               </p>
               <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
@@ -317,7 +302,7 @@ export default function CancelZetyUkPage() {
                 "Cancellation confirmation or support response",
                 "Chat transcript or call notes",
                 "Screenshot of My Plan or account status",
-                "Billing descriptor: Zety.com, BLD*Zety.com, or PP*ZETY",
+                "Billing descriptor shown on the charge (confirm it against Zety's live contact page)",
                 "Payment date and amount",
               ].map((item) => (
                 <li key={item} className="flex gap-3 text-sm font-bold leading-6 text-navy">
@@ -344,23 +329,16 @@ export default function CancelZetyUkPage() {
                 {site.price} only when you download.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>Zety UK</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["£2.95 for 14 days", "Free to build"],
-                ["Renews at £20.95 every 4 weeks", `${site.price} PDF download`],
+            <ComparisonTable
+              caption={`Zety UK and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["Zety UK", "WorkCV"]}
+              rows={[
+                [competitorPricing.zety.entry, "Free to build"],
+                [competitorPricing.zety.renewal, `${site.price} PDF download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>

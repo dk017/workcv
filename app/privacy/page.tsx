@@ -6,6 +6,13 @@ export const metadata: Metadata = {
   title: "Privacy Policy",
   description:
     "How WorkCV handles personal data when you build and download a UK CV.",
+  alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Privacy Policy | WorkCV",
+    description:
+      "How WorkCV handles personal data when you build and download a UK CV.",
+    url: "/privacy",
+  },
 };
 
 export default function PrivacyPage() {

@@ -10,13 +10,14 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Return to Work CV UK - Career Break Template",
   description:
     "Returning to work after a career break? Build a UK CV that explains the gap clearly, shows current skills, and helps you apply with confidence.",
+  alternates: { canonical: "/return-to-work-cv-uk" },
 };
 
 const jsonLd = {
@@ -357,6 +358,13 @@ export default function ReturnToWorkCvUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Return-to-work CV questions."
+      />
       <FinalCta
         heading="Build a return-to-work CV that feels current."
         body={`Start with your experience, add recent evidence, and pay ${site.price} only when you download the final PDF.`}

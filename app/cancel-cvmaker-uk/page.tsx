@@ -9,15 +9,20 @@ import {
   ShieldCheck,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import {
+  competitorPricing,
+  competitorPricingCheckedDate,
+} from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 
-const checkedDate = "13 June 2026";
+const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
   title: "How to Cancel CVMaker UK Subscription",
@@ -91,7 +96,7 @@ const faqItems = [
   {
     question: "How much does CVMaker UK cost after the trial?",
     answer:
-      "On the CVMaker UK costs page checked 13 June 2026, CVMaker listed Pro access at GBP 0.99 for 7 days, followed by automatic monthly renewal at GBP 19.99 per month.",
+      `On the official costs page checked ${checkedDate}, CVMaker listed ${competitorPricing.cvMaker.entry}, followed by automatic renewal at ${competitorPricing.cvMaker.renewal}.`,
   },
   {
     question: "Can I cancel CVMaker UK without logging in?",
@@ -110,21 +115,6 @@ const faqItems = [
   },
 ];
 
-const howToSchema = {
-  "@context": "https://schema.org",
-  "@type": "HowTo",
-  name: "How to Cancel CVMaker UK",
-  description:
-    "Step-by-step guide to cancelling a CVMaker UK subscription and stopping automatic monthly renewal.",
-  totalTime: "PT10M",
-  step: cancellationSteps.map((step, index) => ({
-    "@type": "HowToStep",
-    position: index + 1,
-    name: step.title,
-    text: step.body,
-  })),
-};
-
 const faqSchema = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
@@ -141,10 +131,6 @@ const faqSchema = {
 export default function CancelCvmakerUkPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
-      />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
@@ -169,8 +155,9 @@ export default function CancelCvmakerUkPage() {
                 How to cancel CVMaker UK.
               </h1>
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-                CVMaker UK currently lists Pro access at GBP 0.99 for 7 days,
-                followed by automatic renewal at GBP 19.99 per month. This guide
+                CVMaker&apos;s official costs page listed{" "}
+                {competitorPricing.cvMaker.entry}, followed by automatic renewal
+                at {competitorPricing.cvMaker.renewal} when checked. This guide
                 shows the official account route, help desk fallback, and what
                 to keep as proof after cancelling.
               </p>
@@ -337,23 +324,16 @@ export default function CancelCvmakerUkPage() {
                 pay {site.price} when you download.
               </p>
             </div>
-            <div className="overflow-hidden rounded-xl border border-line bg-white">
-              <div className="grid grid-cols-2 bg-navy px-5 py-4 text-sm font-bold text-white">
-                <span>CVMaker UK</span>
-                <span>WorkCV</span>
-              </div>
-              {[
-                ["GBP 0.99 for 7 days", "Free to build"],
-                ["Renews at GBP 19.99 per month", `${site.priceGbp} PDF download`],
+            <ComparisonTable
+              caption={`CVMaker UK and WorkCV billing comparison, checked ${checkedDate}`}
+              headers={["CVMaker UK", "WorkCV"]}
+              rows={[
+                [competitorPricing.cvMaker.entry, "Free to build"],
+                [`Renews at ${competitorPricing.cvMaker.renewal}`, `${site.priceGbp} PDF download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
-              ].map(([left, right]) => (
-                <div key={left} className="grid grid-cols-2 border-t border-line text-sm">
-                  <div className="p-5 text-muted">{left}</div>
-                  <div className="bg-greensoft p-5 font-bold text-navy">{right}</div>
-                </div>
-              ))}
-            </div>
+              ]}
+            />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
@@ -404,8 +384,8 @@ export default function CancelCvmakerUkPage() {
       <FinalCta
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
-        secondaryHref="/pricing"
-        secondary="Compare pricing"
+        secondaryHref="/cvmaker-alternative"
+        secondary="Compare the CVMaker alternative"
       />
     </>
   );

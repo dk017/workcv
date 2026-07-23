@@ -10,13 +10,14 @@ import {
   Shield,
 } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "CV Employment Gap UK - How to Explain Gaps",
   description:
     "Worried about a gap in your CV? Learn how to explain employment gaps in a UK CV with clear wording examples and a no-subscription CV builder.",
+  alternates: { canonical: "/cv-employment-gap-uk" },
 };
 
 const jsonLd = {
@@ -355,6 +356,13 @@ export default function CvEmploymentGapUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="CV employment gap questions."
+      />
       <FinalCta
         heading="Build a CV that explains the gap and moves on."
         body={`WorkCV helps you structure the timeline, highlight current evidence and pay ${site.price} only when you download.`}

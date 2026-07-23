@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -18,6 +18,7 @@ export const metadata: Metadata = {
   title: "How to Write a CV UK - 10-Step Guide and Editable Example",
   description:
     "Learn how to write a UK CV in 10 practical steps. Includes section examples, ATS guidance, an evidence worksheet and a complete editable CV template.",
+  alternates: { canonical: "/how-to-write-a-cv-uk" },
 };
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
@@ -181,11 +182,11 @@ const situationLinks = [
 ];
 
 const roleLinks = [
+  ["CV vs resume UK", "/cv-vs-resume-uk"],
   ["Nurse CV", "/cv-template-nurse-uk"],
   ["Teacher CV", "/cv-template-teacher-uk"],
   ["Warehouse CV", "/cv-template-warehouse-uk"],
   ["Care worker CV", "/cv-template-care-worker-uk"],
-  ["Graduate CV", "/cv-template-graduate-uk"],
 ];
 
 const finalChecks = [
@@ -465,6 +466,13 @@ export default function HowToWriteACvUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Questions about writing a UK CV."
+      />
       <FinalCta
         heading="Turn the guide into your own finished CV."
         body={`Open the complete example, replace it with your real evidence, then pay ${site.price} only when the final PDF is ready.`}

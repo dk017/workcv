@@ -145,8 +145,21 @@ export default function CvExamplesUkPage() {
               from your own work, study or training.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/cv-builder-no-subscription-uk">Open CV builder</ButtonLink>
+              <ButtonLink href="/editor?template=classic&roleTemplate=general&new=1">
+                Edit a CV example
+              </ButtonLink>
               <ButtonLink href="#examples" variant="secondary">Browse examples</ButtonLink>
+            </div>
+            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
+              <Link href="/how-to-write-a-cv-uk" className="underline underline-offset-4">
+                Read the UK CV writing guide
+              </Link>
+              <Link
+                href="/cv-builder-no-subscription-uk"
+                className="underline underline-offset-4"
+              >
+                How the no-subscription builder works
+              </Link>
             </div>
           </div>
 
@@ -297,8 +310,8 @@ export default function CvExamplesUkPage() {
       <FinalCta
         heading="Use examples as a starting point, not a script."
         body={`Choose a UK CV example, edit it around your own evidence, then pay ${site.price} only when you download the finished PDF.`}
-        primaryHref="/cv-builder-no-subscription-uk"
-        primary="Open CV builder"
+        primaryHref="/editor?template=classic&roleTemplate=general&new=1"
+        primary="Edit a CV example"
         secondaryHref="/templates"
         secondary="Compare templates"
       />

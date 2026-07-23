@@ -9,16 +9,16 @@ import {
 } from "lucide-react";
 
 import { AtsScoreChecker } from "@/components/ats-score-checker";
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Free AI CV Fit Checker UK - Match Your CV to a Job",
+  title: "Free ATS CV Checker UK - Match Your CV to a Job",
   description:
     "See how clearly your CV communicates fit for a UK vacancy. Get a fixed-weight score, requirement evidence, keyword gaps and three priority improvements.",
   alternates: { canonical: "/tools/ats-score-checker" },
   openGraph: {
-    title: "Free UK AI CV Fit Checker",
+    title: "Free ATS CV Checker UK",
     description:
       "Compare your CV with a vacancy. Get an evidence-led fit assessment, transparent score and three priority improvements.",
     url: "/tools/ats-score-checker",
@@ -98,7 +98,7 @@ export default function AtsScoreCheckerPage() {
               Free UK CV tool
             </p>
             <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">
-              Will your CV make your fit clear for this vacancy?
+               Free ATS CV checker: see how well your CV matches a UK job.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
               Get a transparent five-part score, see which vacancy requirements
@@ -234,7 +234,16 @@ export default function AtsScoreCheckerPage() {
         </div>
       </section>
 
-      <FaqSection faqs={faqItems} title="AI CV fit checker questions." />
+      <RelatedLinksSection
+        title="Keep improving your CV."
+        links={[
+          ["Write stronger CV bullets", "/tools/cv-bullet-point-generator"],
+          ["Check keyword balance", "/tools/cv-keyword-density-checker"],
+          ["Use an ATS CV template", "/ats-cv-template-uk"],
+          ["Read the UK CV guide", "/how-to-write-a-cv-uk"],
+        ]}
+      />
+      <FaqSection faqs={faqItems} title="ATS CV checker questions." />
     </>
   );
 }

@@ -10,6 +10,7 @@ import {
   Wand2,
 } from "lucide-react";
 
+import { ComparisonTable } from "@/components/comparison-table";
 import {
   ButtonLink,
   FaqSection,
@@ -275,23 +276,11 @@ export default function EnhancvAlternativeUkPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="hidden grid-cols-[0.75fr_1fr_1fr] bg-navy px-5 py-4 text-sm font-bold text-white md:grid">
-              <span>Area</span>
-              <span>Enhancv</span>
-              <span>WorkCV</span>
-            </div>
-            {comparisonRows.map(([area, enhancv, workcv]) => (
-              <div
-                key={area}
-                className="grid grid-cols-1 border-t border-line text-sm md:grid-cols-[0.75fr_1fr_1fr]"
-              >
-                <div className="bg-paper p-5 font-bold text-navy">{area}</div>
-                <div className="p-5 leading-7 text-muted">{enhancv}</div>
-                <div className="bg-greensoft p-5 font-bold leading-7 text-navy">{workcv}</div>
-              </div>
-            ))}
-          </div>
+          <ComparisonTable
+            caption={`Enhancv vs WorkCV product comparison, checked ${checkedDate}`}
+            headers={["Area", "Enhancv", "WorkCV"]}
+            rows={comparisonRows}
+          />
         </div>
       </section>
 

@@ -114,7 +114,7 @@ export default function HomePage() {
               href="/pricing"
               className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
             >
-              See the no-hidden-fees guarantee
+              See the full pricing breakdown
             </Link>
           </div>
         </div>
@@ -236,6 +236,33 @@ export default function HomePage() {
                 ))}
               </ul>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-paper py-24">
+        <div className="container-page">
+          <SectionLabel>Popular guides &amp; examples</SectionLabel>
+          <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
+            Start with the guidance closest to your application.
+          </h2>
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+            {[
+              ["UK CV examples", "/cv-examples-uk"],
+              ["How to write a CV", "/how-to-write-a-cv-uk"],
+              ["ATS CV template", "/ats-cv-template-uk"],
+              ["Professional CV template", "/professional-cv-template-uk"],
+              ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
+            ].map(([label, href]) => (
+              <Link
+                key={href}
+                href={href}
+                className="group rounded-xl border border-line bg-white p-5 text-sm font-bold text-navy transition hover:-translate-y-1 hover:border-navy"
+              >
+                {label}
+                <span className="mt-4 block text-gold">→</span>
+              </Link>
+            ))}
           </div>
         </div>
       </section>

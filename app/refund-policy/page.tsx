@@ -7,6 +7,13 @@ export const metadata: Metadata = {
   title: "Refund Policy",
   description:
     "WorkCV refund policy for one-time UK CV PDF download purchases.",
+  alternates: { canonical: "/refund-policy" },
+  openGraph: {
+    title: "Refund Policy | WorkCV",
+    description:
+      "WorkCV refund policy for one-time UK CV PDF download purchases.",
+    url: "/refund-policy",
+  },
 };
 
 export default function RefundPolicyPage() {

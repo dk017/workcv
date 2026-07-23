@@ -10,13 +10,14 @@ import {
   UserCheck,
 } from "lucide-react";
 
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Right to Work CV UK - What to Include",
   description:
     "Should you mention right to work on a UK CV? Learn when to include it, what not to share, and how to keep your CV clear and safe.",
+  alternates: { canonical: "/right-to-work-cv-uk" },
 };
 
 const jsonLd = {
@@ -312,6 +313,13 @@ export default function RightToWorkCvUkPage() {
         </div>
       </section>
 
+      <FaqSection
+        faqs={jsonLd.mainEntity.map((item) => ({
+          question: item.name,
+          answer: item.acceptedAnswer.text,
+        }))}
+        title="Right-to-work CV questions."
+      />
       <FinalCta
         heading="Build a UK CV that gives enough information, not too much."
         body={`Use clear sections, keep private details private, and pay ${site.price} only when you download.`}
