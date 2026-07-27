@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WorkCV Job Keyword Highlighter</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">UK job-page scanner</p>
+        <h1>WorkCV Keyword Highlighter</h1>
+        <p>Spot skills and qualifications worth considering when you tailor your CV.</p>
+      </header>
+
+      <section class="panel">
+        <p class="meta-label">Current page</p>
+        <p class="page-title" id="pageTitle">Loading tab…</p>
+        <p class="page-url" id="pageUrl"></p>
+        <div class="actions">
+          <button id="scanButton" class="primary" type="button">Scan this page</button>
+          <button id="clearButton" class="secondary" type="button">Remove highlights</button>
+        </div>
+        <p class="status" id="statusMessage">Ready to scan.</p>
+      </section>
+
+      <section class="panel results" id="resultsPanel" hidden>
+        <div class="summary">
+          <div><span id="highlightCount">0</span><small>matches</small></div>
+          <div><span id="wordCount">0</span><small>visible words</small></div>
+        </div>
+        <div id="resultGroups"></div>
+      </section>
+
+      <footer class="panel footer">
+        <p>Runs locally on the active tab. No account, history or background scraping.</p>
+        <a href="https://workcv.co.uk/tools/ats-score-checker?utm_source=chrome_extension&utm_medium=referral&utm_campaign=job_keyword_highlighter" target="_blank" rel="noreferrer">
+          Compare a job advert with your CV on WorkCV
+        </a>
+      </footer>
+    </main>
+    <script src="shared.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>

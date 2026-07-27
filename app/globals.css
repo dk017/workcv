@@ -22,6 +22,16 @@ body {
   overflow-x: hidden;
 }
 
+/* Hosted tool routes are designed to live inside third-party iframes. */
+body:has(.workcv-embed-root) > header,
+body:has(.workcv-embed-root) > footer {
+  display: none;
+}
+
+body:has(.workcv-embed-root) {
+  background: #ffffff;
+}
+
 ::selection {
   background: #f5e6c0;
   color: #0f2942;
