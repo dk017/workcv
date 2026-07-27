@@ -1,0 +1,13 @@
+.workcv-keyword-highlight {
+  border-radius: 3px !important;
+  box-decoration-break: clone !important;
+  -webkit-box-decoration-break: clone !important;
+  color: #102a43 !important;
+  font: inherit !important;
+  padding: 0 2px !important;
+}
+
+.workcv-keyword-hard { background: #cfe8ff !important; }
+.workcv-keyword-soft { background: #d9f2e3 !important; }
+.workcv-keyword-qualification { background: #f8df9a !important; }
+.workcv-keyword-action { background: #eadcf8 !important; }
