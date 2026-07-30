@@ -14,6 +14,7 @@
     "type-check": "tsc --noEmit",
     "test:ats": "node --no-warnings --test --experimental-strip-types tests/ats-keyword-checker.test.ts",
     "test:tools": "node --no-warnings --test --experimental-strip-types tests/*.test.ts",
+    "test:pdf-runtime": "node scripts/pdf-runtime-smoke.mjs",
     "test:pdf-parity": "node tests/pdf-parity.mjs"
   },
   "dependencies": {

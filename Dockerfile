@@ -24,18 +24,24 @@ ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV HOME=/home/nextjs
+ENV XDG_CONFIG_HOME=/tmp/workcv-chromium-config
+ENV XDG_CACHE_HOME=/tmp/workcv-chromium-cache
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends chromium fonts-liberation \
   && rm -rf /var/lib/apt/lists/* \
   && groupadd --system --gid 1001 nodejs \
-  && useradd --system --uid 1001 --gid nodejs nextjs
+  && useradd --system --uid 1001 --gid nodejs --create-home nextjs
 
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/pdf-runtime-smoke.mjs ./scripts/pdf-runtime-smoke.mjs
 
 USER nextjs
+
+RUN node scripts/pdf-runtime-smoke.mjs
 
 EXPOSE 3000
 
