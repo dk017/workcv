@@ -172,6 +172,21 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-11 w-auto max-w-[208px] border-0"
             />
           </a>
+          <a
+            href="https://findly.tools/workcv?utm_source=workcv"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV featured on Findly.tools"
+          >
+            <img
+              src="https://findly.tools/badges/findly-tools-badge-dark.svg"
+              alt="Featured on Findly.tools"
+              width={175}
+              height={55}
+              className="block h-[55px] w-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
