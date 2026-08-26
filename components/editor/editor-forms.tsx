@@ -423,6 +423,7 @@ function BulletEditor({
           >
             <input
               value={bullet}
+              aria-label={`Bullet point ${index + 1}`}
               onChange={(event) => {
                 const next = [...bullets];
                 next[index] = event.target.value;

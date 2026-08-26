@@ -1,4 +1,4 @@
-import { site } from "@/lib/site";
+import { site } from "../../lib/site.ts";
 
 export const dynamic = "force-static";
 
@@ -25,6 +25,7 @@ Users sign in to WorkCV with a one-time email code through the website. This let
 - API catalog: ${site.url}/.well-known/api-catalog
 - Health: ${site.url}/api/health
 - Agent skills: ${site.url}/.well-known/agent-skills/index.json
+- LLM orientation: ${site.url}/llms.txt
 `;
 
   return new Response(body, {

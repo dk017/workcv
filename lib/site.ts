@@ -1,4 +1,4 @@
-import { WORKCV_PRICE } from "@/lib/commerce";
+import { WORKCV_PRICE } from "./commerce.ts";
 
 const priceAmount = WORKCV_PRICE.amount;
 const priceCurrency = WORKCV_PRICE.currency;

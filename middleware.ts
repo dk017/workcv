@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server.js";
 
-import { agentDiscoveryLinkHeader } from "@/lib/agent-discovery";
+import { agentDiscoveryLinkHeader } from "./lib/agent-discovery.ts";
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

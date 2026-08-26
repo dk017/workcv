@@ -1,6 +1,8 @@
-import { site } from "@/lib/site";
+import { site } from "./site.ts";
 
 export const agentDiscoveryLinks = [
+  `</llms.txt>; rel="alternate"; type="text/plain"`,
+  `</agent-markdown>; rel="alternate"; type="text/markdown"`,
   `</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"`,
   `</auth.md>; rel="service-doc"; type="text/markdown"`,
   `</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"`,
@@ -42,6 +44,7 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - API catalog: ${site.url}/.well-known/api-catalog
 - Agent skills index: ${site.url}/.well-known/agent-skills/index.json
 - Auth notes: ${site.url}/auth.md
+- LLM orientation file: ${site.url}/llms.txt
 - Sitemap: ${site.url}/sitemap.xml
 `;
 

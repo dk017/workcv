@@ -31,6 +31,7 @@ test("mobile editing and page-count guidance remain available", () => {
 test("bullet editing keeps focus and controls remain usable on narrow screens", () => {
   assert.doesNotMatch(formsSource, /key=\{`\$\{index\}-\$\{bullet\.slice/);
   assert.match(formsSource, /key=\{index\}/);
+  assert.match(formsSource, /aria-label=\{`Bullet point \$\{index \+ 1\}`\}/);
   assert.match(formsSource, /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(formsSource, /h-11 min-w-11/);
   assert.match(editorSource, /grid w-full grid-cols-2 gap-2 sm:flex/);
