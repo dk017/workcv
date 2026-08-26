@@ -211,6 +211,9 @@ export default function MadeRedundantPage() {
               <Link href="/cv-employment-gap-uk" className="inline-flex items-center gap-2">
                 Employment gap guidance <ArrowRight className="h-4 w-4" />
               </Link>
+              <Link href="/cv-personal-statement-uk" className="inline-flex items-center gap-2">
+                Personal statement examples <ArrowRight className="h-4 w-4" />
+              </Link>
               <Link href="/tools/ats-score-checker" className="inline-flex items-center gap-2">
                 Target the next vacancy <ArrowRight className="h-4 w-4" />
               </Link>

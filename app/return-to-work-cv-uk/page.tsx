@@ -14,9 +14,9 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Return to Work CV UK - Career Break Template",
+  title: "Return to Work CV Example UK + Career Break Template | WorkCV",
   description:
-    "Returning to work after a career break? Build a UK CV that explains the gap clearly, shows current skills, and helps you apply with confidence.",
+    "Use a return-to-work CV example for the UK to explain a career break briefly, show current skills and target your next role with confidence.",
   alternates: { canonical: "/return-to-work-cv-uk" },
 };
 
@@ -128,9 +128,12 @@ const evidenceIdeas = [
 ];
 
 const relatedLinks = [
+  ["Return-to-work personal statement examples", "/cv-personal-statement-uk"],
   ["Career change CV UK", "/career-change-cv-uk"],
   ["CV with no experience UK", "/cv-no-experience-uk"],
   ["Student CV template", "/student-cv-template"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
   ["Pricing", "/pricing"],
 ];

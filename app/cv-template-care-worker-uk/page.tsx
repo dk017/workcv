@@ -16,9 +16,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Care Worker CV Template UK - Care Assistant Example",
+  title: "Care Worker CV Template UK + Example | WorkCV",
   description:
-    "Use an editable UK care worker CV template with person-centred care, safeguarding, home care, care home, records and training examples.",
+    "Use a care worker CV template for UK jobs with care assistant, safeguarding, records, training and person-centred care examples.",
   alternates: { canonical: "/cv-template-care-worker-uk" },
   openGraph: {
     title: "Care Worker CV Template UK - WorkCV",
@@ -183,6 +183,9 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Care worker personal statement examples", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["CV no experience UK", "/cv-no-experience-uk"],
   ["Return to work CV", "/return-to-work-cv-uk"],
   ["Employment gap CV", "/cv-employment-gap-uk"],

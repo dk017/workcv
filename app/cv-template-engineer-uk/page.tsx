@@ -17,9 +17,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Engineer CV Template UK - Editable Example",
+  title: "Engineer CV Template UK + Example | WorkCV",
   description:
-    "Use an editable engineer CV template for UK engineering jobs. Build a clear CV around discipline fit, technical tools, projects, safety and measurable engineering evidence.",
+    "Use an engineer CV template for UK jobs with discipline fit, technical tools, projects, safety and measurable engineering evidence.",
   alternates: {
     canonical: "/cv-template-engineer-uk",
   },
@@ -163,6 +163,9 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Engineer personal statement examples", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["Professional CV builder", "/cv-builder-no-subscription-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Professional CV template", "/professional-cv-template-uk"],

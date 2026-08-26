@@ -18,9 +18,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Graduate CV Template UK - Scheme and Entry-Level Example",
+  title: "Graduate CV Template UK + Entry-Level Example | WorkCV",
   description:
-    "Use a UK graduate CV template with degree, internship, placement, project, part-time work and transferable skill examples you can edit.",
+    "Use a graduate CV template for UK jobs with degree, internship, placement, project, part-time work and transferable-skill examples.",
   alternates: { canonical: "/cv-template-graduate-uk" },
   openGraph: {
     title: "Graduate CV Template UK - WorkCV",
@@ -184,6 +184,8 @@ const relatedLinks = [
   ["CV no experience UK", "/cv-no-experience-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["CV personal statement UK", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
 ];
 

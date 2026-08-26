@@ -17,9 +17,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Warehouse CV Template UK - Operative, Picker and Packer",
+  title: "Warehouse Operative CV Template UK + Example | WorkCV",
   description:
-    "Use a UK warehouse CV template with picking, packing, goods-in, dispatch, scanner, manual handling and shift-work examples you can edit.",
+    "Use a warehouse operative CV template for UK jobs with picker, packer, goods-in, dispatch, scanner, manual-handling and shift examples.",
   alternates: { canonical: "/cv-template-warehouse-uk" },
   openGraph: {
     title: "Warehouse CV Template UK - WorkCV",
@@ -179,6 +179,9 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Warehouse personal statement examples", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["CV no experience UK", "/cv-no-experience-uk"],
   ["Driver CV template", "/cv-template-driver-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],

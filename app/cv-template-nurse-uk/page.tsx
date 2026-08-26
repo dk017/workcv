@@ -17,9 +17,9 @@ import { site } from "@/lib/site";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 
 export const metadata: Metadata = {
-  title: "Nurse CV Template UK - NMC-Ready Example",
+  title: "Nurse CV Template UK + Example | WorkCV",
   description:
-    "Use a UK nurse CV template with NMC-focused sections, clinical bullet examples, NHS/private care guidance, and an editable CV draft.",
+    "Use a nurse CV template for UK jobs with clinical evidence, NHS and private-care guidance, registration details and editable examples.",
   alternates: { canonical: "/cv-template-nurse-uk" },
   openGraph: {
     title: "Nurse CV Template UK - WorkCV",
@@ -181,6 +181,8 @@ const sourceNotes = [
 const relatedLinks = [
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["CV personal statement UK", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["Career change CV", "/career-change-cv-uk"],
   ["Return to work CV", "/return-to-work-cv-uk"],
   ["Care worker CV template", "/cv-template-care-worker-uk"],

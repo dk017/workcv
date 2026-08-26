@@ -8,6 +8,7 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import { SampleCvProof } from "@/components/sample-cv-proof";
 import {
   competitorPricing,
   competitorPricingCheckedDate,
@@ -319,6 +320,34 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
+
+      <section className="border-y border-line bg-surface py-16">
+        <div className="container-page">
+          <SectionLabel>Choose your starting point</SectionLabel>
+          <h2 className="font-display text-3xl font-semibold text-navy md:text-4xl">
+            Free document, guided builder, or role-specific example.
+          </h2>
+          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Free blank Word CV template", "/tools/blank-cv-template-uk"],
+              ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
+              ["No-subscription builder", "/cv-builder-no-subscription-uk"],
+              ["CV personal statement examples", "/cv-personal-statement-uk"],
+            ].map(([label, href]) => (
+              <Link
+                key={href}
+                href={href}
+                className="group flex min-h-20 items-center justify-between gap-3 rounded-md border border-line bg-white p-4 text-sm font-bold text-navy hover:border-navy"
+              >
+                {label}
+                <ArrowRight className="h-4 w-4 shrink-0 transition group-hover:translate-x-1" />
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <SampleCvProof />
 
       <FaqSection faqs={pricingFaqs} title="Common questions about CV builder costs." />
       <FinalCta

@@ -17,9 +17,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Customer Service CV Template UK - Editable Example",
+  title: "Customer Service CV Template UK + Example | WorkCV",
   description:
-    "Use an editable customer service CV template for UK jobs. Build a clear adviser, assistant or support CV with complaint, CRM and communication examples.",
+    "Use a customer service CV template for UK jobs with adviser, assistant and support examples for complaints, CRM, communication and outcomes.",
   alternates: {
     canonical: "/cv-template-customer-service-uk",
   },
@@ -197,6 +197,9 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Customer service personal statement examples", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["Professional CV builder", "/cv-builder-no-subscription-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Editable UK CV templates", "/templates"],

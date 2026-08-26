@@ -6,9 +6,9 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Career Change CV UK - Template and Examples",
+  title: "Career Change CV Example UK + Template | WorkCV",
   description:
-    "Writing a UK CV for a career change? Learn how to position transferable skills, explain your move, and build a focused CV without a subscription.",
+    "See career change CV examples for the UK: position transferable skills, explain your move and build a focused CV for the target role.",
   alternates: { canonical: "/career-change-cv-uk" },
 };
 
@@ -137,6 +137,8 @@ const relatedLinks = [
   ["Student CV template", "/student-cv-template"],
   ["School leaver CV example", "/school-leaver-cv-example"],
   ["CV personal statement", "/cv-personal-statement-uk"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
 ];
 
 export default function CareerChangeCvUkPage() {

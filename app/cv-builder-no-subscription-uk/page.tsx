@@ -15,6 +15,7 @@ import {
   FinalCta,
   SectionLabel,
 } from "@/components/marketing";
+import { SampleCvProof } from "@/components/sample-cv-proof";
 import {
   competitorPricing,
   competitorPricingCheckedDate,
@@ -132,6 +133,9 @@ const truthChecks = [
 
 const internalLinks = [
   ["Compare CV builder prices", "/pricing"],
+  ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
+  ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
+  ["CV personal statement examples", "/cv-personal-statement-uk"],
   ["Editable UK CV templates", "/templates"],
   ["Customer service CV template", "/cv-template-customer-service-uk"],
   ["Engineer CV template", "/cv-template-engineer-uk"],
@@ -544,6 +548,8 @@ export default function NoSubscriptionUkPage() {
           </div>
         </div>
       </section>
+
+      <SampleCvProof />
 
       <FaqSection
         faqs={faqItems}
