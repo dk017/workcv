@@ -4,7 +4,10 @@ import { FormEvent, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Mail, ShieldCheck } from "lucide-react";
-import { readFirstTouchAttribution } from "@/components/attribution-capture";
+import {
+  readFirstTouchAttribution,
+  trackFunnelEvent,
+} from "@/components/attribution-capture";
 
 export default function LoginForm({ initialNext }: { initialNext: string }) {
   const router = useRouter();
@@ -17,6 +20,10 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
 
   const requestCode = async (event: FormEvent) => {
     event.preventDefault();
+    trackFunnelEvent("login_started", {
+      destination: initialNext,
+      placement: "login_form",
+    });
     setLoading(true);
     setError(null);
     setDevCode(null);

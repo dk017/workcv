@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BarChart3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { UkSalaryChecker } from "@/components/uk-salary-checker";
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
 import { onsSalarySource, salaryRoles } from "@/lib/uk-salary-data";
 import { site } from "@/lib/site";
 
@@ -232,12 +232,20 @@ export default function UkSalaryByJobTitlePage() {
               student-loan thresholds.
             </p>
           </div>
-          <Link
-            href="/tools/take-home-pay-calculator-uk"
-            className="inline-flex min-h-12 items-center justify-center rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover"
-          >
-            Calculate take-home pay
-          </Link>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Link
+              href="/tools/take-home-pay-calculator-uk"
+              className="inline-flex min-h-12 items-center justify-center rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover"
+            >
+              Calculate take-home pay
+            </Link>
+            <ButtonLink
+              href="/editor?from=salary-checker"
+              trackingLabel="salary_checker_editor"
+            >
+              Tailor my CV for the role
+            </ButtonLink>
+          </div>
         </div>
       </section>
 

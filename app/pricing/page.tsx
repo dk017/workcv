@@ -179,8 +179,8 @@ export default function PricingPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Start building free</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary">
+              <ButtonLink href="/editor" trackingLabel="pricing_hero_editor">Start building free</ButtonLink>
+              <ButtonLink href="#compare" variant="secondary" trackingLabel="pricing_hero_compare">
                 Compare prices
               </ButtonLink>
             </div>
@@ -207,7 +207,7 @@ export default function PricingPage() {
               account to remember cancelling.
             </p>
             <div className="mt-8">
-              <ButtonLink href="/editor">Start building</ButtonLink>
+              <ButtonLink href="/editor" trackingLabel="pricing_card_editor">Start building</ButtonLink>
             </div>
           </div>
         </div>
@@ -289,8 +289,8 @@ export default function PricingPage() {
             option competitors may also offer.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV</ButtonLink>
-            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
+            <ButtonLink href="/editor" trackingLabel="pricing_comparison_editor">Build my CV</ButtonLink>
+            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary" trackingLabel="pricing_comparison_no_subscription">
               Why no subscription?
             </ButtonLink>
           </div>
@@ -347,7 +347,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <SampleCvProof />
+      <SampleCvProof trackingContext="pricing_sample" />
 
       <FaqSection faqs={pricingFaqs} title="Common questions about CV builder costs." />
       <FinalCta
@@ -355,6 +355,7 @@ export default function PricingPage() {
         body={`Build free first. Pay ${site.price} only when you want the final PDF. No subscription and no automatic renewal.`}
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="No-subscription details"
+        trackingContext="pricing_final"
       />
     </>
   );

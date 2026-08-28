@@ -8,6 +8,8 @@ import { safeInternalRedirect } from "@/lib/safe-redirect";
 export const metadata: Metadata = {
   title: "Log in",
   description: "Log in to WorkCV with a one-time email code before opening the CV editor.",
+  alternates: { canonical: "/login" },
+  robots: { index: false, follow: true, nocache: true },
 };
 
 export default async function LoginPage({

@@ -6,6 +6,7 @@ export const editorEventNames = [
   "import_failed",
   "section_completed",
   "progress_milestone",
+  "preview_ready",
   "save_failed",
   "save_retried",
   "template_chooser_opened",

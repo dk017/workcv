@@ -2,10 +2,11 @@ import crypto from "crypto";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
-import { ensureAuthTables, getPool } from "@/lib/db";
+import { ensureAnalyticsTables, ensureAuthTables, getPool } from "@/lib/db";
 import { getEmailTransporter, getTransactionalEmailIdentity } from "@/lib/email";
 import { AUTH_LIMITS, exceedsAuthLimit } from "@/lib/auth-policy";
 import { sanitizeSignupAttribution, SignupAttribution } from "@/lib/attribution";
+import { hashAnalyticsIdentifier } from "@/lib/funnel-events";
 
 const sessionCookieName = "workcv_session";
 const loginCodeTtlMinutes = 15;
@@ -73,6 +74,57 @@ async function recordSignupEvent(
     );
   } catch (error) {
     console.error("workcv_signup_event_failed", { eventName, error });
+  }
+}
+
+async function linkFunnelAttributionToUser(
+  userId: string,
+  attribution: SignupAttribution,
+) {
+  try {
+    const visitorHash = attribution.visitorId
+      ? hashAnalyticsIdentifier(attribution.visitorId)
+      : null;
+    const sessionHash = attribution.sessionId
+      ? hashAnalyticsIdentifier(attribution.sessionId)
+      : null;
+    await getPool().query(
+      `
+        UPDATE workcv_users
+        SET first_visitor_hash = COALESCE(first_visitor_hash, $2),
+            first_session_hash = COALESCE(first_session_hash, $3),
+            last_landing_path = COALESCE($4, last_landing_path),
+            last_referrer_host = COALESCE($5, last_referrer_host),
+            last_utm_source = COALESCE($6, last_utm_source),
+            last_utm_medium = COALESCE($7, last_utm_medium),
+            last_utm_campaign = COALESCE($8, last_utm_campaign),
+            updated_at = NOW()
+        WHERE id = $1
+      `,
+      [
+        userId,
+        visitorHash,
+        sessionHash,
+        attribution.lastLandingPath || attribution.landingPath || null,
+        attribution.lastReferrerHost || attribution.referrerHost || null,
+        attribution.lastUtmSource || attribution.utmSource || null,
+        attribution.lastUtmMedium || attribution.utmMedium || null,
+        attribution.lastUtmCampaign || attribution.utmCampaign || null,
+      ],
+    );
+    if (visitorHash) {
+      await ensureAnalyticsTables();
+      await getPool().query(
+        `
+          UPDATE workcv_funnel_events
+          SET user_id = $1
+          WHERE visitor_hash = $2 AND user_id IS NULL
+        `,
+        [userId, visitorHash],
+      );
+    }
+  } catch (error) {
+    console.error("workcv_funnel_attribution_link_failed", error);
   }
 }
 
@@ -293,7 +345,7 @@ export async function verifyEmailLoginCode(
           userId,
           email,
           attribution.landingPath || null,
-          attribution.referrer || null,
+          attribution.referrerHost || attribution.referrer || null,
           attribution.utmSource || null,
           attribution.utmMedium || null,
           attribution.utmCampaign || null,
@@ -317,6 +369,7 @@ export async function verifyEmailLoginCode(
     nextPath,
     user.id,
   );
+  await linkFunnelAttributionToUser(user.id, attribution);
 
   const token = crypto.randomBytes(32).toString("hex");
   await getPool().query(

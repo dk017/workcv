@@ -20,7 +20,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       intro="This policy explains what personal data WorkCV handles, why we use it, and how to contact us about your data."
-      lastUpdated="23 July 2026"
+      lastUpdated="27 August 2026"
       sections={[
         {
           title: "Who this applies to",
@@ -69,6 +69,28 @@ export default function PrivacyPage() {
               <p>
                 Our usual lawful bases are contract, legitimate interests, legal
                 obligation, and consent where a specific consent is requested.
+              </p>
+            </>
+          ),
+        },
+        {
+          title: "First-party journey measurement",
+          body: (
+            <>
+              <p>
+                WorkCV records a limited set of first-party events, such as the
+                first page in a visit, a CV-builder button click, successful
+                signup, CV progress, checkout, payment confirmation, and PDF
+                download. This helps us find broken steps and understand which
+                pages and referral sources make the service useful.
+              </p>
+              <p>
+                Random browser and session identifiers are hashed before storage.
+                We do not put CV text, imported document contents, authentication
+                codes, payment-card data, or full browsing URLs into these event
+                records. Referrers are reduced to their hostname. Detailed journey
+                events are retained for up to 180 days and are not used for
+                cross-site advertising or fingerprinting.
               </p>
             </>
           ),

@@ -42,3 +42,9 @@ export function safeInternalRedirect(value: unknown, fallback = "/editor") {
 
   return value;
 }
+
+export function buildLoginHref(nextPath: unknown = "/editor") {
+  const safeNextPath = safeInternalRedirect(nextPath);
+  const params = new URLSearchParams({ next: safeNextPath });
+  return `/login?${params.toString()}`;
+}

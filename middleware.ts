@@ -21,6 +21,15 @@ export function middleware(request: NextRequest) {
   }
 
   const response = NextResponse.next();
+  const privatePath =
+    pathname === "/login" ||
+    pathname === "/editor" ||
+    pathname === "/my-cvs" ||
+    pathname.startsWith("/cv-pdf/");
+
+  if (privatePath) {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
 
   if (pathname === "/") {
     response.headers.set("Link", agentDiscoveryLinkHeader);
@@ -31,5 +40,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/",
+  matcher: ["/", "/login", "/editor", "/my-cvs", "/cv-pdf/:path*"],
 };

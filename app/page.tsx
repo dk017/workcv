@@ -11,9 +11,10 @@ import {
   SectionLabel,
   TrustStrip,
 } from "@/components/marketing";
+import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 
-const startHref = "/login?next=%2Feditor";
+const startHref = buildLoginHref("/editor");
 
 export const metadata: Metadata = {
   title: "Turn Your Experience into a Professional UK CV",
@@ -81,7 +82,7 @@ export default function HomePage() {
               )}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={startHref}>Start free with email code</ButtonLink>
+              <ButtonLink href={startHref} trackingLabel="home_hero_editor">Start free with email code</ButtonLink>
             </div>
             <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-muted">
               <ShieldCheck className="h-4 w-4 shrink-0 text-success" />
@@ -272,6 +273,7 @@ export default function HomePage() {
         heading="Your next application deserves a CV that feels ready."
         body="Bring your experience. WorkCV helps you shape it into a clear, professional UK CV you can update and use again."
         primaryHref={startHref}
+        trackingContext="home_final"
         primary="Start free with email code"
         secondaryHref={null}
         secondary={null}

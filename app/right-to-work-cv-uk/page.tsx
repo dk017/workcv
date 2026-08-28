@@ -325,6 +325,7 @@ export default function RightToWorkCvUkPage() {
         body={`Use clear sections, keep private details private, and pay ${site.price} only when you download.`}
         secondaryHref="/ats-cv-template-uk"
         secondary="ATS-friendly format"
+        trackingContext="right_to_work_final"
       />
     </>
   );

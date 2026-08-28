@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 
 import { runFeedbackOutreach } from "@/lib/feedback-outreach";
+import { runSavedCvReminders } from "@/lib/saved-cv-reminders";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,6 +32,13 @@ export async function POST(request: NextRequest) {
     typeof payload.limit === "number" && Number.isFinite(payload.limit)
       ? payload.limit
       : 20;
+  if (payload.kind === "saved_cv_reminder") {
+    const result = await runSavedCvReminders({
+      limit,
+      dryRun: payload.dryRun === true,
+    });
+    return NextResponse.json(result);
+  }
   const result = await runFeedbackOutreach({
     limit,
     dryRun: payload.dryRun === true,

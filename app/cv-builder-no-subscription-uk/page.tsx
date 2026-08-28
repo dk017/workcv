@@ -162,6 +162,11 @@ const faqItems = [
       `WorkCV costs ${site.priceGbp} when you download your finished CV as a PDF. You can build your CV before paying.`,
   },
   {
+    question: "Is WorkCV a UK CV builder under £10?",
+    answer:
+      `Yes. The current one-time WorkCV PDF download price is ${site.priceGbp}, which is under £10. You can build and preview first. Email-code login is required, and there is no monthly subscription or automatic renewal.`,
+  },
+  {
     question: "Can I build a CV without paying monthly?",
     answer:
       "Yes. WorkCV is designed for people who want one finished UK CV without a recurring monthly CV builder plan, monthly fee or hidden renewal.",
@@ -244,6 +249,14 @@ export default function NoSubscriptionUkPage() {
               only when this saved CV is ready to download as a PDF. No monthly
               fee, no hidden renewal and no subscription to cancel.
             </p>
+            <div className="mt-6 max-w-2xl rounded-xl border border-gold bg-gold-tint p-5 text-sm leading-7 text-navy">
+              <p className="font-bold">One clear price before you start</p>
+              <p className="mt-1 text-muted">
+                Build and preview your saved CV first. Pay {site.priceGbp} once
+                only when the PDF is ready. There is no monthly subscription or
+                automatic renewal. Email-code login is required before editing.
+              </p>
+            </div>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
                 "Free to build before paying",
@@ -258,8 +271,8 @@ export default function NoSubscriptionUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor?template=classic&new=1">Build my CV</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary">
+              <ButtonLink href="/editor?template=classic&new=1" trackingLabel="no_subscription_hero_editor">Build my CV</ButtonLink>
+              <ButtonLink href="#compare" variant="secondary" trackingLabel="no_subscription_hero_compare">
                 Compare costs
               </ButtonLink>
             </div>
@@ -549,7 +562,7 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
-      <SampleCvProof />
+      <SampleCvProof trackingContext="no_subscription_sample" />
 
       <FaqSection
         faqs={faqItems}

@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 
 import { AtsScoreChecker } from "@/components/ats-score-checker";
-import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, FinalCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -244,6 +244,15 @@ export default function AtsScoreCheckerPage() {
         ]}
       />
       <FaqSection faqs={faqItems} title="ATS CV checker questions." />
+      <FinalCta
+        heading="Turn the evidence you found into a clearer CV."
+        body={`Carry your genuine experience into a guided UK CV, preview the pages, and pay ${site.price} only if you download the PDF.`}
+        primaryHref="/editor?from=ats-checker"
+        primary="Continue in the CV editor"
+        secondaryHref="/ats-cv-template-uk"
+        secondary="Review the ATS template"
+        trackingContext="ats_checker_final"
+      />
     </>
   );
 }

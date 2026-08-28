@@ -5,6 +5,7 @@ let paymentSetupPromise: Promise<void> | null = null;
 let authSetupPromise: Promise<void> | null = null;
 let analyticsSetupPromise: Promise<void> | null = null;
 let feedbackSetupPromise: Promise<void> | null = null;
+let reminderSetupPromise: Promise<void> | null = null;
 
 export function hasDatabaseUrl() {
   return Boolean(process.env.DATABASE_URL);
@@ -139,6 +140,13 @@ export async function ensureAuthTables() {
         ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_term TEXT;
         ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS utm_content TEXT;
         ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS signup_next_path TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS first_visitor_hash TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS first_session_hash TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS last_landing_path TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS last_referrer_host TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS last_utm_source TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS last_utm_medium TEXT;
+        ALTER TABLE workcv_users ADD COLUMN IF NOT EXISTS last_utm_campaign TEXT;
 
         CREATE TABLE IF NOT EXISTS workcv_login_codes (
           id TEXT PRIMARY KEY,
@@ -242,6 +250,34 @@ export async function ensureAnalyticsTables() {
         CREATE INDEX IF NOT EXISTS workcv_editor_events_funnel_idx
           ON workcv_editor_events (event_name, created_at DESC);
 
+        CREATE TABLE IF NOT EXISTS workcv_funnel_events (
+          id BIGSERIAL PRIMARY KEY,
+          event_id_hash TEXT NOT NULL UNIQUE,
+          visitor_hash TEXT NOT NULL,
+          session_hash TEXT NOT NULL,
+          user_id TEXT,
+          event_name TEXT NOT NULL,
+          path TEXT NOT NULL,
+          source TEXT,
+          source_normalized TEXT NOT NULL,
+          medium TEXT,
+          campaign TEXT,
+          referrer_host TEXT,
+          device_class TEXT NOT NULL,
+          metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_funnel_events_event_time_idx
+          ON workcv_funnel_events (event_name, created_at DESC);
+        CREATE INDEX IF NOT EXISTS workcv_funnel_events_source_time_idx
+          ON workcv_funnel_events (source_normalized, created_at DESC);
+        CREATE INDEX IF NOT EXISTS workcv_funnel_events_path_time_idx
+          ON workcv_funnel_events (path, created_at DESC);
+        CREATE INDEX IF NOT EXISTS workcv_funnel_events_user_time_idx
+          ON workcv_funnel_events (user_id, created_at DESC);
+        CREATE INDEX IF NOT EXISTS workcv_funnel_events_visitor_time_idx
+          ON workcv_funnel_events (visitor_hash, created_at DESC);
         CREATE TABLE IF NOT EXISTS workcv_conversion_alerts (
           fingerprint TEXT PRIMARY KEY,
           category TEXT NOT NULL,
@@ -302,4 +338,33 @@ export async function ensureFeedbackOutreachTables() {
       });
   }
   return feedbackSetupPromise;
+}
+
+export async function ensureSavedCvReminderTables() {
+  if (!reminderSetupPromise) {
+    reminderSetupPromise = getPool()
+      .query(`
+        CREATE TABLE IF NOT EXISTS workcv_saved_cv_reminders (
+          user_id TEXT PRIMARY KEY,
+          email_normalized TEXT NOT NULL,
+          document_id TEXT NOT NULL,
+          status TEXT NOT NULL DEFAULT 'sending',
+          attempt_count INTEGER NOT NULL DEFAULT 1,
+          last_attempt_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          sent_at TIMESTAMPTZ,
+          last_error TEXT,
+          created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+        );
+
+        CREATE INDEX IF NOT EXISTS workcv_saved_cv_reminders_status_idx
+          ON workcv_saved_cv_reminders (status, updated_at DESC);
+      `)
+      .then(() => undefined)
+      .catch((error) => {
+        reminderSetupPromise = null;
+        throw error;
+      });
+  }
+  return reminderSetupPromise;
 }

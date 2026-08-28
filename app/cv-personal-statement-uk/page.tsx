@@ -806,6 +806,7 @@ export default function CvPersonalStatementUkPage() {
           body={`Start with a guided UK CV structure and pay ${site.price} only when the final PDF is ready.`}
           secondaryHref="/pricing"
           secondary="See pricing"
+          trackingContext="personal_statement_final"
         />
       </article>
     </>

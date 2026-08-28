@@ -5,10 +5,13 @@ import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/auth";
 import { listCvDocuments } from "@/lib/cv-documents";
 import { templates } from "@/lib/editor-data";
+import { buildLoginHref } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = {
   title: "My CVs",
   description: "Open your saved WorkCV documents or create a new UK CV.",
+  alternates: { canonical: "/my-cvs" },
+  robots: { index: false, follow: false, nocache: true },
 };
 
 function formatUpdatedAt(value: string) {
@@ -24,7 +27,7 @@ function formatUpdatedAt(value: string) {
 
 export default async function MyCvsPage() {
   const user = await getCurrentUser();
-  if (!user) redirect(`/login?next=${encodeURIComponent("/my-cvs")}`);
+  if (!user) redirect(buildLoginHref("/my-cvs"));
 
   const documents = await listCvDocuments(user.id);
 

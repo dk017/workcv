@@ -1,13 +1,19 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, Download, FileText, ShieldCheck } from "lucide-react";
 
+import { TrackedLink } from "@/components/tracked-link";
 import { site } from "@/lib/site";
 
 const samplePdfHref = "/samples/workcv-customer-service-cv-example.pdf";
 const sampleImageSrc = "/product-proof/workcv-customer-service-sample.png";
 
-export function SampleCvProof({ variant = "full" }: { variant?: "full" | "compact" }) {
+export function SampleCvProof({
+  variant = "full",
+  trackingContext = "sample_cv_proof",
+}: {
+  variant?: "full" | "compact";
+  trackingContext?: string;
+}) {
   const compact = variant === "compact";
 
   return (
@@ -57,21 +63,23 @@ export function SampleCvProof({ variant = "full" }: { variant?: "full" | "compac
             </div>
           </div>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-            <Link
+            <TrackedLink
               href={samplePdfHref}
+              placement={`${trackingContext}_pdf`}
               download
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-5 py-3 text-sm font-bold text-navy transition hover:-translate-y-0.5 hover:border-navy"
             >
               Download fictional sample PDF
               <Download className="h-4 w-4" />
-            </Link>
-            <Link
+            </TrackedLink>
+            <TrackedLink
               href="/editor"
+              placement={`${trackingContext}_editor`}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-navy-hover"
             >
               Build my CV
               <ArrowRight className="h-4 w-4" />
-            </Link>
+            </TrackedLink>
           </div>
           <p className="mt-4 text-xs leading-6 text-muted">
             The sample uses fictional details for layout practice. Replace every

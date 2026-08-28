@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Calculator, Scale, ShieldCheck } from "lucide-react";
 
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { RedundancyPayCalculator } from "@/components/redundancy-pay-calculator";
 import { site } from "@/lib/site";
 
@@ -237,6 +237,15 @@ export default function RedundancyPayCalculatorPage() {
       </section>
 
       <FaqSection faqs={faqItems} title="UK redundancy pay questions." />
+      <FinalCta
+        heading="Preparing for your next role after redundancy?"
+        body={`Turn your recent responsibilities and outcomes into a focused UK CV. Build and preview first, then pay ${site.price} only if you download the PDF.`}
+        primaryHref="/editor?new=1&from=redundancy-calculator"
+        primary="Start my next-role CV"
+        secondaryHref="/situations/made-redundant"
+        secondary="Read the redundancy checklist"
+        trackingContext="redundancy_calculator_final"
+      />
     </>
   );
 }

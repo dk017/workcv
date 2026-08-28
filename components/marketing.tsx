@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
+import { TrackedLink } from "@/components/tracked-link";
+import { buildLoginHref } from "@/lib/safe-redirect";
 import { routes, site } from "@/lib/site";
 
-const startEditorHref = "/login?next=%2Feditor";
+const startEditorHref = buildLoginHref("/editor");
 
 type Faq = {
   question: string;
@@ -197,10 +199,12 @@ export function ButtonLink({
   href,
   children,
   variant = "primary",
+  trackingLabel = "button_link",
 }: {
   href: string;
   children: React.ReactNode;
   variant?: "primary" | "secondary";
+  trackingLabel?: string;
 }) {
   const className =
     variant === "primary"
@@ -208,10 +212,10 @@ export function ButtonLink({
       : "inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-6 py-3 text-sm font-bold text-navy transition hover:-translate-y-0.5";
 
   return (
-    <Link href={href} className={className}>
+    <TrackedLink href={href} className={className} placement={trackingLabel}>
       {children}
       <ArrowRight className="h-4 w-4" />
-    </Link>
+    </TrackedLink>
   );
 }
 
@@ -605,6 +609,7 @@ export function FinalCta({
   primary = "Create my CV, pay at download",
   secondaryHref = "/pricing",
   secondary = "See pricing",
+  trackingContext = "final_cta",
 }: {
   heading: string;
   body: string;
@@ -612,6 +617,7 @@ export function FinalCta({
   primary?: string;
   secondaryHref?: string | null;
   secondary?: string | null;
+  trackingContext?: string;
 }) {
   return (
     <section className="bg-navy py-20 text-white">
@@ -619,19 +625,21 @@ export function FinalCta({
         <h2 className="font-display text-4xl font-semibold md:text-5xl">{heading}</h2>
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">{body}</p>
         <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
-          <Link
+          <TrackedLink
             href={primaryHref}
+            placement={`${trackingContext}_primary`}
             className="inline-flex min-h-12 items-center justify-center rounded-md bg-white px-6 py-3 text-sm font-bold text-navy"
           >
             {primary}
-          </Link>
+          </TrackedLink>
           {secondaryHref && secondary && (
-            <Link
+            <TrackedLink
               href={secondaryHref}
+              placement={`${trackingContext}_secondary`}
               className="inline-flex min-h-12 items-center justify-center rounded-md border border-white/35 px-6 py-3 text-sm font-bold text-white"
             >
               {secondary}
-            </Link>
+            </TrackedLink>
           )}
         </div>
       </div>

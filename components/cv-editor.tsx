@@ -46,6 +46,7 @@ import {
   trackEditorEvent,
   type EditorEventName,
 } from "@/lib/editor-events";
+import { buildLoginHref } from "@/lib/safe-redirect";
 import { useAccessibleDialog } from "@/components/editor/use-accessible-dialog";
 import { createCvSaveManager } from "@/components/editor/create-cv-save-manager";
 import { MemoCvDocument } from "@/components/editor/cv-document";
@@ -127,6 +128,7 @@ export function CvEditor() {
   const previousSaveStatusRef = useRef<SaveSnapshot["status"]>("saving");
   const trackedMilestonesRef = useRef(new Set<number>());
   const trackedSectionsRef = useRef(new Set<string>());
+  const previewReadyDocumentRef = useRef<string | null>(null);
   const modalOpen = templatePickerOpen || importOpen || reviewOpen || Boolean(aiReview);
 
   useEffect(() => {
@@ -169,9 +171,9 @@ export function CvEditor() {
             })
           : await fetch(`/api/cv/current${query}`);
         if (response.status === 401) {
-          window.location.href = `/login?next=${encodeURIComponent(
+          window.location.href = buildLoginHref(
             `${window.location.pathname}${window.location.search}`
-          )}`;
+          );
           return;
         }
         if (!response.ok) throw new Error("Failed to load saved CV");
@@ -859,6 +861,14 @@ export function CvEditor() {
         trackEditorEvent("section_completed", draftId, { section });
       }
     });
+    if (
+      draftId &&
+      readiness.ready &&
+      previewReadyDocumentRef.current !== draftId
+    ) {
+      previewReadyDocumentRef.current = draftId;
+      trackEditorEvent("preview_ready", draftId, { score: readiness.score });
+    }
   }, [cv, draftId, readiness.score]);
 
   useEffect(() => {
@@ -988,11 +998,57 @@ export function CvEditor() {
               <Download className="h-4 w-4" />
               {paymentState === "checking" || paymentState === "pending"
                 ? "Confirming payment…"
-                : "Download PDF"}
+                : pdfUnlocked
+                  ? "Download PDF"
+                  : `PDF download · ${site.price} once`}
             </button>
           </div>
         </div>
       </section>
+
+      {loaded && readiness.score === 0 && (
+        <section className="editor-chrome border-b border-line bg-gold-tint">
+          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] flex-col gap-4 py-4 sm:w-[min(1540px,calc(100%-48px))] lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <p className="font-bold text-navy">Choose the quickest way to begin</p>
+              <p className="mt-1 text-sm leading-6 text-muted">
+                Import an existing CV, or start with the clean UK structure below.
+                You can preview every page before paying.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <button type="button" onClick={() => setImportOpen(true)} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white">
+                <Upload className="h-4 w-4" /> Import existing CV
+              </button>
+              <button type="button" onClick={() => setActiveTab("profile")} className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy">
+                Start with a clean CV
+              </button>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {loaded && readiness.score > 0 && (
+        <section className={`editor-chrome border-b border-line ${readiness.ready ? "bg-greensoft" : "bg-surface"}`} aria-live="polite">
+          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 sm:w-[min(1540px,calc(100%-48px))]">
+            <div>
+              <p className="text-sm font-bold text-navy">
+                {readiness.ready ? "Your CV is ready to preview." : `CV readiness: ${readiness.score}%`}
+              </p>
+              <p className="mt-1 text-xs leading-5 text-muted">
+                {readiness.ready
+                  ? `Review the pages, then unlock this saved CV PDF for ${site.price} once.`
+                  : readiness.issues[0]?.message || "Continue adding your real experience."}
+              </p>
+            </div>
+            {!readiness.ready && readiness.nextSection && (
+              <button type="button" onClick={() => setActiveTab(readiness.nextSection!)} className="min-h-10 shrink-0 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy">
+                Continue
+              </button>
+            )}
+          </div>
+        </section>
+      )}
 
       {tailoringOpen && (
         <section className="editor-chrome border-b border-line bg-[#edf4f8]">
@@ -1368,6 +1424,7 @@ function CheckoutSheet({
 
         <div className="mt-5 flex flex-col gap-3">
           <button type="button" onClick={onContinue} disabled={checkoutLoading || !digitalAccessAccepted} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"><Download className="h-4 w-4" />{checkoutLoading ? "Opening secure checkout..." : `Continue to checkout · ${site.price}`}</button>
+          <a href="/samples/workcv-customer-service-cv-example.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center justify-center text-sm font-bold text-navy underline underline-offset-4">Inspect a fictional sample PDF first</a>
           <button type="button" onClick={onClose} disabled={checkoutLoading} className="inline-flex min-h-10 items-center justify-center text-sm font-bold text-muted hover:text-navy disabled:opacity-50">Keep editing</button>
         </div>
       </div>
