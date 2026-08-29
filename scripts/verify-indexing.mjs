@@ -80,6 +80,21 @@ const malformedJson = await fetch(`${baseUrl}/api/events/funnel`, {
 });
 assert(malformedJson.status === 400, `Event route accepted malformed JSON: ${malformedJson.status}`);
 
+const privateLanding = await fetch(`${baseUrl}/api/events/funnel`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({
+    eventName: "landing_view",
+    eventId: "event_private_check_123456789",
+    visitorId: "visitor_private_check_1234567",
+    sessionId: "session_private_check_1234567",
+    path: "/login",
+    deviceClass: "desktop",
+  }),
+});
+assert(privateLanding.status === 400, `Event route accepted a private landing view: ${privateLanding.status}`);
+assert(privateLanding.headers.get("cache-control") === "no-store", "Private landing error response is cacheable");
+
 if (process.env.WORKCV_EXPECT_FUNNEL_DISABLED === "true") {
   const validDisabledEvent = await fetch(`${baseUrl}/api/events/funnel`, {
     method: "POST",

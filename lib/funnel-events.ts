@@ -1,6 +1,6 @@
 import crypto from "node:crypto";
 
-import { sanitizeSameOriginPath } from "./public-paths.ts";
+import { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.ts";
 
 export { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.ts";
 
@@ -103,6 +103,10 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
     !deviceClass ||
     !["mobile", "tablet", "desktop"].includes(deviceClass)
   ) {
+    return null;
+  }
+
+  if (eventName === "landing_view" && !isPublicMeasurementPath(path)) {
     return null;
   }
 

@@ -92,6 +92,22 @@ test("public measurement excludes private and infrastructure paths", () => {
   }
 });
 
+test("server sanitisation rejects private landing views but permits login-start events", () => {
+  const base = {
+    eventId: "event_1234567890123456",
+    visitorId: "visitor_12345678901234",
+    sessionId: "session_12345678901234",
+    deviceClass: "desktop",
+  };
+  assert.equal(
+    sanitizeFunnelEvent({ ...base, eventName: "landing_view", path: "/login" }),
+    null,
+  );
+  assert.ok(
+    sanitizeFunnelEvent({ ...base, eventName: "login_started", path: "/login" }),
+  );
+});
+
 test("invalid CTA metadata is discarded instead of relabelled", () => {
   const event = sanitizeFunnelEvent({
     ...validEvent,
