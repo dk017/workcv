@@ -56,6 +56,8 @@ jobs:
         with:
           context: .
           push: true
+          build-args: |
+            NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED=true
           tags: |
             ${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}
             ${{ steps.meta.outputs.image }}:latest
@@ -101,5 +103,7 @@ jobs:
               echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             fi
             docker compose -p workcv -f docker-compose.ghcr.yml pull app
+            docker run --rm --env-file .env --network werkcv_default --entrypoint node "$WORKCV_IMAGE" scripts/prepare-growth-schema.mjs
             docker compose -p workcv -f docker-compose.ghcr.yml up -d app
             docker compose -p workcv -f docker-compose.ghcr.yml ps
+            docker image prune -f

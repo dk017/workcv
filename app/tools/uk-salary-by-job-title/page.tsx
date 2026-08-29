@@ -6,6 +6,7 @@ import { UkSalaryChecker } from "@/components/uk-salary-checker";
 import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
 import { onsSalarySource, salaryRoles } from "@/lib/uk-salary-data";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: "UK Salary by Job Title - ONS 2025 Pay Checker",
@@ -241,7 +242,7 @@ export default function UkSalaryByJobTitlePage() {
             </Link>
             <ButtonLink
               href="/editor?from=salary-checker"
-              trackingLabel="salary_checker_editor"
+              trackingLabel={analyticsPlacements.salaryEditor}
             >
               Tailor my CV for the role
             </ButtonLink>

@@ -3,15 +3,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { ensureAnalyticsTables, getPool } from "@/lib/db";
-import { editorEventNames } from "@/lib/editor-events";
-import {
-  funnelEventDedupeValue,
-  hashAnalyticsIdentifier,
-  normalizeTrafficSource,
-  sanitizeFunnelEvent,
-} from "@/lib/funnel-events";
+import { isAllowedClientEditorEvent } from "@/lib/editor-events";
 
-const allowedEvents = new Set<string>(editorEventNames);
 const documentIdPattern = /^[a-zA-Z0-9_-]{12,100}$/;
 
 export async function POST(request: NextRequest) {
@@ -25,65 +18,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid event" }, { status: 400 });
   }
 
-  const funnelEvent = sanitizeFunnelEvent(body);
-  if (funnelEvent) {
-    try {
-      await ensureAnalyticsTables();
-      const visitorHash = hashAnalyticsIdentifier(funnelEvent.visitorId);
-      const sessionHash = hashAnalyticsIdentifier(funnelEvent.sessionId);
-      const eventIdHash = hashAnalyticsIdentifier(
-        funnelEventDedupeValue(
-          funnelEvent.eventName,
-          funnelEvent.eventId,
-          funnelEvent.sessionId,
-        ),
-      );
-      const recent = await getPool().query<{ count: string }>(
-        `
-          SELECT COUNT(*)::text AS count
-          FROM workcv_funnel_events
-          WHERE session_hash = $1
-            AND created_at > NOW() - INTERVAL '1 minute'
-        `,
-        [sessionHash],
-      );
-      if (Number(recent.rows[0]?.count || 0) >= 60) {
-        return NextResponse.json({ error: "Too many events" }, { status: 429 });
-      }
-
-      const user = await getCurrentUserFromRequest(request).catch(() => null);
-      await getPool().query(
-        `
-          INSERT INTO workcv_funnel_events
-            (event_id_hash, visitor_hash, session_hash, user_id, event_name, path,
-             source, source_normalized, medium, campaign, referrer_host,
-             device_class, metadata)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13::jsonb)
-          ON CONFLICT DO NOTHING
-        `,
-        [
-          eventIdHash,
-          visitorHash,
-          sessionHash,
-          user?.id || null,
-          funnelEvent.eventName,
-          funnelEvent.path,
-          funnelEvent.source || null,
-          normalizeTrafficSource(funnelEvent.source, funnelEvent.referrerHost),
-          funnelEvent.medium || null,
-          funnelEvent.campaign || null,
-          funnelEvent.referrerHost || null,
-          funnelEvent.deviceClass,
-          JSON.stringify(funnelEvent.metadata),
-        ],
-      );
-      return NextResponse.json({ ok: true });
-    } catch (error) {
-      console.error("workcv_funnel_event_failed", error);
-      return NextResponse.json({ error: "Event unavailable" }, { status: 503 });
-    }
-  }
-
   const user = await getCurrentUserFromRequest(request);
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
@@ -92,7 +26,7 @@ export async function POST(request: NextRequest) {
     typeof body.documentId === "string" && documentIdPattern.test(body.documentId)
       ? body.documentId
       : null;
-  if (!allowedEvents.has(eventName)) {
+  if (!isAllowedClientEditorEvent(eventName)) {
     return NextResponse.json({ error: "Invalid event" }, { status: 400 });
   }
 

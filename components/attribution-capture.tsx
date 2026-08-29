@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import { usePathname } from "next/navigation";
 
 import { shouldReplaceLastTouch } from "@/lib/attribution";
+import { isPublicMeasurementPath } from "@/lib/public-paths";
 
 const storageKey = "workcv_first_touch";
 const lastTouchKey = "workcv_last_touch";
@@ -27,12 +29,15 @@ type FunnelMetadata = {
 };
 
 function randomId() {
-  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-    return crypto.randomUUID();
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi && typeof cryptoApi.randomUUID === "function") {
+    return cryptoApi.randomUUID();
   }
-  return `${Date.now()}_${Math.random().toString(36).slice(2)}_${Math.random()
-    .toString(36)
-    .slice(2)}`;
+  if (cryptoApi) {
+    const bytes = cryptoApi.getRandomValues(new Uint8Array(24));
+    return Array.from(bytes, (value) => value.toString(16).padStart(2, "0")).join("");
+  }
+  throw new Error("Secure browser randomness is unavailable");
 }
 
 function referrerHost() {
@@ -109,7 +114,8 @@ export function trackFunnelEvent(
   try {
     const { visitorId, sessionId } = ensureTrackingContext();
     const touch = readStoredTouch(lastTouchKey) || currentTouch();
-    void fetch("/api/events/editor", {
+    if (process.env.NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED !== "true") return;
+    void fetch("/api/events/funnel", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -133,16 +139,19 @@ export function trackFunnelEvent(
 }
 
 export function AttributionCapture() {
+  const pathname = usePathname();
+
   useEffect(() => {
     try {
       ensureTrackingContext();
+      if (!isPublicMeasurementPath(pathname)) return;
       if (window.sessionStorage.getItem(landingTrackedKey)) return;
       window.sessionStorage.setItem(landingTrackedKey, "1");
       trackFunnelEvent("landing_view");
     } catch {
       // Attribution must never block the visitor journey.
     }
-  }, []);
+  }, [pathname]);
 
   return null;
 }

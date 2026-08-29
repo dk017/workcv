@@ -5,8 +5,11 @@ import { NextRequest, NextResponse } from "next/server";
 import { ensureAnalyticsTables, ensureAuthTables, getPool } from "@/lib/db";
 import { getEmailTransporter, getTransactionalEmailIdentity } from "@/lib/email";
 import { AUTH_LIMITS, exceedsAuthLimit } from "@/lib/auth-policy";
-import { sanitizeSignupAttribution, SignupAttribution } from "@/lib/attribution";
-import { hashAnalyticsIdentifier } from "@/lib/funnel-events";
+import type { PersistedSignupAttribution } from "@/lib/attribution";
+import {
+  preparePersistedSignupAttribution,
+  sanitizePersistedSignupAttribution,
+} from "@/lib/persisted-attribution";
 
 const sessionCookieName = "workcv_session";
 const loginCodeTtlMinutes = 15;
@@ -59,7 +62,7 @@ function sanitizeNextPath(value: unknown) {
 async function recordSignupEvent(
   eventName: "code_requested" | "verification_failed" | "signup_completed" | "login_completed",
   email: string,
-  attribution: SignupAttribution = {},
+  attribution: PersistedSignupAttribution = {},
   nextPath: string | null = null,
   userId: string | null = null,
 ) {
@@ -79,15 +82,11 @@ async function recordSignupEvent(
 
 async function linkFunnelAttributionToUser(
   userId: string,
-  attribution: SignupAttribution,
+  attribution: PersistedSignupAttribution,
 ) {
   try {
-    const visitorHash = attribution.visitorId
-      ? hashAnalyticsIdentifier(attribution.visitorId)
-      : null;
-    const sessionHash = attribution.sessionId
-      ? hashAnalyticsIdentifier(attribution.sessionId)
-      : null;
+    const visitorHash = attribution.visitorHash || null;
+    const sessionHash = attribution.sessionHash || null;
     await getPool().query(
       `
         UPDATE workcv_users
@@ -184,7 +183,7 @@ export async function requestEmailLoginCode(
 ) {
   const email = normalizeEmail(emailInput);
   const ip = normaliseIp(ipInput);
-  const attribution = sanitizeSignupAttribution(attributionInput);
+  const attribution = preparePersistedSignupAttribution(attributionInput);
   const nextPath = sanitizeNextPath(nextPathInput);
   if (!isValidEmail(email)) {
     throw new Error("INVALID_EMAIL");
@@ -275,7 +274,7 @@ export async function verifyEmailLoginCode(
     code_hash: string;
     attempt_count: number;
     locked_until: Date | null;
-    attribution: SignupAttribution;
+    attribution: PersistedSignupAttribution;
     next_path: string | null;
   }>(
     `
@@ -302,7 +301,7 @@ export async function verifyEmailLoginCode(
     await recordSignupEvent(
       "verification_failed",
       email,
-      record?.attribution || {},
+      sanitizePersistedSignupAttribution(record?.attribution),
       requestedNextPath || record?.next_path || null,
     );
     if (record) {
@@ -327,7 +326,7 @@ export async function verifyEmailLoginCode(
     await getPool().query<User>("SELECT id, email FROM workcv_users WHERE email = $1", [email])
   ).rows[0];
   const isNewUser = !user;
-  const attribution = sanitizeSignupAttribution(record.attribution);
+  const attribution = sanitizePersistedSignupAttribution(record.attribution);
   const nextPath = requestedNextPath || record.next_path;
 
   if (!user) {

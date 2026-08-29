@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import {
   AlertTriangle,
   ArrowRight,
@@ -14,6 +13,8 @@ import {
   Target,
 } from "lucide-react";
 
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import {
   analyseAtsKeywords,
   type AtsAnalysis,
@@ -504,14 +505,15 @@ export function AtsScoreChecker() {
                     saved draft after email-code login. The one-off PDF price is {site.price}.
                   </p>
                 </div>
-                <Link
+                <TrackedLink
                   href="/editor?template=classic&new=1&from=cv-fit-assessment"
+                  placement={analyticsPlacements.atsAssessmentHandoff}
                   onClick={prepareEditorHandoff}
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-navy-hover"
                 >
                   Fix these issues in my CV
                   <ArrowRight className="h-4 w-4" />
-                </Link>
+                </TrackedLink>
               </div>
             </div>
           </div>

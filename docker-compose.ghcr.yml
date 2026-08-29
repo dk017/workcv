@@ -6,6 +6,8 @@ services:
       - "127.0.0.1:${APP_PORT:-3004}:3000"
     env_file:
       - .env
+    environment:
+      WORKCV_FUNNEL_INGEST_ENABLED: ${WORKCV_FUNNEL_INGEST_ENABLED:-true}
     networks:
       - shared_db
 

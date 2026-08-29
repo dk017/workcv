@@ -15,22 +15,61 @@ function safeError(error: unknown) {
   return value.replace(/\s+/g, " ").trim().slice(0, 500);
 }
 
-async function eligibleCandidates(limit: number) {
+export async function eligibleCandidates(limit: number) {
   await ensureFeedbackOutreachTables();
   await ensureSavedCvReminderTables();
   const result = await getPool().query<ReminderCandidate>(
     `
-      SELECT DISTINCT ON (u.id) u.id, u.email, d.id AS document_id
-      FROM workcv_users u
-      JOIN workcv_cv_documents d ON d.user_id = u.id
-      LEFT JOIN workcv_feedback_preferences p ON p.email_normalized = LOWER(u.email)
-      LEFT JOIN workcv_saved_cv_reminders r ON r.user_id = u.id
-      WHERE d.updated_at < NOW() - INTERVAL '24 hours'
-        AND d.updated_at >= NOW() - INTERVAL '90 days'
+      WITH latest_documents AS (
+        SELECT DISTINCT ON (u.id)
+          u.id,
+          u.email,
+          u.updated_at AS user_updated_at,
+          d.id AS document_id,
+          d.data,
+          d.updated_at AS document_updated_at,
+          activity.last_editor_activity
+        FROM workcv_users u
+        JOIN workcv_cv_documents d ON d.user_id = u.id
+        LEFT JOIN LATERAL (
+          SELECT MAX(e.created_at) AS last_editor_activity
+          FROM workcv_editor_events e
+          WHERE e.user_id = u.id
+        ) activity ON TRUE
+        ORDER BY u.id, d.updated_at DESC
+      )
+      SELECT d.id, d.email, d.document_id
+      FROM latest_documents d
+      LEFT JOIN workcv_feedback_preferences p ON p.email_normalized = LOWER(d.email)
+      LEFT JOIN workcv_saved_cv_reminders r ON r.user_id = d.id
+      WHERE GREATEST(
+              d.user_updated_at,
+              d.document_updated_at,
+              COALESCE(d.last_editor_activity, '-infinity'::timestamptz)
+            ) < NOW() - INTERVAL '24 hours'
+        AND d.document_updated_at >= NOW() - INTERVAL '90 days'
+        AND (
+          NULLIF(BTRIM(COALESCE(d.data->>'fullName', '')), '') IS NOT NULL
+          OR NULLIF(BTRIM(COALESCE(d.data->>'profile', '')), '') IS NOT NULL
+          OR jsonb_array_length(
+               CASE WHEN jsonb_typeof(d.data->'skills') = 'array'
+                 THEN d.data->'skills' ELSE '[]'::jsonb END
+             ) > 0
+          OR jsonb_array_length(
+               CASE WHEN jsonb_typeof(d.data->'experience') = 'array'
+                 THEN d.data->'experience' ELSE '[]'::jsonb END
+             ) > 0
+          OR jsonb_array_length(
+               CASE WHEN jsonb_typeof(d.data->'education') = 'array'
+                 THEN d.data->'education' ELSE '[]'::jsonb END
+             ) > 0
+        )
         AND p.feedback_opted_out_at IS NULL
         AND NOT EXISTS (
           SELECT 1 FROM workcv_orders o
-          WHERE o.user_id = u.id AND o.amount_cents > 0
+          WHERE o.draft_id = d.document_id
+            AND o.amount_cents > 0
+            AND COALESCE(o.is_test, FALSE) = FALSE
         )
         AND (
           r.user_id IS NULL OR (
@@ -39,7 +78,7 @@ async function eligibleCandidates(limit: number) {
             AND r.last_attempt_at < NOW() - INTERVAL '30 minutes'
           )
         )
-      ORDER BY u.id, d.updated_at DESC
+      ORDER BY d.document_updated_at DESC
       LIMIT $1
     `,
     [limit],
@@ -47,13 +86,44 @@ async function eligibleCandidates(limit: number) {
   return result.rows.filter((candidate) => candidate.email.toLowerCase() !== "contact@workcv.co.uk");
 }
 
-async function claim(candidate: ReminderCandidate) {
+export async function claim(candidate: ReminderCandidate) {
   const result = await getPool().query<{ user_id: string }>(
     `
       INSERT INTO workcv_saved_cv_reminders
         (user_id, email_normalized, document_id, status, attempt_count,
          last_attempt_at, last_error, updated_at)
-      VALUES ($1, LOWER($2), $3, 'sending', 1, NOW(), NULL, NOW())
+      SELECT $1, LOWER($2), $3, 'sending', 1, NOW(), NULL, NOW()
+      WHERE $3 = (
+          SELECT d.id
+          FROM workcv_cv_documents d
+          WHERE d.user_id = $1
+          ORDER BY d.updated_at DESC
+          LIMIT 1
+        )
+        AND EXISTS (
+          SELECT 1
+          FROM workcv_users u
+          JOIN workcv_cv_documents d ON d.id = $3 AND d.user_id = u.id
+          WHERE u.id = $1
+            AND u.updated_at < NOW() - INTERVAL '24 hours'
+            AND d.updated_at < NOW() - INTERVAL '24 hours'
+            AND NOT EXISTS (
+              SELECT 1 FROM workcv_editor_events e
+              WHERE e.user_id = u.id
+                AND e.created_at >= NOW() - INTERVAL '24 hours'
+            )
+            AND NOT EXISTS (
+              SELECT 1 FROM workcv_orders o
+              WHERE o.draft_id = d.id
+                AND o.amount_cents > 0
+                AND COALESCE(o.is_test, FALSE) = FALSE
+            )
+            AND NOT EXISTS (
+              SELECT 1 FROM workcv_feedback_preferences p
+              WHERE p.email_normalized = LOWER(u.email)
+                AND p.feedback_opted_out_at IS NOT NULL
+            )
+        )
       ON CONFLICT (user_id) DO UPDATE SET
         document_id = EXCLUDED.document_id,
         status = 'sending',

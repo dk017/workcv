@@ -22,6 +22,8 @@ import {
 } from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
+import { underTenCvBuilderAnswer } from "@/lib/price-copy";
 
 export const metadata: Metadata = {
   title: "CV Builder No Subscription UK - Pay Once",
@@ -163,8 +165,7 @@ const faqItems = [
   },
   {
     question: "Is WorkCV a UK CV builder under £10?",
-    answer:
-      `Yes. The current one-time WorkCV PDF download price is ${site.priceGbp}, which is under £10. You can build and preview first. Email-code login is required, and there is no monthly subscription or automatic renewal.`,
+    answer: underTenCvBuilderAnswer(site.priceAmount, site.priceGbp),
   },
   {
     question: "Can I build a CV without paying monthly?",
@@ -271,8 +272,8 @@ export default function NoSubscriptionUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor?template=classic&new=1" trackingLabel="no_subscription_hero_editor">Build my CV</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary" trackingLabel="no_subscription_hero_compare">
+              <ButtonLink href="/editor?template=classic&new=1" trackingLabel={analyticsPlacements.noSubscriptionHeroEditor}>Build my CV</ButtonLink>
+              <ButtonLink href="#compare" variant="secondary" trackingLabel={analyticsPlacements.noSubscriptionHeroCompare}>
                 Compare costs
               </ButtonLink>
             </div>
@@ -386,7 +387,7 @@ export default function NoSubscriptionUkPage() {
             ))}
           </div>
           <div className="mt-10">
-            <ButtonLink href="/editor?template=classic&new=1">Start building my CV</ButtonLink>
+            <ButtonLink href="/editor?template=classic&new=1" trackingLabel={analyticsPlacements.noSubscriptionMidEditor}>Start building my CV</ButtonLink>
           </div>
         </div>
       </section>
@@ -556,13 +557,13 @@ export default function NoSubscriptionUkPage() {
               </div>
             </div>
             <div className="mt-6 shrink-0 sm:mt-0">
-              <ButtonLink href="/editor?template=classic&new=1">Build my CV</ButtonLink>
+              <ButtonLink href="/editor?template=classic&new=1" trackingLabel={analyticsPlacements.noSubscriptionLateEditor}>Build my CV</ButtonLink>
             </div>
           </div>
         </div>
       </section>
 
-      <SampleCvProof trackingContext="no_subscription_sample" />
+      <SampleCvProof trackingContext={analyticsPlacements.noSubscriptionSample} />
 
       <FaqSection
         faqs={faqItems}
@@ -573,6 +574,7 @@ export default function NoSubscriptionUkPage() {
         body="No monthly CV builder subscription, no hidden renewal, no automatic renewal, and no cancellation step after you finish your CV."
         primaryHref="/editor?template=classic&new=1"
         primary="Build my CV"
+        trackingContext={analyticsPlacements.noSubscriptionFinal}
         secondaryHref="/pricing"
         secondary="Compare pricing"
       />

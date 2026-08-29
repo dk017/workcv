@@ -1,4 +1,4 @@
-export type SignupAttribution = {
+export type BrowserSignupAttribution = {
   landingPath?: string;
   referrer?: string;
   referrerHost?: string;
@@ -16,7 +16,18 @@ export type SignupAttribution = {
   lastUtmCampaign?: string;
 };
 
-const limits: Record<keyof SignupAttribution, number> = {
+export type PersistedSignupAttribution = Omit<
+  BrowserSignupAttribution,
+  "visitorId" | "sessionId"
+> & {
+  visitorHash?: string;
+  sessionHash?: string;
+};
+
+// Retained as the browser-facing compatibility name used by existing callers.
+export type SignupAttribution = BrowserSignupAttribution;
+
+const limits: Record<keyof BrowserSignupAttribution, number> = {
   landingPath: 500,
   referrer: 1_000,
   referrerHost: 255,
@@ -45,12 +56,12 @@ export function shouldReplaceLastTouch(
   return now - capturedAt > 30 * 24 * 60 * 60 * 1000;
 }
 
-export function sanitizeSignupAttribution(value: unknown): SignupAttribution {
+export function sanitizeSignupAttribution(value: unknown): BrowserSignupAttribution {
   if (!value || typeof value !== "object" || Array.isArray(value)) return {};
 
   const source = value as Record<string, unknown>;
-  const result: SignupAttribution = {};
-  for (const key of Object.keys(limits) as Array<keyof SignupAttribution>) {
+  const result: BrowserSignupAttribution = {};
+  for (const key of Object.keys(limits) as Array<keyof BrowserSignupAttribution>) {
     const raw = source[key];
     if (typeof raw !== "string") continue;
     const clean = raw.trim().replace(/[\u0000-\u001f\u007f]/g, "").slice(0, limits[key]);

@@ -22,12 +22,13 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   const privatePath =
-    pathname === "/login" ||
     pathname === "/editor" ||
     pathname === "/my-cvs" ||
     pathname.startsWith("/cv-pdf/");
 
-  if (privatePath) {
+  if (pathname === "/login") {
+    response.headers.set("X-Robots-Tag", "noindex, follow, noarchive");
+  } else if (privatePath) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
   }
 

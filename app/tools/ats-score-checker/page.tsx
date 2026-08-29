@@ -11,6 +11,7 @@ import {
 import { AtsScoreChecker } from "@/components/ats-score-checker";
 import { FaqSection, FinalCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: "Free ATS CV Checker UK - Match Your CV to a Job",
@@ -251,7 +252,7 @@ export default function AtsScoreCheckerPage() {
         primary="Continue in the CV editor"
         secondaryHref="/ats-cv-template-uk"
         secondary="Review the ATS template"
-        trackingContext="ats_checker_final"
+        trackingContext={analyticsPlacements.atsFinal}
       />
     </>
   );

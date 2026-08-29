@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   funnelEventDedupeValue,
   hashAnalyticsIdentifier,
+  isPublicMeasurementPath,
   normalizeTrafficSource,
   sanitizeFunnelEvent,
   sanitizeReferrerHost,
@@ -68,7 +69,35 @@ test("normalises search and AI sources without treating UTMs as proof", () => {
   assert.equal(normalizeTrafficSource(undefined, "claude.ai"), "claude");
   assert.equal(normalizeTrafficSource(undefined, "gemini.google.com"), "gemini");
   assert.equal(normalizeTrafficSource(undefined, "www.google.co.uk"), "google");
+  assert.equal(normalizeTrafficSource(undefined, "www.bing.com"), "bing");
+  assert.equal(normalizeTrafficSource("microsoft_copilot", "www.bing.com"), "copilot");
+  assert.equal(normalizeTrafficSource(undefined, "perplexity.ai"), "perplexity");
   assert.equal(normalizeTrafficSource(undefined, undefined), "direct_or_unknown");
+});
+
+test("public measurement excludes private and infrastructure paths", () => {
+  for (const path of ["/", "/pricing", "/tools/ats-score-checker"]) {
+    assert.equal(isPublicMeasurementPath(path), true, path);
+  }
+  for (const path of [
+    "/login",
+    "/editor",
+    "/my-cvs",
+    "/cv-pdf/cv_123",
+    "/api/orders",
+    "/agent-markdown",
+    "/chrome/install",
+  ]) {
+    assert.equal(isPublicMeasurementPath(path), false, path);
+  }
+});
+
+test("invalid CTA metadata is discarded instead of relabelled", () => {
+  const event = sanitizeFunnelEvent({
+    ...validEvent,
+    metadata: { destination: "https://evil.example", placement: "Invalid Label" },
+  });
+  assert.deepEqual(event?.metadata, {});
 });
 
 test("hashes browser identifiers before persistence", () => {

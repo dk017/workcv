@@ -9,7 +9,9 @@ FROM node:24-bookworm-slim AS builder
 
 WORKDIR /app
 
+ARG NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED=false
 ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED=${NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED}
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
@@ -38,6 +40,10 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/pdf-runtime-smoke.mjs ./scripts/pdf-runtime-smoke.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/prepare-growth-schema.mjs ./scripts/prepare-growth-schema.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/growth-report-core.mjs ./scripts/growth-report-core.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/report-growth.mjs ./scripts/report-growth.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/cleanup-growth-events.mjs ./scripts/cleanup-growth-events.mjs
 
 USER nextjs
 

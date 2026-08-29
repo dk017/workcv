@@ -18,6 +18,7 @@ import {
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { SampleCvProof } from "@/components/sample-cv-proof";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const pagePath = "/cv-personal-statement-uk";
 const reviewDate = "25 August 2026";
@@ -388,8 +389,8 @@ export default function CvPersonalStatementUkPage() {
                 examples and a real advert-to-statement walkthrough.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <ButtonLink href="/editor">Build my CV statement</ButtonLink>
-                <ButtonLink href="#advert-walkthrough" variant="secondary">
+                <ButtonLink href="/editor" trackingLabel={analyticsPlacements.personalStatementHeroEditor}>Build my CV statement</ButtonLink>
+                <ButtonLink href="#advert-walkthrough" variant="secondary" trackingLabel={analyticsPlacements.personalStatementWalkthrough}>
                   See the walkthrough
                 </ButtonLink>
               </div>
@@ -738,7 +739,7 @@ export default function CvPersonalStatementUkPage() {
           </div>
         </section>
 
-        <SampleCvProof variant="compact" />
+        <SampleCvProof variant="compact" trackingContext={analyticsPlacements.personalStatementSample} />
 
         <section className="bg-surface py-24">
           <div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
@@ -806,7 +807,7 @@ export default function CvPersonalStatementUkPage() {
           body={`Start with a guided UK CV structure and pay ${site.price} only when the final PDF is ready.`}
           secondaryHref="/pricing"
           secondary="See pricing"
-          trackingContext="personal_statement_final"
+          trackingContext={analyticsPlacements.personalStatementFinal}
         />
       </article>
     </>

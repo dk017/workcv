@@ -5,6 +5,7 @@ import { Calculator, Scale, ShieldCheck } from "lucide-react";
 import { FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { RedundancyPayCalculator } from "@/components/redundancy-pay-calculator";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 // Annual refresh: recheck the GB and Northern Ireland weekly caps and maximum awards each April.
 export const metadata: Metadata = {
@@ -244,7 +245,7 @@ export default function RedundancyPayCalculatorPage() {
         primary="Start my next-role CV"
         secondaryHref="/situations/made-redundant"
         secondary="Read the redundancy checklist"
-        trackingContext="redundancy_calculator_final"
+        trackingContext={analyticsPlacements.redundancyFinal}
       />
     </>
   );

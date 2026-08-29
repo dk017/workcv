@@ -12,6 +12,7 @@ import {
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: "Right to Work CV UK - What to Include",
@@ -138,8 +139,8 @@ export default function RightToWorkCvUkPage() {
               line only when it removes uncertainty for the role.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
-              <ButtonLink href="/ats-cv-template-uk" variant="secondary">
+              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.rightToWorkHeroEditor}>Build my UK CV</ButtonLink>
+              <ButtonLink href="/ats-cv-template-uk" variant="secondary" trackingLabel={analyticsPlacements.rightToWorkHeroGuide}>
                 ATS-friendly format
               </ButtonLink>
             </div>
@@ -325,7 +326,7 @@ export default function RightToWorkCvUkPage() {
         body={`Use clear sections, keep private details private, and pay ${site.price} only when you download.`}
         secondaryHref="/ats-cv-template-uk"
         secondary="ATS-friendly format"
-        trackingContext="right_to_work_final"
+        trackingContext={analyticsPlacements.rightToWorkFinal}
       />
     </>
   );

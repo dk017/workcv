@@ -15,6 +15,7 @@ import {
 } from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: `CV Builder Pricing UK - ${site.priceGbp} Once`,
@@ -179,8 +180,8 @@ export default function PricingPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor" trackingLabel="pricing_hero_editor">Start building free</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary" trackingLabel="pricing_hero_compare">
+              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingHeroEditor}>Start building free</ButtonLink>
+              <ButtonLink href="#compare" variant="secondary" trackingLabel={analyticsPlacements.pricingHeroCompare}>
                 Compare prices
               </ButtonLink>
             </div>
@@ -207,7 +208,7 @@ export default function PricingPage() {
               account to remember cancelling.
             </p>
             <div className="mt-8">
-              <ButtonLink href="/editor" trackingLabel="pricing_card_editor">Start building</ButtonLink>
+              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingCardEditor}>Start building</ButtonLink>
             </div>
           </div>
         </div>
@@ -289,8 +290,8 @@ export default function PricingPage() {
             option competitors may also offer.
           </p>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor" trackingLabel="pricing_comparison_editor">Build my CV</ButtonLink>
-            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary" trackingLabel="pricing_comparison_no_subscription">
+            <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingComparisonEditor}>Build my CV</ButtonLink>
+            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary" trackingLabel={analyticsPlacements.pricingComparisonNoSubscription}>
               Why no subscription?
             </ButtonLink>
           </div>
@@ -347,7 +348,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      <SampleCvProof trackingContext="pricing_sample" />
+      <SampleCvProof trackingContext={analyticsPlacements.pricingSample} />
 
       <FaqSection faqs={pricingFaqs} title="Common questions about CV builder costs." />
       <FinalCta
@@ -355,7 +356,7 @@ export default function PricingPage() {
         body={`Build free first. Pay ${site.price} only when you want the final PDF. No subscription and no automatic renewal.`}
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="No-subscription details"
-        trackingContext="pricing_final"
+        trackingContext={analyticsPlacements.pricingFinal}
       />
     </>
   );

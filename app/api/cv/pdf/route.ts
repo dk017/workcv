@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
+import { recordServerEditorEvent } from "@/lib/server-editor-events";
 import { getCvDocument } from "@/lib/cv-documents";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { createPdfRenderToken } from "@/lib/pdf-render-token";
@@ -37,6 +38,11 @@ export async function GET(request: NextRequest) {
     const origin = process.env.PDF_RENDER_BASE_URL || `http://127.0.0.1:${process.env.PORT || 3000}`;
     const renderUrl = `${origin}/cv-pdf/${encodeURIComponent(documentId)}?token=${encodeURIComponent(token)}`;
     const pdf = await renderPdf(renderUrl);
+    await recordServerEditorEvent({
+      userId: user.id,
+      documentId,
+      eventName: "pdf_downloaded",
+    });
     return new NextResponse(new Uint8Array(pdf), {
       headers: {
         "Content-Type": "application/pdf",

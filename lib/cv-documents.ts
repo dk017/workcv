@@ -10,6 +10,7 @@ import {
 } from "@/lib/editor-data";
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 import { parseCvData, repairCvData } from "@/lib/cv-schema";
+import { recordServerEditorEvent } from "@/lib/server-editor-events";
 
 export type CvDocument = {
   id: string;
@@ -196,6 +197,14 @@ export async function createCvDocument(
   );
 
   const row = result.rows[0];
+  const creationMethod = roleTemplate ? "role_template" : template ? "template" : "blank";
+  await recordServerEditorEvent({
+    userId,
+    documentId: row.id,
+    eventName: "document_created",
+    eventKey: `document_created:${row.id}`,
+    metadata: { creation_method: creationMethod },
+  });
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
 }
 

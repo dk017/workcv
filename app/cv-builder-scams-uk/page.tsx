@@ -12,6 +12,7 @@ import {
   competitorPricing,
   competitorPricingCheckedDate,
 } from "@/lib/competitor-pricing";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -269,7 +270,12 @@ export default function CvBuilderScamsUkPage() {
                   unlock.
                 </p>
                 <div className="mt-8">
-                  <ButtonLink href="/editor">Build my CV for {site.priceGbp}</ButtonLink>
+                  <ButtonLink
+                    href="/editor"
+                    trackingLabel={analyticsPlacements.scamsEditor}
+                  >
+                    Build my CV for {site.priceGbp}
+                  </ButtonLink>
                 </div>
               </section>
             </div>
@@ -316,6 +322,7 @@ export default function CvBuilderScamsUkPage() {
         heading="Build your CV without starting a subscription."
         body={`Build and preview first. Pay ${site.price} once for this saved CV, with no trial conversion or automatic renewal.`}
         secondaryHref="/pricing"
+        trackingContext={analyticsPlacements.scamsFinal}
         secondary="See pricing guarantee"
       />
     </>

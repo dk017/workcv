@@ -44,6 +44,7 @@ export async function ensurePaymentTables() {
           status TEXT NOT NULL DEFAULT 'pending',
           consent_at TIMESTAMPTZ,
           consent_version TEXT,
+          is_test BOOLEAN NOT NULL DEFAULT FALSE,
           completed_at TIMESTAMPTZ,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -65,6 +66,7 @@ export async function ensurePaymentTables() {
           user_id TEXT,
           consent_at TIMESTAMPTZ,
           consent_version TEXT,
+          is_test BOOLEAN NOT NULL DEFAULT FALSE,
           confirmation_email_attempted_at TIMESTAMPTZ,
           confirmation_email_sent_at TIMESTAMPTZ,
           paid_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
@@ -85,12 +87,16 @@ export async function ensurePaymentTables() {
           ADD COLUMN IF NOT EXISTS consent_at TIMESTAMPTZ;
         ALTER TABLE workcv_payment_checkouts
           ADD COLUMN IF NOT EXISTS consent_version TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS user_id TEXT;
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS consent_at TIMESTAMPTZ;
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS consent_version TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
 
         DO $backfill$
         BEGIN
@@ -110,6 +116,8 @@ export async function ensurePaymentTables() {
 
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
+        CREATE INDEX IF NOT EXISTS workcv_orders_test_paid_idx
+          ON workcv_orders (is_test, paid_at DESC);
       `)
       .then(() => undefined)
       .catch((error) => {
@@ -176,6 +184,10 @@ export async function ensureAuthTables() {
         ALTER TABLE workcv_login_codes
           ADD COLUMN IF NOT EXISTS next_path TEXT;
 
+        UPDATE workcv_login_codes
+        SET attribution = attribution - 'visitorId' - 'sessionId'
+        WHERE attribution ? 'visitorId' OR attribution ? 'sessionId';
+
         CREATE TABLE IF NOT EXISTS workcv_signup_events (
           id BIGSERIAL PRIMARY KEY,
           event_name TEXT NOT NULL,
@@ -188,6 +200,10 @@ export async function ensureAuthTables() {
 
         CREATE INDEX IF NOT EXISTS workcv_signup_events_funnel_idx
           ON workcv_signup_events (event_name, created_at DESC);
+
+        UPDATE workcv_signup_events
+        SET attribution = attribution - 'visitorId' - 'sessionId'
+        WHERE attribution ? 'visitorId' OR attribution ? 'sessionId';
 
         CREATE TABLE IF NOT EXISTS workcv_auth_rate_events (
           id BIGSERIAL PRIMARY KEY,
@@ -243,12 +259,18 @@ export async function ensureAnalyticsTables() {
           user_id TEXT NOT NULL,
           document_id TEXT,
           event_name TEXT NOT NULL,
+          event_key TEXT,
           metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
         CREATE INDEX IF NOT EXISTS workcv_editor_events_funnel_idx
           ON workcv_editor_events (event_name, created_at DESC);
+        ALTER TABLE workcv_editor_events
+          ADD COLUMN IF NOT EXISTS event_key TEXT;
+        CREATE UNIQUE INDEX IF NOT EXISTS workcv_editor_events_event_key_uidx
+          ON workcv_editor_events (event_key)
+          WHERE event_key IS NOT NULL;
 
         CREATE TABLE IF NOT EXISTS workcv_funnel_events (
           id BIGSERIAL PRIMARY KEY,
@@ -264,12 +286,15 @@ export async function ensureAnalyticsTables() {
           campaign TEXT,
           referrer_host TEXT,
           device_class TEXT NOT NULL,
+          is_test BOOLEAN NOT NULL DEFAULT FALSE,
           metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
 
         CREATE INDEX IF NOT EXISTS workcv_funnel_events_event_time_idx
           ON workcv_funnel_events (event_name, created_at DESC);
+        ALTER TABLE workcv_funnel_events
+          ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
         CREATE INDEX IF NOT EXISTS workcv_funnel_events_source_time_idx
           ON workcv_funnel_events (source_normalized, created_at DESC);
         CREATE INDEX IF NOT EXISTS workcv_funnel_events_path_time_idx

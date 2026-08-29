@@ -1,5 +1,9 @@
 import crypto from "node:crypto";
 
+import { sanitizeSameOriginPath } from "./public-paths.ts";
+
+export { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.ts";
+
 export const publicFunnelEventNames = [
   "landing_view",
   "marketing_cta_clicked",
@@ -32,20 +36,6 @@ function cleanString(value: unknown, limit: number) {
   return clean || undefined;
 }
 
-export function sanitizeSameOriginPath(value: unknown) {
-  const clean = cleanString(value, 500);
-  if (!clean || !clean.startsWith("/") || clean.startsWith("//") || clean.includes("\\")) {
-    return null;
-  }
-  try {
-    const parsed = new URL(clean, "https://workcv.invalid");
-    if (parsed.origin !== "https://workcv.invalid") return null;
-    return parsed.pathname;
-  } catch {
-    return null;
-  }
-}
-
 export function sanitizeReferrerHost(value: unknown) {
   const clean = cleanString(value, 255)?.toLowerCase();
   if (!clean) return undefined;
@@ -65,7 +55,8 @@ export function normalizeTrafficSource(sourceInput?: string, referrerHostInput?:
   if (/claude|anthropic/.test(value)) return "claude";
   if (/gemini|bard\.google/.test(value)) return "gemini";
   if (/perplexity/.test(value)) return "perplexity";
-  if (/copilot|bing\.com|microsoft/.test(value)) return source.includes("copilot") ? "copilot" : "bing";
+  if (/copilot/.test(value)) return "copilot";
+  if (/bing\.com|(^|\s)bing(\s|$)/.test(value)) return "bing";
   if (/google/.test(value)) return "google";
   if (source) return source.replace(/[^a-z0-9._-]/g, "_").slice(0, 80);
   if (host) return "referral";
@@ -120,22 +111,23 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
       ? (input.metadata as Record<string, unknown>)
       : {};
   const allowedMetadata = new Set(["destination", "placement"]);
-  const metadata = Object.fromEntries(
-    Object.entries(metadataInput)
-      .filter(
-        ([key, item]) =>
-          allowedMetadata.has(key) &&
-          ((typeof item === "string" && item.length <= 160) ||
-            typeof item === "boolean" ||
-            typeof item === "number"),
-      )
-      .map(([key, item]) => [
-        key,
-        key === "destination" && typeof item === "string"
-          ? sanitizeSameOriginPath(item) || "invalid"
-          : item,
-      ]),
-  ) as Record<string, string | number | boolean>;
+  const metadataEntries: Array<[string, string | number | boolean]> = [];
+  for (const [key, item] of Object.entries(metadataInput)) {
+    if (!allowedMetadata.has(key)) continue;
+    if (key === "destination") {
+      const destination = sanitizeSameOriginPath(item);
+      if (destination) metadataEntries.push([key, destination]);
+      continue;
+    }
+    if (
+      key === "placement" &&
+      typeof item === "string" &&
+      /^[a-z0-9_]{3,80}$/.test(item)
+    ) {
+      metadataEntries.push([key, item]);
+    }
+  }
+  const metadata = Object.fromEntries(metadataEntries);
 
   return {
     eventId,

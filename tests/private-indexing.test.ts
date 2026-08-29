@@ -16,9 +16,20 @@ test("builds one correctly encoded login return URL", () => {
 });
 
 test("middleware adds response-level noindex to private routes only", () => {
-  for (const path of ["/login?next=%2Feditor", "/editor", "/my-cvs", "/cv-pdf/cv_123"]) {
+  const loginResponse = middleware(
+    new NextRequest("https://workcv.co.uk/login?next=%2Feditor"),
+  );
+  const loginRobots = loginResponse.headers.get("x-robots-tag") || "";
+  assert.match(loginRobots, /noindex/);
+  assert.match(loginRobots, /follow/);
+  assert.doesNotMatch(loginRobots, /nofollow/);
+
+  for (const path of ["/editor", "/my-cvs", "/cv-pdf/cv_123"]) {
     const response = middleware(new NextRequest(`https://workcv.co.uk${path}`));
-    assert.match(response.headers.get("x-robots-tag") || "", /noindex/);
+    const robots = response.headers.get("x-robots-tag") || "";
+    assert.match(robots, /noindex/);
+    assert.match(robots, /nofollow/);
+    assert.match(robots, /noarchive/);
   }
   const publicResponse = middleware(new NextRequest("https://workcv.co.uk/"));
   assert.equal(publicResponse.headers.get("x-robots-tag"), null);

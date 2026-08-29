@@ -6,6 +6,7 @@ import { userOwnsCvDocument } from "@/lib/cv-documents";
 import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { DIGITAL_CONTENT_CONSENT_VERSION } from "@/lib/commerce";
+import { isApprovedTestUser } from "@/lib/test-orders";
 
 export const runtime = "nodejs";
 
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Log in before checkout." }, { status: 401 });
   }
+  const isTest = isApprovedTestUser(user.id);
 
   let body: unknown;
   try {
@@ -98,8 +100,8 @@ export async function POST(request: NextRequest) {
       `
         INSERT INTO workcv_payment_checkouts
           (id, draft_id, email, product_id, checkout_url, site_host, user_id,
-           consent_at, consent_version, status, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', NOW())
+           consent_at, consent_version, status, is_test, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', $9, NOW())
         ON CONFLICT (id) DO UPDATE SET
           draft_id = EXCLUDED.draft_id,
           email = EXCLUDED.email,
@@ -109,6 +111,7 @@ export async function POST(request: NextRequest) {
           user_id = EXCLUDED.user_id,
           consent_at = EXCLUDED.consent_at,
           consent_version = EXCLUDED.consent_version,
+          is_test = EXCLUDED.is_test,
           updated_at = NOW()
       `,
       [
@@ -120,6 +123,7 @@ export async function POST(request: NextRequest) {
         checkout.siteHost,
         user.id,
         DIGITAL_CONTENT_CONSENT_VERSION,
+        isTest,
       ]
     );
 

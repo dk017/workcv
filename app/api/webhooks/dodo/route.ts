@@ -9,6 +9,7 @@ import {
   verifyDodoWebhookSignature,
 } from "@/lib/dodo";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
+import { recordServerEditorEvent } from "@/lib/server-editor-events";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
 
@@ -146,18 +147,20 @@ export async function POST(request: NextRequest) {
     let checkoutUserId: string | null = null;
     let consentAt: Date | null = null;
     let consentVersion: string | null = null;
+    let isTest = false;
     if (checkoutId) {
       const checkout = await getPool().query<{
         email: string | null;
         user_id: string | null;
         consent_at: Date | null;
         consent_version: string | null;
+        is_test: boolean;
       }>(
         `
           UPDATE workcv_payment_checkouts
           SET completed_at = NOW(), status = 'paid', updated_at = NOW()
           WHERE id = $1
-          RETURNING email, user_id, consent_at, consent_version
+          RETURNING email, user_id, consent_at, consent_version, is_test
         `,
         [checkoutId]
       );
@@ -165,14 +168,15 @@ export async function POST(request: NextRequest) {
       checkoutUserId = checkout.rows[0]?.user_id || null;
       consentAt = checkout.rows[0]?.consent_at || null;
       consentVersion = checkout.rows[0]?.consent_version || null;
+      isTest = checkout.rows[0]?.is_test === true;
     }
 
     await getPool().query(
       `
         INSERT INTO workcv_orders
           (id, draft_id, email, product_id, amount_cents, currency, checkout_id,
-           raw_event_type, user_id, consent_at, consent_version)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+           raw_event_type, user_id, consent_at, consent_version, is_test)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
         ON CONFLICT (id) DO NOTHING
       `,
       [
@@ -187,8 +191,18 @@ export async function POST(request: NextRequest) {
         checkoutUserId,
         consentAt,
         consentVersion,
+        isTest,
       ]
     );
+
+    if (checkoutUserId && typeof amountCents === "number" && amountCents > 0) {
+      await recordServerEditorEvent({
+        userId: checkoutUserId,
+        documentId: draftId,
+        eventName: "payment_confirmed",
+        eventKey: `payment_confirmed:${paymentId}`,
+      });
+    }
 
     if (email) {
       const claimed = await getPool().query<{ id: string }>(

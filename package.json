@@ -13,6 +13,7 @@
     "package:distribution": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-distribution-assets.ps1",
     "generate:public-sample": "node scripts/generate-public-cv-sample.mjs",
     "report:growth": "node scripts/report-growth.mjs",
+    "db:prepare:growth": "node scripts/prepare-growth-schema.mjs",
     "verify:indexing": "node scripts/verify-indexing.mjs",
     "cleanup:growth-events": "node scripts/cleanup-growth-events.mjs",
     "test:content": "node --no-warnings --test --experimental-strip-types tests/content-authority-pages.test.ts",

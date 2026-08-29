@@ -1,6 +1,5 @@
 export const editorEventNames = [
   "editor_viewed",
-  "cv_created",
   "import_started",
   "import_succeeded",
   "import_failed",
@@ -15,7 +14,6 @@ export const editorEventNames = [
   "checkout_sheet_opened",
   "checkout_consent_accepted",
   "pdf_clicked",
-  "pdf_downloaded",
   "pdf_generation_retried",
   "pdf_generation_failed",
   "ai_suggestion_generated",
@@ -27,12 +25,19 @@ export const editorEventNames = [
   "checkout_opened",
   "payment_started",
   "payment_pending",
-  "payment_confirmed",
   "payment_failed",
   "payment_cancelled",
 ] as const;
 
+export const historicalEditorEventNames = ["cv_created"] as const;
+
 export type EditorEventName = (typeof editorEventNames)[number];
+
+const editorEventSet = new Set<string>(editorEventNames);
+
+export function isAllowedClientEditorEvent(value: unknown): value is EditorEventName {
+  return typeof value === "string" && editorEventSet.has(value);
+}
 
 export function trackEditorEvent(
   eventName: EditorEventName,

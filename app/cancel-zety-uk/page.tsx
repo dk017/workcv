@@ -21,6 +21,7 @@ import {
   competitorPricing,
   competitorPricingCheckedDate,
 } from "@/lib/competitor-pricing";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 
 const checkedDate = competitorPricingCheckedDate;
@@ -341,11 +342,24 @@ export default function CancelZetyUkPage() {
             />
           </div>
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor">Build my CV for {site.price}</ButtonLink>
-            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary">
+            <ButtonLink
+              href="/editor"
+              trackingLabel={analyticsPlacements.cancelZetyEditor}
+            >
+              Build my CV for {site.price}
+            </ButtonLink>
+            <ButtonLink
+              href="/cv-builder-no-subscription-uk"
+              variant="secondary"
+              trackingLabel={analyticsPlacements.cancelZetyNoSubscription}
+            >
               See no-subscription details
             </ButtonLink>
-            <ButtonLink href="/zety-alternative-uk" variant="secondary">
+            <ButtonLink
+              href="/zety-alternative-uk"
+              variant="secondary"
+              trackingLabel={analyticsPlacements.cancelZetyAlternative}
+            >
               Compare Zety alternative
             </ButtonLink>
           </div>
@@ -387,6 +401,7 @@ export default function CancelZetyUkPage() {
         heading="Build your next CV without a renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/pricing"
+        trackingContext={analyticsPlacements.cancelZetyFinal}
         secondary="Compare pricing"
       />
     </>

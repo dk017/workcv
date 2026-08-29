@@ -13,6 +13,7 @@ import {
 } from "@/components/marketing";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const startHref = buildLoginHref("/editor");
 
@@ -82,7 +83,7 @@ export default function HomePage() {
               )}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={startHref} trackingLabel="home_hero_editor">Start free with email code</ButtonLink>
+              <ButtonLink href={startHref} trackingLabel={analyticsPlacements.homeHeroEditor}>Start free with email code</ButtonLink>
             </div>
             <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-muted">
               <ShieldCheck className="h-4 w-4 shrink-0 text-success" />
@@ -168,7 +169,7 @@ export default function HomePage() {
               formatting work.
             </p>
             <div className="mt-8">
-              <ButtonLink href="/templates" variant="secondary">
+              <ButtonLink href="/templates" variant="secondary" trackingLabel={analyticsPlacements.homeTemplates}>
                 See templates
               </ButtonLink>
             </div>
@@ -273,7 +274,7 @@ export default function HomePage() {
         heading="Your next application deserves a CV that feels ready."
         body="Bring your experience. WorkCV helps you shape it into a clear, professional UK CV you can update and use again."
         primaryHref={startHref}
-        trackingContext="home_final"
+        trackingContext={analyticsPlacements.homeFinal}
         primary="Start free with email code"
         secondaryHref={null}
         secondary={null}

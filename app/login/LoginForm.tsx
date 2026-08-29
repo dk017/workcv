@@ -8,6 +8,7 @@ import {
   readFirstTouchAttribution,
   trackFunnelEvent,
 } from "@/components/attribution-capture";
+import { readRecentCtaPlacement } from "@/lib/cta-attribution";
 
 export default function LoginForm({ initialNext }: { initialNext: string }) {
   const router = useRouter();
@@ -20,9 +21,10 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
 
   const requestCode = async (event: FormEvent) => {
     event.preventDefault();
+    const originatingPlacement = readRecentCtaPlacement(initialNext);
     trackFunnelEvent("login_started", {
       destination: initialNext,
-      placement: "login_form",
+      placement: originatingPlacement || "login_form_direct",
     });
     setLoading(true);
     setError(null);

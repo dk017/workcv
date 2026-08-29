@@ -656,7 +656,6 @@ export function CvEditor() {
       );
       saveManagerRef.current = managerForNewDocument;
       setActiveTab("profile");
-      trackEditorEvent("cv_created", data.document.id);
       const params = new URLSearchParams(window.location.search);
       params.delete("new");
       params.delete("roleTemplate");
@@ -718,7 +717,6 @@ export function CvEditor() {
       link.remove();
       URL.revokeObjectURL(url);
       setReviewOpen(false);
-      trackEditorEvent("pdf_downloaded", draftId);
     } catch (error) {
       trackEditorEvent("pdf_generation_failed", draftId);
       setCheckoutError(error instanceof Error ? error.message : "PDF generation failed");
@@ -867,7 +865,10 @@ export function CvEditor() {
       previewReadyDocumentRef.current !== draftId
     ) {
       previewReadyDocumentRef.current = draftId;
-      trackEditorEvent("preview_ready", draftId, { score: readiness.score });
+      trackEditorEvent("preview_ready", draftId, {
+        score: readiness.score,
+        completion_band: "useful_preview_ready",
+      });
     }
   }, [cv, draftId, readiness.score]);
 
@@ -875,7 +876,6 @@ export function CvEditor() {
     if (!paymentState) return;
     const eventByState: Partial<Record<PaymentState, EditorEventName>> = {
       pending: "payment_pending",
-      paid: "payment_confirmed",
       failed: "payment_failed",
       cancelled: "payment_cancelled",
     };

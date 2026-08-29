@@ -16,6 +16,7 @@ import {
   competitorPricing,
   competitorPricingCheckedDate,
 } from "@/lib/competitor-pricing";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 
@@ -141,8 +142,17 @@ export default function ResumeIoAlternativeUkPage() {
               ))}
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor">Build my UK CV</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary">
+              <ButtonLink
+                href="/editor"
+                trackingLabel={analyticsPlacements.resumeIoAlternativeHeroEditor}
+              >
+                Build my UK CV
+              </ButtonLink>
+              <ButtonLink
+                href="#compare"
+                variant="secondary"
+                trackingLabel={analyticsPlacements.resumeIoAlternativeHeroCompare}
+              >
                 Compare options
               </ButtonLink>
             </div>
@@ -277,7 +287,12 @@ export default function ResumeIoAlternativeUkPage() {
               ready to download.
             </p>
             <div className="mt-6">
-              <ButtonLink href="/editor">Create my CV</ButtonLink>
+              <ButtonLink
+                href="/editor"
+                trackingLabel={analyticsPlacements.resumeIoAlternativeMidEditor}
+              >
+                Create my CV
+              </ButtonLink>
             </div>
           </div>
         </div>
@@ -296,6 +311,7 @@ export default function ResumeIoAlternativeUkPage() {
         heading="Build your CV without the monthly renewal."
         body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/pricing"
+        trackingContext={analyticsPlacements.resumeIoAlternativeFinal}
         secondary="Compare pricing"
       />
     </>
