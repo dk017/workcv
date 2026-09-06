@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import { WorkedSection } from "@/components/cv-guide";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import Link from "next/link";
 import { ArrowRight, Check, Download, FileText, ShieldCheck } from "lucide-react";
 
@@ -105,19 +108,22 @@ export default function BlankCvTemplatePage() {
               watermark or subscription.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
+              <TrackedLink
+                download
+                placement={analyticsPlacements.blankTemplateDownload}
                 href="/api/tools/blank-cv-template"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-navy-hover"
               >
                 <Download className="h-4 w-4" />
                 Download free Word template
-              </a>
-              <Link
+              </TrackedLink>
+              <TrackedLink
+                placement={analyticsPlacements.blankTemplateEditor}
                 href="/editor?new=1"
                 className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-line-strong bg-white px-6 py-3 text-sm font-bold text-navy transition hover:-translate-y-0.5"
               >
                 Build online instead <ArrowRight className="h-4 w-4" />
-              </Link>
+              </TrackedLink>
             </div>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
               <span className="flex items-center gap-2">
@@ -322,6 +328,12 @@ export default function BlankCvTemplatePage() {
         </div>
       </section>
 
+      <WorkedSection title="Check the actual Word template before filling it">
+        <p>The download is a .docx with editable text. Its sections are Personal Profile, Key Skills, Work Experience, Education and Qualifications, Additional Information and References. The image below shows the actual generated file; the simplified hero illustration is a summary.</p>
+        <figure><a href="/product-proof/blank-word-template.png"><img src="/product-proof/blank-word-template.png" alt="Rendered blank WorkCV Word document showing its actual headings and grey replacement instructions" width={794} height={1123} className="mx-auto h-auto w-full max-w-xl border border-line" /></a><figcaption className="mt-3 text-sm text-muted">Actual template preview. Open the image for a larger view and the free DOCX to edit it.</figcaption></figure>
+        <ol className="list-decimal space-y-2 pl-6"><li>Use the direct download above and open the .docx in your document editor.</li><li>Save your own working copy with a recognisable filename.</li><li>Replace YOUR NAME, contact prompts, job titles, dates and every grey instruction. Delete unused sections and irrelevant prompts.</li><li>Check the layout and every page after adding your own content.</li><li>Follow the employer&apos;s file instructions and keep your editable master.</li></ol>
+        <p>Read <Link className="underline" href="/cv-word-or-pdf-uk">whether to send Word or PDF</Link> before exporting. The optional online builder requires login and charges {site.price} once for your saved CV&apos;s PDF; this Word download stays free without an account.</p>
+      </WorkedSection>
       <RelatedLinksSection
         title="More ways to improve the application."
         links={[

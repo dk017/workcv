@@ -473,6 +473,7 @@ export default function HowToWriteACvUkPage() {
         }))}
         title="Questions about writing a UK CV."
       />
+      <section className="bg-paper py-12"><div className="container-page"><h2 className="font-display text-3xl font-semibold text-navy">Already have a written draft?</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-muted">Follow the <Link href="/chatgpt-cv-to-pdf-uk" className="font-bold text-navy underline">ChatGPT-to-PDF walkthrough</Link> to check the text, move it into the editor and review the finished file.</p></div></section>
       <FinalCta
         heading="Turn the guide into your own finished CV."
         body={`Open the complete example, replace it with your real evidence, then pay ${site.price} only when the final PDF is ready.`}

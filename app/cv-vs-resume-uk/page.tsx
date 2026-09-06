@@ -201,6 +201,7 @@ export default function CvVsResumeUkPage() {
         </div>
       </section>
 
+      <section className="container-page py-8"><h2 className="font-display text-3xl font-semibold text-navy">Adapt your existing resume</h2><p className="mt-4 leading-8">See the <Link href="/convert-resume-to-uk-cv" className="font-bold text-navy underline">overseas-to-UK CV conversion</Link> for a complete before-and-after example.</p></section>
       <FaqSection faqs={faqs} title="Questions about CV and resume terminology in the UK." />
       <FinalCta heading="Call it a CV or resume. Build it for the job." body="Start with a UK-ready structure, tailor the evidence and preview the document before deciding whether to unlock its PDF." primaryHref="/resume-builder-uk-no-subscription" primary="Build my document" secondaryHref="/resume-template-uk" secondary="View the template" />
     </>

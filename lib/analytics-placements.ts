@@ -1,4 +1,13 @@
 export const analyticsPlacements = {
+  chatgptGuideEditor: "chatgpt_guide_editor",
+  overseasGuideEditor: "overseas_guide_editor",
+  shortenGuideCheck: "shorten_guide_check",
+  formatGuideWord: "format_guide_word",
+  blankTemplateDownload: "blank_template_download",
+  blankTemplateEditor: "blank_template_editor",
+  careEntryEditor: "care_entry_editor",
+  careerChangeExampleEditor: "career_change_example_editor",
+  returnerExampleEditor: "returner_example_editor",
   homeHeroEditor: "home_hero_editor",
   homePricingProof: "home_pricing_proof",
   homeTemplates: "home_templates_transition",

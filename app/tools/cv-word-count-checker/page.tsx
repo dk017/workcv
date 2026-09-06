@@ -233,6 +233,7 @@ export default function CvLengthCheckerPage() {
       <RelatedLinksSection
         title="Check more than length."
         links={[
+          ["Shorten a CV: complete worked example", "/shorten-cv-to-two-pages"],
           ["Check readability", "/tools/cv-readability-checker"],
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],
           ["Find missing CV content", "/tools/cv-gap-detector-uk"],

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { WorkedSection, GuideTable } from "@/components/cv-guide";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -134,6 +135,8 @@ const truthChecks = [
 ];
 
 const internalLinks = [
+  ["Turn a ChatGPT CV into a PDF", "/chatgpt-cv-to-pdf-uk"],
+  ["Should I send Word or PDF?", "/cv-word-or-pdf-uk"],
   ["Compare CV builder prices", "/pricing"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
@@ -285,7 +288,7 @@ export default function NoSubscriptionUkPage() {
       <section className="border-y border-line bg-surface">
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            "Pay once per PDF download",
+            "Pay once for one saved CV",
             "No monthly fee",
             "No automatic renewal",
             "No hidden renewal",
@@ -298,6 +301,17 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
+      <WorkedSection title="What you receive when you pay once">
+        <GuideTable caption="The WorkCV offer" headings={["Stage", "Included"]} rows={[
+          ["Start", "Email-code login so the CV can be saved and reopened."],
+          ["Before payment", "Build in the editor and preview the layout for free. This is not a trial that renews."],
+          ["Payment", `${site.price} once to unlock the PDF for one saved CV. No monthly renewal.`],
+          ["Download", "PDF output. Payment is associated with the saved CV, not an unlimited collection of new CVs."],
+          ["Need Word?", "Use the separate free blank DOCX template. It is not an export of your editor CV."],
+        ]} />
+        <p>Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link> to move it into the supported editor fields or file import. Review the current on-screen status before importing over a populated CV.</p>
+        <p>See <Link className="underline" href="/pricing">pricing and entitlement details</Link>, the <Link className="underline" href="/refund-policy">refund policy</Link> and the <Link className="underline" href="/cv-word-or-pdf-uk">Word/PDF decision guide</Link> before choosing the appropriate document route.</p>
+      </WorkedSection>
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Cost comparison</SectionLabel>

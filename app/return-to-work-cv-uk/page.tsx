@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ReturnerExample } from "@/components/content-worked-examples";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -361,6 +362,7 @@ export default function ReturnToWorkCvUkPage() {
         </div>
       </section>
 
+      <ReturnerExample />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

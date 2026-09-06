@@ -68,7 +68,11 @@ test("sitemap dates reflect the implementation pass", () => {
     "/cv-template-graduate-uk",
     "/career-change-cv-uk",
     "/return-to-work-cv-uk",
-  ]) assert.match(sitemap, new RegExp(`path: "${route.replaceAll("/", "\\/")}"[^\\n]*lastModified: "2026-08-26"`));
+  ]) {
+    const line = sitemap.split("\n").find((item) => item.includes('path: "' + route + '"'));
+    const reviewed = line?.match(/lastModified: "(\d{4}-\d{2}-\d{2})"/)?.[1];
+    assert.ok(reviewed && reviewed >= "2026-08-26", route + " must retain or advance its reviewed date");
+  }
 });
 
 test("new pages avoid unsupported guarantees", () => {

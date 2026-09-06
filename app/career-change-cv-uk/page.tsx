@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CareerChangeExample } from "@/components/content-worked-examples";
 import Link from "next/link";
 import { ArrowRight, Check, FileText, Search, Shuffle, Target } from "lucide-react";
 
@@ -355,6 +356,7 @@ export default function CareerChangeCvUkPage() {
         </div>
       </section>
 
+      <CareerChangeExample />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

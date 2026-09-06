@@ -276,6 +276,7 @@ export default function CvTemplateWordUkPage() {
       <RelatedLinksSection
         title="Continue with the right UK CV guidance."
         links={[
+          ["Should you send Word or PDF?", "/cv-word-or-pdf-uk"],
           ["Download the blank Word template", "/tools/blank-cv-template-uk"],
           ["CV personal statement examples", "/cv-personal-statement-uk"],
           ["Role-specific CV examples", "/templates"],

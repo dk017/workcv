@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CheckerWorkedExample } from "@/components/content-worked-examples";
 import {
   Check,
   FileText,
@@ -128,6 +129,7 @@ export default function AtsScoreCheckerPage() {
         </div>
       </section>
 
+      <CheckerWorkedExample />
       <section className="bg-surface py-20">
         <div className="container-page grid gap-12 lg:grid-cols-[0.82fr_1.18fr]">
           <div>

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CareEntryExample } from "@/components/content-worked-examples";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -415,6 +416,7 @@ export default function CareWorkerCvTemplateUkPage() {
         </div>
       </section>
 
+      <CareEntryExample />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,
