@@ -43,6 +43,14 @@ const categories: Category[] = [
     { title: "CV Template for Microsoft Word", href: "/tools/cv-template-word-uk", description: "Download a clean editable Word CV and follow practical DOCX editing and export guidance.", icon: FileText },
     { title: "Cover Letter Template", href: "/tools/cover-letter-template-uk", description: "Edit, copy or download a structured UK cover letter template with the correct sign-off.", icon: FileDown },
   ] },
+  { title: "Application builders", description: "Turn an existing CV, early experience or a career break into wording you can review and use.", tools: [
+    { title: "CV Format Checker", href: "/tools/cv-format-checker-uk", description: "Check pasted CV text for clear headings, dates, evidence and common parsing warning signals.", icon: FileCheck2 },
+    { title: "First-Job CV Wizard", href: "/tools/first-job-cv-wizard-uk", description: "Build a truthful first-job CV draft from education, projects, volunteering and strengths.", icon: Sparkles },
+    { title: "Transferable Skills Translator", href: "/tools/transferable-skills-translator-uk", description: "Translate real responsibilities into skills and evidence for a UK career change.", icon: ArrowRight },
+    { title: "CV Shortener", href: "/tools/cv-shortener-uk", description: "Suggest a shorter CV draft while protecting headings, dates and stronger evidence.", icon: FileText },
+    { title: "Resume to UK CV Converter", href: "/tools/uk-cv-converter", description: "Adapt common resume headings and spelling to a UK CV structure and review flagged details.", icon: FileDown },
+    { title: "Employment Gap Explainer", href: "/tools/career-gap-explainer-uk", description: "Write a brief factual career-break line and a separate readiness sentence for your profile.", icon: CalendarCheck },
+  ] },
 ];
 
 const tools = categories.flatMap((category) => category.tools);

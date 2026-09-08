@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import { AlertTriangle, ArrowRight, Check, Clipboard, Copy, HelpCircle, Loader2, RotateCcw, ShieldCheck, Sparkles } from "lucide-react";
+import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
+import { trackFunnelEvent } from "@/components/attribution-capture";
 
 type Fields = { background: string; targetRole: string; evidence: string; jobDescription: string };
 type Result = { variants: Array<{ label: "Balanced" | "Achievement-led" | "Concise"; summary: string; wordCount: number }>; followUpQuestions: string[] };
@@ -19,6 +21,12 @@ export function CvSummaryGenerator() {
   const [copied, setCopied] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const update = (key: keyof Fields, value: string) => setFields((current) => ({ ...current, [key]: value }));
+
+  function useSummaryInCv(summary: string) {
+    writeCvToolHandoff({ source: "cv-summary-generator", patch: { profile: summary } });
+    trackFunnelEvent("marketing_cta_clicked", { destination: "/editor", placement: "cv_summary_generator_editor" });
+    window.location.assign("/editor?from=career-tool&new=1");
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setError(""); setLoading(true); setCopied(null);
@@ -59,7 +67,7 @@ export function CvSummaryGenerator() {
     </form>
     {result ? <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
       <section className="border-y border-line-strong py-7"><div><p className="text-sm font-bold uppercase tracking-[0.14em] text-success">Three editable approaches</p><h2 className="mt-2 font-display text-3xl font-semibold text-navy">Your CV summaries</h2></div>
-        <div className="mt-7 divide-y divide-line border-y border-line">{result.variants.map((variant, index) => <article key={variant.label} className="py-6"><div className="flex items-center justify-between gap-4"><div><h3 className="font-display text-2xl font-semibold text-navy">{variant.label}</h3><p className="mt-1 text-xs font-bold text-muted">{variant.wordCount} words</p></div><button type="button" onClick={() => copy(variant.summary, variant.label)} aria-label={`Copy ${variant.label} summary`} title={`Copy ${variant.label} summary`} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line-strong text-navy hover:bg-paper">{copied === variant.label ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}</button></div><textarea aria-label={`${variant.label} CV summary`} value={variant.summary} onChange={(event) => setResult((current) => current ? { ...current, variants: current.variants.map((item, itemIndex) => itemIndex === index ? { ...item, summary: event.target.value } : item) } : current)} className="mt-4 min-h-36 w-full resize-y rounded-md border border-line bg-white p-4 text-[16px] leading-7 text-ink outline-none focus:border-navy focus:ring-2 focus:ring-navy/15" /></article>)}</div>
+        <div className="mt-7 divide-y divide-line border-y border-line">{result.variants.map((variant, index) => <article key={variant.label} className="py-6"><div className="flex items-center justify-between gap-4"><div><h3 className="font-display text-2xl font-semibold text-navy">{variant.label}</h3><p className="mt-1 text-xs font-bold text-muted">{variant.wordCount} words</p></div><div className="flex flex-wrap justify-end gap-2"><button type="button" onClick={() => useSummaryInCv(variant.summary)} className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-3 text-xs font-bold text-white hover:bg-navy-hover">Use in my CV <ArrowRight className="h-3 w-3" /></button><button type="button" onClick={() => copy(variant.summary, variant.label)} aria-label={`Copy ${variant.label} summary`} title={`Copy ${variant.label} summary`} className="inline-flex h-11 w-11 items-center justify-center rounded-md border border-line-strong text-navy hover:bg-paper">{copied === variant.label ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}</button></div></div><textarea aria-label={`${variant.label} CV summary`} value={variant.summary} onChange={(event) => setResult((current) => current ? { ...current, variants: current.variants.map((item, itemIndex) => itemIndex === index ? { ...item, summary: event.target.value } : item) } : current)} className="mt-4 min-h-36 w-full resize-y rounded-md border border-line bg-white p-4 text-[16px] leading-7 text-ink outline-none focus:border-navy focus:ring-2 focus:ring-navy/15" /></article>)}</div>
         <div className="mt-7 grid gap-4 border-l-4 border-gold bg-paper p-5 sm:grid-cols-[28px_1fr]"><HelpCircle className="h-6 w-6 text-navy" /><div><h3 className="font-display text-xl font-semibold text-navy">Evidence worth adding</h3><ul className="mt-3 space-y-2 text-sm leading-6 text-muted">{result.followUpQuestions.map((question) => <li key={question}>• {question}</li>)}</ul></div></div>
       </section>
       <div className="mt-8 flex flex-col gap-5 border-l-4 border-success bg-[#edf7f1] p-6 sm:flex-row sm:items-center sm:justify-between"><div><h3 className="font-display text-2xl font-semibold text-navy">Use your chosen summary in a complete CV</h3><p className="mt-2 text-sm text-muted">Edit it in your own voice, then add it to the top of your WorkCV draft.</p></div><Link href="/editor" className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">Open CV builder <ArrowRight className="h-4 w-4" /></Link></div>

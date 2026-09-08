@@ -14,6 +14,8 @@ import {
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
+import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
+import { trackFunnelEvent } from "@/components/attribution-capture";
 
 type Fields = {
   jobTitle: string;
@@ -58,6 +60,26 @@ export function CvBulletPointGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
+
+  function useBulletsInCv(bullets: string[]) {
+    writeCvToolHandoff({
+      source: "cv-bullet-point-generator",
+      patch: {
+        experience: [{
+          id: `tool-experience-${Date.now()}`,
+          role: fields.jobTitle,
+          company: "",
+          location: "",
+          start: "",
+          end: employmentStatus === "current" ? "Present" : "",
+          bullets: bullets.join("\n"),
+        }],
+        targetRole: fields.targetRole,
+      },
+    });
+    trackFunnelEvent("marketing_cta_clicked", { destination: "/editor", placement: "cv_bullet_generator_editor" });
+    window.location.assign("/editor?from=career-tool&new=1");
+  }
 
   function update(name: keyof Fields, value: string) {
     setFields((current) => ({ ...current, [name]: value }));
@@ -288,6 +310,13 @@ export function CvBulletPointGenerator() {
               >
                 {copied === "all" ? <Check className="h-4 w-4" /> : <Clipboard className="h-4 w-4" />}
                 {copied === "all" ? "Copied" : "Copy all"}
+              </button>
+              <button
+                type="button"
+                onClick={() => useBulletsInCv(result.bullets)}
+                className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
+              >
+                Use in my CV <ArrowRight className="h-4 w-4" />
               </button>
             </div>
 

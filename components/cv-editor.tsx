@@ -23,6 +23,10 @@ import {
   removeCvSourceFromHandoff,
 } from "@/lib/cv-fit-handoff";
 import {
+  readCvToolHandoff,
+  removeCvToolHandoff,
+} from "@/lib/cv-tool-handoff";
+import {
   CvData,
   CvTargeting,
   EducationItem,
@@ -120,8 +124,11 @@ export function CvEditor() {
     "idle" | "importing" | "complete" | "error"
   >("idle");
   const [fitImportError, setFitImportError] = useState<string | null>(null);
+  const [toolHandoffState, setToolHandoffState] = useState<"idle" | "importing" | "complete">("idle");
+  const [toolHandoffError, setToolHandoffError] = useState<string | null>(null);
   const previewRef = useRef<HTMLDivElement>(null);
   const handoffStartedRef = useRef(false);
+  const toolHandoffStartedRef = useRef(false);
   const saveManagerRef = useRef<DebouncedSaveManager<CvData> | null>(null);
   const lastManagedCvRef = useRef<CvData | null>(null);
   const undoRef = useRef<(() => void) | null>(null);
@@ -318,6 +325,53 @@ export function CvEditor() {
     };
 
     void importAssessmentCv();
+  }, [cv.template, draftId, loaded]);
+
+  useEffect(() => {
+    if (!loaded || !draftId || toolHandoffStartedRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "career-tool") return;
+
+    toolHandoffStartedRef.current = true;
+    const handoff = readCvToolHandoff();
+    if (!handoff) {
+      params.delete("from");
+      window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+      return;
+    }
+
+    const finish = (imported?: CvData) => {
+      setCv((current) => ({ ...current, ...(imported || {}), ...(handoff.patch || {}) }));
+      setActiveTab("profile");
+      setToolHandoffState("complete");
+      removeCvToolHandoff();
+      params.delete("from");
+      window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+    };
+
+    if (!handoff.sourceText) {
+      finish();
+      return;
+    }
+
+    setToolHandoffState("importing");
+    setToolHandoffError(null);
+    void (async () => {
+      try {
+        const response = await fetch("/api/cv/import-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: handoff.sourceText, template: cv.template }),
+        });
+        const data = (await response.json().catch(() => null)) as { cv?: CvData; error?: string } | null;
+        if (!response.ok || !data?.cv) throw new Error(data?.error || "The tool result could not be imported.");
+        finish(data.cv);
+      } catch (error) {
+        setToolHandoffState("idle");
+        setToolHandoffError(error instanceof Error ? error.message : "The tool result could not be imported.");
+        removeCvToolHandoff();
+      }
+    })();
   }, [cv.template, draftId, loaded]);
 
   useEffect(() => {
@@ -1140,7 +1194,7 @@ export function CvEditor() {
         </section>
       )}
 
-      {(fitTargeting || fitImportState === "importing" || fitImportError) && (
+      {(fitTargeting || fitImportState === "importing" || fitImportError || toolHandoffState === "importing" || toolHandoffError) && (
         <section className="editor-chrome border-b border-line bg-[#edf4f8]">
           <div className="mx-auto w-[min(1540px,calc(100%-32px))] py-5 sm:w-[min(1540px,calc(100%-48px))]">
             {fitImportState === "importing" ? (
@@ -1148,10 +1202,20 @@ export function CvEditor() {
                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/25 border-t-navy" />
                 Turning your assessed CV into editable fields...
               </div>
+            ) : toolHandoffState === "importing" ? (
+              <div className="flex items-center gap-3 text-sm font-bold text-navy">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/25 border-t-navy" />
+                Turning your tool result into editable fields...
+              </div>
             ) : fitImportError ? (
               <div className="flex items-start gap-3 text-sm font-bold leading-6 text-[#8d3030]">
                 <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
                 {fitImportError}
+              </div>
+            ) : toolHandoffError ? (
+              <div className="flex items-start gap-3 text-sm font-bold leading-6 text-[#8d3030]">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" />
+                {toolHandoffError}
               </div>
             ) : fitTargeting ? (
               <div className="grid gap-5 xl:grid-cols-[240px_1fr]">
