@@ -248,13 +248,14 @@ export default function HomePage() {
           <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
             Start with the guidance closest to your application.
           </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-6">
             {[
               ["UK CV examples", "/cv-examples-uk"],
               ["How to write a CV", "/how-to-write-a-cv-uk"],
               ["ATS CV template", "/ats-cv-template-uk"],
               ["Professional CV template", "/professional-cv-template-uk"],
               ["No-subscription CV builder", "/cv-builder-no-subscription-uk"],
+              ["Compare UK CV builders", "/best-cv-builder-uk"],
             ].map(([label, href]) => (
               <Link
                 key={href}

@@ -241,48 +241,70 @@ export default function PricingPage() {
             </div>
           </div>
 
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="hidden grid-cols-[1fr_1fr_1.1fr_1.15fr_0.8fr_0.6fr] bg-navy px-5 py-4 text-sm font-bold text-white lg:grid">
-              <span>Builder</span>
-              <span>Entry price</span>
-              <span>Then</span>
-              <span>Approx. ongoing cost</span>
-              <span>Cancel needed</span>
-              <span>Source</span>
-            </div>
-            {competitors.map((row) => (
-              <div
-                key={row.builder}
-                className={`grid gap-4 border-t border-line p-5 text-sm lg:grid-cols-[1fr_1fr_1.1fr_1.15fr_0.8fr_0.6fr] ${
-                  row.featured ? "bg-greensoft font-bold text-navy" : "text-ink"
-                }`}
-              >
-                <PricingCell label="Builder">{row.builder}</PricingCell>
-                <PricingCell label="Entry price">{row.entry}</PricingCell>
-                <PricingCell label="Then">{row.renewal}</PricingCell>
-                <PricingCell label="Approx. ongoing cost">{row.ongoing}</PricingCell>
-                <PricingCell label="Cancel needed">{row.cancellation}</PricingCell>
-                <PricingCell label="Source">
-                  {row.source.startsWith("http") ? (
-                    <a
-                      href={row.source}
-                      className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
-                      rel="nofollow noopener noreferrer"
-                      target="_blank"
-                    >
-                      Check <ExternalLink className="h-3.5 w-3.5" />
-                    </a>
-                  ) : (
-                    <Link
-                      href={row.source}
-                      className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
-                    >
-                      Details <ArrowRight className="h-3.5 w-3.5" />
-                    </Link>
-                  )}
-                </PricingCell>
-              </div>
-            ))}
+          <div
+            className="mt-10 overflow-x-auto rounded-xl border border-line bg-white"
+            role="region"
+            aria-label="UK CV builder pricing comparison"
+            tabIndex={0}
+          >
+            <table className="w-full min-w-[920px] border-collapse text-left text-sm">
+              <caption className="sr-only">
+                UK CV builder pricing comparison, checked {checkedDate}
+              </caption>
+              <thead className="bg-navy text-white">
+                <tr>
+                  {[
+                    "Builder",
+                    "Entry price",
+                    "Then",
+                    "Approx. ongoing cost",
+                    "Cancel needed",
+                    "Source",
+                  ].map((heading) => (
+                    <th key={heading} scope="col" className="px-5 py-4 font-bold">
+                      {heading}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {competitors.map((row) => (
+                  <tr
+                    key={row.builder}
+                    className={`border-t border-line align-top ${
+                      row.featured ? "bg-greensoft" : ""
+                    }`}
+                  >
+                    <th scope="row" className="p-5 text-left font-bold text-navy">
+                      {row.builder}
+                    </th>
+                    <td className="p-5 leading-7 text-ink">{row.entry}</td>
+                    <td className="p-5 leading-7 text-ink">{row.renewal}</td>
+                    <td className="p-5 leading-7 text-muted">{row.ongoing}</td>
+                    <td className="p-5 leading-7 text-ink">{row.cancellation}</td>
+                    <td className="p-5 leading-7">
+                      {row.source.startsWith("http") ? (
+                        <a
+                          href={row.source}
+                          className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
+                          rel="nofollow noopener noreferrer"
+                          target="_blank"
+                        >
+                          Check <ExternalLink className="h-3.5 w-3.5" />
+                        </a>
+                      ) : (
+                        <Link
+                          href={row.source}
+                          className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
+                        >
+                          Details <ArrowRight className="h-3.5 w-3.5" />
+                        </Link>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
           <p className="mt-4 text-sm leading-6 text-muted">
             Ongoing cost estimates show the renewal amount repeated over roughly
@@ -359,22 +381,5 @@ export default function PricingPage() {
         trackingContext={analyticsPlacements.pricingFinal}
       />
     </>
-  );
-}
-
-function PricingCell({
-  label,
-  children,
-}: {
-  label: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div>
-      <span className="mb-1 block text-xs font-bold uppercase tracking-[0.12em] text-muted lg:hidden">
-        {label}
-      </span>
-      {children}
-    </div>
   );
 }

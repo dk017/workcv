@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 import { shouldReplaceLastTouch } from "@/lib/attribution";
@@ -108,7 +108,7 @@ function deviceClass() {
 }
 
 export function trackFunnelEvent(
-  eventName: "landing_view" | "marketing_cta_clicked" | "login_started",
+  eventName: "landing_view" | "page_view" | "marketing_cta_clicked" | "login_started",
   metadata: FunnelMetadata = {},
 ) {
   try {
@@ -140,11 +140,20 @@ export function trackFunnelEvent(
 
 export function AttributionCapture() {
   const pathname = usePathname();
+  const lastPageViewPath = useRef<string | null>(null);
 
   useEffect(() => {
     try {
       ensureTrackingContext();
       if (!isPublicMeasurementPath(pathname)) return;
+
+      // Track one page view per route visit. The ref also prevents React Strict
+      // Mode from sending the initial page view twice during development.
+      if (lastPageViewPath.current !== pathname) {
+        lastPageViewPath.current = pathname;
+        trackFunnelEvent("page_view");
+      }
+
       if (window.sessionStorage.getItem(landingTrackedKey)) return;
       window.sessionStorage.setItem(landingTrackedKey, "1");
       trackFunnelEvent("landing_view");

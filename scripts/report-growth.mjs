@@ -55,6 +55,10 @@ try {
   const metrics = await pool.query(`${bounds}
     SELECT 'qualified_sessions' metric, COUNT(DISTINCT session_hash)::bigint value FROM workcv_funnel_events, bounds
       WHERE event_name='landing_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'public_page_views', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'public_page_view_sessions', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'marketing_cta_clickers', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='marketing_cta_clicked' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'marketing_cta_clicks', COUNT(*)::bigint FROM workcv_funnel_events, bounds
@@ -150,7 +154,16 @@ try {
     SELECT source,landing_path,device_class,utc_week_start,COUNT(*)::bigint sessions,
       COALESCE(SUM(cta_clicks),0)::bigint cta_clicks,
       (ROUND(100.0*COUNT(*) FILTER (WHERE cta_clicks>0)/NULLIF(COUNT(*),0),1)::text||'%') cta_click_rate
-    FROM sessions GROUP BY source,landing_path,device_class,utc_week_start ORDER BY utc_week_start DESC,sessions DESC`, params);
+     FROM sessions GROUP BY source,landing_path,device_class,utc_week_start ORDER BY utc_week_start DESC,sessions DESC`, params);
+
+  const pageViews = await pool.query(`${bounds}
+    SELECT source_normalized source, path, device_class, COUNT(*)::bigint page_views,
+      COUNT(DISTINCT session_hash)::bigint sessions
+    FROM workcv_funnel_events, bounds
+    WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding}
+      AND created_at>=window_start AND created_at<report_end
+    GROUP BY source_normalized, path, device_class
+    ORDER BY page_views DESC, sessions DESC, source, path`, params);
 
   const lastTouch = await pool.query(`${bounds}, attributed AS (
       SELECT o.amount_cents,normalized.source,COALESCE(u.last_landing_path,'(unknown)') landing_path
@@ -185,6 +198,8 @@ try {
   console.table(normalizeNumericRows(firstTouch.rows));
   console.log("Acquisition sessions by source, landing, device, and UTC week");
   console.table(normalizeNumericRows(acquisition.rows));
+  console.log("Public page views by source, route, and device (no PII)");
+  console.table(normalizeNumericRows(pageViews.rows));
   console.log("Last-touch positive production orders (no PII)");
   console.table(normalizeNumericRows(lastTouch.rows));
   console.log("Data quality and explicitly excluded activity");

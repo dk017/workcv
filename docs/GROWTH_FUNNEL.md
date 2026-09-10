@@ -2,9 +2,10 @@
 
 ## What is recorded
 
-WorkCV records three privacy-limited public events before authentication:
+WorkCV records four privacy-limited public events before authentication:
 
 - `landing_view`
+- `page_view`
 - `marketing_cta_clicked`
 - `login_started`
 
@@ -54,7 +55,7 @@ npm run report:growth -- --days=30
 npm run report:growth -- --days=90
 ```
 
-The report captures one half-open UTC window (`window_start <= occurred_at < report_end`) and reuses it for every query. It contains no email addresses or CV content, shows first-touch source/landing acquisition and last-touch production revenue separately, and separates positive production orders from test or zero-value orders.
+The report captures one half-open UTC window (`window_start <= occurred_at < report_end`) and reuses it for every query. It contains no email addresses or CV content, shows route-level public page views alongside first-touch source/landing acquisition and last-touch production revenue, and separates positive production orders from test or zero-value orders.
 
 ## Retention
 

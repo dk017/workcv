@@ -13,10 +13,18 @@ import {
 
 process.env.ANALYTICS_HASH_SECRET = "test-only-analytics-secret";
 
-test("landing views deduplicate by session while other events keep their event ID", () => {
+test("landing views deduplicate by session while route and CTA events keep their event ID", () => {
   assert.equal(
     funnelEventDedupeValue("landing_view", "event_1234567890123456", "session_1234567890123456"),
     "landing_view:session_1234567890123456",
+  );
+  assert.equal(
+    funnelEventDedupeValue(
+      "page_view",
+      "event_1234567890123456",
+      "session_1234567890123456",
+    ),
+    "event_1234567890123456",
   );
   assert.equal(
     funnelEventDedupeValue(
@@ -101,6 +109,10 @@ test("server sanitisation rejects private landing views but permits login-start 
   };
   assert.equal(
     sanitizeFunnelEvent({ ...base, eventName: "landing_view", path: "/login" }),
+    null,
+  );
+  assert.equal(
+    sanitizeFunnelEvent({ ...base, eventName: "page_view", path: "/editor" }),
     null,
   );
   assert.ok(

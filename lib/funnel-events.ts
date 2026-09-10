@@ -6,6 +6,7 @@ export { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.
 
 export const publicFunnelEventNames = [
   "landing_view",
+  "page_view",
   "marketing_cta_clicked",
   "login_started",
 ] as const;
@@ -106,7 +107,7 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
     return null;
   }
 
-  if (eventName === "landing_view" && !isPublicMeasurementPath(path)) {
+  if ((eventName === "landing_view" || eventName === "page_view") && !isPublicMeasurementPath(path)) {
     return null;
   }
 

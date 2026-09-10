@@ -9,6 +9,7 @@ const routes = [
   { path: "/cv-word-or-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
   { path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-08-26" },
+  { path: "/best-cv-builder-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-10" },
   { path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-29" },
   { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-09-06" },
   { path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },

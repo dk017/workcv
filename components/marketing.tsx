@@ -55,6 +55,7 @@ export function Footer({ line = site.summary }: { line?: string }) {
           </p>
           <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
             <Link href="/pricing">Pricing</Link>
+            <Link href="/best-cv-builder-uk">CV builder guide</Link>
             <Link href="/templates">Templates</Link>
             <Link href="/how-to-write-a-cv-uk">CV guide</Link>
             <Link href="/tools">Free tools</Link>

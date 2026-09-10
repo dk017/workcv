@@ -8,7 +8,12 @@ export function ComparisonTable({
   rows: string[][];
 }) {
   return (
-    <div className="mt-10 overflow-x-auto rounded-xl border border-line bg-white">
+    <div
+      className="mt-10 overflow-x-auto rounded-xl border border-line bg-white"
+      role="region"
+      aria-label={caption}
+      tabIndex={0}
+    >
       <table className="w-full min-w-[680px] border-collapse text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-navy text-white">

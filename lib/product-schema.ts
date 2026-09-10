@@ -5,6 +5,10 @@ type WorkCvProductSchemaInput = {
   url: string;
 };
 
+function absoluteSiteUrl(url: string) {
+  return /^https?:\/\//i.test(url) ? url : new URL(url, `${site.url}/`).toString();
+}
+
 const immediateDigitalDelivery = {
   "@type": "ShippingDeliveryTime",
   handlingTime: {
@@ -38,7 +42,7 @@ export function buildWorkCvProductSchema({ description, url }: WorkCvProductSche
       priceCurrency: site.priceCurrency,
       itemCondition: "https://schema.org/NewCondition",
       availability: "https://schema.org/InStock",
-      url,
+      url: absoluteSiteUrl(url),
       description: "One-time CV PDF download price. No monthly subscription.",
       shippingDetails: {
         "@type": "OfferShippingDetails",
