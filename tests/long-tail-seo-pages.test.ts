@@ -9,6 +9,8 @@ const word = read("app/tools/cv-template-word-uk/page.tsx");
 const noSubscription = read("app/cv-builder-no-subscription-uk/page.tsx");
 const pricing = read("app/pricing/page.tsx");
 const sitemap = read("app/sitemap.ts");
+const toolsLayout = read("app/tools/layout.tsx");
+const toolBreadcrumbs = read("components/tool-breadcrumbs.tsx");
 
 test("long-tail canonical pages exist and stay distinct", () => {
   assert.ok(existsSync("app/tools/blank-cv-template-uk/page.tsx"));
@@ -73,6 +75,13 @@ test("sitemap dates reflect the implementation pass", () => {
     const reviewed = line?.match(/lastModified: "(\d{4}-\d{2}-\d{2})"/)?.[1];
     assert.ok(reviewed && reviewed >= "2026-08-26", route + " must retain or advance its reviewed date");
   }
+});
+
+test("tool pages expose visible and structured breadcrumbs", () => {
+  assert.match(toolsLayout, /ToolBreadcrumbs/);
+  assert.match(toolBreadcrumbs, /aria-label="Breadcrumb"/);
+  assert.match(toolBreadcrumbs, /"@type": "BreadcrumbList"/);
+  assert.match(toolBreadcrumbs, /\/tools/);
 });
 
 test("new pages avoid unsupported guarantees", () => {

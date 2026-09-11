@@ -20,7 +20,7 @@ export function BreadcrumbSchema() {
   const segments = pathname.split("/").filter(Boolean);
 
   // BreadcrumbList is only emitted where the page has a matching visible
-  // breadcrumb trail. Tool pages do not currently render that navigation.
+  // breadcrumb trail. Tool pages emit their own trail in app/tools/layout.tsx.
   if (segments[0] !== "situations" || !segments[1]) {
     return null;
   }

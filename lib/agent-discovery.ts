@@ -30,6 +30,7 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - View pricing: ${site.url}/pricing
 - Read the no-subscription CV builder page: ${site.url}/cv-builder-no-subscription-uk
 - Browse UK CV examples: ${site.url}/cv-examples-uk
+- Compare UK CV builders: ${site.url}/best-cv-builder-uk
 
 ## Important product facts
 
@@ -86,5 +87,6 @@ ${site.url}
 - Templates: ${site.url}/templates
 - Pricing: ${site.url}/pricing
 - CV examples: ${site.url}/cv-examples-uk
+- Compare UK CV builders: ${site.url}/best-cv-builder-uk
 - No-subscription builder: ${site.url}/cv-builder-no-subscription-uk
 `;

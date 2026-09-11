@@ -59,6 +59,7 @@ test("llms response emits the maintained orientation with production headers", a
   assert.equal(response.headers.get("x-content-type-options"), "nosniff");
   assert.equal(await response.text(), homepageMarkdown);
   assert.match(homepageMarkdown, /LLM orientation file: https:\/\/workcv\.co\.uk\/llms\.txt/);
+  assert.match(homepageMarkdown, /best-cv-builder-uk/);
 });
 
 test("auth response links to the LLM orientation surface", async () => {
