@@ -14,6 +14,12 @@ const sitemap = read("app/sitemap.ts");
 const toolsHub = read("components/tools-hub.tsx");
 const trendScript = read("scripts/prepare-trend-radar.mjs");
 const softwareTesting = read("app/software-testing-strategies-uk/page.tsx");
+const jobBoards = read("app/top-job-boards-uk/page.tsx");
+const interviewPrep = read("app/how-to-prepare-for-a-job-interview-uk/page.tsx");
+const interviewQuestions = read("app/common-job-interview-questions-uk/page.tsx");
+const thankYou = read("app/thank-you-email-after-interview-uk/page.tsx");
+const progression = read("app/career-advancement-strategies-uk/page.tsx");
+const packPage = read("app/tools/job-application-pack-uk/page.tsx");
 
 const guideRoutes = [
   "app/career-tools/page.tsx",
@@ -41,6 +47,28 @@ test("new content has a reusable money-page CTA path", () => {
   assert.match(guide, /<MoneyPageCta/);
   assert.match(pack, /commercialRoutes\.moneyPage/);
   assert.match(pack, /site\.price/);
+});
+
+test("trend pages deliver task-specific value before conversion", () => {
+  for (const board of ["Indeed UK", "LinkedIn Jobs", "Reed", "GOV.UK Find a job", "NHS Jobs", "CharityJob"]) {
+    assert.match(jobBoards, new RegExp(board.replace(/[.]/g, "\\.")));
+  }
+  assert.match(jobBoards, /Transparent selection, not affiliate rankings/);
+  assert.match(jobBoards, /Leave immediately if/);
+  assert.match(interviewPrep, /Your preparation timeline/);
+  assert.match(interviewPrep, /The evidence matrix/);
+  assert.match(interviewPrep, /reasonable adjustment/i);
+  assert.match(interviewQuestions, /21 common job interview questions/);
+  assert.equal((interviewQuestions.match(/They are testing:/g) ?? []).length, 1);
+  assert.match(interviewQuestions, /What is a weakness you are working on/);
+  assert.match(interviewQuestions, /Worked STAR example/);
+  assert.match(thankYou, /Example 5/);
+  assert.match(thankYou, /Checking in after the promised decision date/);
+  assert.match(progression, /Target-role gap analysis/);
+  assert.match(progression, /Conversation opener/);
+  assert.match(progression, /30-60-90 day plan/);
+  assert.match(packPage, /Eight outputs, each tied to one vacancy/);
+  assert.match(packPage, /Do not paste the result straight into an application/);
 });
 
 test("the application pack is bounded and evidence-led", () => {

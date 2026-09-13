@@ -103,6 +103,48 @@ export default function JobApplicationPackPage() {
         </div>
       </section>
 
+      <section className="border-y border-line bg-paper py-16 md:py-20">
+        <div className="container-page">
+          <SectionLabel>What you receive</SectionLabel>
+          <h2 className="max-w-4xl font-display text-4xl font-semibold text-navy md:text-5xl">Eight outputs, each tied to one vacancy.</h2>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-muted">The result is organised so you can review evidence before copying prose. It shows what the advert asks for, what your input supports and where a human decision is still needed.</p>
+          <div className="mt-9 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {[
+              ["Requirement map", "Important duties and criteria, labelled by whether your evidence supports them."],
+              ["CV profile", "A short role-focused draft to edit for tone, accuracy and seniority."],
+              ["Five CV bullets", "Evidence-led starting points—not invented achievements or guaranteed ATS claims."],
+              ["Keyword review", "Relevant vacancy language to use only where it accurately describes you."],
+              ["Cover letter", "A concise draft connecting your evidence to the employer’s stated needs."],
+              ["Eight questions", "Likely interview prompts with a focus and an answer-planning cue."],
+              ["Follow-up email", "A short post-interview draft with role and employer context."],
+              ["Editor handoff", "Carry the useful CV material into WorkCV, then review every field yourself."],
+            ].map(([title, body]) => <article key={title} className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">{title}</h3><p className="mt-3 text-sm leading-7 text-muted">{body}</p></article>)}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-surface py-16 md:py-20">
+        <div className="container-page grid gap-10 lg:grid-cols-2">
+          <div><SectionLabel>Good input</SectionLabel><h2 className="font-display text-4xl font-semibold text-navy">Give it facts it can work with.</h2><ul className="mt-7 grid gap-3 text-sm leading-7 text-muted">{[
+            "Paste the complete advert, including duties and essential criteria—not only the job title.",
+            "Use evidence from your existing CV or notes: responsibilities, tools, scope and verified outcomes.",
+            "Include your motivation only when it is genuine and specific to the role.",
+            "Remove contact details, references and sensitive personal information before submitting.",
+          ].map((item) => <li key={item} className="flex gap-3"><span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-gold" />{item}</li>)}</ul></div>
+          <div className="rounded-lg border border-line-strong bg-white p-6 shadow-sm"><p className="text-sm font-bold uppercase tracking-[0.14em] text-gold-dark">Mini example</p><p className="mt-4 text-sm leading-7 text-muted"><strong className="text-navy">Advert asks:</strong> handle customer complaints, maintain accurate records and work across teams.</p><p className="mt-3 text-sm leading-7 text-muted"><strong className="text-navy">Useful evidence:</strong> “Resolved delivery queries by checking order records, coordinating with warehouse colleagues and updating customers until closure.”</p><p className="mt-3 text-sm leading-7 text-muted"><strong className="text-navy">Weak input:</strong> “Hard-working people person.” It gives the tool no situation, action, responsibility or outcome to use.</p></div>
+        </div>
+      </section>
+
+      <section className="border-y border-line bg-paper py-16 md:py-20">
+        <div className="container-page"><SectionLabel>A five-step review</SectionLabel><h2 className="max-w-4xl font-display text-4xl font-semibold text-navy md:text-5xl">Do not paste the result straight into an application.</h2><ol className="mt-9 grid gap-5 md:grid-cols-5">{[
+          ["1", "Check support", "Delete any statement your input does not prove."],
+          ["2", "Correct facts", "Verify names, tools, dates, titles and every number."],
+          ["3", "Restore your voice", "Replace generic wording with language you would actually use."],
+          ["4", "Prioritise", "Keep the strongest evidence for this vacancy; remove repetition."],
+          ["5", "Preview", "Check the final CV, letter and attachment names before submitting."],
+        ].map(([number, title, body]) => <li key={number} className="rounded-lg border border-line bg-white p-5"><span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy text-sm font-bold text-white">{number}</span><h3 className="mt-4 font-display text-xl font-semibold text-navy">{title}</h3><p className="mt-2 text-sm leading-7 text-muted">{body}</p></li>)}</ol></div>
+      </section>
+
       <MoneyPageCta heading="Turn the pack into a finished UK CV." body={`Build and preview the document behind your application, then pay ${site.price} once only if you download the PDF.`} trackingContext="job_application_pack_page" />
       <RelatedLinksSection title="Continue with the application." links={[["Prepare for a job interview", "/how-to-prepare-for-a-job-interview-uk"], ["Common interview questions", "/common-job-interview-questions-uk"], ["Cover letter generator", "/tools/cover-letter-generator-uk"], ["ATS score checker", "/tools/ats-score-checker"], ["No-subscription CV builder", "/cv-builder-no-subscription-uk"]]} />
       <FaqSection faqs={faqs} title="Job application pack questions." />
