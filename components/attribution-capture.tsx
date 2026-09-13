@@ -26,6 +26,9 @@ type TouchAttribution = {
 type FunnelMetadata = {
   destination?: string;
   placement?: string;
+  tool?: string;
+  lifecycle?: "started" | "completed";
+  result?: "success" | "error";
 };
 
 function randomId() {
@@ -108,7 +111,13 @@ function deviceClass() {
 }
 
 export function trackFunnelEvent(
-  eventName: "landing_view" | "page_view" | "marketing_cta_clicked" | "login_started",
+  eventName:
+    | "landing_view"
+    | "page_view"
+    | "marketing_cta_clicked"
+    | "login_started"
+    | "tool_started"
+    | "tool_completed",
   metadata: FunnelMetadata = {},
 ) {
   try {

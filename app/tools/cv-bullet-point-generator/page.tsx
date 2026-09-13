@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FileCheck2, ListChecks, ShieldCheck, Sparkles } from "lucide-react";
 
 import { CvBulletPointGenerator } from "@/components/cv-bullet-point-generator";
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, MoneyPageCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 const path = "/tools/cv-bullet-point-generator";
@@ -159,6 +159,11 @@ export default function CvBulletPointGeneratorPage() {
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Put the strongest bullets into a complete UK CV."
+        body={`Build and preview your tailored CV, then pay ${site.price} once only if you download the PDF. No monthly subscription.`}
+        trackingContext="cv_bullet_generator_money"
+      />
       <FaqSection faqs={faqs} title="CV bullet point questions." />
     </>
   );

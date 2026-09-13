@@ -1,6 +1,6 @@
 import pg from "pg";
 
-import { calculateStepConversions, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
+import { addMarketingCluster, calculateStepConversions, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
 
 const { Pool } = pg;
 
@@ -63,6 +63,10 @@ try {
       WHERE event_name='marketing_cta_clicked' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'marketing_cta_clicks', COUNT(*)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='marketing_cta_clicked' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'job_application_pack_starts', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='tool_started' AND is_test=FALSE AND metadata->>'tool'='job_application_pack' AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'job_application_pack_completions', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='tool_completed' AND is_test=FALSE AND metadata->>'tool'='job_application_pack' AND metadata->>'result'='success' AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'login_starters', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='login_started' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'signups', COUNT(DISTINCT user_id)::bigint FROM workcv_signup_events, bounds
@@ -195,13 +199,13 @@ try {
   console.log("Step conversion (same operational event window)");
   console.table(calculateStepConversions(metricRows));
   console.log("First-touch funnel by source and first public landing (no PII)");
-  console.table(normalizeNumericRows(firstTouch.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(firstTouch.rows), "landing_path"));
   console.log("Acquisition sessions by source, landing, device, and UTC week");
-  console.table(normalizeNumericRows(acquisition.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(acquisition.rows), "landing_path"));
   console.log("Public page views by source, route, and device (no PII)");
-  console.table(normalizeNumericRows(pageViews.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(pageViews.rows), "path"));
   console.log("Last-touch positive production orders (no PII)");
-  console.table(normalizeNumericRows(lastTouch.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(lastTouch.rows), "landing_path"));
   console.log("Data quality and explicitly excluded activity");
   console.table(normalizeMetricRows(quality.rows));
 } finally {

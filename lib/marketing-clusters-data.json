@@ -1,0 +1,31 @@
+{
+  "exactRoutes": {
+    "/career-tools": "core-commercial",
+    "/top-job-boards-uk": "job-search",
+    "/how-to-prepare-for-a-job-interview-uk": "applications",
+    "/common-job-interview-questions-uk": "applications",
+    "/thank-you-email-after-interview-uk": "applications",
+    "/tools/job-application-pack-uk": "applications",
+    "/career-advancement-strategies-uk": "career-progression",
+    "/software-testing-strategies-uk": "career-progression",
+    "/situations/made-redundant": "employment-changes",
+    "/tools/redundancy-pay-calculator": "employment-changes",
+    "/tools/notice-period-calculator": "employment-changes",
+    "/tools/uk-salary-by-job-title": "employment-changes",
+    "/cv-builder-no-subscription-uk": "core-commercial",
+    "/pricing": "core-commercial"
+  },
+  "prefixRoutes": [
+    ["/cv-template-", "job-search"],
+    ["/tools/cover-letter", "applications"],
+    ["/tools/ats-score", "applications"],
+    ["/tools/cv-bullet", "applications"],
+    ["/tools/cv-summary", "applications"],
+    ["/tools/first-job", "applications"],
+    ["/career-change-cv-", "career-progression"],
+    ["/return-to-work-cv-", "employment-changes"],
+    ["/cv-employment-gap-", "employment-changes"],
+    ["/tools/take-home-pay", "employment-changes"],
+    ["/tools/uk-living-wage", "employment-changes"]
+  ]
+}

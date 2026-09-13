@@ -21,6 +21,7 @@ const toolLabels: Record<string, string> = {
   "cv-template-word-uk": "CV template for Word",
   "cv-word-count-checker": "CV word count checker",
   "first-job-cv-wizard-uk": "First-job CV wizard",
+  "job-application-pack-uk": "Job Application Pack",
   "notice-period-calculator": "Notice period calculator",
   "redundancy-pay-calculator": "Redundancy pay calculator",
   "take-home-pay-calculator-uk": "Take-home pay calculator",

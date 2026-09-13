@@ -11,7 +11,7 @@ import {
 
 import { AtsScoreChecker } from "@/components/ats-score-checker";
 import { FaqSection, FinalCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
-import { site } from "@/lib/site";
+import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
@@ -244,6 +244,7 @@ export default function AtsScoreCheckerPage() {
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],
           ["Use an ATS CV template", "/ats-cv-template-uk"],
           ["Read the UK CV guide", "/how-to-write-a-cv-uk"],
+          ["Build without a subscription", commercialRoutes.moneyPage],
         ]}
       />
       <FaqSection faqs={faqItems} title="ATS CV checker questions." />
@@ -252,8 +253,8 @@ export default function AtsScoreCheckerPage() {
         body={`Carry your genuine experience into a guided UK CV, preview the pages, and pay ${site.price} only if you download the PDF.`}
         primaryHref="/editor?from=ats-checker"
         primary="Continue in the CV editor"
-        secondaryHref="/ats-cv-template-uk"
-        secondary="Review the ATS template"
+        secondaryHref={commercialRoutes.moneyPage}
+        secondary="See the no-subscription builder"
         trackingContext={analyticsPlacements.atsFinal}
       />
     </>

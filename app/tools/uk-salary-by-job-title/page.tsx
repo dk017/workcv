@@ -3,7 +3,7 @@ import Link from "next/link";
 import { BarChart3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { UkSalaryChecker } from "@/components/uk-salary-checker";
-import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, MoneyPageCta, SectionLabel } from "@/components/marketing";
 import { onsSalarySource, salaryRoles } from "@/lib/uk-salary-data";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
@@ -250,6 +250,11 @@ export default function UkSalaryByJobTitlePage() {
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Turn the target salary into a stronger application."
+        body={`Tailor your UK CV to the role behind the benchmark. Build and preview first, then pay ${site.price} once only if you download the PDF.`}
+        trackingContext="salary_checker_money"
+      />
       <FaqSection faqs={faqItems} title="UK salary benchmark questions." />
     </>
   );

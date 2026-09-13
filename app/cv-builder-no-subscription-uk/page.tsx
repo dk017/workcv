@@ -150,6 +150,7 @@ const internalLinks = [
   ["CVMaker UK alternative", "/cvmaker-alternative"],
   ["LiveCareer alternative UK", "/livecareer-alternative"],
   ["UK resume builder without subscription", "/resume-builder-uk-no-subscription"],
+  ["Career & work tools", "/career-tools"],
   ["Student CV template UK", "/student-cv-template"],
   ["CV with no experience", "/cv-no-experience-uk"],
   ["School leaver CV example", "/school-leaver-cv-example"],

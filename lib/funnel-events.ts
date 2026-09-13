@@ -9,6 +9,8 @@ export const publicFunnelEventNames = [
   "page_view",
   "marketing_cta_clicked",
   "login_started",
+  "tool_started",
+  "tool_completed",
 ] as const;
 
 export type PublicFunnelEventName = (typeof publicFunnelEventNames)[number];
@@ -110,12 +112,24 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
   if ((eventName === "landing_view" || eventName === "page_view") && !isPublicMeasurementPath(path)) {
     return null;
   }
+  if (
+    (eventName === "tool_started" || eventName === "tool_completed") &&
+    !isPublicMeasurementPath(path)
+  ) {
+    return null;
+  }
 
   const metadataInput =
     input.metadata && typeof input.metadata === "object" && !Array.isArray(input.metadata)
       ? (input.metadata as Record<string, unknown>)
       : {};
-  const allowedMetadata = new Set(["destination", "placement"]);
+  const allowedMetadata = new Set([
+    "destination",
+    "placement",
+    "tool",
+    "lifecycle",
+    "result",
+  ]);
   const metadataEntries: Array<[string, string | number | boolean]> = [];
   for (const [key, item] of Object.entries(metadataInput)) {
     if (!allowedMetadata.has(key)) continue;
@@ -130,9 +144,45 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
       /^[a-z0-9_]{3,80}$/.test(item)
     ) {
       metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "tool" &&
+      typeof item === "string" &&
+      /^[a-z0-9_-]{3,40}$/.test(item)
+    ) {
+      metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "lifecycle" &&
+      typeof item === "string" &&
+      ["started", "completed"].includes(item)
+    ) {
+      metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "result" &&
+      typeof item === "string" &&
+      ["success", "error"].includes(item)
+    ) {
+      metadataEntries.push([key, item]);
     }
   }
   const metadata = Object.fromEntries(metadataEntries);
+
+  if (
+    (eventName === "tool_started" || eventName === "tool_completed") &&
+    (typeof metadata.tool !== "string" ||
+      typeof metadata.lifecycle !== "string" ||
+      (eventName === "tool_started" && metadata.lifecycle !== "started") ||
+      (eventName === "tool_completed" &&
+        (metadata.lifecycle !== "completed" ||
+          (metadata.result !== "success" && metadata.result !== "error"))))
+  ) {
+    return null;
+  }
 
   return {
     eventId,

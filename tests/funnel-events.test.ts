@@ -34,6 +34,14 @@ test("landing views deduplicate by session while route and CTA events keep their
     ),
     "event_1234567890123456",
   );
+  assert.equal(
+    funnelEventDedupeValue(
+      "tool_started",
+      "event_1234567890123456",
+      "session_1234567890123456",
+    ),
+    "event_1234567890123456",
+  );
 });
 
 const validEvent = {
@@ -118,6 +126,15 @@ test("server sanitisation rejects private landing views but permits login-start 
   assert.ok(
     sanitizeFunnelEvent({ ...base, eventName: "login_started", path: "/login" }),
   );
+  assert.equal(
+    sanitizeFunnelEvent({
+      ...base,
+      eventName: "tool_started",
+      path: "/editor",
+      metadata: { tool: "job_application_pack", lifecycle: "started" },
+    }),
+    null,
+  );
 });
 
 test("invalid CTA metadata is discarded instead of relabelled", () => {
@@ -126,6 +143,49 @@ test("invalid CTA metadata is discarded instead of relabelled", () => {
     metadata: { destination: "https://evil.example", placement: "Invalid Label" },
   });
   assert.deepEqual(event?.metadata, {});
+});
+
+
+test("tool lifecycle events accept only bounded metadata and the right state", () => {
+  const started = sanitizeFunnelEvent({
+    ...validEvent,
+    eventName: "tool_started",
+    metadata: {
+      tool: "job_application_pack",
+      lifecycle: "started",
+      placement: "job_application_pack_generate",
+      raw_text: "must not survive",
+    },
+  });
+  assert.deepEqual(started?.metadata, {
+    tool: "job_application_pack",
+    lifecycle: "started",
+    placement: "job_application_pack_generate",
+  });
+
+  const completed = sanitizeFunnelEvent({
+    ...validEvent,
+    eventName: "tool_completed",
+    metadata: {
+      tool: "job_application_pack",
+      lifecycle: "completed",
+      result: "success",
+    },
+  });
+  assert.deepEqual(completed?.metadata, {
+    tool: "job_application_pack",
+    lifecycle: "completed",
+    result: "success",
+  });
+
+  assert.equal(
+    sanitizeFunnelEvent({
+      ...validEvent,
+      eventName: "tool_completed",
+      metadata: { tool: "job_application_pack", lifecycle: "started" },
+    }),
+    null,
+  );
 });
 
 test("hashes browser identifiers before persistence", () => {

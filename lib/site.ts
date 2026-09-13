@@ -17,6 +17,12 @@ export const site = {
     "A clear, professional UK CV—ready when you are.",
 };
 
+export const commercialRoutes = {
+  moneyPage: "/cv-builder-no-subscription-uk",
+  pricing: "/pricing",
+  editor: "/editor?template=classic&new=1",
+} as const;
+
 export const routes = [
   { href: "/", label: "Home" },
   { href: "/templates", label: "Templates" },

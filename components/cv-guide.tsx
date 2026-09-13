@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ButtonLink, RelatedLinksSection } from "@/components/marketing";
+import { ButtonLink, MoneyPageCta, RelatedLinksSection } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 export const guideReviewed = "2026-09-06";
@@ -40,6 +40,7 @@ export function Guide({ path, title, intro, children, links, action, placement }
       <p className="mb-6 mt-4 leading-7 text-muted">The blank Word template is free without an account. The WorkCV editor requires email-code login: build and preview free, then pay {site.price} once for the PDF of one saved CV. No subscription.</p>
       <ButtonLink href={action[1]} trackingLabel={placement}>{action[0]}</ButtonLink>
     </div></section>
+    <MoneyPageCta trackingContext={`${placement}_money_cta`} />
     <RelatedLinksSection title="Continue with your CV" links={links} />
   </>;
 }

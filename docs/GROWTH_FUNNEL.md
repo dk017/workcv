@@ -2,14 +2,16 @@
 
 ## What is recorded
 
-WorkCV records four privacy-limited public events before authentication:
+WorkCV records six privacy-limited public events before authentication:
 
 - `landing_view`
 - `page_view`
 - `marketing_cta_clicked`
 - `login_started`
+- `tool_started`
+- `tool_completed`
 
-Random first-party visitor and session identifiers are hashed on the server. Public events may contain a same-origin path, a labelled CTA placement, a same-origin destination, a normalised referral source, campaign fields, a referrer hostname, and a broad device class. The endpoint rejects unknown events and arbitrary metadata.
+Random first-party visitor and session identifiers are hashed on the server. Public events may contain a same-origin path, a labelled CTA placement, a same-origin destination, a bounded tool identifier and lifecycle/result state, a normalised referral source, campaign fields, a referrer hostname, and a broad device class. The endpoint rejects unknown events and arbitrary metadata.
 
 The browser posts these events only to `POST /api/events/funnel`. The authenticated `/api/events/editor` route does not accept anonymous public-funnel traffic. The public endpoint validates an allowlist, rate-limits by both hashed address and hashed session, and never stores an IP address.
 
@@ -56,6 +58,8 @@ npm run report:growth -- --days=90
 ```
 
 The report captures one half-open UTC window (`window_start <= occurred_at < report_end`) and reuses it for every query. It contains no email addresses or CV content, shows route-level public page views alongside first-touch source/landing acquisition and last-touch production revenue, and separates positive production orders from test or zero-value orders.
+
+The headline metrics also include `job_application_pack_starts` and successful `job_application_pack_completions`, identified only by the bounded tool identifier and lifecycle/result metadata. This makes tool usage measurable without storing the application text.
 
 ## Retention
 

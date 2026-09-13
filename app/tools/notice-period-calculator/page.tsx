@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { CalendarCheck, FileSearch, Scale, ShieldCheck } from "lucide-react";
 
-import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
 
@@ -238,6 +238,11 @@ export default function NoticePeriodCalculatorPage() {
           ["Calculate take-home pay", "/tools/take-home-pay-calculator-uk"],
           ["Compare salaries by job", "/tools/uk-salary-by-job-title"],
         ]}
+      />
+      <MoneyPageCta
+        heading="Use the next role as your next step."
+        body={`Update your UK CV while the role details are fresh. Build and preview first, then pay ${site.price} once only if you download the PDF.`}
+        trackingContext="notice_period_money"
       />
       <FaqSection faqs={faqItems} title="UK notice period questions." />
     </>

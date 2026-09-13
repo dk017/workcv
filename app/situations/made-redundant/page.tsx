@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
-import { site } from "@/lib/site";
+import { commercialRoutes, site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Made Redundant UK: What to Do Next",
@@ -109,8 +109,8 @@ export default function MadeRedundantPage() {
               <ButtonLink href="/tools/redundancy-pay-calculator">
                 Calculate redundancy pay
               </ButtonLink>
-              <ButtonLink href="/editor?new=1" variant="secondary">
-                Update my CV
+              <ButtonLink href={commercialRoutes.moneyPage} variant="secondary">
+                Build my CV without a subscription
               </ButtonLink>
             </div>
           </div>
@@ -253,6 +253,8 @@ export default function MadeRedundantPage() {
       <FinalCta
         heading="Put the next application back under your control."
         body={`Build and preview your UK CV free. Pay ${site.price} once only when this saved CV is ready to download.`}
+        primaryHref={commercialRoutes.moneyPage}
+        primary="Build my next-role CV"
         secondaryHref="/tools/redundancy-pay-calculator"
         secondary="Check redundancy pay"
       />

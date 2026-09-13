@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ArrowRight, Check, FileText, Globe2, GraduationCap, SearchCheck } from "lucide-react";
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import { commercialRoutes } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "CV vs Resume UK - Difference and Which to Use",
@@ -85,7 +86,7 @@ export default function CvVsResumeUkPage() {
               For most jobs, CV and resume describe the same practical task: present the evidence that makes you relevant. The important difference is context. Follow the employer&apos;s wording, requirements and market—not a rigid internet rule.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/resume-builder-uk-no-subscription">Build the right document</ButtonLink>
+              <ButtonLink href={commercialRoutes.moneyPage}>Build the right document</ButtonLink>
               <ButtonLink href="/resume-template-uk" variant="secondary">See a UK resume template</ButtonLink>
             </div>
           </div>
@@ -196,14 +197,14 @@ export default function CvVsResumeUkPage() {
         <div className="container-page">
           <SectionLabel>Next step</SectionLabel>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[["UK resume template", "/resume-template-uk"], ["No-subscription resume builder", "/resume-builder-uk-no-subscription"], ["How to write a UK CV", "/how-to-write-a-cv-uk"]].map(([label, href]) => <Link key={href} href={href} className="group flex min-h-24 items-center justify-between gap-4 rounded-xl border border-line bg-white p-5 font-bold text-navy transition hover:-translate-y-1 hover:border-navy">{label}<ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" /></Link>)}
+            {[["UK resume template", "/resume-template-uk"], ["No-subscription CV builder", commercialRoutes.moneyPage], ["How to write a UK CV", "/how-to-write-a-cv-uk"]].map(([label, href]) => <Link key={href} href={href} className="group flex min-h-24 items-center justify-between gap-4 rounded-xl border border-line bg-white p-5 font-bold text-navy transition hover:-translate-y-1 hover:border-navy">{label}<ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" /></Link>)}
           </div>
         </div>
       </section>
 
       <section className="container-page py-8"><h2 className="font-display text-3xl font-semibold text-navy">Adapt your existing resume</h2><p className="mt-4 leading-8">See the <Link href="/convert-resume-to-uk-cv" className="font-bold text-navy underline">overseas-to-UK CV conversion</Link> for a complete before-and-after example.</p></section>
       <FaqSection faqs={faqs} title="Questions about CV and resume terminology in the UK." />
-      <FinalCta heading="Call it a CV or resume. Build it for the job." body="Start with a UK-ready structure, tailor the evidence and preview the document before deciding whether to unlock its PDF." primaryHref="/resume-builder-uk-no-subscription" primary="Build my document" secondaryHref="/resume-template-uk" secondary="View the template" />
+      <FinalCta heading="Call it a CV or resume. Build it for the job." body="Start with a UK-ready structure, tailor the evidence and preview the document before deciding whether to unlock its PDF." primaryHref={commercialRoutes.moneyPage} primary="Build my document" secondaryHref="/resume-template-uk" secondary="View the template" />
     </>
   );
 }

@@ -3,7 +3,7 @@ import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { TrackedLink } from "@/components/tracked-link";
 import { buildLoginHref } from "@/lib/safe-redirect";
-import { routes, site } from "@/lib/site";
+import { commercialRoutes, routes, site } from "@/lib/site";
 
 const startEditorHref = buildLoginHref("/editor");
 
@@ -267,12 +267,53 @@ export function NoSubscriptionCtaStrip() {
           </p>
         </div>
         <Link
-          href="/cv-builder-no-subscription-uk"
+          href={commercialRoutes.moneyPage}
           className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-bold text-navy transition hover:-translate-y-0.5"
         >
           See how it works
           <ArrowRight className="h-4 w-4" />
         </Link>
+      </div>
+    </section>
+  );
+}
+
+export function MoneyPageCta({
+  heading = "Build the CV behind your next application.",
+  body = `Build and preview your UK CV first, then pay ${site.price} once when the PDF is ready. There is no monthly CV-builder subscription.`,
+  trackingContext = "money_page_cta",
+  secondary = true,
+}: {
+  heading?: string;
+  body?: string;
+  trackingContext?: string;
+  secondary?: boolean;
+}) {
+  return (
+    <section className="border-y border-line bg-navy py-16 text-white">
+      <div className="container-page text-center">
+        <h2 className="font-display text-4xl font-semibold md:text-5xl">{heading}</h2>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">{body}</p>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <TrackedLink
+            href={commercialRoutes.moneyPage}
+            placement={`${trackingContext}_money`}
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-navy"
+          >
+            See the no-subscription CV builder
+            <ArrowRight className="h-4 w-4" />
+          </TrackedLink>
+          {secondary ? (
+            <TrackedLink
+              href={commercialRoutes.editor}
+              placement={`${trackingContext}_editor`}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-6 py-3 text-sm font-bold text-white"
+            >
+              Start building free
+              <ArrowRight className="h-4 w-4" />
+            </TrackedLink>
+          ) : null}
+        </div>
       </div>
     </section>
   );

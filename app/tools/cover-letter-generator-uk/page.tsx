@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { FileCheck2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { CoverLetterGenerator } from "@/components/cover-letter-generator";
-import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 const path = "/tools/cover-letter-generator-uk";
@@ -114,6 +114,11 @@ export default function CoverLetterGeneratorPage() {
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Turn the letter into a complete UK application."
+        body={`Build and preview the CV behind your application, then pay ${site.price} once only if you download the PDF. No monthly subscription.`}
+        trackingContext="cover_letter_generator_money"
+      />
       <RelatedLinksSection title="Use a matching structure." links={[["Open the UK cover letter template", "/tools/cover-letter-template-uk"]]} />
       <FaqSection faqs={faqs} title="UK cover letter questions." />
     </>
