@@ -7,6 +7,7 @@ import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { DIGITAL_CONTENT_CONSENT_VERSION } from "@/lib/commerce";
 import { isApprovedTestUser } from "@/lib/test-orders";
+import { sanitizeSaleAttribution } from "@/lib/attribution";
 
 export const runtime = "nodejs";
 
@@ -41,6 +42,7 @@ export async function POST(request: NextRequest) {
   const email = payload.email;
   const consentAccepted = payload.consentAccepted === true;
   const forceNew = payload.forceNew === true;
+  const providedAttribution = sanitizeSaleAttribution(payload.attribution);
 
   if (!isValidDraftId(draftId)) {
     return NextResponse.json({ error: "Invalid draftId" }, { status: 400 });
@@ -63,6 +65,33 @@ export async function POST(request: NextRequest) {
     }
 
     await ensurePaymentTables();
+    const storedAttributionResult = await getPool().query<{
+      last_utm_source: string | null;
+      last_utm_medium: string | null;
+      last_utm_campaign: string | null;
+      last_landing_path: string | null;
+      last_referrer_host: string | null;
+    }>(
+      `SELECT last_utm_source, last_utm_medium, last_utm_campaign,
+              last_landing_path, last_referrer_host
+       FROM workcv_users WHERE id = $1`,
+      [user.id],
+    );
+    const storedRow = storedAttributionResult.rows[0];
+    const storedAttribution = sanitizeSaleAttribution({
+      lastUtmSource: storedRow?.last_utm_source,
+      lastUtmMedium: storedRow?.last_utm_medium,
+      lastUtmCampaign: storedRow?.last_utm_campaign,
+      lastLandingPath: storedRow?.last_landing_path,
+      lastReferrerHost: storedRow?.last_referrer_host,
+    });
+    const attribution = {
+      source: providedAttribution.source || storedAttribution.source || null,
+      medium: providedAttribution.medium || storedAttribution.medium || null,
+      campaign: providedAttribution.campaign || storedAttribution.campaign || null,
+      landingPath: providedAttribution.landingPath || storedAttribution.landingPath || null,
+      referrerHost: providedAttribution.referrerHost || storedAttribution.referrerHost || null,
+    };
     if (forceNew) {
       await getPool().query(
         `
@@ -100,8 +129,11 @@ export async function POST(request: NextRequest) {
       `
         INSERT INTO workcv_payment_checkouts
           (id, draft_id, email, product_id, checkout_url, site_host, user_id,
-           consent_at, consent_version, status, is_test, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', $9, NOW())
+           consent_at, consent_version, status, is_test, attribution_source,
+           attribution_medium, attribution_campaign, attribution_landing_path,
+           attribution_referrer_host, attribution_captured_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', $9,
+                $10, $11, $12, $13, $14, NOW(), NOW())
         ON CONFLICT (id) DO UPDATE SET
           draft_id = EXCLUDED.draft_id,
           email = EXCLUDED.email,
@@ -112,6 +144,12 @@ export async function POST(request: NextRequest) {
           consent_at = EXCLUDED.consent_at,
           consent_version = EXCLUDED.consent_version,
           is_test = EXCLUDED.is_test,
+          attribution_source = EXCLUDED.attribution_source,
+          attribution_medium = EXCLUDED.attribution_medium,
+          attribution_campaign = EXCLUDED.attribution_campaign,
+          attribution_landing_path = EXCLUDED.attribution_landing_path,
+          attribution_referrer_host = EXCLUDED.attribution_referrer_host,
+          attribution_captured_at = EXCLUDED.attribution_captured_at,
           updated_at = NOW()
       `,
       [
@@ -124,6 +162,11 @@ export async function POST(request: NextRequest) {
         user.id,
         DIGITAL_CONTENT_CONSENT_VERSION,
         isTest,
+        attribution.source,
+        attribution.medium,
+        attribution.campaign,
+        attribution.landingPath,
+        attribution.referrerHost,
       ]
     );
 

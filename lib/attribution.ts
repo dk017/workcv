@@ -24,6 +24,14 @@ export type PersistedSignupAttribution = Omit<
   sessionHash?: string;
 };
 
+export type SaleAttribution = {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  landingPath?: string;
+  referrerHost?: string;
+};
+
 // Retained as the browser-facing compatibility name used by existing callers.
 export type SignupAttribution = BrowserSignupAttribution;
 
@@ -97,4 +105,15 @@ export function sanitizeSignupAttribution(value: unknown): BrowserSignupAttribut
     delete result.lastReferrerHost;
   }
   return result;
+}
+
+export function sanitizeSaleAttribution(value: unknown): SaleAttribution {
+  const attribution = sanitizeSignupAttribution(value);
+  return {
+    source: attribution.lastUtmSource || attribution.utmSource,
+    medium: attribution.lastUtmMedium || attribution.utmMedium,
+    campaign: attribution.lastUtmCampaign || attribution.utmCampaign,
+    landingPath: attribution.lastLandingPath || attribution.landingPath,
+    referrerHost: attribution.lastReferrerHost || attribution.referrerHost,
+  };
 }

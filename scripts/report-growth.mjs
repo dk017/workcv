@@ -40,7 +40,8 @@ try {
     to_regclass('public.workcv_editor_events') IS NOT NULL AS editor,
     to_regclass('public.workcv_signup_events') IS NOT NULL AS signup,
     to_regclass('public.workcv_orders') IS NOT NULL AS orders,
-    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'is_test') AS order_test`);
+    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'is_test') AS order_test,
+    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'attribution_captured_at') AS order_attribution`);
   if (Object.values(ready.rows[0] || {}).some((value) => value !== true)) {
     throw new Error("Growth schema is not ready; run npm run db:prepare:growth first");
   }
@@ -170,12 +171,40 @@ try {
     ORDER BY page_views DESC, sessions DESC, source, path`, params);
 
   const lastTouch = await pool.query(`${bounds}, attributed AS (
-      SELECT o.amount_cents,normalized.source,COALESCE(u.last_landing_path,'(unknown)') landing_path
+      SELECT o.amount_cents,normalized.source,
+        COALESCE(
+          CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END,
+          '(unknown)'
+        ) landing_path
       FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
-      CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM (SELECT u.last_utm_source source_value,u.last_referrer_host host_value) raw) normalized,bounds
+      CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM (
+        SELECT CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END source_value,
+               CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END host_value
+      ) raw) normalized,bounds
       WHERE o.amount_cents>0 AND o.is_test=FALSE AND o.paid_at>=window_start AND o.paid_at<report_end)
     SELECT source,landing_path,COUNT(*)::bigint production_orders,COALESCE(SUM(amount_cents),0)::bigint revenue_pence
     FROM attributed GROUP BY source,landing_path ORDER BY production_orders DESC,source,landing_path`, params);
+
+  const latestSale = await pool.query(`WITH latest_order AS (
+      SELECT o.paid_at,o.amount_cents,o.currency,o.attribution_captured_at,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END source_value,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END host_value,
+        COALESCE(
+          CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END,
+          '(unknown)'
+        ) landing_path,
+        u.last_utm_source,u.last_referrer_host
+      FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
+      WHERE o.amount_cents>0 AND o.is_test=FALSE
+      ORDER BY o.paid_at DESC LIMIT 1
+    )
+    SELECT paid_at,amount_cents,currency,${sourceCase} source,landing_path,
+      CASE
+        WHEN attribution_captured_at IS NOT NULL THEN 'checkout_snapshot'
+        WHEN COALESCE(last_utm_source,'')<>'' OR COALESCE(last_referrer_host,'')<>'' THEN 'legacy_profile_fallback'
+        ELSE 'unknown'
+      END attribution_basis
+    FROM latest_order CROSS JOIN LATERAL (SELECT source_value,host_value) raw`);
 
   const quality = await pool.query(`${bounds}
     SELECT 'unattributed_signups' metric,COUNT(DISTINCT s.user_id)::bigint value FROM workcv_signup_events s LEFT JOIN workcv_users u ON u.id=s.user_id,bounds
@@ -204,8 +233,10 @@ try {
   console.table(addMarketingCluster(normalizeNumericRows(acquisition.rows), "landing_path"));
   console.log("Public page views by source, route, and device (no PII)");
   console.table(addMarketingCluster(normalizeNumericRows(pageViews.rows), "path"));
-  console.log("Last-touch positive production orders (no PII)");
+  console.log("Sale source and landing page (checkout snapshot; legacy rows use profile fallback)");
   console.table(addMarketingCluster(normalizeNumericRows(lastTouch.rows), "landing_path"));
+  console.log("Most recent positive production sale (no buyer identifiers)");
+  console.table(normalizeNumericRows(latestSale.rows));
   console.log("Data quality and explicitly excluded activity");
   console.table(normalizeMetricRows(quality.rows));
 } finally {

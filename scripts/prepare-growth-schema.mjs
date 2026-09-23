@@ -41,8 +41,32 @@ try {
 
     ALTER TABLE workcv_payment_checkouts
       ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_source TEXT;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_medium TEXT;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_campaign TEXT;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_landing_path TEXT;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_referrer_host TEXT;
+    ALTER TABLE workcv_payment_checkouts
+      ADD COLUMN IF NOT EXISTS attribution_captured_at TIMESTAMPTZ;
     ALTER TABLE workcv_orders
       ADD COLUMN IF NOT EXISTS is_test BOOLEAN NOT NULL DEFAULT FALSE;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_source TEXT;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_medium TEXT;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_campaign TEXT;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_landing_path TEXT;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_referrer_host TEXT;
+    ALTER TABLE workcv_orders
+      ADD COLUMN IF NOT EXISTS attribution_captured_at TIMESTAMPTZ;
     CREATE INDEX IF NOT EXISTS workcv_orders_test_paid_idx
       ON workcv_orders (is_test, paid_at DESC);
 
@@ -87,6 +111,14 @@ try {
       ) AS order_test,
       EXISTS (
         SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'workcv_orders' AND column_name = 'attribution_captured_at'
+      ) AS order_attribution,
+      EXISTS (
+        SELECT 1 FROM information_schema.columns
+        WHERE table_name = 'workcv_payment_checkouts' AND column_name = 'attribution_captured_at'
+      ) AS checkout_attribution,
+      EXISTS (
+        SELECT 1 FROM information_schema.columns
         WHERE table_name = 'workcv_payment_checkouts' AND column_name = 'is_test'
       ) AS checkout_test,
       to_regclass('public.workcv_editor_events_event_key_uidx') IS NOT NULL AS event_key_index,
@@ -108,6 +140,8 @@ try {
     !result?.funnel_test ||
     !result?.order_test ||
     !result?.checkout_test ||
+    !result?.order_attribution ||
+    !result?.checkout_attribution ||
     !result?.event_key_index ||
     !result?.funnel_report_index ||
     !result?.order_report_index ||

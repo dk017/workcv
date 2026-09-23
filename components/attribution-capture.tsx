@@ -194,3 +194,19 @@ export function readFirstTouchAttribution() {
     return undefined;
   }
 }
+
+export function readCheckoutAttribution() {
+  try {
+    ensureTrackingContext();
+    const touch = readStoredTouch(lastTouchKey) || currentTouch();
+    return {
+      utmSource: touch.utmSource,
+      utmMedium: touch.utmMedium,
+      utmCampaign: touch.utmCampaign,
+      landingPath: touch.landingPath,
+      referrerHost: touch.referrerHost,
+    };
+  } catch {
+    return undefined;
+  }
+}

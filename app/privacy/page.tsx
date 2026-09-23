@@ -85,6 +85,12 @@ export default function PrivacyPage() {
                 pages and referral sources make the service useful.
               </p>
               <p>
+                When checkout starts, we save the recorded traffic source,
+                campaign labels, landing page, and referrer hostname with the
+                payment record so completed sales can be attributed to the
+                journey that led to checkout.
+              </p>
+              <p>
                 Random browser and session identifiers are hashed before storage.
                 We do not put CV text, imported document contents, authentication
                 codes, payment-card data, or full browsing URLs into these event
@@ -121,7 +127,8 @@ export default function PrivacyPage() {
               <p>
                 CV draft content is saved to your WorkCV account after email-code
                 login. Payment records are kept for accounting, fraud prevention,
-                support, and dispute handling.
+                support, dispute handling, and the sales-attribution purpose
+                described above.
               </p>
               <p>
                 We keep personal data only for as long as needed for the purpose it

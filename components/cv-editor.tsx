@@ -53,6 +53,7 @@ import {
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { useAccessibleDialog } from "@/components/editor/use-accessible-dialog";
 import { createCvSaveManager } from "@/components/editor/create-cv-save-manager";
+import { readCheckoutAttribution } from "@/components/attribution-capture";
 import { MemoCvDocument } from "@/components/editor/cv-document";
 import {
   EducationForm,
@@ -810,6 +811,7 @@ export function CvEditor() {
           email,
           consentAccepted: true,
           forceNew: forceNewCheckout,
+          attribution: readCheckoutAttribution(),
         }),
       });
       const data = (await response.json()) as { checkoutUrl?: string; error?: string };

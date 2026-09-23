@@ -148,6 +148,12 @@ export async function POST(request: NextRequest) {
     let consentAt: Date | null = null;
     let consentVersion: string | null = null;
     let isTest = false;
+    let attributionSource: string | null = null;
+    let attributionMedium: string | null = null;
+    let attributionCampaign: string | null = null;
+    let attributionLandingPath: string | null = null;
+    let attributionReferrerHost: string | null = null;
+    let attributionCapturedAt: Date | null = null;
     if (checkoutId) {
       const checkout = await getPool().query<{
         email: string | null;
@@ -155,12 +161,21 @@ export async function POST(request: NextRequest) {
         consent_at: Date | null;
         consent_version: string | null;
         is_test: boolean;
+        attribution_source: string | null;
+        attribution_medium: string | null;
+        attribution_campaign: string | null;
+        attribution_landing_path: string | null;
+        attribution_referrer_host: string | null;
+        attribution_captured_at: Date | null;
       }>(
         `
           UPDATE workcv_payment_checkouts
           SET completed_at = NOW(), status = 'paid', updated_at = NOW()
           WHERE id = $1
-          RETURNING email, user_id, consent_at, consent_version, is_test
+          RETURNING email, user_id, consent_at, consent_version, is_test,
+                    attribution_source, attribution_medium, attribution_campaign,
+                    attribution_landing_path, attribution_referrer_host,
+                    attribution_captured_at
         `,
         [checkoutId]
       );
@@ -169,14 +184,23 @@ export async function POST(request: NextRequest) {
       consentAt = checkout.rows[0]?.consent_at || null;
       consentVersion = checkout.rows[0]?.consent_version || null;
       isTest = checkout.rows[0]?.is_test === true;
+      attributionSource = checkout.rows[0]?.attribution_source || null;
+      attributionMedium = checkout.rows[0]?.attribution_medium || null;
+      attributionCampaign = checkout.rows[0]?.attribution_campaign || null;
+      attributionLandingPath = checkout.rows[0]?.attribution_landing_path || null;
+      attributionReferrerHost = checkout.rows[0]?.attribution_referrer_host || null;
+      attributionCapturedAt = checkout.rows[0]?.attribution_captured_at || null;
     }
 
     await getPool().query(
       `
         INSERT INTO workcv_orders
           (id, draft_id, email, product_id, amount_cents, currency, checkout_id,
-           raw_event_type, user_id, consent_at, consent_version, is_test)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           raw_event_type, user_id, consent_at, consent_version, is_test,
+           attribution_source, attribution_medium, attribution_campaign,
+           attribution_landing_path, attribution_referrer_host, attribution_captured_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+                $13, $14, $15, $16, $17, $18)
         ON CONFLICT (id) DO NOTHING
       `,
       [
@@ -192,6 +216,12 @@ export async function POST(request: NextRequest) {
         consentAt,
         consentVersion,
         isTest,
+        attributionSource,
+        attributionMedium,
+        attributionCampaign,
+        attributionLandingPath,
+        attributionReferrerHost,
+        attributionCapturedAt,
       ]
     );
 
