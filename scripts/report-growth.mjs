@@ -187,8 +187,8 @@ try {
 
   const latestSale = await pool.query(`WITH latest_order AS (
       SELECT o.paid_at,o.amount_cents,o.currency,o.attribution_captured_at,
-        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END source_value,
-        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END host_value,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END sale_source_value,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END sale_host_value,
         COALESCE(
           CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END,
           '(unknown)'
@@ -204,7 +204,9 @@ try {
         WHEN COALESCE(last_utm_source,'')<>'' OR COALESCE(last_referrer_host,'')<>'' THEN 'legacy_profile_fallback'
         ELSE 'unknown'
       END attribution_basis
-    FROM latest_order CROSS JOIN LATERAL (SELECT source_value,host_value) raw`);
+    FROM latest_order CROSS JOIN LATERAL (
+      SELECT latest_order.sale_source_value AS source_value, latest_order.sale_host_value AS host_value
+    ) raw`);
 
   const quality = await pool.query(`${bounds}
     SELECT 'unattributed_signups' metric,COUNT(DISTINCT s.user_id)::bigint value FROM workcv_signup_events s LEFT JOIN workcv_users u ON u.id=s.user_id,bounds
