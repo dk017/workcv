@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { WorkedSection, GuideTable } from "@/components/cv-guide";
+import { GuideTable } from "@/components/cv-guide";
+import { TrackedLink } from "@/components/tracked-link";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -158,11 +162,6 @@ const internalLinks = [
 
 const faqItems = [
   {
-    question: "Is WorkCV a subscription?",
-    answer:
-      `No. WorkCV does not use a monthly subscription for the standard CV download flow. You build first and pay ${site.priceGbp} when you download your final PDF.`,
-  },
-  {
     question: "How much does WorkCV cost in the UK?",
     answer:
       `WorkCV costs ${site.priceGbp} when you download your finished CV as a PDF. You can build your CV before paying.`,
@@ -172,34 +171,9 @@ const faqItems = [
     answer: underTenCvBuilderAnswer(site.priceAmount, site.priceGbp),
   },
   {
-    question: "Can I build a CV without paying monthly?",
-    answer:
-      "Yes. WorkCV is designed for people who want one finished UK CV without a recurring monthly CV builder plan, monthly fee or hidden renewal.",
-  },
-  {
-    question: "Is WorkCV a pay-once CV builder?",
-    answer:
-      `Yes. In the standard WorkCV flow, you build and preview first, then make a one-time ${site.priceGbp} payment when you download the finished PDF.`,
-  },
-  {
-    question: "Are there hidden fees or automatic renewals?",
-    answer:
-      "No. WorkCV does not start a monthly CV builder subscription, hidden renewal or automatic renewal in the standard PDF download flow.",
-  },
-  {
-    question: "Can I use WorkCV without an account or sign up?",
-    answer:
-      "No. WorkCV uses email-code login before the editor so your CV can be saved and reopened. There is no password to remember, but it is not a no-account CV builder.",
-  },
-  {
     question: "Why do many CV builders use subscriptions?",
     answer:
       "Many CV builders offer low trial prices that renew into a paid plan unless cancelled. That model can suit people who need ongoing access, but it may be more than you need for one CV download.",
-  },
-  {
-    question: "Is there a completely free CV builder in the UK?",
-    answer:
-      "Yes, some organisations offer free CV tools. WorkCV is different: it is free to build and preview, then paid when you download the PDF, with a clear one-time download price and no monthly CV builder subscription.",
   },
   {
     question: "Does WorkCV follow UK CV expectations?",
@@ -286,13 +260,14 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
+      <CustomerQuestionNav ids={["Q01", "Q07", "Q03"]} />
       <section className="border-y border-line bg-surface">
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Pay once for one saved CV",
-            "No monthly fee",
+            "Free blank DOCX option",
             "No automatic renewal",
-            "No hidden renewal",
+            "Edit and redownload the paid CV",
           ].map((item) => (
             <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
               <ShieldCheck className="h-5 w-5 shrink-0 text-success" />
@@ -302,7 +277,8 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
-      <WorkedSection title="What you receive when you pay once">
+      <section className="border-y border-line bg-paper py-16"><div className="container-page max-w-5xl space-y-8">
+      <CustomerAnswer questionId="Q01">
         <GuideTable caption="The WorkCV offer" headings={["Stage", "Included"]} rows={[
           ["Start", "Email-code login so the CV can be saved and reopened."],
           ["Before payment", "Build in the editor and preview the layout for free. This is not a trial that renews."],
@@ -310,9 +286,21 @@ export default function NoSubscriptionUkPage() {
           ["Download", "PDF output. Payment is associated with the saved CV, not an unlimited collection of new CVs."],
           ["Need Word?", "Use the separate free blank DOCX template. It is not an export of your editor CV."],
         ]} />
-        <p>Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link> to move it into the supported editor fields or file import. Review the current on-screen status before importing over a populated CV.</p>
-        <p>See <Link className="underline" href="/pricing">pricing and entitlement details</Link>, the <Link className="underline" href="/refund-policy">refund policy</Link> and the <Link className="underline" href="/cv-word-or-pdf-uk">Word/PDF decision guide</Link> before choosing the appropriate document route.</p>
-      </WorkedSection>
+        <p>Inspect the <Link className="font-semibold underline" href="/samples/workcv-customer-service-cv-example.pdf">sample PDF</Link> before starting. Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link>. For costs and future downloads, read <Link className="underline" href={customerQuestionHref("Q05")}>how to reopen a paid CV</Link> and <Link className="underline" href={customerQuestionHref("Q06")}>what one payment covers</Link>.</p>
+      </CustomerAnswer>
+      <CustomerAnswer questionId="Q07">
+        <ol className="list-decimal space-y-2 pl-6"><li>Use an email code to sign in and save your document.</li><li>Edit and preview your CV without entering payment details.</li><li>Choose PDF download only when ready for checkout.</li></ol>
+        <p>Need no account at all? <Link className="font-semibold underline" href="/tools/blank-cv-template-uk">Download the free blank DOCX</Link>. It is a separate file you edit yourself.</p>
+      </CustomerAnswer>
+      <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/cv-builder-no-subscription-uk"]}>{displayReviewDate(customerContentReview["/cv-builder-no-subscription-uk"])}</time>.</p>
+      </div></section>
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q03">
+          <ol className="list-decimal space-y-3 pl-6"><li>Open WorkCV in your phone or tablet browser and sign in with your email code.</li><li>Enter your details, or select <strong>More → Import CV</strong> to upload a PDF or DOCX file. The import dialog does not take pasted text.</li><li>Check every imported field; correct names, dates and experience.</li><li>Switch between <strong>Edit CV</strong> and <strong>Preview</strong> to review every page.</li><li>Choose the PDF download and complete checkout when you are ready.</li><li>Open the downloaded PDF and confirm its contents before applying.</li></ol>
+          <p>On iPhone and iPad, check Safari’s downloads list or the Files app; the location depends on browser and device settings. See <a className="font-semibold underline" href="https://support.apple.com/en-gb/102440" target="_blank" rel="noopener noreferrer">Apple’s download guide</a>. For other browsers, check their downloads list.</p>
+          <p>If checkout succeeded but you cannot find the file, <TrackedLink className="font-semibold underline" placement={analyticsPlacements.customerQ03Support} href={customerQuestionHref("Q24")}>follow the paid download checks</TrackedLink>.</p>
+        </CustomerAnswer>
+      </div></section>
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Cost comparison</SectionLabel>

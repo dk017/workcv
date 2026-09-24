@@ -23,6 +23,7 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
 const privateLanding = `(path = '/login' OR path = '/editor' OR path = '/my-cvs' OR path LIKE '/cv-pdf/%' OR path LIKE '/api/%')`;
 const sourceCase = `CASE
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'chatgpt|openai' THEN 'chatgpt'
+  WHEN LOWER(COALESCE(host_value, '')) = 'search.brave.com' OR LOWER(COALESCE(source_value, '')) IN ('brave','brave_search') THEN 'brave'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'claude|anthropic' THEN 'claude'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'gemini|bard\\.google' THEN 'gemini'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'perplexity' THEN 'perplexity'
@@ -207,6 +208,29 @@ try {
     FROM latest_order CROSS JOIN LATERAL (
       SELECT latest_order.sale_source_value AS source_value, latest_order.sale_host_value AS host_value
     ) raw`);
+
+  const toolUsage = await pool.query(`${bounds}
+    SELECT metadata->>'tool' tool, event_name, COUNT(*)::bigint events,
+      COUNT(DISTINCT session_hash)::bigint sessions
+    FROM workcv_funnel_events, bounds
+    WHERE event_name IN ('tool_started','tool_completed') AND is_test=FALSE
+      AND created_at>=window_start AND created_at<report_end
+    GROUP BY metadata->>'tool',event_name ORDER BY tool,event_name`, params);
+  const acquisitionSales = await pool.query(`${bounds}, attributed AS (
+    SELECT o.amount_cents, normalized.source,
+      CASE WHEN u.first_landing_path LIKE '/%' AND u.first_landing_path NOT IN ('/login','/editor','/my-cvs')
+        AND u.first_landing_path NOT LIKE '/api/%' AND u.first_landing_path NOT LIKE '/cv-pdf/%'
+        THEN u.first_landing_path ELSE '(unknown public landing)' END landing_path
+    FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
+    CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM
+      (SELECT u.utm_source source_value,u.first_referrer host_value) raw) normalized,bounds
+    WHERE o.amount_cents>0 AND o.is_test=FALSE AND o.paid_at>=window_start AND o.paid_at<report_end)
+    SELECT source,landing_path,COUNT(*)::bigint orders,SUM(amount_cents)::bigint revenue_pence
+    FROM attributed GROUP BY source,landing_path ORDER BY orders DESC`, params);
+  console.log("Paid orders by recorded first-touch acquisition (separate from checkout attribution; not causal proof)");
+  console.table(normalizeNumericRows(acquisitionSales.rows));
+  console.log("Tool events and distinct sessions (completion events may repeat; no worksheet or CV text)");
+  console.table(normalizeNumericRows(toolUsage.rows));
 
   const quality = await pool.query(`${bounds}
     SELECT 'unattributed_signups' metric,COUNT(DISTINCT s.user_id)::bigint value FROM workcv_signup_events s LEFT JOIN workcv_users u ON u.id=s.user_id,bounds

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { ReturnerExample } from "@/components/content-worked-examples";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -362,6 +364,13 @@ export default function ReturnToWorkCvUkPage() {
         </div>
       </section>
 
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q19">
+          <p>Sam Taylor’s fictional CV below keeps the paid office administrator role from August 2017 to December 2021, a childcare break from January 2022 to the present, and volunteering as a booking helper from March 2026 to the present. The volunteering overlaps the break from paid work; it is not disguised as a paid position.</p>
+          <p>Sam’s recent booking lists, reminders and customer emails support a part-time administration target. Include a course only if you completed it, and keep childcare details as brief as you prefer. The complete CV and alternative gap wording follow.</p>
+          <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/return-to-work-cv-uk"]}>{displayReviewDate(customerContentReview["/return-to-work-cv-uk"])}</time>.</p>
+        </CustomerAnswer>
+      </div></section>
       <ReturnerExample />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({

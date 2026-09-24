@@ -106,4 +106,26 @@ jobs:
             docker run --rm --env-file .env --network werkcv_default --entrypoint node "$WORKCV_IMAGE" scripts/prepare-growth-schema.mjs
             docker compose -p workcv -f docker-compose.ghcr.yml up -d app
             docker compose -p workcv -f docker-compose.ghcr.yml ps
+            image_repository="${WORKCV_IMAGE%:*}"
+            container_ids="$(docker ps -aq)"
+            if [ -n "$container_ids" ]; then
+              used_image_ids="$(docker inspect --format '{{.Image}}' $container_ids)"
+            else
+              used_image_ids=""
+            fi
+            echo "WorkCV images before cleanup:"
+            docker image ls "$image_repository"
+            image_rows="$(docker image ls --no-trunc --format '{{.Repository}}:{{.Tag}}|{{.ID}}' "$image_repository")"
+            for image_row in $image_rows; do
+              image_ref="${image_row%%|*}"
+              image_id="${image_row#*|}"
+              if printf '%s\n' "$used_image_ids" | grep -Fqx -- "$image_id"; then
+                echo "Keeping WorkCV image still referenced by a container: $image_id"
+              else
+                echo "Removing unused WorkCV image reference: $image_ref"
+                docker image rm "$image_ref"
+              fi
+            done
             docker image prune -f
+            echo "WorkCV images after cleanup:"
+            docker image ls "$image_repository"

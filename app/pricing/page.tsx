@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { TrackedLink } from "@/components/tracked-link";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { ArrowRight, Check, ExternalLink } from "lucide-react";
 
 import {
@@ -14,7 +18,7 @@ import {
   competitorPricingCheckedDate,
 } from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
-import { site } from "@/lib/site";
+import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
@@ -114,11 +118,6 @@ const pricingFaqs = [
     answer:
       `On its pricing page checked ${checkedDate}, Resume.io listed ${competitorPricing.resumeIo.entry}, followed by automatic renewal at ${competitorPricing.resumeIo.renewal}.`,
   },
-  {
-    question: "Do I need to pay monthly for a CV builder?",
-    answer:
-      "No. If you only need one CV PDF, you can use a no-subscription model like WorkCV and pay once when you download. Subscription CV builders may suit people who need ongoing access to a larger career platform.",
-  },
 ];
 
 const productSchema = buildWorkCvProductSchema({
@@ -214,6 +213,23 @@ export default function PricingPage() {
         </div>
       </section>
 
+      <CustomerQuestionNav ids={["Q02", "Q05", "Q06"]} />
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl space-y-14">
+        <CustomerAnswer questionId="Q02">
+          <div className="grid gap-5 md:grid-cols-2">
+            <div className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-2xl font-semibold text-navy">Free editable Word template</h3><dl className="mt-4 space-y-2 text-sm"><div><dt className="font-bold">Cost and account</dt><dd>£0; no WorkCV account</dd></div><div><dt className="font-bold">File and formatting</dt><dd>Editable DOCX; you enter and format your own details in a compatible editor</dd></div><div><dt className="font-bold">Later downloads</dt><dd>The blank file remains free; exporting your finished CV depends on your editor</dd></div></dl><TrackedLink download href="/api/tools/blank-cv-template" placement={analyticsPlacements.customerQ02FreeDownload} className="mt-5 inline-block font-bold text-navy underline">Download the free DOCX</TrackedLink></div>
+            <div className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-2xl font-semibold text-navy">Guided WorkCV builder</h3><dl className="mt-4 space-y-2 text-sm"><div><dt className="font-bold">Cost and account</dt><dd>Email-code account; build and preview free; {site.price} for one saved CV’s PDF</dd></div><div><dt className="font-bold">File and formatting</dt><dd>Guided layout and preview; paid PDF, not an editable DOCX export</dd></div><div><dt className="font-bold">Later downloads</dt><dd>Edit and download that same paid saved CV again without another payment</dd></div></dl><TrackedLink href={commercialRoutes.moneyPage} placement={analyticsPlacements.customerQ02Money} className="mt-5 inline-block font-bold text-navy underline">See how the builder works</TrackedLink></div>
+          </div>
+        </CustomerAnswer>
+        <CustomerAnswer questionId="Q05">
+          <ol className="list-decimal space-y-2 pl-6"><li>Sign in to the account used for the original payment and open <Link className="font-semibold underline" href="/my-cvs">My CVs</Link>.</li><li>Reopen the paid saved document and make your changes.</li><li>Download its PDF again. If payment is still being confirmed or you see another payment request, <Link className="font-semibold underline" href={customerQuestionHref("Q24")}>follow the support checks</Link> before paying again.</li></ol>
+        </CustomerAnswer>
+        <CustomerAnswer questionId="Q06">
+          <ul className="list-disc space-y-2 pl-6"><li>Revise paid document A: covered.</li><li>Download document A again: covered.</li><li>Create separate saved document B: a separate payment is required for its PDF.</li></ul>
+          <p>Read the <Link className="font-semibold underline" href="/terms">terms</Link> for the purchase scope. Use <Link className="font-semibold underline" href="/my-cvs">My CVs</Link> to reopen the document you already paid for.</p>
+        </CustomerAnswer>
+        <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/pricing"]}>{displayReviewDate(customerContentReview["/pricing"])}</time>.</p>
+      </div></section>
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Compare pricing</SectionLabel>

@@ -1,19 +1,26 @@
 import Link from "next/link";
 import { Guide, GuideSection, GuideTable, CvTextExample, GuideSource, guideMetadata } from "@/components/cv-guide";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview } from "@/lib/customer-content-review";
 import { longerCv, shorterCv, shorteningEdits, exampleWordCount } from "@/lib/content-cv-examples";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 const path = "/shorten-cv-to-two-pages";
 export const metadata = guideMetadata(path, "Shorten a CV to Two Pages: Worked Example | WorkCV", "Cut repetition and preserve relevant evidence with six before-and-after CV edits, complete fictional drafts and measured word counts.");
 export default function ShortenCvGuide() {
-  return <Guide path={path} title="How to shorten a three-page CV to two pages" placement={analyticsPlacements.shortenGuideCheck} action={["Check my CV word count", "/tools/cv-word-count-checker"]}
+  return <Guide path={path} title="How to shorten a three-page CV to two pages" reviewed={customerContentReview[path]} placement={analyticsPlacements.shortenGuideCheck} action={["Check my CV word count", "/tools/cv-word-count-checker"]}
     intro="Start by identifying the evidence the vacancy needs, then remove repetition, compress older experience and shorten general self-description. Keep honest dates and relevant qualifications. Two pages is a common target for a standard CV, not a rule for every application. Make content edits before changing the layout, and check the rendered file: a word count alone cannot tell you how many pages it uses."
     links={[["CV readability checker", "/tools/cv-readability-checker"], ["Check against the vacancy", "/tools/ats-score-checker"], ["Turn your draft into a PDF", "/chatgpt-cv-to-pdf-uk"], ["Career-change example", "/career-change-cv-uk"]]}>
-    <GuideSection title="Protect the evidence before cutting">
+    <CustomerAnswer questionId="Q16">
+      <GuideTable caption="How length changes with the application" headings={["Situation", "What to prioritise"]} rows={[
+        ["First job", "Education, projects and genuine responsibilities may fit on one readable page."],
+        ["Experienced, non-academic role", "Give recent relevant evidence space; condense older unrelated roles before squeezing the font."],
+        ["Academic or specialist role", "Follow the employer's detailed format and evidence requirements rather than forcing a one- or two-page rule."],
+      ]} />
       <p>Save a working copy so you can compare versions. List the vacancy's essential requirements and identify where your CV demonstrates each one. A sentence that proves a required skill deserves more space than a long list of routine duties unrelated to the job.</p>
       <p>Keep employer names, actual job titles and dates legible. Compression should not conceal a career break or create a misleading timeline. A relevant qualification may need its full name even when an abbreviation would save a line.</p>
       <p>Two pages is a useful aim for many standard applications. An early-career CV may need only one; academic or specialist applications may require more. An employer's detailed work-history instructions take precedence over an arbitrary page target.</p>
       <GuideSource href="https://www.prospects.ac.uk/careers-advice/cvs-and-cover-letters/how-to-write-a-cv">Prospects: CV length and formatting</GuideSource>
-    </GuideSection>
+    </CustomerAnswer>
     <GuideSection title="Six edits you can apply to your own draft">
       <p>Alex is a fictional retail supervisor applying for office administration. The source facts include weekly rotas, Excel records, customer email replies and shift handovers. The edits retain those facts without inventing time savings or sales results.</p>
       <div className="space-y-6">{shorteningEdits.map(([label, before, after, why]) => <section key={label} className="rounded-lg border border-line bg-white p-5 md:p-7"><h3 className="font-display text-2xl font-semibold text-navy">{label}</h3><p className="mt-4"><strong>Before:</strong> {before}</p><p className="mt-4"><strong>After:</strong> {after}</p><p className="mt-4 text-sm text-muted">{why}</p></section>)}</div>

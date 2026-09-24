@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal-page";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
@@ -20,7 +21,7 @@ export default function PrivacyPage() {
     <LegalPage
       title="Privacy Policy"
       intro="This policy explains what personal data WorkCV handles, why we use it, and how to contact us about your data."
-      lastUpdated="27 August 2026"
+      lastUpdated={displayReviewDate(customerContentReview["/privacy"])}
       sections={[
         {
           title: "Who this applies to",
@@ -102,6 +103,30 @@ export default function PrivacyPage() {
           ),
         },
         {
+          title: "AI-assisted career tools",
+          body: (
+            <>
+              <p>
+                If you submit text to the CV fit checker, job application pack or
+                bullet point generator, WorkCV sends the information you provide
+                to our server and to OpenAI to produce a result. These tools do not
+                need your full name, contact details, identification numbers or
+                sensitive family or medical information to review wording and job fit.
+                You can replace unnecessary personal details with placeholders
+                before submitting. Merely reading a page does not submit a CV.
+              </p>
+              <p>
+                If you choose to carry selected results into the editor, your
+                browser temporarily holds the handoff. Content you save in your
+                WorkCV account is then handled as a saved CV draft under this
+                policy. The first-job wizard builds its initial draft in your
+                browser from the fields you enter; it is a different process from
+                the three AI-assisted tools named above.
+              </p>
+            </>
+          ),
+        },
+        {
           title: "Product research communications",
           body: (
             <>
@@ -119,6 +144,10 @@ export default function PrivacyPage() {
               </p>
             </>
           ),
+        },
+        {
+          title: "Local file checks and statement worksheets",
+          body: <><p>The PDF/DOCX format checker reads the selected file in your browser. File contents, previews and extracted text are not uploaded during this check. The supporting-statement planner also runs locally without sending your worksheet text to our server or an AI provider. Close the page or clear the result when finished on a shared device.</p><p>If you choose to continue from a file check or application pack into the editor, the handoff is temporarily held in this tab. Extracted CV text is sent to our authenticated import service for structured drafting. Content saved in the editor, including original CV text and application-pack notes, becomes part of your account's saved draft. These notes are separate from the CV PDF. The ordinary usage events described above do not contain the file or worksheet contents.</p></>,
         },
         {
           title: "Storage and retention",

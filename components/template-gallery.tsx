@@ -139,6 +139,11 @@ export function TemplateGallery() {
             </Link>
           </div>
 
+          <div className="mb-8 rounded-lg border border-line bg-paper p-5">
+            <h3 className="text-xl font-bold text-navy">Need education first or a compact single column?</h3>
+            <p className="mt-3 text-sm leading-7">The editor includes section ordering, optional projects, certifications, volunteering and languages, plus three single-column presets. Compare real sample PDFs and extracted text before choosing.</p>
+            <Link href="/cv-layout-tests-uk" className="mt-3 inline-flex min-h-11 items-center font-bold text-navy underline">Compare all six designs and presets</Link>
+          </div>
           <div className="grid gap-6 xl:grid-cols-3">
             {templates.map((template) => {
               const details = templateDetails[template.id];

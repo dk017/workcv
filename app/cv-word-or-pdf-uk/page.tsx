@@ -1,14 +1,16 @@
 import Link from "next/link";
 import { Guide, GuideSection, GuideSource, GuideTable, guideMetadata } from "@/components/cv-guide";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview } from "@/lib/customer-content-review";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 const path = "/cv-word-or-pdf-uk";
 export const metadata = guideMetadata(path, "CV in Word or PDF? UK Application Guide | WorkCV", "Choose a CV file format using the employer's instructions. Compare DOCX and PDF, check selectable text and find the right WorkCV template or export.");
 export default function CvFormatGuide() {
-  return <Guide path={path} title="Should you send your CV as Word or PDF?" placement={analyticsPlacements.formatGuideWord} action={["Get the free Word template", "/tools/blank-cv-template-uk"]}
+  return <Guide path={path} title="Should you send your CV as Word or PDF?" reviewed={customerContentReview[path]} placement={analyticsPlacements.formatGuideWord} action={["Get the free Word template", "/tools/blank-cv-template-uk"]}
     intro="Use the format the employer requests. If the advert asks for DOCX, send DOCX; if it asks for PDF, send PDF. When both are accepted, consider whether the recipient needs to edit the file or simply read a stable layout. Keep an editable master, check the upload limit and open the exact file you will submit. Neither format guarantees compatibility with every recruitment system."
     links={[["Free blank Word CV", "/tools/blank-cv-template-uk"], ["Format a ChatGPT draft", "/chatgpt-cv-to-pdf-uk"], ["CV match checker", "/tools/ats-score-checker"], ["WorkCV PDF pricing", "/pricing"]]}>
-    <GuideSection title="Use this decision table">
+    <CustomerAnswer questionId="Q15">
       <GuideTable caption="Choose a format for this application" headings={["Application instructions", "Your next step"]} rows={[
         ["Send a Word document or .docx", "Submit DOCX. Do not substitute a PDF because it looks better in your preview."],
         ["Send a PDF", "Export a text-based PDF from your document and check it opens correctly."],
@@ -19,7 +21,7 @@ export default function CvFormatGuide() {
       ]} />
       <p>Look at the advert, attachments and the actual application portal. Instructions can differ between roles at the same organisation. If they conflict, contact the recruiter before the deadline rather than assuming one generic recommendation applies.</p>
       <GuideSource href="https://www.prospects.ac.uk/careers-advice/cvs-and-cover-letters/how-to-write-a-cv">Prospects: follow the requested file extension</GuideSource>
-    </GuideSection>
+    </CustomerAnswer>
     <GuideSection title="What Word and PDF are useful for">
       <p>A DOCX is an editable document. It is useful when you are revising your wording or the recipient specifically needs to work with the file. Layout can change when it opens with different fonts or software, so inspect the copy you intend to send.</p>
       <p>A PDF is useful for sharing a fixed page layout. It is still possible to produce a poor PDF: text may be too small, a section may fall onto a nearly empty page, or the file may contain only a picture of the CV. Exporting does not replace checking.</p>

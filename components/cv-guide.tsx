@@ -3,19 +3,21 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { ButtonLink, MoneyPageCta, RelatedLinksSection } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { displayReviewDate } from "@/lib/customer-content-review";
 
 export const guideReviewed = "2026-09-06";
 export function guideMetadata(path: string, title: string, description: string): Metadata {
   return { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { title, description, url: path } };
 }
 
-export function Guide({ path, title, intro, children, links, action, placement }: {
+export function Guide({ path, title, intro, children, links, action, placement, reviewed = guideReviewed, published = guideReviewed }: {
   path: string; title: string; intro: string; children: ReactNode;
   links: Array<[string, string]>; action: [string, string]; placement: string;
+  reviewed?: string; published?: string;
 }) {
   const schemas = [
     { "@context": "https://schema.org", "@type": "Article", headline: title, description: intro,
-      mainEntityOfPage: `${site.url}${path}`, datePublished: guideReviewed, dateModified: guideReviewed,
+      mainEntityOfPage: `${site.url}${path}`, datePublished: published, dateModified: reviewed,
       author: { "@type": "Organization", name: "WorkCV", url: site.url }, publisher: { "@type": "Organization", name: "WorkCV", url: site.url } },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: site.url },
@@ -31,7 +33,7 @@ export function Guide({ path, title, intro, children, links, action, placement }
         <p className="mb-4 text-sm font-bold uppercase tracking-widest text-navy">Practical UK CV guide</p>
         <h1 className="font-display text-4xl font-semibold leading-tight text-navy md:text-6xl">{title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">{intro}</p>
-        <p className="mt-5 text-sm text-muted">By WorkCV · Reviewed <time dateTime={guideReviewed}>6 September 2026</time></p>
+        <p className="mt-5 text-sm text-muted">By WorkCV · Reviewed <time dateTime={reviewed}>{displayReviewDate(reviewed)}</time></p>
       </div>
     </section>
     <article className="container-page max-w-5xl space-y-12 py-12 md:py-16">{children}</article>
@@ -73,9 +75,9 @@ export function GuideSource({ href, children }: { href: string; children: ReactN
   return <p className="text-sm leading-7 text-muted">Guidance: <a href={href} className="font-semibold text-navy underline underline-offset-4" rel="noopener noreferrer" target="_blank">{children}</a>.</p>;
 }
 
-export function WorkedSection({ title, children }: { title: string; children: ReactNode }) {
+export function WorkedSection({ title, children, reviewed = guideReviewed }: { title: string; children: ReactNode; reviewed?: string }) {
   return <section className="border-y border-line bg-paper py-16"><div className="container-page max-w-5xl space-y-6 text-base leading-8 text-ink">
-    <p className="text-xs font-bold uppercase tracking-widest text-muted">WorkCV worked example · Reviewed 6 September 2026</p>
+    <p className="text-xs font-bold uppercase tracking-widest text-muted">WorkCV worked example · Reviewed <time dateTime={reviewed}>{displayReviewDate(reviewed)}</time></p>
     <h2 className="font-display text-3xl font-semibold leading-tight text-navy md:text-4xl">{title}</h2>{children}
   </div></section>;
 }

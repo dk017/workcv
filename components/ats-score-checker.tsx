@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useMemo, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -292,9 +293,7 @@ export function AtsScoreChecker() {
         <div className="flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
           <p id="privacy-note" className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            Your text is sent securely to OpenAI to generate this assessment. WorkCV
-            does not save it or include its contents in analytics. OpenAI API data is
-            not used to train models by default.
+            <span>Submitted CV text and the advert go to WorkCV’s server and then OpenAI for this assessment. Remove unnecessary contact or sensitive details first. <Link className="font-semibold underline" href="/tools/ats-score-checker#remove-personal-details">See an anonymised example</Link> and read the <Link className="font-semibold underline" href="/privacy">privacy policy</Link>.</span>
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -366,6 +365,7 @@ export function AtsScoreChecker() {
                 <p className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: resultColour }}>
                   {assessment.band} fit communication
                 </p>
+                <p className="mt-2 text-sm font-semibold text-navy">WorkCV assessment — <Link href="/tools/ats-score-checker#what-the-score-means" className="underline">not an employer ATS score or interview prediction</Link>.</p>
                 <h2 className="mt-3 font-display text-3xl font-semibold text-navy md:text-4xl">
                   {assessment.summary}
                 </h2>

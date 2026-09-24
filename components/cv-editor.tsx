@@ -33,6 +33,7 @@ import {
   ExperienceItem,
   TemplateId,
   createBlankCv,
+  isCvLayoutPreset,
   emptyEducation,
   emptyExperience,
   lines,
@@ -55,6 +56,7 @@ import { useAccessibleDialog } from "@/components/editor/use-accessible-dialog";
 import { createCvSaveManager } from "@/components/editor/create-cv-save-manager";
 import { readCheckoutAttribution } from "@/components/attribution-capture";
 import { MemoCvDocument } from "@/components/editor/cv-document";
+import { CvStructureForm, ApplicationPackReview } from "@/components/editor/cv-structure-form";
 import {
   EducationForm,
   ExperienceForm,
@@ -203,13 +205,15 @@ export function CvEditor() {
             } catch { window.localStorage.removeItem(localKey); }
           }
           lastManagedCvRef.current = data.document.data;
-          setCv(data.document.data);
+          const preset = params.get("layoutPreset");
+          setCv(shouldCreateNew && isCvLayoutPreset(preset) ? { ...data.document.data, layoutPreset: preset } : data.document.data);
           saveManagerRef.current?.dispose();
           const manager = createCvSaveManager(data.document, setSaveSnapshot);
           saveManagerRef.current = manager;
           if (shouldCreateNew) {
             params.delete("new");
             params.delete("roleTemplate");
+            params.delete("layoutPreset");
             params.set("draftId", data.document.id);
             const nextUrl = `${window.location.pathname}${
               params.toString() ? `?${params.toString()}` : ""
@@ -350,6 +354,12 @@ export function CvEditor() {
       window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
     };
 
+    if ((cv.fullName.trim() || cv.experience.some((item) => item.role.trim())) &&
+        !window.confirm("Import this tool result into the current CV? Existing fields may change. Cancel to keep this CV unchanged and return to the tool to start a new CV.")) {
+      setToolHandoffError("Import cancelled. Your current CV is unchanged. The result remains in this tab temporarily.");
+      return;
+    }
+
     if (!handoff.sourceText) {
       finish();
       return;
@@ -369,8 +379,7 @@ export function CvEditor() {
         finish(data.cv);
       } catch (error) {
         setToolHandoffState("idle");
-        setToolHandoffError(error instanceof Error ? error.message : "The tool result could not be imported.");
-        removeCvToolHandoff();
+        setToolHandoffError((error instanceof Error ? error.message : "The tool result could not be imported.") + " Your source is still in this tab for 30 minutes. Reload to retry, or go back and copy your result.");
       }
     })();
   }, [cv.template, draftId, loaded]);
@@ -521,7 +530,7 @@ export function CvEditor() {
   const readiness = useMemo(() => calculateCvReadiness(cv), [cv]);
 
   const updateField = <K extends keyof CvData>(key: K, value: CvData[K]) => {
-    setCv((current) => ({ ...current, [key]: value }));
+    setCv((current) => ({ ...current, [key]: value, ...(key === "template" ? { layoutPreset: "standard" as const } : {}) }));
   };
 
   const updateExperience = (
@@ -1320,8 +1329,9 @@ export function CvEditor() {
                 <SkillsForm cv={cv} updateField={updateField} onSuggestSkills={suggestSkills} assistanceBusy={Boolean(aiLoading)} />
               )}
               {activeTab === "template" && (
-                <TemplateForm cv={cv} updateField={updateField} />
+                <><TemplateForm cv={cv} updateField={updateField} /><CvStructureForm cv={cv} onChange={setCv} /></>
               )}
+              {activeTab === "experience" && <ApplicationPackReview cv={cv} onChange={setCv} />}
             </div>
           </div>
         </div>
@@ -1794,7 +1804,7 @@ function TemplatePickerModal({
                         transform: "scale(var(--preview-scale))",
                       } as React.CSSProperties}
                     >
-                      <MemoCvDocument cv={{ ...cv, template: template.id }} compactPreview />
+                      <MemoCvDocument cv={{ ...cv, template: template.id, layoutPreset: "standard" }} compactPreview />
                     </div>
                   </div>
                   <div className="flex items-start justify-between gap-3">

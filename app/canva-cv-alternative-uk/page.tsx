@@ -11,6 +11,8 @@ import {
 } from "lucide-react";
 
 import { ComparisonTable } from "@/components/comparison-table";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import {
   ButtonLink,
   FaqSection,
@@ -243,6 +245,15 @@ export default function CanvaCvAlternativeUkPage() {
           />
         </div>
       </section>
+
+      <section className="bg-paper py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q14">
+          <ol className="list-decimal space-y-2 pl-6"><li>Open the PDF you would submit and confirm that its text can be selected.</li><li>Copy the whole document into a plain text editor and inspect the reading order.</li><li>Check your name, contact details, headings, role titles and dates.</li><li>If columns or text boxes mix details, simplify the layout and repeat the check.</li><li>Follow the employer’s requested file format and review the final exported file.</li></ol>
+          <div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Possible reading-order problem</h3><p className="mt-2"><strong>Expected:</strong> Experience → role and dates → bullets; Education → course and dates.</p><p className="mt-2"><strong>Possible mixed order:</strong> Experience → Education → role → course → date → date.</p><p className="mt-2 text-sm text-muted">Illustration of a possible extraction problem, not a test of Canva or any employer system.</p></div>
+          <p><a className="font-semibold underline" href="https://support.greenhouse.io/hc/en-us/articles/200989175-Unsuccessful-resume-parse" target="_blank" rel="noopener noreferrer">Greenhouse’s parser guidance</a> documents difficulties with layouts including columns, images, tables and headers. That vendor’s guidance does not mean every system automatically rejects a complex CV.</p>
+          <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/canva-cv-alternative-uk"]}>{displayReviewDate(customerContentReview["/canva-cv-alternative-uk"])}</time>.</p>
+        </CustomerAnswer>
+      </div></section>
 
       <section className="bg-paper py-24">
         <div className="container-page grid gap-10 lg:grid-cols-2">

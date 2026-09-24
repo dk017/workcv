@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-09-24T02:15:56.179Z",
+  "parser": "PDF.js 6.0.227",
+  "renderer": "Chromium 153.0.8010.48",
+  "fixture": "Fictional Emily Thompson CV with the same content across six layouts",
+  "reports": [
+    {
+      "id": "classic",
+      "name": "Classic",
+      "template": "classic",
+      "preset": "standard",
+      "pages": 1,
+      "words": 217,
+      "headings": [
+        "PROFILE",
+        "EXPERIENCE",
+        "EDUCATION",
+        "SKILLS",
+        "PROJECTS",
+        "CERTIFICATIONS",
+        "VOLUNTEERING",
+        "LANGUAGES"
+      ]
+    },
+    {
+      "id": "modern",
+      "name": "Modern",
+      "template": "modern",
+      "preset": "standard",
+      "pages": 1,
+      "words": 218,
+      "headings": [
+        "SKILLS",
+        "PROFILE",
+        "EXPERIENCE",
+        "EDUCATION",
+        "PROJECTS",
+        "CERTIFICATIONS",
+        "VOLUNTEERING",
+        "LANGUAGES"
+      ]
+    },
+    {
+      "id": "compact",
+      "name": "Compact",
+      "template": "compact",
+      "preset": "standard",
+      "pages": 1,
+      "words": 217,
+      "headings": [
+        "PROFILE",
+        "EXPERIENCE",
+        "EDUCATION",
+        "PROJECTS",
+        "CERTIFICATIONS",
+        "VOLUNTEERING",
+        "LANGUAGES",
+        "SKILLS"
+      ]
+    },
+    {
+      "id": "education-first",
+      "name": "Education first",
+      "template": "classic",
+      "preset": "education-first",
+      "pages": 1,
+      "words": 217,
+      "headings": [
+        "PROFILE",
+        "EDUCATION",
+        "PROJECTS",
+        "EXPERIENCE",
+        "SKILLS",
+        "CERTIFICATIONS",
+        "VOLUNTEERING",
+        "LANGUAGES"
+      ]
+    },
+    {
+      "id": "compact-single",
+      "name": "Compact single column",
+      "template": "classic",
+      "preset": "compact-single",
+      "pages": 1,
+      "words": 217,
+      "headings": [
+        "PROFILE",
+        "EXPERIENCE",
+        "EDUCATION",
+        "SKILLS",
+        "PROJECTS",
+        "CERTIFICATIONS",
+        "VOLUNTEERING",
+        "LANGUAGES"
+      ]
+    },
+    {
+      "id": "experienced",
+      "name": "Experienced professional",
+      "template": "classic",
+      "preset": "experienced",
+      "pages": 1,
+      "words": 217,
+      "headings": [
+        "PROFILE",
+        "EXPERIENCE",
+        "PROJECTS",
+        "CERTIFICATIONS",
+        "SKILLS",
+        "EDUCATION",
+        "VOLUNTEERING",
+        "LANGUAGES"
+      ]
+    }
+  ]
+}

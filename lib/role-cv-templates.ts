@@ -684,6 +684,7 @@ export function getRoleCvTemplate(role: RoleTemplateId, template?: TemplateId): 
                 : nurseCv;
   return {
     ...source,
+    ...(["graduate", "student", "school-leaver"].includes(role) ? { layoutPreset: "education-first" as const } : {}),
     template: template || source.template,
     experience: source.experience.map((item) => ({ ...item })),
     education: source.education.map((item) => ({ ...item })),

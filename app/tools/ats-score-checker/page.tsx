@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 import { CheckerWorkedExample } from "@/components/content-worked-examples";
+import Link from "next/link";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { CvTextExample } from "@/components/cv-guide";
+import { anonymisedCvExample } from "@/lib/customer-answer-examples";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import {
   Check,
   FileText,
@@ -29,11 +35,6 @@ export const metadata: Metadata = {
 
 const faqItems = [
   {
-    question: "Is this a real employer ATS score?",
-    answer:
-      "No. It is a fixed-weight WorkCV assessment of how clearly your supplied CV communicates fit for one vacancy. Employer systems, configurations and human decisions differ, so it does not predict an interview or reproduce a particular ATS.",
-  },
-  {
     question: "How is the match percentage calculated?",
     answer:
       "The application awards up to 35 points for vacancy relevance, 25 for evidence and achievements, 20 for role clarity, 10 for ATS-readable content structure and 10 for completeness. AI supplies bounded classifications and exact evidence snippets; application code calculates the score.",
@@ -46,7 +47,7 @@ const faqItems = [
   {
     question: "Does WorkCV save the text I paste?",
     answer:
-      "WorkCV sends the text securely to OpenAI to generate the assessment but does not save the text or include its contents in analytics. OpenAI API data is not used for model training by default. If you choose to carry the result into the editor, the resulting CV draft and vacancy context are saved to your WorkCV account.",
+      "WorkCV sends the submitted CV text and job advert to OpenAI for processing; it does not include your CV text in analytics. If you carry selected results into the editor, that draft and vacancy context can be saved to your account. Remove unnecessary personal details and read the privacy policy before submitting.",
   },
   {
     question: "Does this inspect my CV file layout?",
@@ -110,7 +111,7 @@ export default function AtsScoreCheckerPage() {
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
               <span className="flex items-center gap-2">
                 <ShieldCheck className="h-5 w-5 text-success" />
-                No CV text saved
+                Remove personal details first
               </span>
               <span className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-gold" />
@@ -129,6 +130,23 @@ export default function AtsScoreCheckerPage() {
         </div>
       </section>
 
+      <CustomerQuestionNav ids={["Q11", "Q12", "Q21"]} />
+      <section className="bg-paper py-16"><div className="container-page max-w-5xl space-y-14">
+        <CustomerAnswer questionId="Q11">
+          <p>The result has five explained dimensions: vacancy relevance (35 points), evidence and achievements (25), role clarity (20), readable content structure (10) and completeness (10). WorkCV calculates the result from its assessment; a different employer’s process can differ. Pasted text also cannot show the source file’s columns, fonts or reading order.</p>
+          <p>Use the <Link className="font-semibold underline" href={customerQuestionHref("Q12")}>specific improvement steps</Link> and check the <Link className="font-semibold underline" href="/cv-word-or-pdf-uk">submitted file separately</Link>.</p>
+        </CustomerAnswer>
+        <CustomerAnswer questionId="Q12">
+          <ol className="list-decimal space-y-2 pl-6"><li>Check essential gaps first. Alex’s fictional Birch Office Services vacancy names Sage as essential, but the supplied CV does not evidence it. Do not insert a false skill.</li><li>Make the supported Excel tracker and customer-email tasks prominent; add an outcome only if you know it.</li><li>Replace a generic profile with a factual retail-to-admin target while keeping the original retail title and dates.</li></ol>
+          <p>The worked calculation below uses an editorial fixture and the current WorkCV scoring function. A live assessment can differ. <Link className="font-semibold underline" href="/tools/job-application-pack-uk">Review tailored edits in the application pack</Link> after you understand the evidence.</p>
+        </CustomerAnswer>
+        <CustomerAnswer questionId="Q21">
+          <CvTextExample title="What an anonymised input can look like" text={anonymisedCvExample} />
+          <p>Leave useful task evidence in place, but replace contact information and consider placeholder employer names for confidential material. A combination of remaining details can still identify someone, so placeholders are not a guarantee of anonymity. Do not include other people’s private contact details.</p>
+          <p>For a check, the text you submit goes to WorkCV’s server and then to OpenAI for processing. The checker reads pasted text rather than the original file layout. Read our <Link className="font-semibold underline" href="/privacy">privacy policy</Link> before submitting personal data.</p>
+        </CustomerAnswer>
+        <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/tools/ats-score-checker"]}>{displayReviewDate(customerContentReview["/tools/ats-score-checker"])}</time>.</p>
+      </div></section>
       <CheckerWorkedExample />
       <section className="bg-surface py-20">
         <div className="container-page grid gap-12 lg:grid-cols-[0.82fr_1.18fr]">

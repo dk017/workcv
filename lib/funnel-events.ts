@@ -59,6 +59,7 @@ export function normalizeTrafficSource(sourceInput?: string, referrerHostInput?:
   if (/gemini|bard\.google/.test(value)) return "gemini";
   if (/perplexity/.test(value)) return "perplexity";
   if (/copilot/.test(value)) return "copilot";
+  if (host === "search.brave.com" || host.endsWith(".search.brave.com") || source === "brave" || source === "brave_search") return "brave";
   if (/bing\.com|(^|\s)bing(\s|$)/.test(value)) return "bing";
   if (/google/.test(value)) return "google";
   if (source) return source.replace(/[^a-z0-9._-]/g, "_").slice(0, 80);

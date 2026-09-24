@@ -4,6 +4,7 @@ import {
   createBlankCv,
   type CvData,
   type TemplateId,
+  cvSectionIds,
 } from "./editor-data.ts";
 
 export const CV_MAX_PAYLOAD_BYTES = 100 * 1024;
@@ -103,6 +104,10 @@ export const cvDataSchema = z
     experience: z.array(experienceItemSchema).max(CV_MAX_EXPERIENCE_ITEMS),
     education: z.array(educationItemSchema).max(CV_MAX_EDUCATION_ITEMS),
     targeting: targetingSchema.optional(),
+    layoutPreset: z.enum(["standard", "education-first", "compact-single", "experienced"]).optional(),
+    sectionOrder: z.array(z.enum(cvSectionIds)).max(8).refine((items) => new Set(items).size === items.length, "Sections must not repeat").optional(),
+    additionalSections: z.object({ projects: z.string().max(5000).optional(), certifications: z.string().max(5000).optional(), volunteering: z.string().max(5000).optional(), languages: z.string().max(5000).optional() }).strict().optional(),
+    applicationPack: z.object({ bullets: z.array(z.string().max(1000)).max(20), coverLetter: z.string().max(10000), interviewPrompts: z.array(z.string().max(1000)).max(20), thankYouEmail: z.string().max(5000), originalCvText: z.string().max(24000).optional(), evidenceReview: z.array(z.string().max(1000)).max(10).optional() }).strict().optional(),
   })
   .strict()
   .superRefine((value, context) => {
@@ -256,6 +261,11 @@ export function repairCvData(
 
   const targetingResult = targetingSchema.safeParse(source.targeting);
   if (targetingResult.success) repaired.targeting = targetingResult.data;
+  for (const key of ["layoutPreset", "sectionOrder", "additionalSections", "applicationPack"] as const) {
+    if (source[key] === undefined) continue;
+    const candidate = cvDataSchema.safeParse({ ...repaired, [key]: source[key] });
+    if (candidate.success) Object.assign(repaired, { [key]: candidate.data[key] });
+  }
 
   return parseCvData(repaired);
 }

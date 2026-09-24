@@ -3,6 +3,10 @@ import Link from "next/link";
 import { Mail } from "lucide-react";
 
 import { ButtonLink } from "@/components/marketing";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -30,6 +34,14 @@ export default function ContactPage() {
             For payment, download, refund, or saved-editor support, email
             us and include the receipt email you used at checkout.
           </p>
+        </div>
+
+        <div className="mt-10 max-w-3xl rounded-xl border border-line bg-white p-6 md:p-8">
+          <CustomerAnswer questionId="Q24">
+            <ol className="list-decimal space-y-3 pl-6"><li>Sign in with the email account used for the original CV and open <TrackedLink href="/my-cvs" placement={analyticsPlacements.customerQ24MyCvs} className="font-semibold underline">My CVs</TrackedLink>.</li><li>Reopen the original saved CV, rather than starting a new document.</li><li>If the editor says <strong>Confirming payment…</strong>, select <strong>Check again</strong> and allow status to update.</li><li>Try the PDF download again and inspect your browser’s downloads list.</li><li>If it still fails, email support with your receipt email, payment time and timezone, order reference if available, browser/device and the visible error. A redacted screenshot can help.</li></ol>
+            <p>Do not send your card number, password, email login code or full CV. We aim to reply within two working days. The <Link className="font-semibold underline" href="/refund-policy">refund policy</Link> is also available.</p>
+          </CustomerAnswer>
+          <p className="mt-5 text-sm text-muted">Reviewed <time dateTime={customerContentReview["/contact"]}>{displayReviewDate(customerContentReview["/contact"])}</time>.</p>
         </div>
 
         <div className="mt-10 grid gap-6 lg:grid-cols-[1fr_0.8fr]">
@@ -66,7 +78,7 @@ export default function ContactPage() {
         </div>
 
         <div className="mt-10">
-          <ButtonLink href="/editor">Return to editor</ButtonLink>
+          <ButtonLink href="/my-cvs">Open my saved CVs</ButtonLink>
         </div>
       </div>
     </section>

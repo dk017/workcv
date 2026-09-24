@@ -8,6 +8,8 @@ import {
   ExperienceItem,
   TemplateId,
   lines,
+  orderedCvSections,
+  cvSectionLabels,
 } from "@/lib/editor-data";
 import { getCvNameTypography } from "@/lib/cv-typography";
 
@@ -22,6 +24,9 @@ export function CvDocument({
     compactPreview ? "shadow-none" : ""
   }`;
 
+  if (cv.layoutPreset && cv.layoutPreset !== "standard") {
+    return <ClassicCvDocument cv={cv} baseClass={baseClass + " cv-preset-" + cv.layoutPreset} />;
+  }
   if (cv.template === "modern") {
     return <ModernCvDocument cv={cv} baseClass={baseClass} />;
   }
@@ -120,13 +125,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
         </div>
       </aside>
       <main className="min-w-0 px-10 py-10">
-        <CvSection title="Profile" compact={false} template="modern">
-          <p className="leading-7 text-ink">
-            {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-          </p>
-        </CvSection>
-        <ExperienceContent cv={cv} template="modern" />
-        <EducationContent cv={cv} template="modern" />
+        <CvBody cv={cv} template="modern" />
       </main>
     </article>
   );
@@ -149,13 +148,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
       </header>
       <div className="cv-compact-body grid grid-cols-[minmax(0,1fr)_220px] gap-8 pt-2">
         <main className="min-w-0">
-          <CvSection title="Profile" compact template="compact">
-            <p className="leading-6 text-ink">
-              {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-            </p>
-          </CvSection>
-          <ExperienceContent cv={cv} template="compact" />
-          <EducationContent cv={cv} template="compact" />
+          <CvBody cv={cv} template="compact" />
         </main>
         <aside>
           <CvSection title="Skills" compact template="compact">
@@ -200,20 +193,19 @@ function CvBody({
   cv: CvData;
   template: TemplateId;
 }) {
-  return (
-    <>
-      <CvSection title="Profile" compact={false} template={template}>
-        <p className="leading-7 text-ink">
-          {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-        </p>
-      </CvSection>
-      <ExperienceContent cv={cv} template={template} />
-      <EducationContent cv={cv} template={template} />
-      <CvSection title="Skills" compact={false} template={template}>
-        <SkillsList cv={cv} />
-      </CvSection>
-    </>
-  );
+  return <>{orderedCvSections(cv).map((section) => {
+    if (section === "experience") return <ExperienceContent key={section} cv={cv} template={template} />;
+    if (section === "education") return <EducationContent key={section} cv={cv} template={template} />;
+    if (section === "skills" && template !== "classic") return null;
+    const extra = section !== "profile" && section !== "skills" ? cv.additionalSections?.[section] : undefined;
+    if (extra !== undefined && !extra.trim()) return null;
+    if (section !== "profile" && section !== "skills" && !extra) return null;
+    return <CvSection key={section} title={cvSectionLabels[section]} compact={template === "compact"} template={template}>
+      {section === "profile" ? <p className="leading-7 text-ink">{cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}</p>
+        : section === "skills" ? <SkillsList cv={cv} />
+        : <p className="whitespace-pre-line break-words leading-7 text-ink">{extra}</p>}
+    </CvSection>;
+  })}</>;
 }
 
 function ExperienceContent({

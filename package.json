@@ -13,6 +13,7 @@
     "package:distribution": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-distribution-assets.ps1",
     "generate:public-sample": "node scripts/generate-public-cv-sample.mjs",
     "report:growth": "node scripts/report-growth.mjs",
+    "trend:prepare": "node scripts/prepare-trend-radar.mjs",
     "db:prepare:growth": "node scripts/prepare-growth-schema.mjs",
     "verify:indexing": "node scripts/verify-indexing.mjs",
     "cleanup:growth-events": "node scripts/cleanup-growth-events.mjs",
@@ -22,9 +23,12 @@
     "test:ats": "node --no-warnings --test --experimental-strip-types tests/ats-keyword-checker.test.ts",
     "test:tools": "node --no-warnings --test --experimental-strip-types tests/*.test.ts",
     "test:pdf-runtime": "node scripts/pdf-runtime-smoke.mjs",
-    "test:pdf-parity": "node tests/pdf-parity.mjs"
+    "test:pdf-parity": "node tests/pdf-parity.mjs",
+    "test:mcp": "node --no-warnings --experimental-strip-types --test tests/mcp-pilot.test.ts",
+    "smoke:mcp": "node --no-warnings --experimental-strip-types scripts/mcp-pilot-smoke.mjs"
   },
   "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@napi-rs/canvas": "^1.0.0",
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.1",

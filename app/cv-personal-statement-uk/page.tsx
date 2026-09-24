@@ -16,13 +16,15 @@ import {
 } from "lucide-react";
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { SampleCvProof } from "@/components/sample-cv-proof";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const pagePath = "/cv-personal-statement-uk";
-const reviewDate = "25 August 2026";
-const reviewDateIso = "2026-08-25";
+const reviewDateIso = customerContentReview["/cv-personal-statement-uk"];
+const reviewDate = displayReviewDate(reviewDateIso);
 const publishedDateIso = "2026-06-13";
 const advertUrl = "https://www.jobs.nhs.uk/candidate/jobadvert/C9301-26-0052";
 
@@ -415,6 +417,14 @@ export default function CvPersonalStatementUkPage() {
             </div>
           </div>
         </section>
+
+        <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+          <CustomerAnswer questionId="Q17">
+            <div className="grid gap-4 md:grid-cols-3"><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Keep it</h3><p className="mt-2">It names your target role and points to evidence the rest of your CV demonstrates.</p></div><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Rewrite it</h3><p className="mt-2">It says “dynamic team player” but never names a role, task or relevant skill.</p></div><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Remove it</h3><p className="mt-2">It repeats the job history without helping the reader understand your application.</p></div></div>
+            <p><strong>Fictional Alex, generic:</strong> “Dynamic team player with excellent organisational skills.” <strong>Evidence-led:</strong> “Retail supervisor moving into office administration, with experience coordinating a 12-person rota, updating an Excel delivery tracker and replying to customer order enquiries.” The second version keeps Alex’s true title and shows what the candidate did.</p>
+            <p>A separate supporting statement requested by an employer needs its own evidence against that role. For <Link className="font-semibold underline" href="/chatgpt-cv-to-pdf-uk#ai-without-invented-facts">AI wording checks</Link>, never add achievements the source CV does not support.</p>
+          </CustomerAnswer>
+        </div></section>
 
         <section className="bg-surface py-24">
           <div className="container-page">

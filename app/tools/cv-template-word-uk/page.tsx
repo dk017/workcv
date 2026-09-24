@@ -8,17 +8,21 @@ import {
   RelatedLinksSection,
   SectionLabel,
 } from "@/components/marketing";
-import { site } from "@/lib/site";
+import { commercialRoutes, site } from "@/lib/site";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 
 const path = "/tools/cv-template-word-uk";
 
 export const metadata: Metadata = {
-  title: "How to Edit a CV Template in Word UK | WorkCV",
+  title: { absolute: "Edit a UK CV With or Without Microsoft Word | WorkCV" },
   description:
-    "Learn how to edit a UK CV template in Microsoft Word: replace prompts, keep styles consistent, fix page breaks and export a clean PDF.",
+    "Edit a UK CV in Word or a compatible editor, check formatting and export the right file. Includes a free DOCX template and a guided PDF option.",
   alternates: { canonical: path },
   openGraph: {
-    title: "How to Edit a CV Template in Word - UK Guide",
+    title: "Edit a UK CV With or Without Microsoft Word | WorkCV",
     description:
       "A practical guide to editing, checking and exporting a UK CV template in Microsoft Word.",
     url: path,
@@ -40,11 +44,6 @@ const faqs = [
     question: "Should I send the CV as a Word document or PDF?",
     answer:
       "Follow the employer's instructions. If no format is specified, PDF usually preserves the layout more consistently, while the DOCX remains useful as your editable master.",
-  },
-  {
-    question: "Can I edit the free WorkCV CV template in Google Docs?",
-    answer:
-      "Most modern editors can open the DOCX, including Google Docs and LibreOffice. Formatting can vary slightly, so inspect the final document and exported PDF before applying.",
   },
   {
     question: "Is the Word CV template free?",
@@ -110,7 +109,7 @@ export default function CvTemplateWordUkPage() {
           <div>
             <SectionLabel>Word editing guide</SectionLabel>
             <h1 className="max-w-4xl font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">
-              How to edit a CV template in Microsoft Word.
+              How to edit a UK CV, with or without Microsoft Word.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
               Download a free UK DOCX, then follow a practical editing workflow:
@@ -166,6 +165,15 @@ export default function CvTemplateWordUkPage() {
           </div>
         </div>
       </section>
+
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q04">
+          <ol className="list-decimal space-y-3 pl-6"><li>Keep an unchanged backup of your DOCX.</li><li>Upload a working copy to Google Drive and open or edit it in Google Docs. This uses Google’s service and may need a Google account.</li><li>Replace the template prompts with your facts. Keep text as text rather than an image of your CV.</li><li>Download the employer’s requested format and reopen it to inspect every heading, bullet, date and page break.</li></ol>
+          <p>Google explains <a className="font-semibold underline" href="https://support.google.com/docs/answer/9406611?hl=en" target="_blank" rel="noopener noreferrer">how its Docs editors handle Office files</a>. Formatting can shift between editors, so check the final export.</p>
+          <div className="flex flex-wrap gap-5"><TrackedLink download href="/api/tools/blank-cv-template" placement={analyticsPlacements.customerQ04FreeDownload} className="font-semibold text-navy underline">Download the free blank DOCX</TrackedLink><Link href={commercialRoutes.moneyPage} className="font-semibold text-navy underline">Compare the guided PDF builder</Link></div>
+          <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview[path]}>{displayReviewDate(customerContentReview[path])}</time>.</p>
+        </CustomerAnswer>
+      </div></section>
 
       <section className="bg-surface py-20">
         <div className="container-page">

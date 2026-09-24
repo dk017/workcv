@@ -12,6 +12,12 @@ import {
 } from "lucide-react";
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { CvTextExample, GuideTable } from "@/components/cv-guide";
+import { TrackedLink } from "@/components/tracked-link";
+import { firstCvExample } from "@/lib/customer-answer-examples";
+import { analyticsPlacements } from "@/lib/analytics-placements";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -32,15 +38,6 @@ const jsonLd = {
         "@type": "Answer",
         text:
           "Start with a short profile, then show education, skills, projects, volunteering, school responsibilities, clubs, caring responsibilities, training and any part-time or unpaid work. Match the evidence to the job advert.",
-      },
-    },
-    {
-      "@type": "Question",
-      name: "What can I put on a CV if I have never had a job?",
-      acceptedAnswer: {
-        "@type": "Answer",
-        text:
-          "You can include school or college projects, coursework, volunteering, clubs, sports teams, family responsibilities, online courses, certificates, languages, digital skills and examples of reliability or teamwork.",
       },
     },
     {
@@ -210,6 +207,19 @@ export default function CvNoExperienceUkPage() {
           </div>
         </div>
       </section>
+
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q18">
+          <CvTextExample title="Jordan Reed: a complete first CV for a retail role" text={firstCvExample} />
+          <GuideTable caption="How the fictional experience supports the application" headings={["Actual activity", "Relevant evidence"]} rows={[
+            ["Welcomed visitors at a school open evening", "Customer communication and knowing when to refer a question to a teacher."],
+            ["Maintained a group project task list", "Organisation and keeping classmates informed of progress."],
+            ["Sorted donations and asked about unclear items", "Accuracy, following guidance and recognising when to ask the coordinator."],
+          ]} />
+          <p>Jordan, the school, grades and organisation are fictional. Replace every detail with your own facts; do not copy qualifications or volunteering you have not completed. The <TrackedLink href="/tools/first-job-cv-wizard-uk" placement={analyticsPlacements.customerQ18Wizard} className="font-semibold text-navy underline">first-job CV wizard</TrackedLink> can turn your own education, projects and responsibilities into a draft to check.</p>
+          <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/cv-no-experience-uk"]}>{displayReviewDate(customerContentReview["/cv-no-experience-uk"])}</time>.</p>
+        </CustomerAnswer>
+      </div></section>
 
       <section className="bg-surface py-24">
         <div className="container-page">

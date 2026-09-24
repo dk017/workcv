@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -53,6 +54,7 @@ const careerToolEditorRoute = `${commercialRoutes.editor}&from=career-tool`;
 export function JobApplicationPack() {
   const [fields, setFields] = useState<Fields>(emptyFields);
   const [result, setResult] = useState<JobApplicationPackResult | null>(null);
+  const [resultInput, setResultInput] = useState<Fields | null>(null);
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState("");
@@ -90,6 +92,7 @@ export function JobApplicationPack() {
         throw new Error(data.error || "The application pack could not be generated.");
       }
       setResult(data);
+      setResultInput({ ...fields });
       trackFunnelEvent("tool_completed", {
         tool: "job_application_pack",
         lifecycle: "completed",
@@ -145,17 +148,18 @@ export function JobApplicationPack() {
   }
 
   function continueToEditor() {
-    if (!result) return;
-    writeCvToolHandoff({
+    if (!result || !resultInput) return;
+    try { writeCvToolHandoff({
       source: "job-application-pack",
+      sourceText: resultInput.cvText.trim(),
       patch: {
-        fullName: fields.fullName.trim(),
-        targetRole: fields.targetRole.trim(),
+        fullName: resultInput.fullName.trim(),
+        targetRole: resultInput.targetRole.trim(),
         profile: result.profile,
-        skills: result.keywords.found.map((keyword) => keyword.term).join("\n"),
+        applicationPack: { bullets: result.bullets, coverLetter: result.coverLetter.letter, interviewPrompts: result.interviewQuestions.map((item) => item.question + " — " + item.answerPrompt), thankYouEmail: result.thankYouEmail, originalCvText: resultInput.cvText, evidenceReview: result.requirements.map((item) => item.requirement + " — " + item.status + ". " + (item.cvEvidence || "No source evidence found.") + " " + item.action) },
         targeting: {
-          role: fields.targetRole.trim(),
-          jobDescription: fields.jobDescription.trim(),
+          role: resultInput.targetRole.trim(),
+          jobDescription: resultInput.jobDescription.trim(),
           priorities: result.requirements.slice(0, 3).map((item) => ({
             category: "vacancy-relevance" as const,
             title: item.requirement,
@@ -163,7 +167,7 @@ export function JobApplicationPack() {
           })),
         },
       },
-    });
+    }); } catch { setError("Browser storage is unavailable. Copy your pack before opening the editor."); return; }
     trackFunnelEvent("marketing_cta_clicked", {
       destination: careerToolEditorRoute,
       placement: analyticsPlacements.jobApplicationPackHandoff,
@@ -198,7 +202,7 @@ export function JobApplicationPack() {
         <div className="mt-6 flex flex-col gap-5 border-t border-line pt-5 lg:flex-row lg:items-end lg:justify-between">
           <p className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            Your entries are sent to the generation provider for this request and are not saved by WorkCV. Remove contact details or other sensitive data the pack does not need.
+            <span>Your entries are sent through WorkCV to OpenAI to generate the pack. Remove contact details and sensitive information the review does not need. If you carry selected wording into the editor, saved draft content follows the account policy. Read the <Link href="/privacy" className="font-semibold underline">privacy policy</Link>.</span>
           </p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={loadExample} disabled={isLoading} className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:opacity-60">Try example</button>
@@ -274,7 +278,7 @@ export function JobApplicationPack() {
 
             <div className="border-t border-line bg-paper p-6 md:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div><p className="font-display text-2xl font-semibold text-navy">Put the useful parts into your CV.</p><p className="mt-2 max-w-2xl text-sm leading-7 text-muted">Carry the profile, keywords and vacancy priorities into the editor. The cover letter, interview notes and email stay separate.</p></div>
+                <div><p className="font-display text-2xl font-semibold text-navy">Put the useful parts into your CV.</p><p className="mt-2 max-w-2xl text-sm leading-7 text-muted">Carry your original CV and complete pack into the editor. Review the import, then use the Experience tab to edit and apply truthful bullets to the correct role. The cover letter, evidence review and interview notes are saved separately from the CV PDF.</p></div>
                 <button type="button" onClick={continueToEditor} className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">Use these details in my CV <ArrowRight className="h-4 w-4" /></button>
               </div>
             </div>

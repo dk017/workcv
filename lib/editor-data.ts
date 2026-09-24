@@ -1,4 +1,22 @@
 export type TemplateId = "classic" | "modern" | "compact";
+export const cvSectionIds = ["profile", "experience", "education", "skills", "projects", "certifications", "volunteering", "languages"] as const;
+export type CvSectionId = typeof cvSectionIds[number];
+export type CvLayoutPreset = "standard" | "education-first" | "compact-single" | "experienced";
+export function isCvLayoutPreset(value: unknown): value is CvLayoutPreset {
+  return typeof value === "string" && ["standard", "education-first", "compact-single", "experienced"].includes(value);
+}
+export const cvSectionLabels: Record<CvSectionId, string> = {
+  profile: "Profile", experience: "Experience", education: "Education", skills: "Skills",
+  projects: "Projects", certifications: "Certifications", volunteering: "Volunteering", languages: "Languages",
+};
+export function orderedCvSections(cv: CvData): CvSectionId[] {
+  const defaults: CvSectionId[] = cv.layoutPreset === "education-first"
+    ? ["profile", "education", "projects", "experience", "skills", "certifications", "volunteering", "languages"]
+    : cv.layoutPreset === "experienced"
+      ? ["profile", "experience", "projects", "certifications", "skills", "education", "volunteering", "languages"]
+      : [...cvSectionIds];
+  return Array.from(new Set([...(cv.sectionOrder || defaults), ...defaults]));
+}
 
 export type ExperienceItem = {
   id: string;
@@ -48,6 +66,10 @@ export type CvData = {
   experience: ExperienceItem[];
   education: EducationItem[];
   targeting?: CvTargeting;
+  layoutPreset?: CvLayoutPreset;
+  sectionOrder?: CvSectionId[];
+  additionalSections?: Partial<Record<"projects" | "certifications" | "volunteering" | "languages", string>>;
+  applicationPack?: { bullets: string[]; coverLetter: string; interviewPrompts: string[]; thankYouEmail: string; originalCvText?: string; evidenceReview?: string[] };
 };
 
 export const templates: Array<{

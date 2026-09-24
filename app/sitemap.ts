@@ -1,8 +1,11 @@
 import type { MetadataRoute } from "next";
 
 import { site } from "@/lib/site";
+import { customerReviewDate } from "@/lib/customer-content-review";
 
 const routes = [
+  { path: "/cv-layout-tests-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-24" },
+  { path: "/tools/supporting-statement-planner-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-24" },
   { path: "/chatgpt-cv-to-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/convert-resume-to-uk-cv", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/shorten-cv-to-two-pages", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
@@ -22,7 +25,7 @@ const routes = [
   { path: "/resume-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
   { path: "/cv-vs-resume-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/cv-examples-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-23" },
-  { path: "/templates", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-22" },
+  { path: "/templates", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-24" },
   { path: "/student-cv-template", priority: 0.75, changeFrequency: "monthly" },
   { path: "/school-leaver-cv-example", priority: 0.75, changeFrequency: "monthly" },
   { path: "/cv-no-experience-uk", priority: 0.85, changeFrequency: "monthly" },
@@ -50,7 +53,7 @@ const routes = [
   { path: "/tools/ats-score-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/tools/uk-salary-by-job-title", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
   { path: "/tools/notice-period-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
-  { path: "/tools/cv-format-checker-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
+  { path: "/tools/cv-format-checker-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-24" },
   { path: "/tools/first-job-cv-wizard-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
   { path: "/tools/transferable-skills-translator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
   { path: "/tools/cv-shortener-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
@@ -100,7 +103,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   return routes.map((route) => ({
     url: `${site.url}${route.path}`,
-    lastModified: route.lastModified ? new Date(route.lastModified) : lastModified,
+    lastModified: customerReviewDate(route.path) ? new Date(customerReviewDate(route.path)!) : route.lastModified ? new Date(route.lastModified) : lastModified,
     changeFrequency: route.changeFrequency,
     priority: route.priority,
   }));

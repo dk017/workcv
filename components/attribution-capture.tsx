@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
-import { shouldReplaceLastTouch } from "@/lib/attribution";
+import { shouldReplaceLastTouch, canCapturePublicTouch } from "@/lib/attribution";
 import { isPublicMeasurementPath } from "@/lib/public-paths";
 
 const storageKey = "workcv_first_touch";
@@ -11,6 +11,9 @@ const lastTouchKey = "workcv_last_touch";
 const visitorKey = "workcv_visitor_id";
 const sessionKey = "workcv_session_id";
 const landingTrackedKey = "workcv_landing_tracked";
+// document.referrer survives client navigation. Consume it once, not again on
+// every CTA, login or checkout event in the same browser document.
+let publicEntryCaptured = false;
 
 type TouchAttribution = {
   landingPath: string;
@@ -89,18 +92,20 @@ function ensureTrackingContext() {
   }
 
   const touch = currentTouch();
-  if (!window.localStorage.getItem(storageKey)) {
+  const previousFirstTouch = readStoredTouch(storageKey);
+  if (isPublicMeasurementPath(touch.landingPath) && (!previousFirstTouch || !isPublicMeasurementPath(previousFirstTouch.landingPath))) {
     window.localStorage.setItem(storageKey, JSON.stringify(touch));
   }
   const previousLastTouch = readStoredTouch(lastTouchKey);
   if (
-    shouldReplaceLastTouch(
+    canCapturePublicTouch(touch.landingPath, previousLastTouch?.landingPath, publicEntryCaptured) && (!previousLastTouch || !isPublicMeasurementPath(previousLastTouch.landingPath) || shouldReplaceLastTouch(
       previousLastTouch?.capturedAt,
       Boolean(touch.utmSource || touch.referrerHost),
-    )
+    ))
   ) {
     window.localStorage.setItem(lastTouchKey, JSON.stringify(touch));
   }
+  if (isPublicMeasurementPath(touch.landingPath)) publicEntryCaptured = true;
   return { visitorId, sessionId };
 }
 
@@ -138,7 +143,7 @@ export function trackFunnelEvent(
         campaign: touch.utmCampaign,
         referrerHost: touch.referrerHost,
         deviceClass: deviceClass(),
-        metadata,
+        metadata: { ...metadata, ...(eventName === "tool_started" ? { lifecycle: "started" } : eventName === "tool_completed" ? { lifecycle: "completed" } : {}) },
       }),
       keepalive: true,
     }).catch(() => undefined);
@@ -203,7 +208,7 @@ export function readCheckoutAttribution() {
       utmSource: touch.utmSource,
       utmMedium: touch.utmMedium,
       utmCampaign: touch.utmCampaign,
-      landingPath: touch.landingPath,
+      landingPath: isPublicMeasurementPath(touch.landingPath) ? touch.landingPath : undefined,
       referrerHost: touch.referrerHost,
     };
   } catch {

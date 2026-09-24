@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { FileCheck2, ShieldCheck, Sparkles } from "lucide-react";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { GuideTable } from "@/components/cv-guide";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 
 import { JobApplicationPack } from "@/components/job-application-pack";
 import {
@@ -44,12 +49,12 @@ const faqs = [
   {
     question: "What happens to the CV and job advert I paste?",
     answer:
-      "The text is sent to the generation provider for this request and is not saved by WorkCV. Remove contact details and sensitive information that the application does not need.",
+      "The text you submit is sent through WorkCV to OpenAI to generate the result. Remove contact details and sensitive information that the review does not need; read WorkCV's privacy policy before submitting personal data.",
   },
   {
     question: "Can I move the result into my WorkCV CV?",
     answer:
-      "Yes. The handoff carries the profile, found keywords and vacancy priorities into the editor. The cover letter, interview prompts and thank-you email remain separate drafts.",
+      "Yes. The handoff imports your original CV and carries the suggested profile, vacancy priorities and complete pack into a new saved CV. In the Experience tab, review and apply bullets to the correct role. Your original text, cover letter, evidence review, interview prompts and thank-you email remain available as notes, separate from the CV PDF.",
   },
 ];
 
@@ -95,6 +100,25 @@ export default function JobApplicationPackPage() {
           <div className="mt-10 rounded-lg border border-line-strong bg-surface p-5 shadow-soft md:p-7"><JobApplicationPack /></div>
         </div>
       </section>
+
+      <CustomerQuestionNav ids={["Q10", "Q13"]} />
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl space-y-14">
+        <CustomerAnswer questionId="Q10">
+          <ol className="list-decimal space-y-2 pl-6"><li>Keep a factual master CV that you can return to.</li><li>Highlight one vacancy’s essential requirements.</li><li>Match each requirement to a real bullet, project or qualification; mark gaps honestly.</li><li>Edit the target role, profile, skill order and a few relevant bullets without changing job titles or dates.</li><li>Review the final CV and requested file format before applying.</li></ol>
+          <p>The editor imports your original CV and keeps its source text for comparison. Your complete pack remains available in the Experience tab: review bullets before adding them to a selected role, edit the cover letter, and keep evidence and interview notes separately from the PDF. Original skills are not replaced by a keyword list. The <Link className="font-semibold underline" href={customerQuestionHref("Q13")}>advert-language example</Link> shows how to choose terms. For a longer application statement, use the free <Link className="font-semibold underline" href="/tools/supporting-statement-planner-uk">supporting-statement planner</Link>.</p>
+        </CustomerAnswer>
+        <CustomerAnswer questionId="Q13">
+          <p>The following fictional Birch Office Services vacancy asks for Excel records, customer email replies, scheduling and Sage. Alex Morgan’s existing retail CV supports the first three; it does not supply Sage evidence.</p>
+          <GuideTable caption="Fictional vacancy requirements against Alex Morgan's actual example CV" headings={["Advert term", "Real CV evidence", "Truthful next edit"]} rows={[
+            ["Excel records", "Updated the Excel delivery tracker and checked discrepancies against delivery notes before escalating them.", "Place that bullet near the relevant admin evidence; do not claim advanced Excel or an error reduction."],
+            ["Customer email replies", "Replied to customer order enquiries by email, recording the agreed next step in the order log.", "Use customer enquiries, email and order-log language in this real work context."],
+            ["Scheduling", "Coordinated the weekly rota for a 12-person team, recording approved holiday and arranging cover with the manager.", "Connect rota coordination to scheduling while keeping the actual retail supervisor title."],
+            ["Sage, marked essential", "No Sage evidence supplied in this CV.", "Ask whether you have genuine omitted evidence. If not, leave Sage out and decide whether this vacancy fits."],
+          ]} />
+          <p>A stronger Excel bullet names the tracker and the check performed. Repeating “Excel” in a skills list without an example adds less value. The <Link className="font-semibold underline" href={customerQuestionHref("Q11")}>WorkCV match checker</Link> can identify evidence gaps, but its result is not an employer score.</p>
+        </CustomerAnswer>
+        <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview[path]}>{displayReviewDate(customerContentReview[path])}</time>.</p>
+      </div></section>
 
       <section className="bg-surface py-20">
         <div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">

@@ -18,6 +18,7 @@ export default async function EditorPage({
 }: {
   searchParams: {
     template?: string;
+    layoutPreset?: string;
     payment?: string;
     draftId?: string;
     roleTemplate?: string;
@@ -29,6 +30,7 @@ export default async function EditorPage({
   if (!user) {
     const editorParams = new URLSearchParams();
     if (searchParams.template) editorParams.set("template", searchParams.template);
+    if (searchParams.layoutPreset) editorParams.set("layoutPreset", searchParams.layoutPreset);
     if (searchParams.payment) editorParams.set("payment", searchParams.payment);
     if (searchParams.draftId) editorParams.set("draftId", searchParams.draftId);
     if (searchParams.roleTemplate) editorParams.set("roleTemplate", searchParams.roleTemplate);

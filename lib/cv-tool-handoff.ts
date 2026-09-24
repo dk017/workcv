@@ -1,4 +1,6 @@
 import type { CvData } from "@/lib/editor-data";
+import { createBlankCv } from "./editor-data.ts";
+import { cvDataSchema } from "./cv-schema.ts";
 
 export const cvToolHandoffKey = "workcv-cv-tool-handoff-v1";
 
@@ -12,6 +14,9 @@ export type CvToolPatch = Partial<
     | "experience"
     | "education"
     | "targeting"
+    | "applicationPack"
+    | "layoutPreset"
+    | "additionalSections"
   >
 >;
 
@@ -44,14 +49,18 @@ export function readCvToolHandoff(): CvToolHandoff | null {
   try {
     const raw = window.sessionStorage.getItem(cvToolHandoffKey);
     if (!raw) return null;
+    if (raw.length > 150000) { window.sessionStorage.removeItem(cvToolHandoffKey); return null; }
     const value = JSON.parse(raw) as Partial<CvToolHandoff>;
     if (
       value.version !== 1 ||
       typeof value.createdAt !== "number" ||
+      !Number.isFinite(value.createdAt) ||
+      value.createdAt > Date.now() + 60000 ||
       Date.now() - value.createdAt > 30 * 60 * 1_000 ||
       typeof value.source !== "string" ||
       (value.sourceText !== undefined && typeof value.sourceText !== "string") ||
-      (value.patch !== undefined && typeof value.patch !== "object")
+      (value.sourceText !== undefined && value.sourceText.length > 30000) ||
+      (value.patch !== undefined && (!value.patch || Array.isArray(value.patch) || typeof value.patch !== "object" || !cvDataSchema.safeParse({ ...createBlankCv(), ...value.patch }).success))
     ) {
       window.sessionStorage.removeItem(cvToolHandoffKey);
       return null;

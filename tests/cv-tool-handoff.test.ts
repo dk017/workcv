@@ -68,3 +68,12 @@ test("expired and malformed handoffs are discarded before import", () => {
   assert.equal(readCvToolHandoff(), null);
   assert.equal(storage.getItem(cvToolHandoffKey), null);
 });
+
+test("handoff rejects invalid CV fields, arrays and future timestamps", () => {
+  for (const patch of [[], { profile: 42 }, { additionalSections: { projects: "x".repeat(5001) } }]) {
+    storage.setItem(cvToolHandoffKey, JSON.stringify({ version: 1, createdAt: Date.now(), source: "test", patch }));
+    assert.equal(readCvToolHandoff(), null);
+  }
+  storage.setItem(cvToolHandoffKey, JSON.stringify({ version: 1, createdAt: Date.now() + 3600000, source: "test" }));
+  assert.equal(readCvToolHandoff(), null);
+});

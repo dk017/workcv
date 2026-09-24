@@ -1,3 +1,10 @@
+import { isPublicMeasurementPath } from "./public-paths.ts";
+
+export function canCapturePublicTouch(path: string, previousPath?: string, sameDocumentEntry = false) {
+  if (!isPublicMeasurementPath(path)) return false;
+  return !sameDocumentEntry || !previousPath || !isPublicMeasurementPath(previousPath);
+}
+
 export type BrowserSignupAttribution = {
   landingPath?: string;
   referrer?: string;
