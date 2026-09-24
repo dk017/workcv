@@ -1,6 +1,6 @@
 # Product value improvements — 24 September 2026
 
-Scope: implement the competitor-review findings without copying unsupported ATS or hiring claims. Preserve existing work. No production deployment is implied.
+Scope: implement the competitor-review findings without copying unsupported ATS or hiring claims. Deployed to production on 24 September 2026; release commit `297f042a48c26ea8b89b72a7edfe7ead0026a1f9`, [GitHub Actions run #80](https://github.com/dk017/workcv/actions/runs/36002031943).
 
 ## Verification checklist
 
@@ -39,5 +39,7 @@ Supporting asset endpoint: /pdf-worker.mjs (build-time static JavaScript, not a 
 - Six generated PDF layouts visually reviewed. Public sample results record actual parser, renderer, heading order, word counts and page counts.
 - Production build passed, including type checking and generation of 136 static pages. Post-build public-tool browser checks passed: eight responsive checks, PDF/DOCX extraction, malformed-file feedback, statement example, word limit and free download, with zero content POSTs or browser exceptions.
 - Post-build customer-journey checks passed: 18 pages and 24 answers at three widths, eight tracked links, ATS, complete application-pack and first-job handoffs, and free DOCX download. Account/AI-dependent journeys use mocked APIs; no payment, email or live AI generation was performed.
-- Local production responses verified: both new content routes return 200 with correct canonical URLs and sitemap inclusion; the PDF worker returns JavaScript with the correct MIME type; the visual-test editor route returns 404. Git diff whitespace checks passed. No production deployment was performed, and existing unrelated changes are preserved.
-- After deployment, confirm public 200 responses, sitemap inclusion and worker JavaScript MIME type; check crawl/index status and compare actual tool completion and paid-order cohorts over comparable windows. Observe AI citations separately from referral sources. No ranking, citation or revenue increase is guaranteed.
+- Production deployment completed successfully. The workflow built and pushed the image, prepared the existing growth schema and restarted `workcv-app-1` on commit `297f042a48c26ea8b89b72a7edfe7ead0026a1f9`.
+- Live HTTP checks passed: both new routes returned 200 and their canonical links; sitemap and robots returned 200 and listed the new pages; PDF worker returned JavaScript; sample PDF and free DOCX returned their expected MIME types; visual-test editor route returned 404; corrected job-board and money pages returned 200.
+- Docker cleanup removed three old WorkCV image tags that no running or stopped container referenced, kept the active release image, and left other repositories and volumes untouched. The existing dangling-image prune reclaimed 0 B.
+- After release, check crawl/index status and compare actual tool completions and paid-order cohorts over comparable windows. Observe AI citations separately from referral sources. No ranking, citation or revenue increase is guaranteed.

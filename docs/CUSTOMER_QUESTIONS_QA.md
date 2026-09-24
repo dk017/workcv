@@ -1,6 +1,6 @@
 # Customer question implementation QA
 
-Review date: 23 September 2026. Current status: local implementation verified. Release: local implementation only; no production deployment recorded. Build checked: current working tree on 23 September 2026 (no commit created for this work).
+Review date: 24 September 2026. Current status: implementation and production release verified. Release commit: `297f042a48c26ea8b89b72a7edfe7ead0026a1f9`; [GitHub Actions run #80](https://github.com/dk017/workcv/actions/runs/36002031943) completed successfully.
 
 ## Scope and preservation
 
@@ -29,11 +29,11 @@ These are actual local results. “Not run” is not a pass.
 | Live paid checkout and provider calls | Not part of local QA | Do not make a real charge or paid AI call for static content checks |
 | Search Console baseline | Unavailable in this environment | No connected Search Console export or read-only access was available; no impressions or clicks are recorded as zero. |
 | Growth-report baseline | Unavailable in this environment | `DATABASE_URL` was absent, so the existing database-backed report was not run. No sales, revenue or attribution values are invented. |
-| Production health after deployment | Not run | Complete only if this task includes an actual authorised deployment |
+| Production health after deployment | Pass | New content pages, sitemap, robots, PDF worker, sample PDF, free DOCX, privacy, corrected job-board page and money page returned expected statuses/types; test-only editor route returned 404. See the release URL record. |
 
 ## Human acceptance checklist
 
-The follow-up verifier run on 23 September 2026 passed all 54 page-width checks and ten explicit interaction checks (eight attribution-preserving clicks and two complete handoffs), recorded in `tmp/customer-questions-qa/results.json`. This follow-up changed the verifier/documentation only; the previously successful product build and 198-test run remain the baseline. Browser QA requires a build with `NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED=true`, matching the production workflow. Serve the compiled site with its public/static assets before running the verifier. Analytics requests are intercepted, and editor navigation is fulfilled with a local test destination.
+The follow-up verifier run on 23 September 2026 passed all 54 page-width checks and ten explicit interaction checks (eight attribution-preserving clicks and two complete handoffs). Browser QA used a build with `NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED=true`, matching the production workflow. Analytics requests were intercepted, and editor navigation was fulfilled with a local test destination. Browser screenshots and detailed run output remained local QA artifacts and were not packaged with the release.
 
 - [x] Every one of Q01–Q24 answers its visitor's question before a commercial pitch.
 - [x] Paid and free options are clearly separate and consistently priced.

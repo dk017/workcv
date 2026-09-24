@@ -1,6 +1,6 @@
 # WorkCV: useful customer answers and conversion implementation spec
 
-Prepared: 23 September 2026. Status: ready for implementation; this document does not represent deployed changes.
+Prepared: 23 September 2026. Status: implemented and deployed on 24 September 2026. See `docs/CUSTOMER_QUESTIONS_QA.md` and `docs/CUSTOMER_QUESTIONS_RELEASE_URLS.md` for verification and live routes.
 
 Repository: `D:\DKPlayground\OneOffUKCV`. Public site: https://workcv.co.uk.
 
@@ -716,16 +716,16 @@ Read each page as its intended visitor. Can they perform the named task without 
 
 ## 12. Rollout, submission list and rollback
 
-This spec requests implementation guidance, not an automatic production deployment. When deployment is part of the active authorised implementation task, use the existing workflow; do not invent a new hosting process or silently deploy unrelated dirty changes.
+Deployment was explicitly requested for this release. The existing workflow and reviewed branch were used; unrelated workspace changes were not staged.
 
 1. Review the explicit changed-file list, tests and QA record. Stage/commit only intended changes if committing is authorised; never use broad destructive cleanup or `git add .` on this dirty workspace.
 2. Use `.github/workflows/build-app-image.yml` with the reviewed branch/ref and explicit `deploy=true`. Its default is false. Existing deployment performs its established preparation/restart process; do not add a new migration for these content changes.
 3. Verify live target pages, free DOCX, sample PDF, privacy, sitemap and robots with read-only requests/rendering. Production smoke must not submit real CVs or create purchases.
 4. Verify no server/render errors and that the deployed version actually contains the answers. Record release identifier/time and live smoke results.
-5. For Docker housekeeping, only use the already authorised existing dangling-image cleanup in the deployment workflow. Do not expand this content rollout to delete all unused images, volumes or rollback assets.
+5. For this release, the owner also explicitly requested Docker image cleanup. The deploy workflow removed only WorkCV image tags not referenced by any running or stopped container, retained the active image, left other repositories and volumes untouched, and ran the existing dangling-image prune.
 6. If a release causes a functional regression, use the project's existing known-good image/release rollback process. Do not delete documents/orders, reset the user's working tree, or improvise database rollback for a content release.
 
-Deliver `docs/CUSTOMER_QUESTIONS_RELEASE_URLS.md` listing these updated URLs for the owner. They are existing pages, not new pages. Include deploy status and actual date; do not tell the user to submit unshipped updates. Submission/indexing is separate from publication, and anchors are not individual sitemap URLs.
+`docs/CUSTOMER_QUESTIONS_RELEASE_URLS.md` records the deployed updated URLs and separately lists the two new utility pages. Submission/indexing is separate from publication, and anchors are not individual sitemap URLs.
 
 ```text
 https://workcv.co.uk/cv-builder-no-subscription-uk
@@ -789,17 +789,17 @@ Do not copy comments as testimonials, identify posters on public WorkCV pages, o
 
 The implementation is complete only when:
 
-- [ ] All Q01–Q24 are visibly answered at their primary anchors, with the specified practical evidence/action.
-- [ ] All 17 existing content pages are covered; privacy clarification is accurate; no new thin URLs exist.
-- [ ] Existing tools, free DOCX, real sample PDFs/screenshots, internal anchors and entitlement behaviour are preserved.
-- [ ] Prices/account/export/payment scope are consistent across answers, CTAs, FAQ text and existing schema.
-- [ ] No invented CV facts, provider results, ATS guarantees, success rates, qualifications, testimonials or review dates appear.
-- [ ] Paid recovery routes to the existing paid document, never an accidental new purchase.
-- [ ] Meaningful contextual money-page links exist without blocking value/free downloads or overwhelming the pages.
-- [ ] New tracking uses the current pipeline and excludes personal content; attribution is not overwritten.
-- [ ] Type/build/tests and browser checks have actual recorded outcomes; limitations are explicit.
-- [ ] QA, measurement/future-topic intake and release-URL documents are complete.
-- [ ] Full diff reviewed; unrelated workspace changes untouched; deployment status reported accurately.
+- [x] All Q01–Q24 are visibly answered at their primary anchors, with the specified practical evidence/action.
+- [x] All 17 existing content pages are covered; privacy clarification is accurate; no new thin URLs exist.
+- [x] Existing tools, free DOCX, real sample PDFs/screenshots, internal anchors and entitlement behaviour are preserved.
+- [x] Prices/account/export/payment scope are consistent across answers, CTAs, FAQ text and existing schema.
+- [x] No invented CV facts, provider results, ATS guarantees, success rates, qualifications, testimonials or review dates appear.
+- [x] Paid recovery routes to the existing paid document, never an accidental new purchase.
+- [x] Meaningful contextual money-page links exist without blocking value/free downloads or overwhelming the pages.
+- [x] New tracking uses the current pipeline and excludes personal content; attribution is not overwritten.
+- [x] Type/build/tests and browser checks have actual recorded outcomes; limitations are explicit.
+- [x] QA, measurement/future-topic intake and release-URL documents are complete.
+- [x] Full diff reviewed; unrelated workspace changes untouched; deployment status reported accurately.
 
 ### Ready-to-use instruction for Sol
 
