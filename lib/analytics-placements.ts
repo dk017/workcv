@@ -1,4 +1,7 @@
 export const analyticsPlacements = {
+  coverLetterMoney: "cover_letter_money",
+  coverLetterBlankCv: "cover_letter_blank_cv",
+  noSubscriptionHeroSample: "no_subscription_hero_sample",
   layoutEvidenceEditor: "layout_evidence_editor",
   statementPlannerTemplates: "statement_planner_templates",
   fileCheckerEditor: "file_checker_editor",
@@ -20,6 +23,10 @@ export const analyticsPlacements = {
   careerChangeExampleEditor: "career_change_example_editor",
   returnerExampleEditor: "returner_example_editor",
   homeHeroEditor: "home_hero_editor",
+  homeSamplePdf: "home_sample_pdf",
+  homeExistingCv: "home_existing_cv",
+  homeFirstCv: "home_first_cv",
+  homeAiDraft: "home_ai_draft",
   homePricingProof: "home_pricing_proof",
   homeTemplates: "home_templates_transition",
   homeFinal: "home_final",

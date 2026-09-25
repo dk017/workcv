@@ -210,12 +210,13 @@ try {
     ) raw`);
 
   const toolUsage = await pool.query(`${bounds}
-    SELECT metadata->>'tool' tool, event_name, COUNT(*)::bigint events,
+    SELECT metadata->>'tool' tool, event_name, metadata->>'result' result,
+      metadata->>'placement' placement, COUNT(*)::bigint events,
       COUNT(DISTINCT session_hash)::bigint sessions
     FROM workcv_funnel_events, bounds
     WHERE event_name IN ('tool_started','tool_completed') AND is_test=FALSE
       AND created_at>=window_start AND created_at<report_end
-    GROUP BY metadata->>'tool',event_name ORDER BY tool,event_name`, params);
+    GROUP BY metadata->>'tool',event_name,metadata->>'result',metadata->>'placement' ORDER BY tool,event_name,result,placement`, params);
   const acquisitionSales = await pool.query(`${bounds}, attributed AS (
     SELECT o.amount_cents, normalized.source,
       CASE WHEN u.first_landing_path LIKE '/%' AND u.first_landing_path NOT IN ('/login','/editor','/my-cvs')

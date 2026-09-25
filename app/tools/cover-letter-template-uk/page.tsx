@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Download, FileText, PenLine, ShieldCheck } from "lucide-react";
 import { CoverLetterTemplate } from "@/components/cover-letter-template";
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 
 const path = "/tools/cover-letter-template-uk";
@@ -21,4 +22,34 @@ export default function Page() { return <>{schemas.map((schema, index) => <scrip
   <section className="bg-surface py-20"><div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr]"><div><SectionLabel>Four focused paragraphs</SectionLabel><h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">Structure the argument before polishing sentences.</h2><p className="mt-6 text-base leading-8 text-muted">The template separates intent, two pieces of relevant evidence and a professional close. This keeps the letter focused on why your experience fits this vacancy instead of repeating the whole CV.</p></div><ol className="divide-y divide-line border-y border-line">{[["Opening","Name the role, employer and one genuine reason for applying."],["Strongest evidence","Connect a specific action and result to a priority requirement."],["Second evidence","Demonstrate a different relevant skill without repeating the first example."],["Close","Summarise fit, confirm interest and invite further discussion."]].map(([title, body], index) => <li key={title} className="grid gap-4 py-5 sm:grid-cols-[44px_1fr]"><span className="inline-flex h-10 w-10 items-center justify-center rounded-md bg-paper text-sm font-bold text-navy">{index + 1}</span><div><h3 className="font-display text-2xl font-semibold text-navy">{title}</h3><p className="mt-2 text-sm leading-7 text-muted">{body}</p></div></li>)}</ol></div></section>
   <section className="border-y border-line bg-paper py-20"><div className="container-page grid gap-10 lg:grid-cols-[1fr_0.8fr]"><div><SectionLabel>Template, not boilerplate</SectionLabel><h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">Every bracket requires your judgement.</h2><p className="mt-6 text-base leading-8 text-muted">Prospects advises using a basic template for ideas and structure rather than copying finished wording. Replace every prompt, verify every claim and tailor the examples to the job description.</p><p className="mt-4 text-sm font-bold text-navy">Guidance reviewed 10 July 2026.</p></div><div className="grid content-start gap-3 text-sm font-bold text-navy"><a href="https://nationalcareers.service.gov.uk/careers-advice/covering-letter" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">National Careers Service: covering letters</a><a href="https://www.prospects.ac.uk/careers-advice/cvs-and-cover-letters/cover-letters/sample-cover-letter/" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">Prospects: sample cover letter structure</a><Link href="/tools/cover-letter-generator-uk" className="rounded-md border border-line bg-white p-4 hover:border-navy">Generate a tailored cover letter</Link></div></div></section>
   <FaqSection faqs={faqs} title="UK cover letter template questions." />
+  <section className="border-t border-line bg-paper py-16"><div className="container-page max-w-4xl">
+    <SectionLabel>Worked example</SectionLabel>
+    <h2 className="font-display text-3xl font-semibold text-navy">From retail experience to an office application</h2>
+    <p className="mt-4 leading-7 text-muted">Fictional example: Alex applies for an office assistant role at Birch Office Services. The fictional advert asks for clear customer communication, accurate records and teamwork. Use the reasoning, not Alex’s claims, in your own letter.</p>
+    <div className="mt-6 space-y-4 rounded-xl border border-line bg-white p-6 leading-7 text-ink">
+      <p>Dear Ms Patel,</p>
+      <p>I am applying for the office assistant position at Birch Office Services. The combination of customer enquiries and careful record keeping interests me because these are the parts of my retail work I most enjoy. I would like to bring that experience to an office support role.</p>
+      <p>At North Street Stores, I answered customer questions in person and by telephone. When an order was delayed, I checked its status with colleagues, explained the available options and recorded the agreed next step for the following shift. This taught me to give clear updates and keep a useful record rather than leave colleagues to repeat the conversation.</p>
+      <p>I also helped check deliveries against order records and raised discrepancies with my supervisor before stock was put away. During busy periods, I agreed priorities with the team and kept handover notes for unfinished tasks. I would bring the same care to your records and day-to-day administrative support, while learning your office systems.</p>
+      <p>My CV gives further details of my experience. I would welcome the opportunity to discuss how my customer service and record-keeping skills could support your team. Thank you for considering my application.</p>
+      <p>Yours sincerely,<br />Alex Morgan</p>
+    </div>
+    <h3 className="mt-8 text-xl font-bold text-navy">How to adapt this to your vacancy</h3>
+    <ul className="mt-4 list-disc space-y-3 pl-6 leading-7 text-muted">
+      <li>Pick two requirements from the actual advert. For each, describe something you personally did and what happened next.</li>
+      <li>Replace the opening with your genuine reason for wanting that role. Do not claim to know an employer’s systems or values without checking.</li>
+      <li>Use your real job titles and dates consistently with your CV. Do not add numbers, qualifications or software skills just to sound stronger.</li>
+      <li>For a first job, use a relevant project, volunteering task or responsibility. You do not need to invent paid employment.</li>
+    </ul>
+    <h3 className="mt-8 text-xl font-bold text-navy">Before sending the Word file</h3>
+    <p className="mt-4 leading-7 text-muted">Open the downloaded DOCX in Word or a compatible editor. Search for remaining square brackets, check the recipient and employer, and inspect every page. Follow the vacancy’s file instructions: attach DOCX or PDF if requested, or paste the letter into the email body when asked. Keep a copy of the version you send.</p>
+  </div></section>
+  <section className="border-t border-line bg-surface py-16"><div className="container-page max-w-4xl">
+    <h2 className="font-display text-3xl font-semibold text-navy">Need the CV to go with your letter?</h2>
+    <p className="mt-4 leading-7 text-muted">Check that both documents describe the same experience. Your cover letter and Word download above are free. If you want WorkCV to format your CV, sign in with an email code, build and preview it, then pay {site.price} once for that saved CV’s PDF. Editing and redownloading the same paid CV is included; a separate new CV has its own unlock.</p>
+    <div className="mt-6 flex flex-wrap gap-3">
+      <ButtonLink href="/cv-builder-no-subscription-uk" trackingLabel={analyticsPlacements.coverLetterMoney}>See the pay-once CV builder</ButtonLink>
+      <ButtonLink href="/tools/blank-cv-template-uk" variant="secondary" trackingLabel={analyticsPlacements.coverLetterBlankCv}>Get a free blank CV in Word</ButtonLink>
+    </div>
+  </div></section>
   </>; }

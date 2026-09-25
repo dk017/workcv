@@ -255,6 +255,7 @@ export default function NoSubscriptionUkPage() {
                 Compare costs
               </ButtonLink>
             </div>
+            <p className="mt-4 text-sm leading-6 text-muted"><TrackedLink href="/samples/chatgpt-cv-alex-morgan.pdf" placement={analyticsPlacements.noSubscriptionHeroSample} className="font-bold text-navy underline underline-offset-4">Inspect a free sample CV PDF before signing in</TrackedLink>. Fictional details; no account or payment required for the sample.</p>
           </div>
           <CvPreview />
         </div>

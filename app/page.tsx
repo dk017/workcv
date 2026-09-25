@@ -84,17 +84,62 @@ export default function HomePage() {
             </div>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href={startHref} trackingLabel={analyticsPlacements.homeHeroEditor}>Start free with email code</ButtonLink>
+              <ButtonLink href="/samples/chatgpt-cv-alex-morgan.pdf" variant="secondary" trackingLabel={analyticsPlacements.homeSamplePdf}>See a sample PDF</ButtonLink>
             </div>
             <p className="mt-3 flex items-center gap-2 text-sm leading-6 text-muted">
               <ShieldCheck className="h-4 w-4 shrink-0 text-success" />
               One-time email code first · No payment until download
             </p>
+            <p className="mt-2 text-sm leading-6 text-muted">The sample uses fictional details and opens free, without signing in.</p>
           </div>
           <CvPreview />
         </div>
       </section>
 
       <TrustStrip />
+      <section aria-labelledby="starting-point-heading" className="border-b border-line bg-surface py-16">
+        <div className="container-page">
+          <SectionLabel>Your starting point</SectionLabel>
+          <h2 id="starting-point-heading" className="max-w-3xl font-display text-3xl font-semibold text-navy md:text-4xl">What do you need help with today?</h2>
+          <p className="mt-4 max-w-3xl leading-7 text-muted">Try a free tool or follow a worked example before creating an account. Choose the route that matches what you already have.</p>
+          <div className="mt-8 grid gap-5 lg:grid-cols-3">
+            {[
+              {
+                title: "I have a CV and a job in mind",
+                body: "Compare your real experience with the job advert. Review suggested bullets, missing evidence and a cover-letter draft before taking selected content into the editor.",
+                detail: "Have your CV text and the job advert ready. The free tool uses AI; check every suggestion.",
+                href: "/tools/job-application-pack-uk",
+                label: "Match my CV to a job",
+                placement: analyticsPlacements.homeExistingCv,
+              },
+              {
+                title: "I am writing my first CV",
+                body: "Use education, projects, volunteering and responsibilities to build a starting draft, even if you have never had a paid job.",
+                detail: "Bring real examples of what you have done. No invented jobs or achievements needed.",
+                href: "/tools/first-job-cv-wizard-uk",
+                label: "Start my first-CV draft",
+                placement: analyticsPlacements.homeFirstCv,
+              },
+              {
+                title: "I have an AI-written draft",
+                body: "Follow a complete example from checked text to a formatted PDF. Learn how to enter text by section or import a saved PDF or DOCX in the editor.",
+                detail: "This is a step-by-step guide, not a connection to your ChatGPT account.",
+                href: "/chatgpt-cv-to-pdf-uk",
+                label: "See how to format my draft",
+                placement: analyticsPlacements.homeAiDraft,
+              },
+            ].map((route) => (
+              <article key={route.href} className="flex min-w-0 flex-col rounded-xl border border-line bg-paper p-6">
+                <h3 className="font-display text-2xl font-semibold text-navy">{route.title}</h3>
+                <p className="mt-4 leading-7 text-muted">{route.body}</p>
+                <p className="mb-6 mt-3 text-sm leading-6 text-muted">{route.detail}</p>
+                <div className="mt-auto"><ButtonLink href={route.href} variant="secondary" trackingLabel={route.placement}>{route.label}</ButtonLink></div>
+              </article>
+            ))}
+          </div>
+          <p className="mt-6 text-sm leading-6 text-muted">These starting routes are free to access. Saving a CV in the editor requires an email code; your finished editor PDF costs {site.price} per saved CV, with no subscription. <Link href="/pricing" className="font-bold text-navy underline underline-offset-4">See exactly what the payment includes</Link>.</p>
+        </div>
+      </section>
       <TransformationSection />
 
       <section className="border-y border-line bg-surface py-20">

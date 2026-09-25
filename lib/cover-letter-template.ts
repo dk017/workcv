@@ -1,3 +1,9 @@
+export function changeCoverLetterRecipient(text: string, managerKnown: boolean) {
+  return text
+    .replace(/^Dear (?:\[Hiring manager name\]|Sir or Madam),\r?$/m, managerKnown ? "Dear [Hiring manager name]," : "Dear Sir or Madam,")
+    .replace(/^Yours (?:sincerely|faithfully),\r?$/m, managerKnown ? "Yours sincerely," : "Yours faithfully,");
+}
+
 export function coverLetterTemplateText(managerKnown: boolean) {
   const greeting = managerKnown ? "Dear [Hiring manager name]," : "Dear Sir or Madam,";
   const signOff = managerKnown ? "Yours sincerely," : "Yours faithfully,";
