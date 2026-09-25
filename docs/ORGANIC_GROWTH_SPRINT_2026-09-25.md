@@ -41,7 +41,9 @@ Existing funnel events are gated by NEXT_PUBLIC_WORKCV_FUNNEL_ENABLED. No letter
 - CTA placements: cover_letter_money, cover_letter_blank_cv, no_subscription_hero_sample.
 - The growth report separates tool action placement and success/error. Do not add distinct sessions across these rows: one session can perform several actions.
 
-Release: 25 September 2026. The release workflow ran its standard growth-schema preparation. The read-only production baseline and live funnel-event receipt still need confirmation.
+Release: 25 September 2026, commit c2867ef, [GitHub Actions run #81](https://github.com/dk017/workcv/actions/runs/36088717562). Build and deployment jobs passed. Growth schema preparation reported zero forbidden raw identifier rows. Live HTTP checks returned 200 for the homepage, cover-letter resource, no-subscription page, sample PDF and blank CV template. The read-only production baseline and live funnel-event receipt still need confirmation.
+
+The deploy cleanup removed the now-unused prior WorkCV image and its tag, kept the image referenced by the running container, and listed only the new image afterward. Docker reported 0 B reclaimed because removed image layers were shared with the active image; it removed the obsolete image reference safely, but did not free unique layer storage.
 
 Weekly review: use the same date windows for search clicks, tool actions, editor previews, paid orders and successful CV downloads. Compare original public landing/source acquisition separately from checkout attribution. Clicks on the optional CV offer are not purchases. Exclude test orders; do not infer causation from small before/after samples.
 
