@@ -102,11 +102,15 @@ jobs:
             if [ -n "${GHCR_TOKEN:-}" ]; then
               echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
             fi
+            image_repository="${WORKCV_IMAGE%:*}"
+            # Record WorkCV image IDs before pulling, so only these can be
+            # removed later. Never prune server-wide: other services share
+            # this host.
+            previous_image_ids="$(docker image ls -q --no-trunc "$image_repository" | sort -u)"
             docker compose -p workcv -f docker-compose.ghcr.yml pull app
             docker run --rm --env-file .env --network werkcv_default --entrypoint node "$WORKCV_IMAGE" scripts/prepare-growth-schema.mjs
             docker compose -p workcv -f docker-compose.ghcr.yml up -d app
             docker compose -p workcv -f docker-compose.ghcr.yml ps
-            image_repository="${WORKCV_IMAGE%:*}"
             container_ids="$(docker ps -aq)"
             if [ -n "$container_ids" ]; then
               used_image_ids="$(docker inspect --format '{{.Image}}' $container_ids)"
@@ -126,6 +130,14 @@ jobs:
                 docker image rm "$image_ref"
               fi
             done
-            docker image prune -f
+            for image_id in $previous_image_ids; do
+              if printf '%s\n' "$used_image_ids" | grep -Fqx -- "$image_id"; then
+                continue
+              fi
+              if docker image inspect "$image_id" >/dev/null 2>&1; then
+                echo "Removing superseded WorkCV image: $image_id"
+                docker image rm "$image_id" || echo "Could not remove $image_id; leaving it in place"
+              fi
+            done
             echo "WorkCV images after cleanup:"
             docker image ls "$image_repository"
