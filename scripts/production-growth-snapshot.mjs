@@ -43,7 +43,14 @@ export async function collectSnapshot(client, environment = process.env) {
     await client.query("SET LOCAL lock_timeout = '2s'");
     await client.query("SET LOCAL TIME ZONE 'UTC'");
     const end = (await client.query("SELECT NOW() AS at")).rows[0].at;
-    const testUsers = (environment.WORKCV_TEST_USER_IDS || "").split(",").map(x => x.trim()).filter(Boolean);
+    // Entries are user IDs or sign-in emails; emails resolve to IDs here and
+    // never leave the database.
+    const testEntries = (environment.WORKCV_TEST_USER_IDS || "").split(",").map(x => x.trim()).filter(Boolean);
+    const testEmails = testEntries.filter(x => x.includes("@")).map(x => x.toLowerCase());
+    const emailUserIds = testEmails.length
+      ? (await client.query("SELECT id FROM workcv_users WHERE lower(email) = ANY($1::text[])", [testEmails])).rows.map(row => row.id)
+      : [];
+    const testUsers = [...new Set([...testEntries.filter(x => !x.includes("@")), ...emailUserIds])];
     const report = { version: 1, request_id: environment.WORKCV_REPORT_ID, generated_at: end,
       timezone: "UTC", windows: [], notes: [
         "Rolling 7/30-day windows share one database snapshot; final day is partial.",

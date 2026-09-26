@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Log in before checkout." }, { status: 401 });
   }
-  const isTest = isApprovedTestUser(user.id);
+  const isTest = isApprovedTestUser(user);
 
   let body: unknown;
   try {

@@ -19,6 +19,10 @@ test("price answer remains truthful on both sides of the £10 boundary", () => {
 
 test("test-order classification comes only from the server allowlist", () => {
   const environment = { WORKCV_TEST_USER_IDS: "operator-1, operator-2" };
-  assert.equal(isApprovedTestUser("operator-2", environment), true);
-  assert.equal(isApprovedTestUser("customer-1", environment), false);
+  assert.equal(isApprovedTestUser({ id: "operator-2" }, environment), true);
+  assert.equal(isApprovedTestUser({ id: "customer-1" }, environment), false);
+  const byEmail = { WORKCV_TEST_USER_IDS: "operator-1, Owner@Example.com" };
+  assert.equal(isApprovedTestUser({ id: "user-9", email: "owner@example.com " }, byEmail), true);
+  assert.equal(isApprovedTestUser({ id: "user-9", email: "someone@example.com" }, byEmail), false);
+  assert.equal(isApprovedTestUser({ id: "owner@example.com" }, { WORKCV_TEST_USER_IDS: "someone@example.com" }), false);
 });
