@@ -48,6 +48,7 @@ const routes = [
   { path: "/tools/cv-gap-detector-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/blank-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/tools/cv-template-word-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
+  { path: "/cover-letter-examples-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-26" },
   { path: "/tools/cover-letter-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/redundancy-pay-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-30" },
   { path: "/tools/ats-score-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
