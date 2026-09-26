@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { FormEvent, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -408,13 +409,14 @@ export function RedundancyPayCalculator() {
               </p>
             </div>
           </div>
-          <Link
+          <TrackedLink
             href="/editor?new=1"
+            placement={analyticsPlacements.redundancyCalculatorSticky}
             className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
           >
             Update my CV
             <ArrowRight className="h-4 w-4" />
-          </Link>
+          </TrackedLink>
         </div>
       </div>
     </div>

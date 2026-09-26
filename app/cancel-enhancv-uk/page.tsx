@@ -325,7 +325,7 @@ export default function CancelEnhancvUkPage() {
               headers={["Enhancv Pro", "WorkCV"]}
               rows={[
                 ["Monthly, quarterly or semiannual Pro plans", "Free to build"],
-                ["Billed at the start of each period", `${site.priceGbp} PDF download`],
+                ["Billed at the start of each period", `${site.priceGbp} PDF + Word download`],
                 ["Cancel from the Billing page", "No monthly subscription"],
                 ["AI resume platform", "Focused UK CV builder"],
               ]}
@@ -379,7 +379,7 @@ export default function CancelEnhancvUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling Enhancv." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/enhancv-alternative-uk"
         secondary="Compare the Enhancv alternative"
       />

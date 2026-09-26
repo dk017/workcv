@@ -329,7 +329,7 @@ export default function CancelCvmakerUkPage() {
               headers={["CVMaker UK", "WorkCV"]}
               rows={[
                 [competitorPricing.cvMaker.entry, "Free to build"],
-                [`Renews at ${competitorPricing.cvMaker.renewal}`, `${site.priceGbp} PDF download`],
+                [`Renews at ${competitorPricing.cvMaker.renewal}`, `${site.priceGbp} PDF + Word download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
               ]}
@@ -383,7 +383,7 @@ export default function CancelCvmakerUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling CVMaker." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/cvmaker-alternative"
         secondary="Compare the CVMaker alternative"
       />

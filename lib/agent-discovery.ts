@@ -19,8 +19,9 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - Create a UK-ready CV in a guided editor.
 - Choose a clean CV template.
 - Preview the CV before paying.
-- Download the finished CV as a PDF after payment.
-- Pay ${site.price} once for the PDF download.
+- Download the finished CV as a PDF and as an editable Word (.docx) file after payment.
+- Write a matching cover letter in the same editor; it uses the CV's header and design and downloads as PDF and Word with the same payment.
+- Pay ${site.price} once per saved CV; both formats are included.
 - Avoid monthly subscriptions and automatic renewal.
 
 ## Main actions
@@ -35,10 +36,10 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 ## Important product facts
 
 - WorkCV is built for UK CV expectations.
-- The standard flow exports PDF, not DOCX.
+- The paid flow exports both PDF and an editable single-column Word (.docx) file.
 - Users log in with a one-time email code so their CV can be saved.
 - There is no monthly CV builder subscription in the standard download flow.
-- The current PDF download price is ${site.price}.
+- The current one-time price is ${site.price} per saved CV, covering the CV and one matching cover letter, each as PDF and Word.
 
 ## Agent discovery
 
@@ -62,12 +63,13 @@ ${site.url}
 - Guided UK CV creation.
 - Editable CV templates.
 - Saved CV editing after email-code login.
-- PDF download after one-time payment.
+- PDF and Word (.docx) download after one-time payment.
+- A matching cover letter, included in the same payment.
 - No monthly CV builder subscription in the standard flow.
 
 ## Current limitations
 
-- WorkCV exports PDF only.
+- The Word file uses a single-column layout, so sidebar templates look simpler in Word than in the PDF.
 - WorkCV does not currently expose a public MCP server.
 - WorkCV does not currently expose OAuth/OIDC agent registration.
 - Payment and download require the normal website flow.

@@ -13,6 +13,7 @@
     "package:distribution": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-distribution-assets.ps1",
     "generate:public-sample": "node scripts/generate-public-cv-sample.mjs",
     "report:growth": "node scripts/report-growth.mjs",
+    "report:growth:production": "node scripts/report-growth-production.mjs",
     "trend:prepare": "node scripts/prepare-trend-radar.mjs",
     "db:prepare:growth": "node scripts/prepare-growth-schema.mjs",
     "verify:indexing": "node scripts/verify-indexing.mjs",

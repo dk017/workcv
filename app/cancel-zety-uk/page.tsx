@@ -335,7 +335,7 @@ export default function CancelZetyUkPage() {
               headers={["Zety UK", "WorkCV"]}
               rows={[
                 [competitorPricing.zety.entry, "Free to build"],
-                [competitorPricing.zety.renewal, `${site.price} PDF download`],
+                [competitorPricing.zety.renewal, `${site.price} PDF + Word download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
               ]}
@@ -399,7 +399,7 @@ export default function CancelZetyUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling Zety." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/pricing"
         trackingContext={analyticsPlacements.cancelZetyFinal}
         secondary="Compare pricing"

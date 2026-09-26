@@ -70,6 +70,22 @@ export type CvData = {
   sectionOrder?: CvSectionId[];
   additionalSections?: Partial<Record<"projects" | "certifications" | "volunteering" | "languages", string>>;
   applicationPack?: { bullets: string[]; coverLetter: string; interviewPrompts: string[]; thankYouEmail: string; originalCvText?: string; evidenceReview?: string[] };
+  coverLetter?: CoverLetter;
+};
+
+export const COVER_LETTER_MAX_PARAGRAPHS = 6;
+
+export type CoverLetterGreeting = "hiring-manager" | "sir-madam";
+
+export type CoverLetter = {
+  jobTitle: string;
+  employer: string;
+  reference: string;
+  recipientName: string;
+  greeting: CoverLetterGreeting;
+  employerAddress: string;
+  includeDate: boolean;
+  paragraphs: string[];
 };
 
 export const templates: Array<{

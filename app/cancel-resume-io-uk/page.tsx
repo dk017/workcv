@@ -329,7 +329,7 @@ export default function CancelResumeIoUkPage() {
               headers={["Resume.io UK", "WorkCV"]}
               rows={[
                 [competitorPricing.resumeIo.entry, "Free to build"],
-                [`Renews at ${competitorPricing.resumeIo.renewal}`, `${site.priceGbp} PDF download`],
+                [`Renews at ${competitorPricing.resumeIo.renewal}`, `${site.priceGbp} PDF + Word download`],
                 ["Confirmation step listed for cancellation", "No monthly subscription"],
                 ["Broad CV and cover-letter tools", "Focused UK CV builder"],
               ]}
@@ -383,7 +383,7 @@ export default function CancelResumeIoUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling Resume.io." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/resume-io-alternative-uk"
         secondary="Compare the Resume.io alternative"
       />

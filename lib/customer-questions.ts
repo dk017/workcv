@@ -18,12 +18,12 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q01: {
     id: "Q01", ownerPath: "/cv-builder-no-subscription-uk", anchor: "pay-once-cv-builder",
     question: "Which UK CV builder lets me pay once for a PDF without a subscription?",
-    answer: `WorkCV lets you build and preview a UK CV free, then pay ${site.price} once to download the PDF for that saved CV. There is no monthly subscription or automatic renewal. An account is required to save your CV. If you need a completely free file instead, use the separate editable Word template.`,
+    answer: `WorkCV lets you build and preview a UK CV free, then pay ${site.price} once to download that saved CV as a PDF and an editable Word file. There is no monthly subscription or automatic renewal. An account is required to save your CV. If you need a completely free file instead, use the separate editable Word template.`,
   },
   Q02: {
     id: "Q02", ownerPath: "/pricing", anchor: "free-vs-paid-cv",
     question: "Can I create and download a CV completely free, or is only the editor free?",
-    answer: `WorkCV's blank Word template is free to download without an account or payment. You fill and format that document yourself. The online builder is separate: building and previewing are free after sign-in, while downloading the finished PDF costs ${site.price} once for that saved CV. Choose the option that matches the file and help you need.`,
+    answer: `WorkCV's blank Word template is free to download without an account or payment. You fill and format that document yourself. The online builder is separate: building and previewing are free after sign-in, while downloading the finished CV as PDF and Word costs ${site.price} once for that saved CV. Choose the option that matches the file and help you need.`,
   },
   Q03: {
     id: "Q03", ownerPath: "/cv-builder-no-subscription-uk", anchor: "cv-on-phone-or-ipad",
@@ -43,7 +43,7 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q06: {
     id: "Q06", ownerPath: "/pricing", anchor: "one-payment-one-saved-cv",
     question: "Does one payment cover one saved CV or every CV I create?",
-    answer: "One payment unlocks PDF downloads for one saved CV. You can keep editing and downloading that same document without another payment. A separate new saved CV has its own payment requirement. For example, changing the wording in your existing paid CV is different from creating a second saved CV for another application.",
+    answer: "One payment unlocks PDF and Word downloads for one saved CV and the cover letter saved with it. You can keep editing and downloading that same CV and letter without another payment. A separate new saved CV has its own payment requirement. For example, changing the wording in your existing paid CV is different from creating a second saved CV for another application.",
   },
   Q07: {
     id: "Q07", ownerPath: "/cv-builder-no-subscription-uk", anchor: "account-and-payment",
@@ -88,7 +88,7 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q15: {
     id: "Q15", ownerPath: "/cv-word-or-pdf-uk", anchor: "choose-word-or-pdf",
     question: "Should I send my CV as Word or PDF when applying in the UK?",
-    answer: "Send the format the employer asks for. If both are accepted and no preference is given, a text-based PDF can preserve the layout; keep an editable master as well. Use DOCX when it is requested. Check the final file rather than assuming its extension guarantees readability. WorkCV's paid builder exports PDF; its separate free template is DOCX.",
+    answer: "Send the format the employer asks for. If both are accepted and no preference is given, a text-based PDF can preserve the layout; keep an editable master as well. Use DOCX when it is requested. Check the final file rather than assuming its extension guarantees readability. WorkCV's paid builder exports both PDF and an editable Word (DOCX) file; its separate free template is also DOCX.",
   },
   Q16: {
     id: "Q16", ownerPath: "/shorten-cv-to-two-pages", anchor: "one-page-or-two",

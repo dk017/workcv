@@ -1,6 +1,6 @@
 import pg from "pg";
 
-import { addMarketingCluster, calculateStepConversions, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
+import { addMarketingCluster, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
 
 const { Pool } = pg;
 
@@ -252,8 +252,7 @@ try {
   console.table(metricRows);
   const grossPence = metricRows.find((row) => row.metric === "gross_production_gbp_pence")?.value || 0;
   console.log(`Gross production revenue (GBP): £${(grossPence / 100).toFixed(2)}`);
-  console.log("Step conversion (same operational event window)");
-  console.table(calculateStepConversions(metricRows));
+  console.log("Operational totals mix sessions, users and orders. Do not divide them into step conversion rates. Use report:growth:production for linked visitor milestones.");
   console.log("First-touch funnel by source and first public landing (no PII)");
   console.table(addMarketingCluster(normalizeNumericRows(firstTouch.rows), "landing_path"));
   console.log("Acquisition sessions by source, landing, device, and UTC week");

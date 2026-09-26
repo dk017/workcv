@@ -172,6 +172,16 @@ main section.py-24 {
   overflow-wrap: anywhere;
 }
 
+.letter-document .letter-name {
+  font-size: var(--cv-name-preview-size);
+  hyphens: none;
+}
+
+.letter-document p,
+.letter-document span {
+  overflow-wrap: anywhere;
+}
+
 @container (max-width: 794px) {
   .cv-preview-scale {
     zoom: 0.94;
@@ -332,6 +342,55 @@ main section.py-24 {
     transform: none !important;
     width: 210mm !important;
     zoom: 1 !important;
+  }
+
+  .letter-document {
+    box-sizing: border-box !important;
+    color: #111827 !important;
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    width: 210mm !important;
+    max-width: none !important;
+    box-shadow: none !important;
+    outline: 0 !important;
+    overflow: visible !important;
+  }
+
+  .letter-document .letter-name {
+    font-size: var(--cv-name-print-size, 24pt) !important;
+    line-height: 1.05 !important;
+  }
+
+  .letter-document .letter-contact {
+    font-size: 8.8pt !important;
+  }
+
+  .letter-document .letter-header {
+    padding-top: 8mm !important;
+  }
+
+  .letter-document .letter-body {
+    padding: 8mm 20mm 6mm !important;
+  }
+
+  .letter-document .letter-header.mx-16 {
+    margin-left: 20mm !important;
+    margin-right: 20mm !important;
+  }
+
+  .letter-document .letter-header.px-16 {
+    padding: 8mm 20mm !important;
+  }
+
+  .letter-document p {
+    font-size: 10.5pt !important;
+    line-height: 1.45 !important;
+  }
+
+  .letter-document .letter-paragraph {
+    break-inside: avoid-page;
   }
 
   .print-document {

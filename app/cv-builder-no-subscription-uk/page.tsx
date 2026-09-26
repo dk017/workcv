@@ -33,7 +33,7 @@ import { underTenCvBuilderAnswer } from "@/lib/price-copy";
 export const metadata: Metadata = {
   title: "CV Builder No Subscription UK - Pay Once",
   description:
-    `Use a UK CV builder without a subscription. Build and preview first, then make a one-time ${site.priceGbp} payment for the PDF. No monthly fee or hidden renewal.`,
+    `Use a UK CV builder without a subscription. Build and preview first, then make a one-time ${site.priceGbp} payment for PDF and Word downloads. No monthly fee or hidden renewal.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
@@ -90,7 +90,7 @@ const modelSteps = [
   },
   {
     title: "Pay when the PDF is ready",
-    body: `The standard WorkCV flow uses a one-time payment of ${site.price} when you download the final CV as a PDF.`,
+    body: `The standard WorkCV flow uses a one-time payment of ${site.price} when you download the final CV as a PDF and an editable Word file.`,
   },
   {
     title: "No monthly fee to manage",
@@ -164,7 +164,7 @@ const faqItems = [
   {
     question: "How much does WorkCV cost in the UK?",
     answer:
-      `WorkCV costs ${site.priceGbp} when you download your finished CV as a PDF. You can build your CV before paying.`,
+      `WorkCV costs ${site.priceGbp} once when you download your finished CV as a PDF and an editable Word file. You can build your CV before paying.`,
   },
   {
     question: "Is WorkCV a UK CV builder under £10?",
@@ -239,7 +239,7 @@ export default function NoSubscriptionUkPage() {
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
                 "Free to build before paying",
-                `One-time ${site.price} PDF download`,
+                `One-time ${site.price} PDF + Word download`,
                 "No automatic renewal",
                 "No hidden monthly fees",
               ].map((item) => (
@@ -283,8 +283,8 @@ export default function NoSubscriptionUkPage() {
         <GuideTable caption="The WorkCV offer" headings={["Stage", "Included"]} rows={[
           ["Start", "Email-code login so the CV can be saved and reopened."],
           ["Before payment", "Build in the editor and preview the layout for free. This is not a trial that renews."],
-          ["Payment", `${site.price} once to unlock the PDF for one saved CV. No monthly renewal.`],
-          ["Download", "PDF output. Payment is associated with the saved CV, not an unlimited collection of new CVs."],
+          ["Payment", `${site.price} once to unlock PDF and Word downloads for one saved CV. No monthly renewal.`],
+          ["Download", "PDF plus an editable single-column Word (DOCX) file. Payment is associated with the saved CV, not an unlimited collection of new CVs."],
           ["Need Word?", "Use the separate free blank DOCX template. It is not an export of your editor CV."],
         ]} />
         <p>Inspect the <Link className="font-semibold underline" href="/samples/workcv-customer-service-cv-example.pdf">sample PDF</Link> before starting. Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link>. For costs and future downloads, read <Link className="underline" href={customerQuestionHref("Q05")}>how to reopen a paid CV</Link> and <Link className="underline" href={customerQuestionHref("Q06")}>what one payment covers</Link>.</p>

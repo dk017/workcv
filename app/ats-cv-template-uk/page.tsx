@@ -47,7 +47,7 @@ const faqItems = [
   {
     question: "Should I upload a PDF or DOCX CV?",
     answer:
-      "Follow the vacancy or application portal. Prospects notes that not every ATS accepts the same file formats. WorkCV exports PDF, so use another tool if an employer explicitly requires DOCX or another format.",
+      "Follow the vacancy or application portal. Prospects notes that not every ATS accepts the same file formats. WorkCV exports both PDF and an editable Word (DOCX) file, so you can send whichever format the employer asks for.",
   },
   {
     question: "Should I copy keywords from the job advert?",
@@ -241,7 +241,7 @@ export default function AtsCvTemplateUkPage() {
           </div>
           <div className="flex gap-3 text-sm leading-6 text-ink">
             <FileText className="h-5 w-5 shrink-0 text-gold" />
-            <p><strong className="text-navy">PDF only:</strong> check the application accepts PDF before paying for the WorkCV export.</p>
+            <p><strong className="text-navy">PDF and Word:</strong> one payment includes both files, so you can match the format the application asks for.</p>
           </div>
         </div>
       </section>
@@ -310,7 +310,7 @@ export default function AtsCvTemplateUkPage() {
             <p className="mt-6 text-lg leading-8 text-muted">
               Prospects warns that ATS compatibility differs and recommends
               checking the advert, application instructions or recruiter for the
-              required format. WorkCV currently exports PDF only.
+              required format. WorkCV exports both PDF and an editable Word (DOCX) file.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

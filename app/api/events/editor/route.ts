@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { ensureAnalyticsTables, getPool } from "@/lib/db";
-import { isAllowedClientEditorEvent } from "@/lib/editor-events";
+import { isAllowedClientEditorEvent, surveyEventMetadata } from "@/lib/editor-events";
 
 const documentIdPattern = /^[a-zA-Z0-9_-]{12,100}$/;
 
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
     body.metadata && typeof body.metadata === "object" && !Array.isArray(body.metadata)
       ? (body.metadata as Record<string, unknown>)
       : {};
-  const metadata = Object.fromEntries(
+  const rawMetadata = Object.fromEntries(
     Object.entries(metadataInput)
       .filter(
         ([key, value]) =>
@@ -44,7 +44,9 @@ export async function POST(request: NextRequest) {
             (typeof value === "string" && value.length <= 80)),
       )
       .slice(0, 10),
-  );
+  ) as Record<string, string | number | boolean>;
+  const metadata = surveyEventMetadata(eventName, rawMetadata);
+  if (!metadata) return NextResponse.json({ error: "Invalid event" }, { status: 400 });
 
   await ensureAnalyticsTables();
   await getPool().query(

@@ -28,7 +28,7 @@ export function ApplicationPackReview({ cv, onChange }: { cv: CvData; onChange: 
   const pack = cv.applicationPack;
   if (!pack) return null;
   return <section className="mt-6 space-y-4 border-t border-line pt-6"><h2 className="text-xl font-bold text-navy">Your application pack</h2>
-    <p className="text-sm leading-6 text-muted">Original experience is retained. Edit each suggestion, confirm it is true, then add it to the correct role. Nothing is applied automatically. These notes are saved with this CV but do not appear in its PDF.</p>
+    <p className="text-sm leading-6 text-muted">Original experience is retained. Edit each suggestion, confirm it is true, then add it to the correct role. Nothing is applied automatically. These notes are saved with this CV but do not appear in its PDF. To send the letter below, use it in the Cover letter tab.</p>
     <label className="block text-sm font-bold">Role for a reviewed bullet<select className={field} value={roleId} onChange={(e) => setRoleId(e.target.value)}><option value="">Choose a role</option>{cv.experience.map((role) => <option key={role.id} value={role.id}>{role.role || "Untitled role"} — {role.company}</option>)}</select></label>
     {pack.bullets.map((bullet, index) => <div key={index}><label className="block text-sm">Suggested bullet {index + 1}<textarea className={field} maxLength={1000} value={bullet} onChange={(e) => onChange({ ...cv, applicationPack: { ...pack, bullets: pack.bullets.map((text, i) => i === index ? e.target.value : text) } })} /></label>
       <button type="button" className={button} disabled={!roleId || !bullet.trim()} onClick={() => {

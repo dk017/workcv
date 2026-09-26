@@ -46,7 +46,7 @@ export default function Page() { return <>{schemas.map((schema, index) => <scrip
   </div></section>
   <section className="border-t border-line bg-surface py-16"><div className="container-page max-w-4xl">
     <h2 className="font-display text-3xl font-semibold text-navy">Need the CV to go with your letter?</h2>
-    <p className="mt-4 leading-7 text-muted">Check that both documents describe the same experience. Your cover letter and Word download above are free. If you want WorkCV to format your CV, sign in with an email code, build and preview it, then pay {site.price} once for that saved CV’s PDF. Editing and redownloading the same paid CV is included; a separate new CV has its own unlock.</p>
+    <p className="mt-4 leading-7 text-muted">Check that both documents describe the same experience. Your cover letter and Word download above are free. If you want WorkCV to format your CV, sign in with an email code, build and preview it, then pay {site.price} once to download that saved CV as PDF and Word. Editing and redownloading the same paid CV is included; a separate new CV has its own unlock.</p>
     <div className="mt-6 flex flex-wrap gap-3">
       <ButtonLink href="/cv-builder-no-subscription-uk" trackingLabel={analyticsPlacements.coverLetterMoney}>See the pay-once CV builder</ButtonLink>
       <ButtonLink href="/tools/blank-cv-template-uk" variant="secondary" trackingLabel={analyticsPlacements.coverLetterBlankCv}>Get a free blank CV in Word</ButtonLink>

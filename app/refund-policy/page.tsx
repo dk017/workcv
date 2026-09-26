@@ -6,12 +6,12 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: "Refund Policy",
   description:
-    "WorkCV refund policy for one-time UK CV PDF download purchases.",
+    "WorkCV refund policy for one-time UK CV and cover letter download purchases.",
   alternates: { canonical: "/refund-policy" },
   openGraph: {
     title: "Refund Policy | WorkCV",
     description:
-      "WorkCV refund policy for one-time UK CV PDF download purchases.",
+      "WorkCV refund policy for one-time UK CV and cover letter download purchases.",
     url: "/refund-policy",
   },
 };
@@ -20,13 +20,14 @@ export default function RefundPolicyPage() {
   return (
     <LegalPage
       title="Refund Policy"
-      intro="This policy explains when we can refund a one-time WorkCV PDF download purchase."
+      intro="This policy explains when we can refund a one-time WorkCV download purchase."
       sections={[
         {
           title: "Summary",
           body: (
             <p>
-              WorkCV sells immediate digital access to a CV PDF download for{" "}
+              WorkCV sells immediate digital access to downloads for one saved CV
+              (PDF and Word) and its cover letter (PDF and Word) for{" "}
               {site.price}. There is no subscription to cancel.
             </p>
           ),
@@ -35,7 +36,7 @@ export default function RefundPolicyPage() {
           title: "Before download access starts",
           body: (
             <p>
-              If you pay but PDF access does not unlock, contact us at
+              If you pay but download access does not unlock, contact us at
               contact@workcv.co.uk with your receipt email. We will either help
               unlock access or refund the payment.
             </p>
@@ -46,7 +47,7 @@ export default function RefundPolicyPage() {
           body: (
             <p>
               At checkout, you are asked to confirm that you want immediate access
-              to the digital PDF download and understand that cancellation rights
+              to the digital downloads and understand that cancellation rights
               may be affected once access starts. This does not affect your
               statutory rights if the digital content is faulty, not as described,
               or not supplied.

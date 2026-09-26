@@ -54,6 +54,7 @@ export const analyticsPlacements = {
   rightToWorkHeroGuide: "right_to_work_hero_guide",
   rightToWorkFinal: "right_to_work_final",
   redundancyFinal: "redundancy_calculator_final",
+  redundancyCalculatorSticky: "redundancy_calculator_sticky",
   atsAssessmentHandoff: "ats_assessment_handoff",
   atsFinal: "ats_checker_final",
   salaryEditor: "salary_checker_editor",

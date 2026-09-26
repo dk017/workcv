@@ -348,9 +348,9 @@ export default function CancelMyPerfectCvUkPage() {
               headers={["MyPerfectCV", "WorkCV"]}
               rows={[
                 [competitorPricing.myPerfectCv.entry, "Free to build"],
-                [`Renews at ${competitorPricing.myPerfectCv.renewal}`, `${site.priceGbp} PDF download`],
+                [`Renews at ${competitorPricing.myPerfectCv.renewal}`, `${site.priceGbp} PDF + Word download`],
                 ["Subscription cancellation needed", "No monthly subscription"],
-                ["PDF download needs premium access", "PDF download paid once"],
+                ["PDF download needs premium access", "PDF and Word paid once"],
               ]}
             />
           </div>
@@ -396,7 +396,7 @@ export default function CancelMyPerfectCvUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling MyPerfectCV." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/myperfectcv-alternative-uk"
         secondary="Compare the MyPerfectCV alternative"
       />

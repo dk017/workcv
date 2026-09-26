@@ -24,7 +24,7 @@ import { analyticsPlacements } from "@/lib/analytics-placements";
 export const metadata: Metadata = {
   title: `CV Builder Pricing UK - ${site.priceGbp} Once`,
   description:
-    `Compare UK CV builder costs. WorkCV is ${site.priceGbp} when you download your PDF, with no monthly subscription or automatic renewal.`,
+    `Compare UK CV builder costs. WorkCV is ${site.priceGbp} once for your CV and a matching cover letter, as PDF and Word, with no monthly subscription or automatic renewal.`,
   alternates: {
     canonical: "/pricing",
   },
@@ -86,7 +86,7 @@ const included = [
   "Guided UK CV editor",
   "Clean CV templates",
   "Live preview before paying",
-  `PDF download for ${site.priceGbp}`,
+  `CV + cover letter, PDF + Word, for ${site.priceGbp}`,
   "Edit and redownload this saved CV without paying again",
   "No monthly CV builder subscription",
   "No automatic renewal",
@@ -96,7 +96,7 @@ const pricingFaqs = [
   {
     question: "How much does WorkCV cost in the UK?",
     answer:
-      `WorkCV costs ${site.priceGbp} when you download your final CV as a PDF. You can build and preview your CV before paying.`,
+      `WorkCV costs ${site.priceGbp} once when you download your final CV. The payment includes the CV and a matching cover letter, each as a PDF and an editable Word (.docx) file. You can build and preview your CV before paying.`,
   },
   {
     question: "Is WorkCV a subscription?",
@@ -218,14 +218,14 @@ export default function PricingPage() {
         <CustomerAnswer questionId="Q02">
           <div className="grid gap-5 md:grid-cols-2">
             <div className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-2xl font-semibold text-navy">Free editable Word template</h3><dl className="mt-4 space-y-2 text-sm"><div><dt className="font-bold">Cost and account</dt><dd>£0; no WorkCV account</dd></div><div><dt className="font-bold">File and formatting</dt><dd>Editable DOCX; you enter and format your own details in a compatible editor</dd></div><div><dt className="font-bold">Later downloads</dt><dd>The blank file remains free; exporting your finished CV depends on your editor</dd></div></dl><TrackedLink download href="/api/tools/blank-cv-template" placement={analyticsPlacements.customerQ02FreeDownload} className="mt-5 inline-block font-bold text-navy underline">Download the free DOCX</TrackedLink></div>
-            <div className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-2xl font-semibold text-navy">Guided WorkCV builder</h3><dl className="mt-4 space-y-2 text-sm"><div><dt className="font-bold">Cost and account</dt><dd>Email-code account; build and preview free; {site.price} for one saved CV’s PDF</dd></div><div><dt className="font-bold">File and formatting</dt><dd>Guided layout and preview; paid PDF, not an editable DOCX export</dd></div><div><dt className="font-bold">Later downloads</dt><dd>Edit and download that same paid saved CV again without another payment</dd></div></dl><TrackedLink href={commercialRoutes.moneyPage} placement={analyticsPlacements.customerQ02Money} className="mt-5 inline-block font-bold text-navy underline">See how the builder works</TrackedLink></div>
+            <div className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-2xl font-semibold text-navy">Guided WorkCV builder</h3><dl className="mt-4 space-y-2 text-sm"><div><dt className="font-bold">Cost and account</dt><dd>Email-code account; build and preview free; {site.price} for one saved CV and its cover letter, as PDF and Word</dd></div><div><dt className="font-bold">File and formatting</dt><dd>Guided layout and preview; paid PDF plus an editable single-column Word (DOCX) file</dd></div><div><dt className="font-bold">Later downloads</dt><dd>Edit and download that same paid CV and its letter again without another payment</dd></div></dl><TrackedLink href={commercialRoutes.moneyPage} placement={analyticsPlacements.customerQ02Money} className="mt-5 inline-block font-bold text-navy underline">See how the builder works</TrackedLink></div>
           </div>
         </CustomerAnswer>
         <CustomerAnswer questionId="Q05">
-          <ol className="list-decimal space-y-2 pl-6"><li>Sign in to the account used for the original payment and open <Link className="font-semibold underline" href="/my-cvs">My CVs</Link>.</li><li>Reopen the paid saved document and make your changes.</li><li>Download its PDF again. If payment is still being confirmed or you see another payment request, <Link className="font-semibold underline" href={customerQuestionHref("Q24")}>follow the support checks</Link> before paying again.</li></ol>
+          <ol className="list-decimal space-y-2 pl-6"><li>Sign in to the account used for the original payment and open <Link className="font-semibold underline" href="/my-cvs">My CVs</Link>.</li><li>Reopen the paid saved document and make your changes.</li><li>Download its PDF or Word file again. If payment is still being confirmed or you see another payment request, <Link className="font-semibold underline" href={customerQuestionHref("Q24")}>follow the support checks</Link> before paying again.</li></ol>
         </CustomerAnswer>
         <CustomerAnswer questionId="Q06">
-          <ul className="list-disc space-y-2 pl-6"><li>Revise paid document A: covered.</li><li>Download document A again: covered.</li><li>Create separate saved document B: a separate payment is required for its PDF.</li></ul>
+          <ul className="list-disc space-y-2 pl-6"><li>Revise paid document A: covered.</li><li>Download document A again: covered.</li><li>Create separate saved document B: a separate payment is required for its downloads.</li></ul>
           <p>Read the <Link className="font-semibold underline" href="/terms">terms</Link> for the purchase scope. Use <Link className="font-semibold underline" href="/my-cvs">My CVs</Link> to reopen the document you already paid for.</p>
         </CustomerAnswer>
         <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/pricing"]}>{displayReviewDate(customerContentReview["/pricing"])}</time>.</p>
@@ -391,7 +391,7 @@ export default function PricingPage() {
       <FaqSection faqs={pricingFaqs} title="Common questions about CV builder costs." />
       <FinalCta
         heading="Pay once. Download your CV. Done."
-        body={`Build free first. Pay ${site.price} only when you want the final PDF. No subscription and no automatic renewal.`}
+        body={`Build free first. Pay ${site.price} once for your CV and matching cover letter as PDF and Word. No subscription and no automatic renewal.`}
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="No-subscription details"
         trackingContext={analyticsPlacements.pricingFinal}

@@ -33,7 +33,7 @@ export default function ChatGptCvGuide() {
         ["Text in a ChatGPT conversation", "Copy the profile, jobs, education and skills into the corresponding editor fields.", "The profile box is for your summary, not the entire CV."],
         ["A saved DOCX or text-based PDF", "Choose Import CV and select the file. The current limit is 10MB.", "Review the import summary, then the editable fields; automated extraction can miss or misplace information."],
         ["A photograph or scan", "Use your original editable document or enter the text manually.", "Do not assume an image of a CV can be extracted accurately."],
-        ["You want to format it yourself", "Download the free blank Word template and replace its prompts.", "This is a separate document, not a Word export from the WorkCV editor."],
+        ["You want to format it yourself", "Download the free blank Word template and replace its prompts.", "This is a separate free document. The paid WorkCV editor also exports your finished CV as Word."],
       ]} />
       <p>WorkCV does not connect to your ChatGPT account. Uploading a file moves its content into editable fields; it does not preserve the original document's design. The selected WorkCV template controls the new layout.</p>
     </GuideSection>

@@ -1,8 +1,20 @@
 name: Diagnose app
+run-name: "${{ inputs.mode == 'growth_report' && format('Private growth report {0}', inputs.report_id) || 'Diagnose app logs' }}"
 
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: "Diagnostic operation"
+        type: choice
+        options: [app_logs, growth_report]
+        default: app_logs
+      report_public_key:
+        description: "Growth report recipient RSA public key (base64 PEM); NEVER a private key"
+        required: false
+      report_id:
+        description: "Growth report request UUID"
+        required: false
       deploy_dir:
         description: "Remote deploy directory"
         required: true
@@ -14,6 +26,7 @@ on:
 
 jobs:
   app-logs:
+    if: ${{ inputs.mode != 'growth_report' }}
     name: Read filtered app logs
     runs-on: ubuntu-latest
     permissions:
@@ -32,3 +45,32 @@ jobs:
             docker compose -p workcv -f docker-compose.ghcr.yml logs --tail "${{ github.event.inputs.tail }}" app \
               | grep -Ei 'workcv_import|cv/import|openai|pdf|error' \
               | tail -200 || true
+
+  growth-report:
+    if: ${{ inputs.mode == 'growth_report' }}
+    name: Read encrypted production growth snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare read-only reporter
+        run: echo "REPORT_CODE=$(base64 -w0 scripts/production-growth-snapshot.mjs)" >> "$GITHUB_ENV"
+      - name: Read encrypted snapshot
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          REPORT_PUBLIC_KEY: ${{ inputs.report_public_key }}
+          REPORT_ID: ${{ inputs.report_id }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: REPORT_CODE,REPORT_PUBLIC_KEY,REPORT_ID
+          command_timeout: 3m
+          script: |
+            set -eu
+            cd /opt/workcv
+            printf '%s' "$REPORT_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T \
+              -e WORKCV_REPORT_EXECUTE=1 -e WORKCV_REPORT_PUBLIC_KEY="$REPORT_PUBLIC_KEY" \
+              -e WORKCV_REPORT_ID="$REPORT_ID" app node --input-type=module

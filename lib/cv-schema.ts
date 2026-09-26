@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import {
+  COVER_LETTER_MAX_PARAGRAPHS,
   createBlankCv,
   type CvData,
   type TemplateId,
@@ -90,6 +91,19 @@ const targetingSchema = z
   })
   .strict();
 
+export const coverLetterSchema = z
+  .object({
+    jobTitle: shortText,
+    employer: shortText,
+    reference: z.string().max(80),
+    recipientName: z.string().max(120),
+    greeting: z.enum(["hiring-manager", "sir-madam"]),
+    employerAddress: lineList(6, 160, 600),
+    includeDate: z.boolean(),
+    paragraphs: z.array(z.string().max(2_500)).max(COVER_LETTER_MAX_PARAGRAPHS),
+  })
+  .strict();
+
 export const cvDataSchema = z
   .object({
     template: z.enum(["classic", "modern", "compact"]),
@@ -108,6 +122,7 @@ export const cvDataSchema = z
     sectionOrder: z.array(z.enum(cvSectionIds)).max(8).refine((items) => new Set(items).size === items.length, "Sections must not repeat").optional(),
     additionalSections: z.object({ projects: z.string().max(5000).optional(), certifications: z.string().max(5000).optional(), volunteering: z.string().max(5000).optional(), languages: z.string().max(5000).optional() }).strict().optional(),
     applicationPack: z.object({ bullets: z.array(z.string().max(1000)).max(20), coverLetter: z.string().max(10000), interviewPrompts: z.array(z.string().max(1000)).max(20), thankYouEmail: z.string().max(5000), originalCvText: z.string().max(24000).optional(), evidenceReview: z.array(z.string().max(1000)).max(10).optional() }).strict().optional(),
+    coverLetter: coverLetterSchema.optional(),
   })
   .strict()
   .superRefine((value, context) => {
@@ -261,7 +276,7 @@ export function repairCvData(
 
   const targetingResult = targetingSchema.safeParse(source.targeting);
   if (targetingResult.success) repaired.targeting = targetingResult.data;
-  for (const key of ["layoutPreset", "sectionOrder", "additionalSections", "applicationPack"] as const) {
+  for (const key of ["layoutPreset", "sectionOrder", "additionalSections", "applicationPack", "coverLetter"] as const) {
     if (source[key] === undefined) continue;
     const candidate = cvDataSchema.safeParse({ ...repaired, [key]: source[key] });
     if (candidate.success) Object.assign(repaired, { [key]: candidate.data[key] });

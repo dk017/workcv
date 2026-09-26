@@ -43,7 +43,7 @@ export function buildWorkCvProductSchema({ description, url }: WorkCvProductSche
       itemCondition: "https://schema.org/NewCondition",
       availability: "https://schema.org/InStock",
       url: absoluteSiteUrl(url),
-      description: "One-time CV PDF download price. No monthly subscription.",
+      description: "One-time price for a CV and matching cover letter, each downloadable as PDF and editable Word (DOCX). No monthly subscription.",
       shippingDetails: {
         "@type": "OfferShippingDetails",
         shippingRate: {

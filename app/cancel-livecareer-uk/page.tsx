@@ -329,7 +329,7 @@ export default function CancelLiveCareerUkPage() {
               headers={["LiveCareer UK", "WorkCV"]}
               rows={[
                 [competitorPricing.liveCareer.entry, "Free to build"],
-                [`Renews at ${competitorPricing.liveCareer.renewal}`, `${site.priceGbp} PDF download`],
+                [`Renews at ${competitorPricing.liveCareer.renewal}`, `${site.priceGbp} PDF + Word download`],
                 ["Cancellation reference listed", "No monthly subscription"],
                 ["CV and cover-letter platform", "Focused UK CV builder"],
               ]}
@@ -383,7 +383,7 @@ export default function CancelLiveCareerUkPage() {
       <FaqSection faqs={faqItems} title="Questions about cancelling LiveCareer." />
       <FinalCta
         heading="Build your next CV without a renewal."
-        body={`WorkCV is ${site.price} when you download your PDF. No monthly CV builder subscription and no automatic renewal.`}
+        body={`WorkCV is ${site.price} once for your CV as PDF and Word. No monthly CV builder subscription and no automatic renewal.`}
         secondaryHref="/livecareer-alternative"
         secondary="Compare the LiveCareer alternative"
       />

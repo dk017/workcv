@@ -4,6 +4,8 @@ export const serverEditorEventNames = [
   "document_created",
   "payment_confirmed",
   "pdf_downloaded",
+  "docx_downloaded",
+  "cover_letter_downloaded",
 ] as const;
 
 export type ServerEditorEventName = (typeof serverEditorEventNames)[number];
@@ -12,6 +14,8 @@ const allowedMetadata: Record<ServerEditorEventName, ReadonlySet<string>> = {
   document_created: new Set(["creation_method"]),
   payment_confirmed: new Set([]),
   pdf_downloaded: new Set([]),
+  docx_downloaded: new Set([]),
+  cover_letter_downloaded: new Set(["format"]),
 };
 
 function safeMetadata(

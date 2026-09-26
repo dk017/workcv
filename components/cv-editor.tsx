@@ -7,8 +7,10 @@ import {
   Briefcase,
   Check,
   Download,
+  FileText,
   GraduationCap,
   LayoutTemplate,
+  Mail,
   MoreHorizontal,
   Plus,
   Sparkles,
@@ -57,6 +59,10 @@ import { createCvSaveManager } from "@/components/editor/create-cv-save-manager"
 import { readCheckoutAttribution } from "@/components/attribution-capture";
 import { MemoCvDocument } from "@/components/editor/cv-document";
 import { CvStructureForm, ApplicationPackReview } from "@/components/editor/cv-structure-form";
+import { CoverLetterForm } from "@/components/editor/cover-letter-form";
+import { PurposeSurvey } from "@/components/editor/purpose-survey";
+import { CoverLetterDocument } from "@/components/editor/cover-letter-document";
+import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import {
   EducationForm,
   ExperienceForm,
@@ -73,7 +79,7 @@ export { CvDocument } from "@/components/editor/cv-document";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
-type TabId = "profile" | "experience" | "education" | "skills" | "template";
+type TabId = "profile" | "experience" | "education" | "skills" | "template" | "cover-letter";
 type AiReview = {
   kind: "profile" | "bullets" | "skills";
   title: string;
@@ -89,6 +95,7 @@ const tabs: Array<{ id: TabId; label: string; icon: typeof User }> = [
   { id: "education", label: "Education", icon: GraduationCap },
   { id: "skills", label: "Skills", icon: Sparkles },
   { id: "template", label: "Template", icon: LayoutTemplate },
+  { id: "cover-letter", label: "Cover letter", icon: Mail },
 ];
 
 export function CvEditor() {
@@ -105,6 +112,9 @@ export function CvEditor() {
   const [checkoutError, setCheckoutError] = useState<string | null>(null);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [pdfDownloading, setPdfDownloading] = useState(false);
+  const [docxDownloading, setDocxDownloading] = useState(false);
+  const [letterDownloading, setLetterDownloading] = useState<"pdf" | "docx" | null>(null);
+  const [purposeSurveyOpen, setPurposeSurveyOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [forceNewCheckout, setForceNewCheckout] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -392,7 +402,7 @@ export function CvEditor() {
     const updatePreview = () => {
       window.cancelAnimationFrame(frame);
       frame = window.requestAnimationFrame(() => {
-        const document = preview.querySelector<HTMLElement>(".print-document");
+        const document = preview.querySelector<HTMLElement>(".print-document, .letter-document");
         if (!document) return;
         const viewport = preview.parentElement;
         if (viewport) {
@@ -403,12 +413,14 @@ export function CvEditor() {
             Number.parseFloat(styles.paddingRight);
           preview.style.zoom = String(Math.min(1, availableWidth / 794));
         }
-        setPreviewPageCount(Math.max(1, Math.ceil(document.scrollHeight / 1123)));
+        if (document.classList.contains("print-document")) {
+          setPreviewPageCount(Math.max(1, Math.ceil(document.scrollHeight / 1123)));
+        }
       });
     };
 
     const observer = new ResizeObserver(updatePreview);
-    const document = preview.querySelector<HTMLElement>(".print-document");
+    const document = preview.querySelector<HTMLElement>(".print-document, .letter-document");
     if (document) observer.observe(document);
     if (preview.parentElement) observer.observe(preview.parentElement);
     updatePreview();
@@ -417,7 +429,7 @@ export function CvEditor() {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [cv]);
+  }, [cv, activeTab]);
 
   useEffect(() => {
     if (!draftId) return;
@@ -771,21 +783,92 @@ export function CvEditor() {
         const data = (await response.json().catch(() => null)) as { error?: string } | null;
         throw new Error(data?.error || "PDF generation failed");
       }
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `${cv.fullName.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "workcv"}-cv.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      URL.revokeObjectURL(url);
+      saveDownload(await response.blob(), "pdf");
       setReviewOpen(false);
     } catch (error) {
       trackEditorEvent("pdf_generation_failed", draftId);
       setCheckoutError(error instanceof Error ? error.message : "PDF generation failed");
     } finally {
       setPdfDownloading(false);
+    }
+  };
+
+  const downloadDocx = async () => {
+    if (!draftId || !pdfUnlocked || docxDownloading) return;
+    trackEditorEvent("docx_clicked", draftId);
+    setDocxDownloading(true);
+    setCheckoutError(null);
+    try {
+      const saved = await saveManagerRef.current?.flush();
+      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      const response = await fetch(`/api/cv/docx?draftId=${encodeURIComponent(draftId)}`);
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Word download failed");
+      }
+      saveDownload(await response.blob(), "docx");
+    } catch (error) {
+      trackEditorEvent("docx_generation_failed", draftId);
+      setCheckoutError(error instanceof Error ? error.message : "Word download failed");
+    } finally {
+      setDocxDownloading(false);
+    }
+  };
+
+  const downloadCoverLetter = async (format: "pdf" | "docx") => {
+    if (!draftId || !pdfUnlocked || letterDownloading) return;
+    if (!hasCoverLetterContent(cv)) {
+      setActiveTab("cover-letter");
+      return;
+    }
+    trackEditorEvent("cover_letter_download_clicked", draftId, { format });
+    setLetterDownloading(format);
+    setCheckoutError(null);
+    try {
+      const saved = await saveManagerRef.current?.flush();
+      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      const url = `/api/cv/cover-letter?draftId=${encodeURIComponent(draftId)}&format=${format}`;
+      let response = await fetch(url);
+      if (response.status === 503 && format === "pdf") {
+        await new Promise((resolve) => window.setTimeout(resolve, 900));
+        response = await fetch(url);
+      }
+      if (!response.ok) {
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Cover letter download failed");
+      }
+      saveDownload(await response.blob(), format, "cover-letter");
+    } catch (error) {
+      trackEditorEvent("cover_letter_generation_failed", draftId, { format });
+      setCheckoutError(error instanceof Error ? error.message : "Cover letter download failed");
+    } finally {
+      setLetterDownloading(null);
+    }
+  };
+
+  const saveDownload = (blob: Blob, extension: "pdf" | "docx", kind: "cv" | "cover-letter" = "cv") => {
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${cv.fullName.trim().replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "") || "workcv"}-${kind}.${extension}`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(url);
+    askPurposeOnce();
+  };
+
+  // Ask the optional purpose question once per saved CV, after its first
+  // successful download. Storage failures simply skip the question.
+  const askPurposeOnce = () => {
+    if (!draftId) return;
+    try {
+      const key = `workcv-purpose-asked:${draftId}`;
+      if (window.localStorage.getItem(key)) return;
+      window.localStorage.setItem(key, "1");
+      setPurposeSurveyOpen(true);
+    } catch {
+      // Private browsing or blocked storage: do not ask.
     }
   };
 
@@ -1054,22 +1137,73 @@ export function CvEditor() {
                 </button>
               </div>
             </details>
-            <button
-              type="button"
-              onClick={startDownload}
-              disabled={checkoutLoading || paymentState === "checking" || paymentState === "pending"}
-              className="order-3 col-span-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60 sm:order-none sm:min-h-10 sm:w-auto"
-            >
-              <Download className="h-4 w-4" />
-              {paymentState === "checking" || paymentState === "pending"
-                ? "Confirming payment…"
-                : pdfUnlocked
-                  ? "Download PDF"
-                  : `PDF download · ${site.price} once`}
-            </button>
+            {pdfUnlocked ? (
+              <details className="relative order-3 col-span-2 sm:order-none">
+                <summary className="inline-flex min-h-12 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover sm:min-h-10 sm:w-auto [&::-webkit-details-marker]:hidden">
+                  <Download className="h-4 w-4" />
+                  {pdfDownloading || docxDownloading || letterDownloading ? "Preparing…" : "Download"}
+                </summary>
+                <div className="absolute right-0 z-30 mt-2 w-64 overflow-hidden rounded-md border border-line bg-white p-1 shadow-soft">
+                  <p className="px-3 pb-1 pt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">CV</p>
+                  <button type="button" disabled={pdfDownloading} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); startDownload(); }} className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60">
+                    <Download className="h-4 w-4" /> CV as PDF
+                  </button>
+                  <button type="button" disabled={docxDownloading} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); void downloadDocx(); }} className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60">
+                    <FileText className="h-4 w-4" /> CV as Word
+                  </button>
+                  <p className="border-t border-line px-3 pb-1 pt-3 text-xs font-bold uppercase tracking-[0.12em] text-muted">Cover letter</p>
+                  {hasCoverLetterContent(cv) ? (
+                    <>
+                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); void downloadCoverLetter("pdf"); }} className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60">
+                        <Download className="h-4 w-4" /> Cover letter as PDF
+                      </button>
+                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); void downloadCoverLetter("docx"); }} className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60">
+                        <FileText className="h-4 w-4" /> Cover letter as Word
+                      </button>
+                    </>
+                  ) : (
+                    <button type="button" onClick={(event) => { event.currentTarget.closest("details")?.removeAttribute("open"); setActiveTab("cover-letter"); setMobileView("edit"); }} className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60">
+                      <Mail className="h-4 w-4" /> Write your cover letter
+                    </button>
+                  )}
+                </div>
+              </details>
+            ) : (
+              <button
+                type="button"
+                onClick={startDownload}
+                disabled={checkoutLoading || paymentState === "checking" || paymentState === "pending"}
+                className="order-3 col-span-2 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60 sm:order-none sm:min-h-10 sm:w-auto"
+              >
+                <Download className="h-4 w-4" />
+                {paymentState === "checking" || paymentState === "pending"
+                  ? "Confirming payment…"
+                  : `Download · ${site.price} once`}
+              </button>
+            )}
           </div>
         </div>
       </section>
+
+      {purposeSurveyOpen && (
+        <PurposeSurvey
+          onPurpose={(purpose) => trackEditorEvent("cv_purpose_selected", draftId, { purpose })}
+          onVolume={(volume) => trackEditorEvent("cv_application_volume_selected", draftId, { volume })}
+          onClose={(answered) => {
+            if (!answered) trackEditorEvent("cv_purpose_dismissed", draftId);
+            setPurposeSurveyOpen(false);
+          }}
+        />
+      )}
+
+      {pdfUnlocked && checkoutError && !reviewOpen && (
+        <div className="editor-chrome border-b border-red-200 bg-redsoft" role="alert">
+          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 text-sm font-bold text-navy sm:w-[min(1540px,calc(100%-48px))]">
+            <p>{checkoutError}</p>
+            <button type="button" onClick={() => setCheckoutError(null)} aria-label="Dismiss download error" className="rounded p-1 hover:bg-white"><X className="h-4 w-4" /></button>
+          </div>
+        </div>
+      )}
 
       {loaded && readiness.score === 0 && (
         <section className="editor-chrome border-b border-line bg-gold-tint">
@@ -1102,7 +1236,7 @@ export function CvEditor() {
               </p>
               <p className="mt-1 text-xs leading-5 text-muted">
                 {readiness.ready
-                  ? `Review the pages, then unlock this saved CV PDF for ${site.price} once.`
+                  ? `Review the pages, then unlock this CV and its cover letter as PDF and Word for ${site.price} once.`
                   : readiness.issues[0]?.message || "Continue adding your real experience."}
               </p>
             </div>
@@ -1164,7 +1298,7 @@ export function CvEditor() {
             <div>
               <p className="font-bold text-navy">
                 {paymentState === "paid"
-                  ? "Payment confirmed — your PDF is ready."
+                  ? "Payment confirmed — your CV and cover letter downloads are ready."
                   : paymentState === "cancelled"
                     ? "Checkout was cancelled. Your CV is still saved."
                     : paymentState === "failed"
@@ -1260,7 +1394,7 @@ export function CvEditor() {
         <div className={`editor-form min-w-0 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
           <div className="sticky top-20 space-y-5">
             <div className="overflow-x-auto rounded-xl border border-line bg-white p-2">
-              <div className="flex min-w-max gap-2 xl:grid xl:min-w-0 xl:grid-cols-5">
+              <div className="flex min-w-max gap-2 xl:grid xl:min-w-0 xl:grid-cols-3 2xl:grid-cols-6">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const active = activeTab === tab.id;
@@ -1268,7 +1402,10 @@ export function CvEditor() {
                     <button
                       key={tab.id}
                       type="button"
-                      onClick={() => setActiveTab(tab.id)}
+                      onClick={() => {
+                        if (tab.id === "cover-letter" && activeTab !== "cover-letter") trackEditorEvent("cover_letter_opened", draftId);
+                        setActiveTab(tab.id);
+                      }}
                       className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-3 text-sm font-bold ${
                         active
                           ? "bg-navy text-white"
@@ -1332,17 +1469,27 @@ export function CvEditor() {
                 <><TemplateForm cv={cv} updateField={updateField} /><CvStructureForm cv={cv} onChange={setCv} /></>
               )}
               {activeTab === "experience" && <ApplicationPackReview cv={cv} onChange={setCv} />}
+              {activeTab === "cover-letter" && (
+                <CoverLetterForm
+                  cv={cv}
+                  onChange={setCv}
+                  onEvent={(eventName) => trackEditorEvent(eventName, draftId)}
+                  downloadUnlocked={pdfUnlocked}
+                  downloading={letterDownloading}
+                  onDownload={(format) => void downloadCoverLetter(format)}
+                />
+              )}
             </div>
           </div>
         </div>
 
         <div className={`print-area min-w-0 ${mobileView === "edit" ? "hidden lg:block" : "block"}`}>
-          {previewPageCount > 2 && (
+          {activeTab !== "cover-letter" && previewPageCount > 2 && (
             <div className="editor-chrome mb-4 flex flex-col gap-3 rounded-md border border-gold bg-gold-tint p-4 sm:flex-row sm:items-center sm:justify-between" role="status"><div><p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p><p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p></div>{cv.template !== "compact" && <button type="button" onClick={() => updateField("template", "compact")} className="min-h-10 shrink-0 rounded-md bg-navy px-4 text-sm font-bold text-white">Use Compact</button>}</div>
           )}
           <div className="cv-preview-viewport rounded-md border border-line bg-[#eef6f3] p-2">
             <div ref={previewRef} className="cv-preview-scale relative">
-              <MemoCvDocument cv={cv} />
+              {activeTab === "cover-letter" ? <CoverLetterDocument cv={cv} /> : <MemoCvDocument cv={cv} />}
             </div>
           </div>
         </div>
@@ -1471,7 +1618,7 @@ function CheckoutSheet({
         </div>
 
         <div className="mt-5 flex items-end justify-between gap-4 border-y border-line py-4">
-          <div><p className="font-display text-4xl font-semibold text-navy">{site.price}</p><p className="mt-1 text-sm font-bold text-navy">No subscription or renewal</p></div>
+          <div><p className="font-display text-4xl font-semibold text-navy">{site.price}</p><p className="mt-1 text-sm font-bold text-navy">No subscription or renewal</p><ul className="mt-2 space-y-0.5 text-xs leading-5 text-muted"><li>CV as PDF and editable Word (.docx)</li><li>Matching cover letter as PDF and Word</li><li>Edit and download again at no extra cost</li></ul></div>
           <p className="max-w-44 text-right text-xs leading-5 text-muted">{site.priceTaxInclusive ? "Final total, including applicable tax." : "Applicable tax is calculated and shown by Dodo before payment."}</p>
         </div>
 
