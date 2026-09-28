@@ -20,6 +20,7 @@ import {
   type JobApplicationPackResult,
 } from "@/lib/job-application-pack";
 import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
+import { buildCoverLetterPatch } from "@/lib/cover-letter-handoff";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { commercialRoutes, site } from "@/lib/site";
 
@@ -153,6 +154,7 @@ export function JobApplicationPack() {
       source: "job-application-pack",
       sourceText: resultInput.cvText.trim(),
       patch: {
+        coverLetter: buildCoverLetterPatch(resultInput, result.coverLetter.paragraphs).coverLetter,
         fullName: resultInput.fullName.trim(),
         targetRole: resultInput.targetRole.trim(),
         profile: result.profile,

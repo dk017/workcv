@@ -27,6 +27,7 @@ import {
 import {
   readCvToolHandoff,
   removeCvToolHandoff,
+  type CvToolHandoff,
 } from "@/lib/cv-tool-handoff";
 import {
   CvData,
@@ -142,6 +143,7 @@ export function CvEditor() {
   const previewRef = useRef<HTMLDivElement>(null);
   const handoffStartedRef = useRef(false);
   const toolHandoffStartedRef = useRef(false);
+  const pendingToolSaveRef = useRef<{ handoff: CvToolHandoff; cv: CvData; draftId: string; version: number | null } | null>(null);
   const saveManagerRef = useRef<DebouncedSaveManager<CvData> | null>(null);
   const lastManagedCvRef = useRef<CvData | null>(null);
   const undoRef = useRef<(() => void) | null>(null);
@@ -350,18 +352,20 @@ export function CvEditor() {
     toolHandoffStartedRef.current = true;
     const handoff = readCvToolHandoff();
     if (!handoff) {
+      setToolHandoffError("Your tool result is unavailable or has expired. Return to the tool and continue again in the same tab within 30 minutes, or paste your copied text. Your saved CV has not been changed.");
       params.delete("from");
       window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
       return;
     }
 
     const finish = (imported?: CvData) => {
-      setCv((current) => ({ ...current, ...(imported || {}), ...(handoff.patch || {}) }));
-      setActiveTab("profile");
-      setToolHandoffState("complete");
-      removeCvToolHandoff();
-      params.delete("from");
-      window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+      const nextCv = { ...cv, ...(imported || {}), ...(handoff.patch || {}) };
+      pendingToolSaveRef.current = { handoff, cv: nextCv, draftId, version: null };
+      setCv(nextCv);
+      setActiveTab(handoff.source === "cover-letter-generator" ? "cover-letter" : "profile");
+      setMobileView("edit");
+      setToolHandoffState("importing");
+      // Keep the source and navigation marker until the account save succeeds.
     };
 
     if ((cv.fullName.trim() || cv.experience.some((item) => item.role.trim())) &&
@@ -508,7 +512,30 @@ export function CvEditor() {
       return;
     }
     saveManagerRef.current.setValue(cv);
+    const pendingToolSave = pendingToolSaveRef.current;
+    if (pendingToolSave?.cv === cv && pendingToolSave.version === null) {
+      pendingToolSave.version = saveManagerRef.current.snapshot().version;
+      void saveManagerRef.current.flush();
+    }
   }, [cv, loaded]);
+
+  useEffect(() => {
+    const pending = pendingToolSaveRef.current;
+    if (!pending || pending.draftId !== draftId || pending.version === null) return;
+    if (saveSnapshot.status === "error") {
+      setToolHandoffState("idle");
+      setToolHandoffError("Your result is in the editor, but could not be saved to your account. Use the save recovery controls above. The original transfer remains available in this tab until it expires.");
+      return;
+    }
+    if (saveSnapshot.status !== "saved" || saveSnapshot.version < pending.version || saveManagerRef.current?.hasUnsavedChanges()) return;
+    removeCvToolHandoff(pending.handoff);
+    pendingToolSaveRef.current = null;
+    const params = new URLSearchParams(window.location.search);
+    params.delete("from");
+    window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+    setToolHandoffError(null);
+    setToolHandoffState("complete");
+  }, [draftId, saveSnapshot]);
 
   useEffect(() => {
     const previous = previousSaveStatusRef.current;
@@ -1339,7 +1366,7 @@ export function CvEditor() {
         </section>
       )}
 
-      {(fitTargeting || fitImportState === "importing" || fitImportError || toolHandoffState === "importing" || toolHandoffError) && (
+      {(fitTargeting || fitImportState === "importing" || fitImportError || toolHandoffState !== "idle" || toolHandoffError) && (
         <section className="editor-chrome border-b border-line bg-[#edf4f8]">
           <div className="mx-auto w-[min(1540px,calc(100%-32px))] py-5 sm:w-[min(1540px,calc(100%-48px))]">
             {fitImportState === "importing" ? (
@@ -1350,7 +1377,7 @@ export function CvEditor() {
             ) : toolHandoffState === "importing" ? (
               <div className="flex items-center gap-3 text-sm font-bold text-navy">
                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/25 border-t-navy" />
-                Turning your tool result into editable fields...
+                Adding and saving your tool result...
               </div>
             ) : fitImportError ? (
               <div className="flex items-start gap-3 text-sm font-bold leading-6 text-[#8d3030]">
@@ -1385,6 +1412,7 @@ export function CvEditor() {
                 </div>
               </div>
             ) : null}
+            {toolHandoffState === "complete" && !toolHandoffError ? <p role="status" className="mt-3 text-sm font-bold text-navy">Your tool result is saved. {cv.coverLetter ? "Your letter is ready in the Cover letter tab. Review it and finish your CV before downloading." : "Review the imported details before using your CV."}</p> : null}
           </div>
         </section>
       )}

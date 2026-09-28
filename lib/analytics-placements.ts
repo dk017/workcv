@@ -1,4 +1,5 @@
 export const analyticsPlacements = {
+  coverLetterHandoff: "cover_letter_generator_handoff",
   homeBundleMoney: "home_bundle_money",
   atsTemplateBundleMoney: "ats_template_bundle_money",
   rightToWorkBundleMoney: "right_to_work_bundle_money",

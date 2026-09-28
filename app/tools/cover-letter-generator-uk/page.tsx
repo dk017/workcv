@@ -44,7 +44,7 @@ const faqs = [
   {
     question: "What happens to the information I paste?",
     answer:
-      "WorkCV sends the form fields to the OpenAI API to create the draft and does not save them. Avoid entering sensitive personal data that the letter does not need.",
+      "WorkCV sends the form fields to the OpenAI API to create the draft. If you choose to continue to the editor, the letter, your name and job details are held in the same browser tab for transfer and saved to your account after sign-in. Continue within 30 minutes. Avoid entering sensitive personal data that the letter does not need.",
   },
 ];
 

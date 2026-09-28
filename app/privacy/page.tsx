@@ -107,21 +107,24 @@ export default function PrivacyPage() {
           body: (
             <>
               <p>
-                If you submit text to the CV fit checker, job application pack or
-                bullet point generator, WorkCV sends the information you provide
+                If you submit text to the CV fit checker, job application pack,
+                cover letter generator or bullet point generator, WorkCV sends the information you provide
                 to our server and to OpenAI to produce a result. These tools do not
-                need your full name, contact details, identification numbers or
-                sensitive family or medical information to review wording and job fit.
+                need contact details, identification numbers or sensitive family or
+                medical information to review wording and job fit. Letter tools use
+                the name you enter for the sign-off.
                 You can replace unnecessary personal details with placeholders
                 before submitting. Merely reading a page does not submit a CV.
               </p>
               <p>
                 If you choose to carry selected results into the editor, your
-                browser temporarily holds the handoff. Content you save in your
+                browser holds the handoff in the same tab. Transfers expire after
+                30 minutes; the stored copy is removed when consumed, when an expired
+                transfer is read, or when the browser clears the tab session. Content you save in your
                 WorkCV account is then handled as a saved CV draft under this
                 policy. The first-job wizard builds its initial draft in your
                 browser from the fields you enter; it is a different process from
-                the three AI-assisted tools named above.
+                the AI-assisted tools named above.
               </p>
             </>
           ),

@@ -15,6 +15,7 @@ export type CvToolPatch = Partial<
     | "education"
     | "targeting"
     | "applicationPack"
+    | "coverLetter"
     | "layoutPreset"
     | "additionalSections"
   >
@@ -41,6 +42,9 @@ export function writeCvToolHandoff(input: {
     patch: input.patch,
     sourceText: input.sourceText?.slice(0, 30_000),
   };
+  if (input.patch && !cvDataSchema.safeParse({ ...createBlankCv(), ...input.patch }).success) {
+    throw new Error("The tool result is not a valid CV draft.");
+  }
   window.sessionStorage.setItem(cvToolHandoffKey, JSON.stringify(handoff));
 }
 
@@ -67,11 +71,14 @@ export function readCvToolHandoff(): CvToolHandoff | null {
     }
     return value as CvToolHandoff;
   } catch {
-    window.sessionStorage.removeItem(cvToolHandoffKey);
+    try { window.sessionStorage.removeItem(cvToolHandoffKey); } catch { /* Storage may be blocked. */ }
     return null;
   }
 }
 
-export function removeCvToolHandoff() {
-  if (typeof window !== "undefined") window.sessionStorage.removeItem(cvToolHandoffKey);
+export function removeCvToolHandoff(expected?: CvToolHandoff) {
+  if (typeof window === "undefined") return;
+  // A newer tool result must not be removed by an older save completing.
+  if (expected && JSON.stringify(readCvToolHandoff()) !== JSON.stringify(expected)) return;
+  try { window.sessionStorage.removeItem(cvToolHandoffKey); } catch { /* The saved CV remains available. */ }
 }
