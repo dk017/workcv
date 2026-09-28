@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { generateKeyPairSync } from "node:crypto";
 import test from "node:test";
-import { encryptSnapshot, collectSnapshot } from "../scripts/production-growth-snapshot.mjs";
+import { encryptSnapshot, encryptedTransportLines, collectSnapshot } from "../scripts/production-growth-snapshot.mjs";
 import { decryptSnapshot, readEncryptedChunks, renderDashboard, cohortRate } from "../scripts/production-growth-dashboard.mjs";
 
 const keys = generateKeyPairSync("rsa", { modulusLength: 3072,
@@ -29,6 +29,16 @@ test("tampered or incomplete transport fails closed", () => {
   assert.throws(() => readEncryptedChunks("WORKCV_GROWTH_CHUNK:1/2:YWJj"), /incomplete/);
   assert.throws(() => readEncryptedChunks("WORKCV_GROWTH_CHUNK:2/2:YWJj\nWORKCV_GROWTH_CHUNK:1/2:YWJj"), /incomplete/);
   assert.throws(() => readEncryptedChunks("WORKCV_GROWTH_CHUNK:1/1:YWJj\nWORKCV_GROWTH_CHUNK:1/1:YWJj"), /incomplete/);
+});
+
+test("hex transport handles a large report and rejects CI secret masking without accepting a partial chunk", () => {
+  const large = { ...fixture, rows: Array.from({ length: 500 }, (_, i) => ({ source: "google", count: i })) };
+  const encrypted = encryptSnapshot(large, publicKey);
+  const lines = encryptedTransportLines(encrypted);
+  assert.ok(lines.length > 1);
+  assert.deepEqual(decryptSnapshot(readEncryptedChunks(lines.join("\r\n")), keys.privateKey, "example"), large);
+  assert.throws(() => readEncryptedChunks(lines.join("\n").replace(/(HEX:1\/\d+:).{4}/, "$1***")), /masked or damaged/);
+  assert.throws(() => readEncryptedChunks("WORKCV_GROWTH_CHUNK:1/1:YW***Jj"), /masked or damaged/);
 });
 
 test("weak recipient keys are refused before querying production", () => {

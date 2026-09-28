@@ -13,12 +13,17 @@ export function decryptSnapshot(encoded, privateKey, requestId) {
 }
 
 export function readEncryptedChunks(log) {
-  const chunks = [...log.matchAll(/WORKCV_GROWTH_CHUNK:(\d+)\/(\d+):([A-Za-z0-9+/=]+)/g)];
-  const count = Number(chunks[0]?.[2]);
-  if (!count || chunks.length !== count || chunks.some((m, i) => Number(m[1]) !== i + 1 || Number(m[2]) !== count)) {
+  const chunks = [...log.matchAll(/WORKCV_GROWTH_(CHUNK|HEX):(\d+)\/(\d+):([^\r\n]*)/g)];
+  const count = Number(chunks[0]?.[3]);
+  const format = chunks[0]?.[1];
+  if (!count || chunks.length !== count || chunks.some((m, i) => m[1] !== format || Number(m[2]) !== i + 1 || Number(m[3]) !== count)) {
     throw new Error("Encrypted report is missing or incomplete; no plaintext fallback is permitted");
   }
-  return chunks.map(m => m[3]).join("");
+  const payloads = chunks.map(m => m[4].trim());
+  const pattern = format === "HEX" ? /^(?:[a-f0-9]{2})+$/ : /^[A-Za-z0-9+/]+={0,2}$/;
+  if (payloads.some(payload => !pattern.test(payload))) throw new Error("Encrypted report was masked or damaged in transit; request a fresh snapshot");
+  const encoded = payloads.join("");
+  return format === "HEX" ? Buffer.from(encoded, "hex").toString("base64") : encoded;
 }
 
 const escape = value => String(value ?? "—").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

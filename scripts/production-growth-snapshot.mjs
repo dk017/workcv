@@ -19,6 +19,13 @@ export function encryptSnapshot(snapshot, publicKeyBase64) {
   })).toString("base64");
 }
 
+export function encryptedTransportLines(encoded) {
+  // Hex avoids accidental matches with alphabetic secrets (e.g. SSH usernames)
+  // in public CI logs. The receiver still rejects any masking or truncation.
+  const chunks = Buffer.from(encoded, "base64").toString("hex").match(/.{1,3000}/g);
+  return chunks.map((chunk, index) => `WORKCV_GROWTH_HEX:${index + 1}/${chunks.length}:${chunk}`);
+}
+
 const publicPath = `(path ~ '^/' AND path !~ '^/(login|editor|my-cvs|cv-pdf|api)(/|$)')`;
 const sourceSql = `CASE
   WHEN lower(coalesce(medium_value,'')) IN ('cpc','ppc','paid','paid_search','paid_social','display','affiliate') THEN 'paid_or_affiliate_tagged'
@@ -193,8 +200,7 @@ if (process.env.WORKCV_REPORT_EXECUTE === "1") {
     client = new pg.Client({ connectionString: process.env.DATABASE_URL, connectionTimeoutMillis: 10000 });
     await client.connect();
     const report = await collectSnapshot(client);
-    const chunks = encryptSnapshot(report, process.env.WORKCV_REPORT_PUBLIC_KEY).match(/.{1,3000}/g);
-    chunks.forEach((chunk, index) => console.log(`WORKCV_GROWTH_CHUNK:${index + 1}/${chunks.length}:${chunk}`));
+    encryptedTransportLines(encryptSnapshot(report, process.env.WORKCV_REPORT_PUBLIC_KEY)).forEach(line => console.log(line));
   } catch (error) {
     // Do not send SQL, credentials or report contents into public CI logs.
     console.error("WORKCV_GROWTH_FAILED:" + (/^[A-Z0-9]{5}$/.test(error.code || "") ? error.code : "REPORT_ERROR"));
