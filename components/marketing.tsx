@@ -262,7 +262,7 @@ export function NoSubscriptionCtaStrip() {
             Tired of CV builders charging you monthly?
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-white/75">
-            WorkCV costs {site.price} when you download your PDF. No monthly
+            Pay {site.price} once for your CV and matching cover letter as PDF and Word. No monthly
             subscription, no automatic renewal, and nothing to cancel later.
           </p>
         </div>
@@ -280,7 +280,7 @@ export function NoSubscriptionCtaStrip() {
 
 export function MoneyPageCta({
   heading = "Build the CV behind your next application.",
-  body = `Build and preview your UK CV first, then pay ${site.price} once when the PDF is ready. There is no monthly CV-builder subscription.`,
+  body = `Build and preview free. Pay ${site.price} once for one saved UK CV and its matching cover letter, each as PDF and Word. No subscription; edits and redownloads of the same saved CV and letter are included.`,
   trackingContext = "money_page_cta",
   secondary = true,
 }: {
@@ -540,13 +540,13 @@ export function ProofSection() {
       stat: `${site.price}`,
       title: "shown before the editor",
       body:
-        "The price is not saved for the last click. You see the one-time PDF price before you start.",
+        "See the one-time price before you start: your CV and matching cover letter, each as PDF and Word.",
     },
     {
       stat: "0",
       title: "renewals to cancel",
       body:
-        "The checkout unlocks one saved CV PDF. There is no monthly plan, renewal date, or account trap.",
+        "One payment unlocks one saved CV and its matching cover letter. Edit and redownload that same document pair without another payment.",
     },
     {
       stat: "2026",

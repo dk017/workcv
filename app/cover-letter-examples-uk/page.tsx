@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { TrackedLink } from "@/components/tracked-link";
 import Link from "next/link";
 import { CheckCircle2, FileText, Mail, ShieldCheck } from "lucide-react";
 
@@ -173,6 +174,7 @@ export default function CoverLetterExamplesPage() {
                   <div className="mt-4">
                     <ButtonLink href="/editor?new=1" trackingLabel={analyticsPlacements.coverLetterExamplesInline}>Start my CV and letter</ButtonLink>
                   </div>
+                  <p className="mt-3 text-sm"><TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.coverLetterExamplesBundleMoney} className="font-bold text-navy underline underline-offset-4">See what the {site.price} CV and cover-letter payment includes</TrackedLink></p>
                 </div>
               )}
             </aside>

@@ -194,7 +194,7 @@ export function CoverLetterGenerator() {
             </div>
             <div className="border-t border-line bg-paper p-6 md:p-8">
               <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div><p className="font-display text-2xl font-semibold text-navy">Make the CV match the letter.</p><p className="mt-2 text-sm text-muted">Build and preview free, then unlock your chosen CV PDF once for {site.price}.</p></div>
+                <div><p className="font-display text-2xl font-semibold text-navy">Make the CV match the letter.</p><p className="mt-2 text-sm text-muted">Build and preview free. Pay {site.price} once for one saved CV and its matching cover letter as PDF and Word. Edits and redownloads of the same CV and letter are included.</p></div>
                 <Link href="/editor?new=1" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">Build my CV <ArrowRight className="h-4 w-4" /></Link>
               </div>
             </div>

@@ -14,24 +14,25 @@ import {
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { TrackedLink } from "@/components/tracked-link";
 
 const startHref = buildLoginHref("/editor");
 
 export const metadata: Metadata = {
   title: "Turn Your Experience into a Professional UK CV",
   description:
-    "Add your experience in your own words, organise it with guided UK CV sections, preview every page, and download a professional CV when it is ready.",
+    `Build and preview a professional UK CV and matching cover letter. Pay ${site.price} once for PDF and Word downloads. No subscription.`,
 };
 
 const homepageFaqs = [
   {
     question: "How much does WorkCV cost?",
-    answer: `You can build your CV free. You pay ${site.price} when you download the final PDF.`,
+    answer: `Build and preview free. Pay ${site.price} once for one saved CV and its matching cover letter, each as PDF and editable Word. Edits and redownloads of that saved CV and letter are included; a separate new CV needs its own payment.`,
   },
   {
     question: "Is WorkCV a subscription?",
     answer:
-      "No. WorkCV does not use a monthly subscription for the standard CV download flow. You pay once when you want the finished PDF.",
+      "No. Pay once to unlock your saved CV and matching cover letter as PDF and Word. There is no automatic renewal.",
   },
   {
     question: "Do I need to log in before using the editor?",
@@ -46,7 +47,7 @@ const homepageFaqs = [
   {
     question: "Can I edit my CV later?",
     answer:
-      "Yes. Return to the same saved CV, edit it, and download the updated PDF without paying again. A separate new CV has its own one-time unlock.",
+      "Yes. Return to the same saved CV, edit it and its matching cover letter, and download updated PDF and Word files without paying again. A separate new CV has its own one-time unlock.",
   },
 ];
 
@@ -65,12 +66,12 @@ export default function HomePage() {
             </h1>
             <p className="mt-7 max-w-[22rem] text-lg leading-8 text-muted sm:max-w-2xl sm:text-xl">
               Add your experience in your own words. WorkCV gives it a clear,
-              professional UK structure you can preview, refine, and use with
-              confidence.
+              professional UK structure and a matching cover letter. Preview
+              both, then pay {site.price} once to download them as PDF and Word.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-3">
               {[
-                `Pay ${site.price} once at download`,
+                "CV + cover letter · PDF + Word",
                 "Email code first, then build free",
                 "Edit and redownload without paying again",
               ].map(
@@ -91,6 +92,7 @@ export default function HomePage() {
               One-time email code first · No payment until download
             </p>
             <p className="mt-2 text-sm leading-6 text-muted">The sample uses fictional details and opens free, without signing in.</p>
+            <p className="mt-3 text-sm leading-6"><TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.homeBundleMoney} className="font-bold text-navy underline underline-offset-4">See the {site.price} CV and cover-letter offer</TrackedLink>. One saved CV and its letter; separate new CVs need a separate payment.</p>
           </div>
           <CvPreview />
         </div>
@@ -137,7 +139,7 @@ export default function HomePage() {
               </article>
             ))}
           </div>
-          <p className="mt-6 text-sm leading-6 text-muted">These starting routes are free to access. Saving a CV in the editor requires an email code; your finished editor PDF costs {site.price} per saved CV, with no subscription. <Link href="/pricing" className="font-bold text-navy underline underline-offset-4">See exactly what the payment includes</Link>.</p>
+          <p className="mt-6 text-sm leading-6 text-muted">These starting routes are free to access. Saving a CV in the editor requires an email code; {site.price} unlocks one saved CV and its matching letter as PDF and Word, with no subscription. <Link href="/pricing" className="font-bold text-navy underline underline-offset-4">See exactly what the payment includes</Link>.</p>
         </div>
       </section>
       <TransformationSection />
@@ -185,7 +187,7 @@ export default function HomePage() {
               ],
               [
                 "Download when ready",
-                `Check every page, then pay ${site.price} once to unlock this saved CV as a PDF.`,
+                `Check every page, then pay ${site.price} once for this saved CV and its matching cover letter as PDF and Word.`,
               ],
             ].map(([title, body], index) => (
               <div key={title} className="rounded-xl border border-line bg-paper p-6">
@@ -318,7 +320,7 @@ export default function HomePage() {
       <FaqSection faqs={homepageFaqs} title="Common questions before you start." />
       <FinalCta
         heading="Your next application deserves a CV that feels ready."
-        body="Bring your experience. WorkCV helps you shape it into a clear, professional UK CV you can update and use again."
+        body={`Build and preview your UK CV and matching cover letter. Pay ${site.price} once for PDF and Word downloads, with edits and redownloads of the same saved CV and letter included.`}
         primaryHref={startHref}
         trackingContext={analyticsPlacements.homeFinal}
         primary="Start free with email code"

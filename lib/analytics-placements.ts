@@ -1,4 +1,8 @@
 export const analyticsPlacements = {
+  homeBundleMoney: "home_bundle_money",
+  atsTemplateBundleMoney: "ats_template_bundle_money",
+  rightToWorkBundleMoney: "right_to_work_bundle_money",
+  coverLetterExamplesBundleMoney: "cover_letter_examples_bundle_money",
   coverLetterMoney: "cover_letter_money",
   coverLetterBlankCv: "cover_letter_blank_cv",
   noSubscriptionHeroSample: "no_subscription_hero_sample",

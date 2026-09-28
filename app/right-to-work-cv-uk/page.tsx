@@ -13,6 +13,7 @@ import {
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { TrackedLink } from "@/components/tracked-link";
 
 export const metadata: Metadata = {
   title: "Right to Work CV UK - What to Include",
@@ -216,6 +217,7 @@ export default function RightToWorkCvUkPage() {
                 </div>
               </div>
             ))}
+            <p className="p-5 text-sm leading-7 text-muted">Ready to put your wording into a complete application? See the <TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.rightToWorkBundleMoney} className="font-bold text-navy underline underline-offset-4">UK CV builder with no subscription</TrackedLink>. Build and preview free; {site.price} once includes your saved CV and matching cover letter as PDF and Word.</p>
           </div>
         </div>
       </section>
@@ -323,7 +325,7 @@ export default function RightToWorkCvUkPage() {
       />
       <FinalCta
         heading="Build a UK CV that gives enough information, not too much."
-        body={`Use clear sections, keep private details private, and pay ${site.price} only when you download.`}
+        body={`Use clear sections and keep private details private. Build and preview free, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`}
         secondaryHref="/ats-cv-template-uk"
         secondary="ATS-friendly format"
         trackingContext={analyticsPlacements.rightToWorkFinal}

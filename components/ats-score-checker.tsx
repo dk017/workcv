@@ -502,7 +502,7 @@ export function AtsScoreChecker() {
                   </p>
                   <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
                     Your CV, target vacancy and three priorities will carry into a new
-                    saved draft after email-code login. The one-off PDF price is {site.price}.
+                    saved draft after email-code login. Pay {site.price} once for this saved CV and its matching cover letter as PDF and Word.
                   </p>
                 </div>
                 <TrackedLink

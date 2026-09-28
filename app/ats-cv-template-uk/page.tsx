@@ -16,6 +16,8 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: "ATS CV Template UK - Clean Applicant Tracking Format",
@@ -241,7 +243,7 @@ export default function AtsCvTemplateUkPage() {
           </div>
           <div className="flex gap-3 text-sm leading-6 text-ink">
             <FileText className="h-5 w-5 shrink-0 text-gold" />
-            <p><strong className="text-navy">PDF and Word:</strong> one payment includes both files, so you can match the format the application asks for.</p>
+            <p><strong className="text-navy">PDF and Word:</strong> choose the format the employer asks for. The <TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.atsTemplateBundleMoney} className="font-bold text-navy underline underline-offset-4">{site.price} no-subscription CV builder</TrackedLink> includes your saved CV and matching cover letter in both formats.</p>
           </div>
         </div>
       </section>
@@ -450,7 +452,7 @@ export default function AtsCvTemplateUkPage() {
       <FaqSection faqs={faqItems} title="Questions about ATS-friendly UK CV templates." />
       <FinalCta
         heading="Start with the cleanest WorkCV structure."
-        body={`Edit the Classic template, tailor it to the vacancy and preview every page. If the employer accepts PDF, unlock this saved CV once for ${site.price}.`}
+        body={`Edit the Classic template, tailor it to the vacancy and preview every page. Pay ${site.price} once for this saved CV and its matching cover letter as PDF and Word. Send the format the employer requests.`}
         primaryHref={editorHref}
         primary="Use the ATS-friendly template"
         secondaryHref="/templates"

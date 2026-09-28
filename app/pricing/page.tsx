@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "CV Builder Pricing UK - WorkCV",
     description:
-      `Build your CV first. Pay ${site.priceGbp} when you download. Compare WorkCV with UK CV builder trial and renewal pricing.`,
+      `Pay ${site.priceGbp} once for one saved CV and matching cover letter, each as PDF and Word. Build and preview free. No subscription or renewal.`,
     url: "/pricing",
   },
 };
@@ -106,7 +106,7 @@ const pricingFaqs = [
   {
     question: "When do I pay?",
     answer:
-      "You pay when you are ready to download the final PDF version of your CV. You can use the editor and preview before that point.",
+      "Pay when you are ready to download. One payment unlocks your saved CV and its matching cover letter as PDF and Word. You can use the editor and preview before paying.",
   },
   {
     question: "How much does MyPerfectCV cost?",
@@ -122,7 +122,7 @@ const pricingFaqs = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    `UK CV builder with a ${site.priceGbp} PDF download price and no monthly subscription in the standard download flow.`,
+    `UK CV builder: ${site.priceGbp} once for one saved CV and matching cover letter, each as PDF and Word. No subscription or automatic renewal.`,
   url: `${site.url}/pricing`,
 });
 
@@ -158,17 +158,17 @@ export default function PricingPage() {
               CV builder pricing UK
             </p>
             <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              {site.priceGbp} when your CV is ready.
+              Your CV and cover letter. {site.priceGbp} once.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Build your CV first, preview the result, then pay {site.price} to
-              download the final PDF. No monthly subscription, no automatic
-              renewal, and no cancellation step after you finish.
+              Build and preview first. One payment includes your saved CV and
+              matching cover letter, each as a PDF and an editable Word file.
+              No monthly subscription or automatic renewal.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
                 "Free to build before paying",
-                "Pay only at PDF download",
+                "PDF + editable Word included",
                 "No recurring billing",
                 "Always priced in GBP",
               ].map((item) => (
@@ -192,10 +192,10 @@ export default function PricingPage() {
               {site.priceGbp}
             </div>
             <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
-              one-time PDF download price
+              one saved CV + matching cover letter
             </p>
             <ul className="mt-7 space-y-3">
-              {included.slice(0, 4).map((item) => (
+              {included.map((item) => (
                 <li key={item} className="flex gap-3 text-sm font-bold text-navy">
                   <Check className="h-5 w-5 shrink-0 text-success" />
                   {item}
@@ -203,8 +203,8 @@ export default function PricingPage() {
               ))}
             </ul>
             <p className="mt-7 leading-7 text-muted">
-              Built for people who need one strong UK CV, not another monthly
-              account to remember cancelling.
+              Edit and download this same saved CV and its letter again without
+              paying again. A separate new CV needs its own one-time payment.
             </p>
             <div className="mt-8">
               <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingCardEditor}>Start building</ButtonLink>
