@@ -17,7 +17,7 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Return to Work CV Example UK + Career Break Template | WorkCV",
+  title: "Return to Work CV UK: Career Break Example",
   description:
     "Use a return-to-work CV example for the UK to explain a career break briefly, show current skills and target your next role with confidence.",
   alternates: { canonical: "/return-to-work-cv-uk" },

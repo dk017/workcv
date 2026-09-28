@@ -9,7 +9,7 @@ import { site } from "@/lib/site";
 const slug = "/livecareer-alternative";
 
 export const metadata: Metadata = {
-  title: "LiveCareer Alternative UK - No Subscription CV Builder",
+  title: "LiveCareer Alternative UK - No Subscription",
   description:
     `Compare LiveCareer with WorkCV's ${site.price} saved-CV PDF unlock, including CV tools, cover letters, billing and cancellation links.`,
   alternates: { canonical: slug },

@@ -104,11 +104,6 @@ export default function CvBuilderScamsUkPage() {
       <article>
         <section className="quiet-grid bg-paper py-16 md:py-24">
           <div className="container-page">
-            <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
-              <Link href="/" className="hover:text-navy">Home</Link>
-              <span>/</span>
-              <span className="text-navy">CV builder charges UK</span>
-            </div>
             <div className="max-w-4xl">
               <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
                 Checked {checkedDate}

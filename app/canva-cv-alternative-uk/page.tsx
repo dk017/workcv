@@ -25,7 +25,7 @@ import { site } from "@/lib/site";
 const checkedDate = "13 June 2026";
 
 export const metadata: Metadata = {
-  title: "Canva CV Alternative UK - CV Builder for Applications",
+  title: "Canva CV Alternative UK for Job Applications",
   description:
     `Looking for a Canva CV alternative in the UK? Compare Canva's design-led CV templates with WorkCV's UK CV builder and ${site.price} PDF download.`,
   alternates: {

@@ -3,7 +3,7 @@ import Link from "next/link";
 import { CareerToolPage } from "@/components/career-tool-page";
 const path = "/tools/cv-format-checker-uk";
 export const metadata: Metadata = {
-  title: "Free CV Format Checker UK — PDF and DOCX Reading Order",
+  title: "Free CV Format Checker UK - PDF and DOCX",
   description: "Inspect a PDF or DOCX privately in your browser. Compare extracted reading order, check headings and see what still needs a human review.",
   alternates: { canonical: path },
   openGraph: { title: "Free UK CV File and Format Checker", description: "Inspect extracted CV text and PDF pages without uploading your file.", url: path },

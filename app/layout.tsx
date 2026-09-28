@@ -6,6 +6,7 @@ import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
 import { AttributionCapture } from "@/components/attribution-capture";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
+import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
 import { site } from "@/lib/site";
 import "./globals.css";
 
@@ -104,6 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans antialiased">
         <AttributionCapture />
         <Header />
+        <SiteBreadcrumbs />
         <main>{children}</main>
         <Footer />
       </body>

@@ -5,7 +5,7 @@ import { statementExample, buildStatement } from "@/lib/supporting-statement";
 import { site } from "@/lib/site";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
-export const metadata: Metadata = { title: "Civil Service Supporting Statement Planner UK — Free Evidence Worksheet", description: "Map each Civil Service application criterion to your own actions and outcomes. Free private worksheet, word count, worked example and text download.", alternates: { canonical: "/tools/supporting-statement-planner-uk" } };
+export const metadata: Metadata = { title: "Supporting Statement Planner UK (Civil Service)", description: "Map each Civil Service application criterion to your own actions and outcomes. Free private worksheet, word count, worked example and text download.", alternates: { canonical: "/tools/supporting-statement-planner-uk" } };
 export default function Page() {
   return <main className="bg-paper"><div className="container-page space-y-10 py-14">
     <header className="max-w-3xl space-y-5"><p className="text-sm font-bold uppercase text-navy">Free UK application evidence worksheet</p><h1 className="font-display text-4xl font-semibold text-navy md:text-6xl">Build a supporting statement from evidence, not generic claims.</h1><p className="text-lg leading-8">For a Civil Service personal or supporting statement, start with the criteria in the vacancy. Show what you personally did and what happened. This planner helps organise that evidence; it is not a short CV profile generator and cannot score your application.</p><p className="text-sm text-muted">Reviewed 24 September 2026 · WorkCV editorial team · No affiliation with the Civil Service.</p></header>

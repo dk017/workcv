@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cancelGuides } from "@/components/cancel-guide-links";
 import { ArrowRight, ShieldCheck } from "lucide-react";
 
 import { TrackedLink } from "@/components/tracked-link";
@@ -73,6 +74,12 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <Link href="/terms">Terms</Link>
             <Link href="/refund-policy">Refunds</Link>
           </div>
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted">
+          <span className="font-bold text-navy">Cancel a CV builder subscription:</span>
+          {cancelGuides.map((guide) => (
+            <Link key={guide.href} href={guide.href} className="hover:text-navy">{guide.name}</Link>
+          ))}
         </div>
         <div className="flex flex-wrap items-center gap-4">
           <a

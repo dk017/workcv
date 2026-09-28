@@ -12,10 +12,12 @@ export function EditorialGuideShell({ path, eyebrow, title, intro, answer, revie
 }) {
   const reviewedIso = new Date(`${reviewed} UTC`).toISOString().slice(0, 10);
   const articleSchema = { "@context": "https://schema.org", "@type": "Article", headline: title, description: intro, dateModified: reviewedIso, mainEntityOfPage: `${site.url}${path}`, author: { "@type": "Organization", name: site.name }, publisher: { "@type": "Organization", name: site.name } };
+  const breadcrumbSchema = { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [["Home", site.url], ["Career tools", `${site.url}/career-tools`], [eyebrow, `${site.url}${path}`]].map(([name, item], index) => ({ "@type": "ListItem", position: index + 1, name, item })) };
   const faqSchema = { "@context": "https://schema.org", "@type": "FAQPage", mainEntity: faqs.map((faq) => ({ "@type": "Question", name: faq.question, acceptedAnswer: { "@type": "Answer", text: faq.answer } })) };
   return <>
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
     <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     <section className="quiet-grid border-b border-line bg-paper py-14 md:py-20"><div className="container-page max-w-5xl">
       <nav aria-label="Breadcrumb" className="mb-7 text-sm text-muted"><Link href="/" className="hover:text-navy">Home</Link><span aria-hidden="true"> / </span><Link href="/career-tools" className="hover:text-navy">Career tools</Link><span aria-hidden="true"> / </span><span className="text-navy">{eyebrow}</span></nav>
       <SectionLabel>{eyebrow}</SectionLabel><h1 className="max-w-4xl font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">{title}</h1>

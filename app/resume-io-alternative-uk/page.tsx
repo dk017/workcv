@@ -23,7 +23,7 @@ import { site } from "@/lib/site";
 const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
-  title: "Resume.io Alternative UK - No Subscription CV Builder",
+  title: "Resume.io Alternative UK - No Subscription",
   description:
     `Looking for a Resume.io alternative in the UK? Compare Resume.io's 7-day trial and renewal pricing with WorkCV's ${site.priceGbp} PDF download model.`,
   alternates: {

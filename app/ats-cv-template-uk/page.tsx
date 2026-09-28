@@ -20,7 +20,7 @@ import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
-  title: "ATS CV Template UK - Clean Applicant Tracking Format",
+  title: "ATS CV Template UK - Applicant Tracking Format",
   description:
     "Edit an ATS-friendly UK CV template with standard headings, a clean single-column structure and honest job-specific wording. Preview before paying.",
   alternates: { canonical: "/ats-cv-template-uk" },

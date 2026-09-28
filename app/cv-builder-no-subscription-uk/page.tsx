@@ -31,7 +31,7 @@ import { analyticsPlacements } from "@/lib/analytics-placements";
 import { underTenCvBuilderAnswer } from "@/lib/price-copy";
 
 export const metadata: Metadata = {
-  title: `CV Builder No Subscription UK - ${site.price} CV + Cover Letter`,
+  title: `CV Builder No Subscription UK - ${site.price} CV + Letter`,
   description:
     `Build and preview free. Pay ${site.priceGbp} once for your UK CV and matching cover letter as PDF and Word. No subscription. Edit and redownload the same saved CV.`,
   alternates: {

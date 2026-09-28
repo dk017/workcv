@@ -13,7 +13,7 @@ import { customerContentReview, displayReviewDate } from "@/lib/customer-content
 const path = "/tools/blank-cv-template-uk";
 
 export const metadata: Metadata = {
-  title: "Free CV Template UK Download - Editable Word | WorkCV",
+  title: "Free CV Template UK Download - Editable Word",
   description:
     "Download a free editable CV template for UK jobs as a Word document. No signup, payment or subscription; tailor it before you apply.",
   alternates: { canonical: path },

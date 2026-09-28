@@ -4,7 +4,7 @@ import { CareerToolPage } from "@/components/career-tool-page";
 
 const path = "/tools/transferable-skills-translator-uk";
 export const metadata: Metadata = {
-  title: "Transferable Skills Translator UK - Career Change CV Tool",
+  title: "Transferable Skills Translator UK - Career Change",
   description: "Translate real responsibilities into transferable CV skills for a UK career change. Free browser tool with editable wording and no signup.",
   alternates: { canonical: path },
   openGraph: { title: "Free Transferable Skills Translator UK", description: "Find the skills your previous experience can prove for a new role.", url: path },

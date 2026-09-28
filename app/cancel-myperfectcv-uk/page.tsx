@@ -22,6 +22,7 @@ import {
   competitorPricingCheckedDate,
 } from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
+import { CancelGuideLinks } from "@/components/cancel-guide-links";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -159,13 +160,6 @@ export default function CancelMyPerfectCvUkPage() {
 
       <section className="quiet-grid bg-paper py-16 md:py-24">
         <div className="container-page">
-          <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
-            <Link href="/" className="hover:text-navy">
-              Home
-            </Link>
-            <span>/</span>
-            <span className="text-navy">Cancel MyPerfectCV UK</span>
-          </div>
 
           <div className="grid gap-12 lg:grid-cols-[1fr_0.9fr] lg:items-center">
             <div>
@@ -393,6 +387,7 @@ export default function CancelMyPerfectCvUkPage() {
         </div>
       </section>
 
+      <CancelGuideLinks current="/cancel-myperfectcv-uk" />
       <FaqSection faqs={faqItems} title="Questions about cancelling MyPerfectCV." />
       <FinalCta
         heading="Build your next CV without a renewal."

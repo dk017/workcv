@@ -29,7 +29,7 @@ const publishedDateIso = "2026-06-13";
 const advertUrl = "https://www.jobs.nhs.uk/candidate/jobadvert/C9301-26-0052";
 
 export const metadata: Metadata = {
-  title: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+  title: "CV Personal Statement UK: 12 Examples + Walkthrough",
   description:
     "Write a stronger UK CV personal statement with 12 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
   alternates: { canonical: pagePath },

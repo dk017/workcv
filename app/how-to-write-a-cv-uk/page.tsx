@@ -15,7 +15,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "How to Write a CV UK - 10-Step Guide and Editable Example",
+  title: "How to Write a CV UK: 10-Step Guide + Example",
   description:
     "Learn how to write a UK CV in 10 practical steps. Includes section examples, ATS guidance, an evidence worksheet and a complete editable CV template.",
   alternates: { canonical: "/how-to-write-a-cv-uk" },

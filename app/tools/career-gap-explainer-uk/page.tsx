@@ -4,7 +4,7 @@ import { CareerToolPage } from "@/components/career-tool-page";
 
 const path = "/tools/career-gap-explainer-uk";
 export const metadata: Metadata = {
-  title: "Employment Gap CV Explainer UK - Free Career Break Tool",
+  title: "Employment Gap Explainer UK - Free CV Tool",
   description: "Write a brief, factual employment-gap line for a UK CV and a readiness sentence for your profile. Free private browser tool with no signup.",
   alternates: { canonical: path },
   openGraph: { title: "Free UK Employment Gap CV Explainer", description: "Give an employment gap context without making it the headline of your CV.", url: path },
