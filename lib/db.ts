@@ -152,8 +152,13 @@ export async function ensurePaymentTables() {
         END
         $backfill$;
 
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS refunded_at TIMESTAMPTZ;
+
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
+        CREATE INDEX IF NOT EXISTS workcv_orders_user_product_idx
+          ON workcv_orders (user_id, product_id, paid_at);
         CREATE INDEX IF NOT EXISTS workcv_orders_test_paid_idx
           ON workcv_orders (is_test, paid_at DESC);
       `)

@@ -52,6 +52,10 @@ export async function collectSnapshot(client, environment = process.env) {
     const end = (await client.query("SELECT NOW() AS at")).rows[0].at;
     // Entries are user IDs or sign-in emails; emails resolve to IDs here and
     // never leave the database.
+    // Product IDs are not secret; the pattern check keeps the interpolation safe.
+    const passProductId = /^pdt_[A-Za-z0-9]+$/.test(environment.DODO_PASS_PRODUCT_ID || "")
+      ? environment.DODO_PASS_PRODUCT_ID
+      : "pdt_0NoafhI03VVtoLtkpGLHe";
     const testEntries = (environment.WORKCV_TEST_USER_IDS || "").split(",").map(x => x.trim()).filter(Boolean);
     const testEmails = testEntries.filter(x => x.includes("@")).map(x => x.toLowerCase());
     const emailUserIds = testEmails.length
@@ -153,6 +157,7 @@ export async function collectSnapshot(client, environment = process.env) {
         sum(amount_cents)::bigint gross_minor_units FROM o GROUP BY 1 ORDER BY 1`);
       const sales = await query(`, attributed AS (
         SELECT o.amount_cents,upper(coalesce(o.currency,'UNKNOWN')) currency,${sourceSql} source,
+          CASE WHEN o.product_id = '${passProductId}' THEN 'job_search_pass' ELSE 'single_cv' END plan,
           ${safePath("CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END")} landing_path,
           CASE WHEN o.attribution_captured_at IS NOT NULL THEN 'checkout_snapshot' ELSE 'legacy_profile_fallback' END attribution_basis
         FROM o LEFT JOIN workcv_users u ON u.id=o.user_id
@@ -161,8 +166,8 @@ export async function collectSnapshot(client, environment = process.env) {
           CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_medium ELSE u.last_utm_medium END medium_value,
           CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END host_value
         ) raw
-      ) SELECT source,landing_path,attribution_basis,currency,count(*)::int orders,sum(amount_cents)::bigint gross_minor_units
-      FROM attributed GROUP BY 1,2,3,4 ORDER BY orders DESC,source,landing_path`);
+      ) SELECT plan,source,landing_path,attribution_basis,currency,count(*)::int orders,sum(amount_cents)::bigint gross_minor_units
+      FROM attributed GROUP BY 1,2,3,4,5 ORDER BY orders DESC,plan,source,landing_path`);
       const tools = await query(`SELECT metadata->>'tool' tool,event_name,metadata->>'result' result,
         metadata->>'placement' placement,count(*)::int events,count(DISTINCT session_hash)::int sessions
         FROM f WHERE event_name IN ('tool_started','tool_completed') GROUP BY 1,2,3,4 ORDER BY 1,2,3,4`);

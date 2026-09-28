@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
-import { ensurePaymentTables, getPool, hasDatabaseUrl } from "@/lib/db";
+import { getPassStatus, hasPaidCvOrder } from "@/lib/cv-entitlement";
+import { getPool, hasDatabaseUrl } from "@/lib/db";
 
 export const runtime = "nodejs";
 
@@ -27,24 +28,13 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "CV not found" }, { status: 404 });
     }
 
-    await ensurePaymentTables();
-    const result = await getPool().query(
-      `
-        SELECT id, paid_at
-        FROM workcv_orders
-        WHERE draft_id = $1
-        ORDER BY paid_at DESC
-        LIMIT 1
-      `,
-      [draftId]
-    );
+    const [unlocked, pass] = await Promise.all([
+      hasPaidCvOrder(user.id, draftId),
+      getPassStatus(user.id),
+    ]);
 
-    if (result.rows.length > 0) {
-      return NextResponse.json({
-        paid: true,
-        status: "paid",
-        paidAt: result.rows[0]?.paid_at ?? null,
-      });
+    if (unlocked) {
+      return NextResponse.json({ paid: true, status: "paid", pass });
     }
 
     const checkout = await getPool().query<{ status: string }>(
@@ -62,6 +52,7 @@ export async function GET(request: NextRequest) {
       paid: false,
       status:
         status === "failed" || status === "cancelled" ? status : "pending",
+      pass,
     });
   } catch (error) {
     console.error("payment_status_check_failed", error);

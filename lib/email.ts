@@ -56,11 +56,20 @@ export async function sendPurchaseConfirmationEmail(input: {
   amountCents: number | null;
   currency: string;
   editorUrl: string;
+  plan?: "cv" | "pass";
+  passEndsAt?: Date | null;
 }) {
   const transporter = getEmailTransporter();
   if (!transporter) {
     throw new Error("SMTP is not configured for purchase confirmation email");
   }
+  const isPass = input.plan === "pass";
+  const passEnd = input.passEndsAt
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" }).format(input.passEndsAt)
+    : null;
+  const unlockedText = isPass
+    ? `Your Job Search Pass is active${passEnd ? ` until ${passEnd}` : " for 90 days"}. Every CV and cover letter you create before then is unlocked as PDF and Word, and stays yours to edit and download after the pass ends.`
+    : "Your saved CV is unlocked. You can return to the editor to download it or make further changes.";
 
   const { from, replyTo } = getTransactionalEmailIdentity();
   const amount = formatAmount(input.amountCents, input.currency);
@@ -73,14 +82,14 @@ export async function sendPurchaseConfirmationEmail(input: {
     from,
     replyTo,
     to: input.to,
-    subject: "Your WorkCV purchase is confirmed",
+    subject: isPass ? "Your WorkCV Job Search Pass is active" : "Your WorkCV purchase is confirmed",
     text: [
       "Your WorkCV payment was successful.",
       "",
       amountText.trimEnd(),
       `Order reference: ${input.orderId}`,
       "",
-      "Your saved CV is unlocked. You can return to the editor to download it or make further changes.",
+      unlockedText,
       input.editorUrl,
       "",
       "This was a one-time payment. No subscription or automatic renewal was started.",
@@ -92,7 +101,7 @@ export async function sendPurchaseConfirmationEmail(input: {
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#17202a;max-width:600px">
         <h1 style="color:#0f2942;font-size:24px">Your WorkCV purchase is confirmed</h1>
-        <p>Your payment was successful and your saved CV is now unlocked.</p>
+        <p>Your payment was successful. ${escapeHtml(unlockedText)}</p>
         ${amountHtml}
         <p><strong>Order reference:</strong> ${safeOrderId}</p>
         <p>

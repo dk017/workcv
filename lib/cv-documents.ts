@@ -10,7 +10,10 @@ import {
 } from "@/lib/editor-data";
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 import { parseCvData, repairCvData } from "@/lib/cv-schema";
+import { duplicateTitle, prepareDuplicateCv } from "@/lib/cv-duplicate";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
+import { WORKCV_PASS, WORKCV_PASS_PRODUCT_ID } from "@/lib/commerce";
+import { unlockedDocumentSql } from "@/lib/pass-rules";
 
 export type CvDocument = {
   id: string;
@@ -152,14 +155,12 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
         d.data,
         d.template_id,
         d.updated_at,
-        EXISTS (
-          SELECT 1 FROM workcv_orders o WHERE o.draft_id = d.id
-        ) AS paid
+        ${unlockedDocumentSql("$2", "$3")} AS paid
       FROM workcv_cv_documents d
       WHERE d.user_id = $1
       ORDER BY d.updated_at DESC
     `,
-    [userId]
+    [userId, WORKCV_PASS_PRODUCT_ID, WORKCV_PASS.days]
   );
 
   return result.rows.map((row) => {
@@ -206,6 +207,35 @@ export async function createCvDocument(
     metadata: { creation_method: creationMethod },
   });
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
+}
+
+export async function duplicateCvDocument(userId: string, sourceId: string) {
+  await ensureAuthTables();
+  const source = await getPool().query<{ title: string; data: CvData; template_id: string }>(
+    "SELECT title, data, template_id FROM workcv_cv_documents WHERE id = $1 AND user_id = $2",
+    [sourceId, userId],
+  );
+  const row = source.rows[0];
+  if (!row) return null;
+  const data = parseCvData(prepareDuplicateCv(repairCvData(row.data, parseTemplate(row.template_id))));
+  const id = crypto.randomUUID();
+  const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
+    `
+      INSERT INTO workcv_cv_documents (id, user_id, title, data, template_id)
+      VALUES ($1, $2, $3, $4::jsonb, $5)
+      RETURNING id, data, updated_at
+    `,
+    [id, userId, duplicateTitle(row.title || data.fullName || "My CV"), JSON.stringify(data), data.template],
+  );
+  const created = result.rows[0];
+  await recordServerEditorEvent({
+    userId,
+    documentId: created.id,
+    eventName: "document_created",
+    eventKey: `document_created:${created.id}`,
+    metadata: { creation_method: "duplicate" },
+  });
+  return { id: created.id, data: repairCvData(created.data), updatedAt: created.updated_at.toISOString() };
 }
 
 export class CvUpdateConflictError extends Error {

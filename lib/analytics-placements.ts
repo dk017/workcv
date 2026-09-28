@@ -38,6 +38,7 @@ export const analyticsPlacements = {
   pricingHeroEditor: "pricing_hero_editor",
   pricingHeroCompare: "pricing_hero_compare",
   pricingCardEditor: "pricing_card_editor",
+  pricingPassEditor: "pricing_pass_editor",
   pricingComparisonEditor: "pricing_comparison_editor",
   pricingComparisonNoSubscription: "pricing_comparison_no_subscription",
   pricingSample: "pricing_sample",

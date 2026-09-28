@@ -3,9 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
-import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
+import { createDodoCheckout } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
-import { DIGITAL_CONTENT_CONSENT_VERSION } from "@/lib/commerce";
+import { DIGITAL_CONTENT_CONSENT_VERSION, isWorkcvPlan, productIdForPlan } from "@/lib/commerce";
+import { getPassStatus } from "@/lib/cv-entitlement";
 import { isApprovedTestUser } from "@/lib/test-orders";
 import { sanitizeSaleAttribution } from "@/lib/attribution";
 
@@ -42,6 +43,11 @@ export async function POST(request: NextRequest) {
   const email = payload.email;
   const consentAccepted = payload.consentAccepted === true;
   const forceNew = payload.forceNew === true;
+  if (payload.plan !== undefined && !isWorkcvPlan(payload.plan)) {
+    return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  }
+  const plan = isWorkcvPlan(payload.plan) ? payload.plan : "cv";
+  const planProductId = productIdForPlan(plan);
   const providedAttribution = sanitizeSaleAttribution(payload.attribution);
 
   if (!isValidDraftId(draftId)) {
@@ -65,6 +71,12 @@ export async function POST(request: NextRequest) {
     }
 
     await ensurePaymentTables();
+    if (plan === "pass" && (await getPassStatus(user.id)).active) {
+      return NextResponse.json(
+        { error: "You already have an active Job Search Pass. Your new CVs are unlocked automatically." },
+        { status: 409 },
+      );
+    }
     const storedAttributionResult = await getPool().query<{
       last_utm_source: string | null;
       last_utm_medium: string | null;
@@ -109,12 +121,13 @@ export async function POST(request: NextRequest) {
         WHERE draft_id = $1
           AND user_id = $2
           AND status = 'pending'
+          AND product_id = $3
           AND created_at > NOW() - INTERVAL '15 minutes'
           AND checkout_url IS NOT NULL
         ORDER BY created_at DESC
         LIMIT 1
       `,
-      [draftId, user.id],
+      [draftId, user.id, planProductId],
     );
     if (!forceNew && existing.rows[0]?.checkout_url) {
       return NextResponse.json({ checkoutUrl: existing.rows[0].checkout_url });
@@ -123,6 +136,7 @@ export async function POST(request: NextRequest) {
     const checkout = await createDodoCheckout({
       draftId,
       email: isValidEmail(email) ? email : undefined,
+      plan,
     });
 
     await getPool().query(
@@ -156,7 +170,7 @@ export async function POST(request: NextRequest) {
         checkout.sessionId,
         draftId,
         isValidEmail(email) ? email : null,
-        DODO_PRODUCT_ID,
+        checkout.productId,
         checkout.checkoutUrl,
         checkout.siteHost,
         user.id,

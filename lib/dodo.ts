@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-import { WORKCV_PRICE, WORKCV_PRODUCT_ID } from "@/lib/commerce";
+import { WORKCV_PRICE, WORKCV_PRODUCT_ID, productIdForPlan, type WorkcvPlan } from "@/lib/commerce";
 
 export const DODO_PRODUCT_ID = WORKCV_PRODUCT_ID;
 
@@ -32,13 +32,15 @@ export function getSiteHost() {
   }
 }
 
-export async function createDodoCheckout(input: { draftId: string; email?: string }) {
+export async function createDodoCheckout(input: { draftId: string; email?: string; plan?: WorkcvPlan }) {
   if (!DODO_API_KEY) {
     throw new Error("DODO_API_KEY is not configured");
   }
 
+  const plan = input.plan || "cv";
+  const productId = productIdForPlan(plan);
   const body: Record<string, unknown> = {
-    product_cart: [{ product_id: DODO_PRODUCT_ID, quantity: 1 }],
+    product_cart: [{ product_id: productId, quantity: 1 }],
     allowed_payment_method_types: ["credit", "debit", "apple_pay", "google_pay"],
     billing_currency: WORKCV_PRICE.currency,
     return_url: `${getAppUrl()}/editor?payment=success&draftId=${encodeURIComponent(
@@ -49,8 +51,8 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
     )}`,
     metadata: {
       draft_id: input.draftId,
-      product: "cv-download",
-      product_id: DODO_PRODUCT_ID,
+      product: plan === "pass" ? "job-search-pass" : "cv-download",
+      product_id: productId,
       provider: "dodo",
       site_host: getSiteHost(),
     },
@@ -92,6 +94,7 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
   return {
     checkoutUrl: checkout.checkout_url,
     sessionId: checkout.session_id,
+    productId,
     siteHost: getSiteHost(),
   };
 }

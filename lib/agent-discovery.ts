@@ -22,6 +22,7 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - Download the finished CV as a PDF and as an editable Word (.docx) file after payment.
 - Write a matching cover letter in the same editor; it uses the CV's header and design and downloads as PDF and Word with the same payment.
 - Pay ${site.price} once per saved CV; both formats are included.
+- Or buy a ${site.passDays}-day Job Search Pass for ${site.passPrice} once: unlimited CVs and matching cover letters during the pass, never renews.
 - Avoid monthly subscriptions and automatic renewal.
 
 ## Main actions
@@ -40,6 +41,7 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - Users log in with a one-time email code so their CV can be saved.
 - There is no monthly CV builder subscription in the standard download flow.
 - The current one-time price is ${site.price} per saved CV, covering the CV and one matching cover letter, each as PDF and Word.
+- The Job Search Pass is ${site.passPrice} once for unlimited CVs and cover letters created within ${site.passDays} days. CVs made during the pass stay downloadable afterwards. It never renews.
 
 ## Agent discovery
 

@@ -1,4 +1,4 @@
-import { WORKCV_PRICE } from "./commerce.ts";
+import { WORKCV_PASS, WORKCV_PRICE } from "./commerce.ts";
 
 const priceAmount = WORKCV_PRICE.amount;
 const priceCurrency = WORKCV_PRICE.currency;
@@ -13,6 +13,8 @@ export const site = {
   price: `£${priceAmount.toFixed(2)}`,
   priceGbp: `£${priceAmount.toFixed(2)}`,
   priceTaxInclusive: WORKCV_PRICE.taxInclusive,
+  passPrice: `£${WORKCV_PASS.amount.toFixed(2)}`,
+  passDays: WORKCV_PASS.days,
   summary:
     "A clear, professional UK CV—ready when you are.",
 };

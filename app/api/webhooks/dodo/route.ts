@@ -12,6 +12,8 @@ import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
+import { planForProductId } from "@/lib/commerce";
+import { passExpiry, refundRevokesAccess } from "@/lib/pass-rules";
 
 export const runtime = "nodejs";
 
@@ -24,6 +26,7 @@ type DodoWebhookEvent = {
 
 type DodoPaymentPayload = {
   payment_id?: string;
+  refund_id?: string;
   id?: string;
   checkout_session_id?: string | null;
   customer?: {
@@ -82,6 +85,7 @@ export async function POST(request: NextRequest) {
     "payment.succeeded",
     "payment.failed",
     "payment.cancelled",
+    "refund.succeeded",
   ]);
   if (!event.type || !supportedEventTypes.has(event.type)) {
     return NextResponse.json({ status: "ignored" });
@@ -92,13 +96,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing payment payload" }, { status: 400 });
   }
 
+  if (event.type === "refund.succeeded") {
+    return handleRefund(data);
+  }
+
   const metadata = data.metadata || {};
   const draftId = metadataString(metadata, "draft_id") || metadataString(metadata, "draftId");
   const productId = metadataString(metadata, "product_id") || DODO_PRODUCT_ID;
   const eventSiteHost = metadataString(metadata, "site_host")?.toLowerCase() || null;
   const expectedSiteHost = getSiteHost();
 
-  if (productId !== DODO_PRODUCT_ID) {
+  const plan = planForProductId(productId);
+  if (!plan) {
     return NextResponse.json({ status: "ignored", reason: "product_mismatch" });
   }
 
@@ -258,6 +267,8 @@ export async function POST(request: NextRequest) {
             amountCents,
             currency,
             editorUrl: `${getAppUrl()}/editor?draftId=${encodeURIComponent(draftId)}`,
+            plan,
+            passEndsAt: plan === "pass" ? passExpiry(new Date()) : null,
           });
           await getPool().query(
             `
@@ -298,5 +309,30 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
+  }
+}
+
+// A full refund revokes the order's access; partial refunds are left in place.
+async function handleRefund(data: DodoPaymentPayload) {
+  const paymentId = data.payment_id;
+  if (!paymentId) return NextResponse.json({ error: "Missing payment_id" }, { status: 400 });
+  try {
+    await ensurePaymentTables();
+    const order = await getPool().query<{ amount_cents: number | null }>(
+      "SELECT amount_cents FROM workcv_orders WHERE id = $1",
+      [paymentId],
+    );
+    if (!order.rows[0]) return NextResponse.json({ status: "ignored", reason: "unknown_payment" });
+    if (!refundRevokesAccess(readAmountCents(data), order.rows[0].amount_cents)) {
+      return NextResponse.json({ status: "ok", access: "kept_partial_refund" });
+    }
+    await getPool().query(
+      "UPDATE workcv_orders SET refunded_at = COALESCE(refunded_at, NOW()) WHERE id = $1",
+      [paymentId],
+    );
+    return NextResponse.json({ status: "ok", access: "revoked" });
+  } catch (error) {
+    console.error("dodo_refund_processing_failed", error);
+    return NextResponse.json({ error: "Refund processing failed" }, { status: 500 });
   }
 }

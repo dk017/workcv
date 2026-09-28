@@ -69,7 +69,7 @@ export default async function MyCvsPage() {
                         document.paid ? "bg-[#e8f5ee] text-success" : "bg-paper text-muted"
                       }`}
                     >
-                      {document.paid ? "PDF unlocked" : "Draft"}
+                      {document.paid ? "Unlocked" : "Draft"}
                     </span>
                   </div>
                   <dl className="mt-5 space-y-2 text-sm text-muted">

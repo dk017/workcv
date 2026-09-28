@@ -6,6 +6,7 @@ import {
   AlertTriangle,
   Briefcase,
   Check,
+  Copy,
   Download,
   FileText,
   GraduationCap,
@@ -117,6 +118,8 @@ export function CvEditor() {
   const [letterDownloading, setLetterDownloading] = useState<"pdf" | "docx" | null>(null);
   const [purposeSurveyOpen, setPurposeSurveyOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
+  const [passStatus, setPassStatus] = useState<PaymentStatusResult["pass"] | null>(null);
+  const [checkoutPlan, setCheckoutPlan] = useState<"cv" | "pass">("cv");
   const [forceNewCheckout, setForceNewCheckout] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
   const [importOpen, setImportOpen] = useState(false);
@@ -448,6 +451,7 @@ export function CvEditor() {
         | PaymentStatusResult
         | null;
       if (!response.ok || !data) throw new Error("Payment status unavailable");
+      if (data.pass) setPassStatus(data.pass);
       return data;
     };
     const checkPaidStatus = async () => {
@@ -489,7 +493,8 @@ export function CvEditor() {
         const data = await readStatus();
         if (!cancelled && data.paid) {
           setPdfUnlocked(true);
-          setPaymentState("paid");
+          // A CV unlocked by an active Job Search Pass was not just paid for.
+          if (!data.pass?.active) setPaymentState("paid");
         }
       } catch {
         if (!cancelled) {
@@ -711,7 +716,7 @@ export function CvEditor() {
     });
   };
 
-  const resetDraft = async () => {
+  const resetDraft = async (copyFrom?: string) => {
     if (creatingNew) return;
     const manager = saveManagerRef.current;
     if (
@@ -736,7 +741,7 @@ export function CvEditor() {
       const response = await fetch("/api/cv/new", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template: cv.template }),
+        body: JSON.stringify(copyFrom ? { copyFrom } : { template: cv.template }),
       });
       const data = (await response.json()) as {
         document?: { id: string; data: CvData; updatedAt: string };
@@ -744,6 +749,11 @@ export function CvEditor() {
       };
       if (!response.ok || !data.document) {
         throw new Error(data.error || "Could not create a new CV");
+      }
+      if (copyFrom) {
+        trackEditorEvent("cv_duplicated", data.document.id, { pass_active: Boolean(passStatus?.active) });
+        setJobDescriptionDraft("");
+        setTailoringOpen(true);
       }
 
       window.localStorage.removeItem(storageKey);
@@ -900,11 +910,11 @@ export function CvEditor() {
   };
 
   const continueFromReview = () => {
-    trackEditorEvent("checkout_opened", draftId);
-    void startCheckout(cv.email);
+    trackEditorEvent("checkout_opened", draftId, { plan: checkoutPlan });
+    void startCheckout(cv.email, checkoutPlan);
   };
 
-  const startCheckout = async (email: string) => {
+  const startCheckout = async (email: string, plan: "cv" | "pass" = "cv") => {
     if (!draftId || !loaded) {
       setCheckoutError("Your draft is still initialising. Please try again.");
       return;
@@ -912,7 +922,7 @@ export function CvEditor() {
 
     setCheckoutLoading(true);
     setCheckoutError(null);
-    trackEditorEvent("payment_started", draftId);
+    trackEditorEvent("payment_started", draftId, { plan });
 
     try {
       const saved = await saveManagerRef.current?.flush();
@@ -927,6 +937,7 @@ export function CvEditor() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           draftId,
+          plan,
           email,
           consentAccepted: true,
           forceNew: forceNewCheckout,
@@ -979,6 +990,7 @@ export function CvEditor() {
         | PaymentStatusResult
         | null;
       if (!response.ok || !data) throw new Error();
+      if (data.pass) setPassStatus(data.pass);
       if (data.paid) {
         setPdfUnlocked(true);
         setPaymentState("paid");
@@ -1162,8 +1174,25 @@ export function CvEditor() {
                   <Plus className="h-4 w-4" />
                   {creatingNew ? "Creating..." : "New CV"}
                 </button>
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.currentTarget.closest("details")?.removeAttribute("open");
+                    if (draftId) void resetDraft(draftId);
+                  }}
+                  disabled={creatingNew || !draftId}
+                  className="flex min-h-11 w-full items-center gap-3 rounded px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60"
+                >
+                  <Copy className="h-4 w-4" />
+                  Duplicate for another job
+                </button>
               </div>
             </details>
+            {passStatus?.active && (
+              <span className="order-2 col-span-2 inline-flex min-h-10 items-center justify-center gap-2 rounded-md border border-gold bg-gold-tint px-3 text-xs font-bold text-navy sm:order-none sm:col-span-1" title="Every CV you create before your Job Search Pass ends is unlocked.">
+                Job Search Pass · {passStatus.daysLeft} {passStatus.daysLeft === 1 ? "day" : "days"} left
+              </span>
+            )}
             {pdfUnlocked ? (
               <details className="relative order-3 col-span-2 sm:order-none">
                 <summary className="inline-flex min-h-12 w-full cursor-pointer list-none items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover sm:min-h-10 sm:w-auto [&::-webkit-details-marker]:hidden">
@@ -1216,6 +1245,13 @@ export function CvEditor() {
         <PurposeSurvey
           onPurpose={(purpose) => trackEditorEvent("cv_purpose_selected", draftId, { purpose })}
           onVolume={(volume) => trackEditorEvent("cv_application_volume_selected", draftId, { volume })}
+          passOfferAvailable={!passStatus?.active}
+          onPassOfferShown={() => trackEditorEvent("pass_offer_shown", draftId, { placement: "post_download" })}
+          onPassOffer={() => {
+            trackEditorEvent("pass_offer_clicked", draftId, { placement: "post_download" });
+            setCheckoutPlan("pass");
+            setReviewOpen(true);
+          }}
           onClose={(answered) => {
             if (!answered) trackEditorEvent("cv_purpose_dismissed", draftId);
             setPurposeSurveyOpen(false);
@@ -1553,6 +1589,12 @@ export function CvEditor() {
           checkoutLoading={checkoutLoading}
           onClose={() => setReviewOpen(false)}
           onContinue={continueFromReview}
+          plan={checkoutPlan}
+          passAvailable={!passStatus?.active}
+          onPlanChange={(plan) => {
+            setCheckoutPlan(plan);
+            trackEditorEvent("checkout_plan_selected", draftId, { plan });
+          }}
           onConsentAccepted={() =>
             trackEditorEvent("checkout_consent_accepted", draftId)
           }
@@ -1613,6 +1655,9 @@ function CheckoutSheet({
   onClose,
   onContinue,
   onConsentAccepted,
+  plan,
+  passAvailable,
+  onPlanChange,
 }: {
   issues: string[];
   checkoutError: string | null;
@@ -1620,7 +1665,12 @@ function CheckoutSheet({
   onClose: () => void;
   onContinue: () => void;
   onConsentAccepted: () => void;
+  plan: "cv" | "pass";
+  passAvailable: boolean;
+  onPlanChange: (plan: "cv" | "pass") => void;
 }) {
+  const selectedPlan = passAvailable ? plan : "cv";
+  const selectedPrice = selectedPlan === "pass" ? site.passPrice : site.price;
   const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
   const dialogRef = useAccessibleDialog(onClose, !checkoutLoading);
   return (
@@ -1639,16 +1689,32 @@ function CheckoutSheet({
               id="checkout-sheet-title"
               className="mt-1 font-display text-3xl font-semibold text-navy"
           >
-              Download your CV
+              {selectedPlan === "pass" ? "Get the Job Search Pass" : "Download your CV"}
           </h2>
           </div>
           <button type="button" onClick={onClose} aria-label="Close checkout" disabled={checkoutLoading} className="rounded border border-line p-2 text-muted hover:text-navy disabled:opacity-50"><X className="h-5 w-5" /></button>
         </div>
 
-        <div className="mt-5 flex items-end justify-between gap-4 border-y border-line py-4">
-          <div><p className="font-display text-4xl font-semibold text-navy">{site.price}</p><p className="mt-1 text-sm font-bold text-navy">No subscription or renewal</p><ul className="mt-2 space-y-0.5 text-xs leading-5 text-muted"><li>CV as PDF and editable Word (.docx)</li><li>Matching cover letter as PDF and Word</li><li>Edit and download again at no extra cost</li></ul></div>
-          <p className="max-w-44 text-right text-xs leading-5 text-muted">{site.priceTaxInclusive ? "Final total, including applicable tax." : "Applicable tax is calculated and shown by Dodo before payment."}</p>
-        </div>
+        <fieldset className="mt-5 space-y-3">
+          <legend className="sr-only">Choose what to buy</legend>
+          <label className={`flex cursor-pointer gap-3 rounded-lg border p-4 ${selectedPlan === "cv" ? "border-navy bg-paper" : "border-line bg-white"}`}>
+            <input type="radio" name="workcv-plan" className="mt-1 h-4 w-4 accent-navy" checked={selectedPlan === "cv"} onChange={() => onPlanChange("cv")} />
+            <span className="min-w-0 flex-1">
+              <span className="flex items-baseline justify-between gap-3"><span className="font-bold text-navy">This CV</span><span className="font-display text-2xl font-semibold text-navy">{site.price}</span></span>
+              <span className="mt-1 block text-xs leading-5 text-muted">This CV and its matching cover letter as PDF and Word. Edit and download again at no extra cost.</span>
+            </span>
+          </label>
+          {passAvailable && (
+            <label className={`flex cursor-pointer gap-3 rounded-lg border p-4 ${selectedPlan === "pass" ? "border-navy bg-paper" : "border-line bg-white"}`}>
+              <input type="radio" name="workcv-plan" className="mt-1 h-4 w-4 accent-navy" checked={selectedPlan === "pass"} onChange={() => onPlanChange("pass")} />
+              <span className="min-w-0 flex-1">
+                <span className="flex items-baseline justify-between gap-3"><span className="font-bold text-navy">Job Search Pass <span className="ml-1 rounded bg-gold-tint px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-navy">3+ applications</span></span><span className="font-display text-2xl font-semibold text-navy">{site.passPrice}</span></span>
+                <span className="mt-1 block text-xs leading-5 text-muted">Unlimited CVs and matching cover letters for {site.passDays} days. Duplicate your CV for each job. Every CV you make stays yours to edit and download.</span>
+              </span>
+            </label>
+          )}
+          <p className="text-xs font-bold text-navy">One-time payment. No subscription or renewal. <span className="font-normal text-muted">{site.priceTaxInclusive ? "Final total, including applicable tax." : "Applicable tax is calculated and shown by Dodo before payment."}</span></p>
+        </fieldset>
 
         {issues.length > 0 && (
           <div className="mt-4 rounded-md border border-gold bg-gold-tint px-3 py-2 text-xs leading-5 text-navy" role="note">
@@ -1674,7 +1740,7 @@ function CheckoutSheet({
         {checkoutError && <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">{checkoutError}</p>}
 
         <div className="mt-5 flex flex-col gap-3">
-          <button type="button" onClick={onContinue} disabled={checkoutLoading || !digitalAccessAccepted} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"><Download className="h-4 w-4" />{checkoutLoading ? "Opening secure checkout..." : `Continue to checkout · ${site.price}`}</button>
+          <button type="button" onClick={onContinue} disabled={checkoutLoading || !digitalAccessAccepted} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-55"><Download className="h-4 w-4" />{checkoutLoading ? "Opening secure checkout..." : `Continue to checkout · ${selectedPrice}`}</button>
           <a href="/samples/workcv-customer-service-cv-example.pdf" target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center justify-center text-sm font-bold text-navy underline underline-offset-4">Inspect a fictional sample PDF first</a>
           <button type="button" onClick={onClose} disabled={checkoutLoading} className="inline-flex min-h-10 items-center justify-center text-sm font-bold text-muted hover:text-navy disabled:opacity-50">Keep editing</button>
         </div>

@@ -3,6 +3,7 @@ import { createFeedbackUnsubscribeToken } from "@/lib/feedback-token";
 import { savedCvReminderEnabled } from "@/lib/reminder-policy";
 import { sendSavedCvReminderEmail } from "@/lib/saved-cv-reminder-email";
 import { site } from "@/lib/site";
+import { WORKCV_PASS_PRODUCT_ID } from "@/lib/commerce";
 
 type ReminderCandidate = {
   id: string;
@@ -71,6 +72,11 @@ export async function eligibleCandidates(limit: number) {
             AND o.amount_cents > 0
             AND COALESCE(o.is_test, FALSE) = FALSE
         )
+        -- Job Search Pass holders never receive saved-CV reminders.
+        AND NOT EXISTS (
+          SELECT 1 FROM workcv_orders pass_order
+          WHERE pass_order.user_id = d.id AND pass_order.product_id = $2
+        )
         AND (
           r.user_id IS NULL OR (
             r.status IN ('failed', 'sending')
@@ -81,7 +87,7 @@ export async function eligibleCandidates(limit: number) {
       ORDER BY d.document_updated_at DESC
       LIMIT $1
     `,
-    [limit],
+    [limit, WORKCV_PASS_PRODUCT_ID],
   );
   return result.rows.filter((candidate) => candidate.email.toLowerCase() !== "contact@workcv.co.uk");
 }
@@ -119,6 +125,10 @@ export async function claim(candidate: ReminderCandidate) {
                 AND COALESCE(o.is_test, FALSE) = FALSE
             )
             AND NOT EXISTS (
+              SELECT 1 FROM workcv_orders pass_order
+              WHERE pass_order.user_id = u.id AND pass_order.product_id = $4
+            )
+            AND NOT EXISTS (
               SELECT 1 FROM workcv_feedback_preferences p
               WHERE p.email_normalized = LOWER(u.email)
                 AND p.feedback_opted_out_at IS NOT NULL
@@ -136,7 +146,7 @@ export async function claim(candidate: ReminderCandidate) {
         AND workcv_saved_cv_reminders.last_attempt_at < NOW() - INTERVAL '30 minutes'
       RETURNING user_id
     `,
-    [candidate.id, candidate.email, candidate.document_id],
+    [candidate.id, candidate.email, candidate.document_id, WORKCV_PASS_PRODUCT_ID],
   );
   return result.rows.length > 0;
 }

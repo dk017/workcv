@@ -28,7 +28,10 @@ export default function RefundPolicyPage() {
             <p>
               WorkCV sells immediate digital access to downloads for one saved CV
               (PDF and Word) and its cover letter (PDF and Word) for{" "}
-              {site.price}. There is no subscription to cancel.
+              {site.price}, or a {site.passDays}-day Job Search Pass for{" "}
+              {site.passPrice}. Both are one-time payments; there is no
+              subscription to cancel. A full refund removes the download access
+              that the refunded purchase unlocked.
             </p>
           ),
         },

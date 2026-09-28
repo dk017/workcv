@@ -43,7 +43,7 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q06: {
     id: "Q06", ownerPath: "/pricing", anchor: "one-payment-one-saved-cv",
     question: "Does one payment cover one saved CV or every CV I create?",
-    answer: "One payment unlocks PDF and Word downloads for one saved CV and the cover letter saved with it. You can keep editing and downloading that same CV and letter without another payment. A separate new saved CV has its own payment requirement. For example, changing the wording in your existing paid CV is different from creating a second saved CV for another application.",
+    answer: `One payment unlocks PDF and Word downloads for one saved CV and the cover letter saved with it. You can keep editing and downloading that same CV and letter without another payment. A separate new saved CV has its own payment requirement. For example, changing the wording in your existing paid CV is different from creating a second saved CV for another application. If you are applying to several jobs, the ${site.passDays}-day Job Search Pass (${site.passPrice} once, never renews) unlocks every CV you create during the pass.`,
   },
   Q07: {
     id: "Q07", ownerPath: "/cv-builder-no-subscription-uk", anchor: "account-and-payment",

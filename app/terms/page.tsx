@@ -40,6 +40,10 @@ export default function TermsPage() {
                 and no automatic renewal for this product.
               </p>
               <p>
+                The Job Search Pass costs {site.passPrice} once. It is not a
+                subscription: it does not renew and no further payment is taken.
+              </p>
+              <p>
                 Checkout is provided by Dodo Payments. Your payment may be subject
                 to Dodo Payments' own checkout and payment processing terms.
               </p>
@@ -57,6 +61,21 @@ export default function TermsPage() {
               again without paying again. A separate saved CV needs its own
               payment. Keep your receipt email and contact us if payment succeeds
               but the editor does not unlock.
+            </p>
+          ),
+        },
+        {
+          title: "Job Search Pass",
+          body: (
+            <p>
+              A Job Search Pass unlocks every saved CV in your account that was
+              created before the pass ends, {site.passDays} days after payment,
+              including CVs you created before buying it. Each unlocked CV includes
+              its cover letter, both as PDF and Word. CVs created during the pass
+              stay unlocked after it ends, so you can keep editing and
+              downloading them. CVs created after the pass ends need a new
+              purchase. If a pass is fully refunded, CVs unlocked only by that pass
+              return to draft.
             </p>
           ),
         },

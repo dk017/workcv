@@ -204,10 +204,56 @@ export default function PricingPage() {
             </ul>
             <p className="mt-7 leading-7 text-muted">
               Edit and download this same saved CV and its letter again without
-              paying again. A separate new CV needs its own one-time payment.
+              paying again. A separate new CV needs its own one-time payment,
+              or use the Job Search Pass below.
             </p>
             <div className="mt-8">
               <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingCardEditor}>Start building</ButtonLink>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="job-search-pass" className="border-y border-line bg-surface py-16 md:py-20">
+        <div className="container-page grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
+          <div>
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-success">Applying for 3 or more jobs?</p>
+            <h2 className="font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
+              Job Search Pass: a tailored CV and cover letter for every application.
+            </h2>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+              Careers advisers recommend tailoring your CV to each job. The pass gives you unlimited CVs and matching
+              cover letters for {site.passDays} days, so you can duplicate your CV for every vacancy instead of sending
+              the same one everywhere.
+            </p>
+            <p className="mt-5 max-w-2xl text-sm leading-6 text-navy">
+              Subscription CV builders charge {competitorPricing.myPerfectCv.renewal} or more. Over a three-month search
+              that is £50 or more. The pass is {site.passPrice}, once.
+            </p>
+          </div>
+          <div className="rounded-[20px] border-2 border-gold bg-white p-8 shadow-soft">
+            <h3 className="font-display text-3xl font-semibold text-navy">Job Search Pass</h3>
+            <div className="mt-5 font-display text-6xl font-semibold leading-none text-navy">{site.passPrice}</div>
+            <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">once · {site.passDays} days · never renews</p>
+            <ul className="mt-6 space-y-3">
+              {[
+                `Unlimited CVs and cover letters for ${site.passDays} days`,
+                "Duplicate your CV for each job in one click",
+                "PDF and editable Word for everything",
+                "Keep every CV you make: edit and download anytime",
+                "No subscription and nothing to cancel",
+              ].map((item) => (
+                <li key={item} className="flex gap-3 text-sm font-bold text-navy">
+                  <Check className="h-5 w-5 shrink-0 text-success" />
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <p className="mt-6 text-sm leading-6 text-muted">
+              Build your first CV free, then choose the Job Search Pass at checkout.
+            </p>
+            <div className="mt-6">
+              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingPassEditor}>Start building</ButtonLink>
             </div>
           </div>
         </div>
