@@ -107,3 +107,23 @@ test("duplicate titles do not pile up (copy) suffixes", () => {
   assert.equal(duplicateTitle("Emily Thompson (copy)"), "Emily Thompson (copy)");
   assert.equal(duplicateTitle("  "), "My CV (copy)");
 });
+
+test("duplicating turns the previous employer's name into a prompt", () => {
+  const copy = prepareDuplicateCv({
+    ...sampleCv,
+    coverLetter: {
+      jobTitle: "Advisor",
+      employer: "Birch & Co. (UK)",
+      reference: "",
+      recipientName: "",
+      greeting: "hiring-manager",
+      employerAddress: "",
+      includeDate: true,
+      paragraphs: ["I want to join Birch & Co. (UK) because birch & co. (uk) values service.", "No employer here."],
+    },
+  });
+  assert.deepEqual(copy.coverLetter?.paragraphs, [
+    "I want to join [employer] because [employer] values service.",
+    "No employer here.",
+  ]);
+});

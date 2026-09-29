@@ -492,9 +492,9 @@ export function CvEditor() {
 
         const data = await readStatus();
         if (!cancelled && data.paid) {
+          // Reopening an unlocked CV: unlock quietly. "Payment confirmed" is
+          // only shown when returning from checkout.
           setPdfUnlocked(true);
-          // A CV unlocked by an active Job Search Pass was not just paid for.
-          if (!data.pass?.active) setPaymentState("paid");
         }
       } catch {
         if (!cancelled) {
@@ -947,7 +947,11 @@ export function CvEditor() {
       const data = (await response.json()) as { checkoutUrl?: string; error?: string };
 
       if (!response.ok || !data.checkoutUrl) {
-        throw new Error(data.error || "Checkout unavailable");
+        throw new Error(
+          response.status >= 500 || !data.error
+            ? "Secure checkout is temporarily unavailable. Your CV is saved; please try again in a moment."
+            : data.error,
+        );
       }
 
       window.location.href = data.checkoutUrl;
@@ -1295,11 +1299,13 @@ export function CvEditor() {
           <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 sm:w-[min(1540px,calc(100%-48px))]">
             <div>
               <p className="text-sm font-bold text-navy">
-                {readiness.ready ? "Your CV is ready to preview." : `CV readiness: ${readiness.score}%`}
+                {readiness.ready ? (pdfUnlocked ? "Your CV is unlocked." : "Your CV is ready to preview.") : `CV readiness: ${readiness.score}%`}
               </p>
               <p className="mt-1 text-xs leading-5 text-muted">
                 {readiness.ready
-                  ? `Review the pages, then unlock this CV and its cover letter as PDF and Word for ${site.price} once.`
+                  ? pdfUnlocked
+                    ? "Use Download for your CV and cover letter as PDF or Word. Edits are included at no extra cost."
+                    : `Review the pages, then unlock this CV and its cover letter as PDF and Word for ${site.price} once.`
                   : readiness.issues[0]?.message || "Continue adding your real experience."}
               </p>
             </div>
@@ -1457,8 +1463,8 @@ export function CvEditor() {
       <section className="mx-auto grid w-[min(1540px,calc(100%-32px))] gap-6 py-6 sm:w-[min(1540px,calc(100%-48px))] lg:grid-cols-[minmax(480px,0.92fr)_minmax(0,1.08fr)] xl:grid-cols-[minmax(560px,0.95fr)_minmax(0,1.15fr)]">
         <div className={`editor-form min-w-0 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
           <div className="sticky top-20 space-y-5">
-            <div className="overflow-x-auto rounded-xl border border-line bg-white p-2">
-              <div className="flex min-w-max gap-2 xl:grid xl:min-w-0 xl:grid-cols-3 2xl:grid-cols-6">
+            <div className="rounded-xl border border-line bg-white p-2">
+              <div className="grid grid-cols-3 gap-2 2xl:grid-cols-6">
                 {tabs.map((tab) => {
                   const Icon = tab.icon;
                   const active = activeTab === tab.id;
@@ -1591,6 +1597,7 @@ export function CvEditor() {
           onContinue={continueFromReview}
           plan={checkoutPlan}
           passAvailable={!passStatus?.active}
+          cvAvailable={!pdfUnlocked}
           onPlanChange={(plan) => {
             setCheckoutPlan(plan);
             trackEditorEvent("checkout_plan_selected", draftId, { plan });
@@ -1657,6 +1664,7 @@ function CheckoutSheet({
   onConsentAccepted,
   plan,
   passAvailable,
+  cvAvailable = true,
   onPlanChange,
 }: {
   issues: string[];
@@ -1667,9 +1675,10 @@ function CheckoutSheet({
   onConsentAccepted: () => void;
   plan: "cv" | "pass";
   passAvailable: boolean;
+  cvAvailable?: boolean;
   onPlanChange: (plan: "cv" | "pass") => void;
 }) {
-  const selectedPlan = passAvailable ? plan : "cv";
+  const selectedPlan = !cvAvailable ? "pass" : passAvailable ? plan : "cv";
   const selectedPrice = selectedPlan === "pass" ? site.passPrice : site.price;
   const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
   const dialogRef = useAccessibleDialog(onClose, !checkoutLoading);
@@ -1697,6 +1706,12 @@ function CheckoutSheet({
 
         <fieldset className="mt-5 space-y-3">
           <legend className="sr-only">Choose what to buy</legend>
+          {!cvAvailable && (
+            <p className="rounded-lg border border-line bg-greensoft p-3 text-xs leading-5 text-navy">
+              This CV is already unlocked and stays that way. The pass covers the new CVs you create for other jobs.
+            </p>
+          )}
+          {cvAvailable && (
           <label className={`flex cursor-pointer gap-3 rounded-lg border p-4 ${selectedPlan === "cv" ? "border-navy bg-paper" : "border-line bg-white"}`}>
             <input type="radio" name="workcv-plan" className="mt-1 h-4 w-4 accent-navy" checked={selectedPlan === "cv"} onChange={() => onPlanChange("cv")} />
             <span className="min-w-0 flex-1">
@@ -1704,6 +1719,7 @@ function CheckoutSheet({
               <span className="mt-1 block text-xs leading-5 text-muted">This CV and its matching cover letter as PDF and Word. Edit and download again at no extra cost.</span>
             </span>
           </label>
+          )}
           {passAvailable && (
             <label className={`flex cursor-pointer gap-3 rounded-lg border p-4 ${selectedPlan === "pass" ? "border-navy bg-paper" : "border-line bg-white"}`}>
               <input type="radio" name="workcv-plan" className="mt-1 h-4 w-4 accent-navy" checked={selectedPlan === "pass"} onChange={() => onPlanChange("pass")} />

@@ -68,7 +68,8 @@ export function PurposeSurvey({
               <p id="purpose-survey-title" className="text-sm font-bold text-navy">Applying for more than a few jobs?</p>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">
                 Careers advisers recommend tailoring your CV to each role. The Job Search Pass lets you duplicate this CV for
-                every application: unlimited CVs and cover letters for {site.passDays} days, {site.passPrice} once. It never renews.
+                every application: unlimited CVs and cover letters for {site.passDays} days, {site.passPrice} once. It never renews,
+                and this CV stays unlocked either way.
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button type="button" onClick={() => { onPassOffer?.(); onClose(true); }} className="min-h-10 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover">See the Job Search Pass</button>
