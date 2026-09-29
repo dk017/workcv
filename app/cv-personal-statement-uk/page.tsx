@@ -29,12 +29,12 @@ const publishedDateIso = "2026-06-13";
 const advertUrl = "https://www.jobs.nhs.uk/candidate/jobadvert/C9301-26-0052";
 
 export const metadata: Metadata = {
-  title: "CV Personal Statement UK: 12 Examples + Walkthrough",
+  title: "CV Personal Statement UK: 20 Examples + Walkthrough",
   description:
-    "Write a stronger UK CV personal statement with 12 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
+    "Write a stronger UK CV personal statement with 20 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
   alternates: { canonical: pagePath },
   openGraph: {
-    title: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+    title: "CV Personal Statement UK: 20 Examples + Job-Advert Walkthrough",
     description:
       "See how to turn a real UK job advert and your evidence into a focused CV personal statement.",
     url: pagePath,
@@ -85,7 +85,7 @@ const jsonLd = {
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+  headline: "CV Personal Statement UK: 20 Examples + Job-Advert Walkthrough",
   description: metadata.description,
   datePublished: publishedDateIso,
   dateModified: reviewDateIso,
@@ -322,6 +322,97 @@ const examples: Example[] = [
       "Links the example to operational value.",
     ],
   },
+  {
+    title: "Registered nurse",
+    context: "Hospital ward",
+    statement:
+      "NMC-registered adult nurse with two years' experience on a busy medical ward, caring for up to eight patients per shift. Confident with patient assessment, medicines administration and NEWS2 observations, and quick to escalate a deteriorating patient using SBAR. Seeking a band 5 surgical post where safe, compassionate care and clear handovers matter.",
+    annotations: [
+      "Registration and setting come first.",
+      "Names precise clinical skills, not adjectives.",
+      "States the band and setting being targeted.",
+    ],
+    relatedHref: "/cv-template-nurse-uk",
+  },
+  {
+    title: "Secondary teacher",
+    context: "Schools",
+    statement:
+      "Qualified secondary English teacher with QTS and two years' experience teaching Key Stage 3 and GCSE classes of mixed attainment. Plans sequenced lessons, uses regular low-stakes assessment to adapt teaching, and works closely with the SENCO to support pupils with additional needs. Looking for a department where reading for pleasure and consistent routines are priorities.",
+    annotations: [
+      "QTS and key stages stated up front.",
+      "Shows teaching practice through methods, not slogans.",
+      "Ties the target to something specific about the school.",
+    ],
+    relatedHref: "/cv-template-teacher-uk",
+  },
+  {
+    title: "Student (part-time job)",
+    context: "Retail or hospitality",
+    statement:
+      "Second-year business student looking for part-time retail work alongside my degree. Experienced in serving customers as a volunteer at a community bookshop and in organising events for my university society. Reliable, comfortable handling cash and available for up to 16 hours a week, including weekends.",
+    annotations: [
+      "Honest about being a student.",
+      "Uses volunteering and societies as evidence.",
+      "Gives availability, which part-time employers need.",
+    ],
+    relatedHref: "/student-cv-template",
+  },
+  {
+    title: "Healthcare assistant",
+    context: "NHS or care setting",
+    statement:
+      "Healthcare assistant with 18 months' experience supporting patients with personal care, observations and mobility on an elderly care ward. Completed the Care Certificate and trained in basic life support and infection prevention. Seeking a healthcare assistant role where kindness, accurate observations and good teamwork with nurses make a difference.",
+    annotations: [
+      "Lists training actually completed.",
+      "Keeps within the scope of the role.",
+      "Links personal qualities to real tasks.",
+    ],
+  },
+  {
+    title: "Receptionist",
+    context: "Front of house",
+    statement:
+      "Friendly and organised receptionist with two years' experience running the front desk at a busy dental practice. Manages appointment diaries, telephone and email enquiries and patient check-in on practice software, while keeping personal information confidential. Seeking a front-of-house role where a calm, welcoming first impression matters.",
+    annotations: [
+      "Describes the desk tasks employers expect.",
+      "Mentions confidentiality, often essential.",
+      "Uses personality words only with evidence.",
+    ],
+  },
+  {
+    title: "IT support technician",
+    context: "Service desk",
+    statement:
+      "IT support technician with three years' first and second line experience in a 300-user organisation. Resolves hardware, software and account issues through a ticketing system, manages Microsoft 365 and Active Directory accounts, and writes clear guides that reduce repeat calls. Looking to join a service desk that values patient explanation as much as technical fixes.",
+    annotations: [
+      "Gives scale and support level.",
+      "Names systems a screener will search for.",
+      "Shows impact without inventing numbers.",
+    ],
+  },
+  {
+    title: "Accounts assistant",
+    context: "Finance",
+    statement:
+      "Accounts assistant studying for AAT Level 3, with two years' experience processing supplier invoices, matching purchase orders and chasing missing paperwork before month end. Uses Sage and Excel daily, including lookups and pivot tables for spend reports. Seeking a finance role where accuracy and steady progress towards qualification are supported.",
+    annotations: [
+      "Shows the qualification in progress honestly.",
+      "Names specific finance tasks and tools.",
+      "States a realistic next step.",
+    ],
+  },
+  {
+    title: "Hospitality team member",
+    context: "Restaurants and hotels",
+    statement:
+      "Hospitality team member with two years' experience serving customers in a busy café and hotel restaurant. Comfortable taking orders, handling payments and keeping service moving during peak times, with Level 2 Food Hygiene. Looking for a front-of-house role where good service and teamwork keep guests coming back.",
+    annotations: [
+      "Covers the core front-of-house duties.",
+      "Includes the certificate employers ask for.",
+      "Short and easy to scan.",
+    ],
+  },
 ];
 
 const beforeAfter = [
@@ -387,7 +478,7 @@ export default function CvPersonalStatementUkPage() {
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
                 A UK CV personal statement should not be a life story. It should
                 quickly show the role you want, the evidence you bring and why
-                the rest of the CV is worth reading. This guide includes 12
+                the rest of the CV is worth reading. This guide includes 20
                 examples and a real advert-to-statement walkthrough.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -412,7 +503,7 @@ export default function CvPersonalStatementUkPage() {
                 tools, settings, scale and genuine outcomes instead.
               </p>
               <p className="mt-4 text-sm font-bold leading-6 text-navy">
-                12 examples · 1 real advert walkthrough · no invented claims
+                20 examples · 1 real advert walkthrough · no invented claims
               </p>
             </div>
           </div>
@@ -585,7 +676,7 @@ export default function CvPersonalStatementUkPage() {
 
         <section id="examples" className="scroll-mt-24 bg-surface py-24">
           <div className="container-page">
-            <SectionLabel>12 examples</SectionLabel>
+            <SectionLabel>20 examples</SectionLabel>
             <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
               UK CV personal statement examples with evidence built in.
             </h2>

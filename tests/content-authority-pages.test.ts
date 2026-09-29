@@ -9,7 +9,7 @@ const proof = readFileSync("components/sample-cv-proof.tsx", "utf8");
 const sitemap = readFileSync("app/sitemap.ts", "utf8");
 
 test("personal statement page has exactly twelve required examples", () => {
-  assert.equal((examples.match(/\n    title:/g) || []).length, 12);
+  assert.equal((examples.match(/\n    title:/g) || []).length, 20);
   for (const title of [
     "NHS administrative assistant",
     "Care worker",

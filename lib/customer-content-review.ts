@@ -10,7 +10,7 @@ export const customerContentReview = {
   "/canva-cv-alternative-uk": "2026-09-23",
   "/cv-word-or-pdf-uk": "2026-09-23",
   "/shorten-cv-to-two-pages": "2026-09-23",
-  "/cv-personal-statement-uk": "2026-09-23",
+  "/cv-personal-statement-uk": "2026-09-29",
   "/cv-no-experience-uk": "2026-09-23",
   "/tools/first-job-cv-wizard-uk": "2026-09-23",
   "/return-to-work-cv-uk": "2026-09-23",
