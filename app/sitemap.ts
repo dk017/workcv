@@ -48,6 +48,7 @@ const routes = [
   { path: "/tools/blank-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/tools/cv-template-word-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/about", priority: 0.6, changeFrequency: "monthly", lastModified: "2026-09-29" },
+  { path: "/how-long-should-a-cv-be-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-29" },
   { path: "/cover-letter-examples-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-26" },
   { path: "/tools/cover-letter-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/redundancy-pay-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-30" },

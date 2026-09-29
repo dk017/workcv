@@ -40,7 +40,7 @@ export default function ShortenCvGuide() {
         ["Relevant qualifications and professional credentials", "Unused template prompts and generic interests with no connection to the role"],
       ]} />
       <p>Preview again after every group of edits. Check whether a heading has been stranded at the bottom of a page, whether the final line wraps unnecessarily and whether a job is split awkwardly. Fix the wording or section spacing before shrinking the font.</p>
-      <p>Use readable body text and consistent margins. If the document still needs more room, reassess relevance rather than squeezing every line. The <Link className="underline" href="/tools/cv-word-count-checker">word-count checker</Link> can measure the text, while the final PDF or Word preview reveals the actual layout.</p>
+      <p>Use readable body text and consistent margins. If the document still needs more room, reassess relevance rather than squeezing every line. See <Link className="underline" href="/how-long-should-a-cv-be-uk">how long a UK CV should be</Link> for measured words per page. The <Link className="underline" href="/tools/cv-word-count-checker">word-count checker</Link> can measure the text, while the final PDF or Word preview reveals the actual layout.</p>
     </GuideSection>
     <GuideSection title="Questions about cutting a CV">
       <p><strong>Can I remove older jobs?</strong> You can give older unrelated work less detail, but do not present an incomplete history as complete when the employer explicitly asks for every role. A brief dated entry may be sufficient.</p>

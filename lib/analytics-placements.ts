@@ -65,6 +65,8 @@ export const analyticsPlacements = {
   coverLetterExamplesInline: "cover_letter_examples_inline",
   coverLetterExamplesTemplate: "cover_letter_examples_template",
   coverLetterExamplesFinal: "cover_letter_examples_final",
+  cvLengthGuideEditor: "cv_length_guide_editor",
+  cvLengthGuideShorten: "cv_length_guide_shorten",
   atsAssessmentHandoff: "ats_assessment_handoff",
   atsFinal: "ats_checker_final",
   salaryEditor: "salary_checker_editor",
