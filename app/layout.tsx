@@ -7,7 +7,7 @@ import { Footer } from "@/components/marketing";
 import { AttributionCapture } from "@/components/attribution-capture";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
 import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
-import { site } from "@/lib/site";
+import { site, founder } from "@/lib/site";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -71,6 +71,8 @@ const brandSchema = {
         "@type": "ImageObject",
         url: `${site.url}/opengraph-image`,
       },
+      founder: { "@type": "Person", name: founder.name },
+      email: "contact@workcv.co.uk",
     },
     {
       "@type": "WebSite",

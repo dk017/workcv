@@ -57,6 +57,7 @@ const pages: Record<string, { name: string; parent?: keyof typeof sections }> = 
   "/how-to-write-a-cv-uk": { name: "How to write a CV" },
   "/return-to-work-cv-uk": { name: "Return to work CV" },
   "/right-to-work-cv-uk": { name: "Right to work on a CV" },
+  "/about": { name: "About" },
   "/contact": { name: "Contact" },
   "/privacy": { name: "Privacy policy" },
   "/terms": { name: "Terms of use" },

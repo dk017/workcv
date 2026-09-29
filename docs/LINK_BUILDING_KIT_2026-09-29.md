@@ -6,7 +6,7 @@ Current facts to use everywhere (update if prices change):
 - One CV + matching cover letter, PDF and Word: **£7.99 once**
 - Job Search Pass: unlimited CVs and cover letters for 90 days, **£24.99 once**, never renews
 - Build and preview free; email-code login; no subscription or automatic renewal
-- Founder: DK (independent founder, based in India, building for UK job seekers)
+- Founder: Dhineshkumar R (independent founder, based in India, building for UK job seekers). About page: https://workcv.co.uk/about
 
 ## 1. SaaSHub listing correction
 
@@ -26,7 +26,7 @@ Launch from your own maker account. Tuesday–Thursday launches get the most att
 - **Links:** https://workcv.co.uk/ (main), https://workcv.co.uk/pricing
 - **Gallery** (in `public/directory-assets/` and the Dodo images): `workcv-launch-card-1270x760.png`, `workcv-home-desktop-1280x720.png`, `workcv-templates-desktop-1280x720.png`, `workcv-pricing-desktop-1280x720.png`, `workcv-home-mobile-390x844.png`, plus the Job Search Pass product image.
 - **Maker's first comment:**
-  > Hi Product Hunt, I'm DK, the solo maker of WorkCV.
+  > Hi Product Hunt, I'm Dhineshkumar, the solo maker of WorkCV.
   >
   > I built it after seeing how many UK job seekers pay £1.95–£2.95 for a CV builder "trial" and then get charged £16.95–£19.95 every four weeks. WorkCV does one job: a clean UK-format CV (no photo or date of birth, UK conventions) plus a matching cover letter, which you can preview free and download as PDF and Word for £7.99, once.
   >
@@ -62,7 +62,7 @@ Before emailing, read the article and note one specific, accurate point where Wo
 > If it's useful, I'm happy to set up free access so you can test it properly before deciding anything. There's no expectation of a mention or a link, and I'm not offering payment.
 >
 > Thanks for your time,
-> DK, WorkCV · https://workcv.co.uk
+> Dhineshkumar R, WorkCV · https://workcv.co.uk
 
 Track each one: date sent, article, response, and whether a mention went live. Wait two weeks before one polite follow-up; stop after that.
 

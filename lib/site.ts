@@ -19,6 +19,12 @@ export const site = {
     "A clear, professional UK CV—ready when you are.",
 };
 
+export const founder = {
+  name: "Dhineshkumar R",
+  role: "Founder",
+  location: "India",
+} as const;
+
 export const commercialRoutes = {
   moneyPage: "/cv-builder-no-subscription-uk",
   pricing: "/pricing",
