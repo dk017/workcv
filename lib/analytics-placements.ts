@@ -35,6 +35,7 @@ export const analyticsPlacements = {
   homePricingProof: "home_pricing_proof",
   homeTemplates: "home_templates_transition",
   homeFinal: "home_final",
+  homeDetailsEditor: "home_details_editor",
   pricingHeroEditor: "pricing_hero_editor",
   pricingHeroCompare: "pricing_hero_compare",
   pricingCardEditor: "pricing_card_editor",

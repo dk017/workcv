@@ -15,6 +15,12 @@ import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { TrackedLink } from "@/components/tracked-link";
+import {
+  EvidenceContrastSection,
+  FounderNote,
+  ForgottenDetailsSection,
+  GuidanceQuotesSection,
+} from "@/components/cv-evidence";
 
 const startHref = buildLoginHref("/editor");
 
@@ -99,6 +105,8 @@ export default function HomePage() {
       </section>
 
       <TrustStrip />
+      <EvidenceContrastSection />
+      <ForgottenDetailsSection ctaHref={startHref} trackingLabel={analyticsPlacements.homeDetailsEditor} />
       <section aria-labelledby="starting-point-heading" className="border-b border-line bg-surface py-16">
         <div className="container-page">
           <SectionLabel>Your starting point</SectionLabel>
@@ -201,6 +209,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <GuidanceQuotesSection />
 
       <section className="bg-paper py-24">
         <div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr] lg:items-center">
@@ -317,6 +327,7 @@ export default function HomePage() {
         </div>
       </section>
 
+      <FounderNote />
       <FaqSection faqs={homepageFaqs} title="Common questions before you start." />
       <FinalCta
         heading="Your next application deserves a CV that feels ready."

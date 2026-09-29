@@ -10,7 +10,9 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
+import { EvidenceContrastSection } from "@/components/cv-evidence";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import type { EvidenceRow } from "@/lib/cv-evidence";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
@@ -90,27 +92,27 @@ const exampleRules = [
   },
 ];
 
-const weakStrong = [
-  [
-    "Customer service",
-    "Friendly person with excellent communication skills.",
-    "Handled telephone, email and in-person enquiries, resolved routine complaints and updated CRM records accurately.",
-  ],
-  [
-    "Engineering",
-    "Worked on engineering projects.",
-    "Updated CAD drawings, documented test results and worked with production colleagues to investigate recurring defects.",
-  ],
-  [
-    "Driving",
-    "Good driver and reliable worker.",
-    "Completed multi-drop routes, recorded proof of delivery and reported vehicle defects before scheduled shifts.",
-  ],
-  [
-    "Graduate",
-    "Recent graduate looking for an opportunity.",
-    "Business graduate with placement, Excel analysis and customer-research project experience relevant to entry-level analyst roles.",
-  ],
+const weakStrong: EvidenceRow[] = [
+  {
+    role: "Customer service",
+    safe: "Friendly person with excellent communication skills.",
+    specific: "Handled telephone, email and in-person enquiries, resolved routine complaints and updated CRM records accurately.",
+  },
+  {
+    role: "Engineering",
+    safe: "Worked on engineering projects.",
+    specific: "Updated CAD drawings, documented test results and worked with production colleagues to investigate recurring defects.",
+  },
+  {
+    role: "Driving",
+    safe: "Good driver and reliable worker.",
+    specific: "Completed multi-drop routes, recorded proof of delivery and reported vehicle defects before scheduled shifts.",
+  },
+  {
+    role: "Graduate",
+    safe: "Recent graduate looking for an opportunity.",
+    specific: "Business graduate with placement, Excel analysis and customer-research project experience relevant to entry-level analyst roles.",
+  },
 ];
 
 const sourceNotes = [
@@ -262,35 +264,7 @@ export default function CvExamplesUkPage() {
         </div>
       </section>
 
-      <section className="bg-surface py-24">
-        <div className="container-page">
-          <SectionLabel>Example wording</SectionLabel>
-          <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
-            Move from vague claims to evidence.
-          </h2>
-          <div className="mt-10 overflow-hidden rounded-xl border border-line bg-white">
-            <div className="hidden grid-cols-[160px_1fr_1fr] gap-5 bg-navy px-6 py-4 text-sm font-bold text-white md:grid">
-              <span>Role</span>
-              <span>Too vague</span>
-              <span>Stronger direction</span>
-            </div>
-            {weakStrong.map(([role, weak, strong]) => (
-              <div
-                key={role}
-                className="grid gap-4 border-t border-line px-6 py-5 first:border-t-0 md:grid-cols-[160px_1fr_1fr] md:gap-5"
-              >
-                <h3 className="font-display text-xl font-semibold text-navy">{role}</h3>
-                <p className="text-sm leading-7 text-muted">{weak}</p>
-                <p className="text-sm leading-7 text-ink">{strong}</p>
-              </div>
-            ))}
-          </div>
-          <p className="mt-5 max-w-3xl text-sm leading-7 text-muted">
-            These are writing directions, not claims to copy. Replace every
-            detail with facts you can explain in an interview.
-          </p>
-        </div>
-      </section>
+      <EvidenceContrastSection rows={weakStrong} label="Example wording" heading="Move from vague claims to evidence." />
 
       <section className="bg-paper py-24">
         <div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
