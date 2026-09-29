@@ -80,6 +80,7 @@ const config: EarlyCareerPageConfig = {
     { question: "How long should a school leaver CV be?", answer: "A clear one-page CV is often enough. Use a second page only when you have relevant work experience, qualifications, projects or responsibilities that genuinely help the application." },
   ],
   relatedLinks: [
+    ["Apprenticeship cover letter example", "/cover-letter-examples-uk#apprenticeship"],
     ["Student CV template", "/student-cv-template"],
     ["CV with no experience", "/cv-no-experience-uk"],
     ["Warehouse CV template", "/cv-template-warehouse-uk"],

@@ -162,6 +162,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Delivery driver cover letter example", "/cover-letter-examples-uk#delivery-driver"],
   ["Professional CV builder", "/cv-builder-no-subscription-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Warehouse CV template", "/cv-template-warehouse-uk"],

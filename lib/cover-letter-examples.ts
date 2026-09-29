@@ -12,11 +12,13 @@ export type CoverLetterExample = {
   signOff: "Yours sincerely," | "Yours faithfully,";
   name: string;
   whyItWorks: string[];
+  cvHref?: string;
 };
 
 export const coverLetterExamples: CoverLetterExample[] = [
   {
     slug: "customer-service",
+    cvHref: "/cv-template-customer-service-uk",
     role: "Customer service advisor",
     searchLabel: "customer service cover letter example",
     context: "Priya has two years in a busy supermarket and is applying for a contact centre role at an energy supplier.",
@@ -57,6 +59,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "teacher",
+    cvHref: "/cv-template-teacher-uk",
     role: "Primary school teacher",
     searchLabel: "teacher cover letter example",
     context: "Hannah is an early career teacher applying for a Year 4 post at another primary school.",
@@ -77,6 +80,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "care-worker",
+    cvHref: "/cv-template-care-worker-uk",
     role: "Care worker",
     searchLabel: "care worker cover letter example",
     context: "Grace cared for a family member for three years and is applying for her first paid care role.",
@@ -97,6 +101,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "internship",
+    cvHref: "/cv-template-graduate-uk",
     role: "Marketing internship",
     searchLabel: "internship cover letter example",
     context: "Daniel is a second-year business student applying for a summer marketing internship.",
@@ -117,6 +122,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "graduate-engineer",
+    cvHref: "/cv-template-engineer-uk",
     role: "Graduate engineer",
     searchLabel: "engineering cover letter example",
     context: "Aisha is finishing a mechanical engineering degree and applying for a graduate scheme.",
@@ -177,6 +183,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "apprenticeship",
+    cvHref: "/school-leaver-cv-example",
     role: "Apprenticeship",
     searchLabel: "apprenticeship cover letter example",
     context: "Josh is leaving college and applying for an electrical apprenticeship.",
@@ -197,6 +204,7 @@ export const coverLetterExamples: CoverLetterExample[] = [
   },
   {
     slug: "part-time-student",
+    cvHref: "/student-cv-template",
     role: "Student part-time job",
     searchLabel: "student cover letter example",
     context: "Chloe is a university student applying for a part-time library assistant job on campus.",
@@ -213,6 +221,69 @@ export const coverLetterExamples: CoverLetterExample[] = [
       "Addresses a team when no individual is named, then signs off faithfully.",
       "Uses volunteering as relevant customer-facing evidence.",
       "States hours and availability, which part-time employers need first.",
+    ],
+  },
+  {
+    slug: "nurse",
+    role: "Registered nurse",
+    searchLabel: "nurse cover letter example",
+    cvHref: "/cv-template-nurse-uk",
+    context: "Amelia is an NMC-registered adult nurse applying for a band 5 post on a surgical ward at another NHS trust.",
+    greeting: "Dear Ms Okoro,",
+    paragraphs: [
+      "I am applying for the Band 5 Staff Nurse post on the surgical assessment unit at Riverside NHS Foundation Trust. I have been a registered adult nurse for two years, and your unit's focus on safe, timely assessment is where I want to develop my practice.",
+      "On my current medical ward I care for a caseload of up to eight patients per shift, completing assessments, administering medicines and recording NEWS2 observations. When a patient's score rose during a night shift, I escalated promptly using SBAR and supported the doctor's review.",
+      "I work closely with healthcare assistants, physiotherapists and discharge coordinators, and I have mentored two student nurses on placement. I would bring the same calm teamwork and careful documentation to your unit.",
+      "Thank you for considering my application. I would welcome the opportunity to discuss the post and to visit the unit before interview.",
+    ],
+    signOff: "Yours sincerely,",
+    name: "Amelia Roberts",
+    whyItWorks: [
+      "States registration, band and setting in the first sentence, which NHS shortlisting looks for.",
+      "Uses one specific clinical example (escalation with SBAR) instead of general claims.",
+      "Shows teamwork and mentoring, both common person-specification criteria.",
+    ],
+  },
+  {
+    slug: "delivery-driver",
+    role: "Delivery driver",
+    searchLabel: "delivery driver cover letter example",
+    cvHref: "/cv-template-driver-uk",
+    context: "James has two years of multi-drop experience and is applying to a regional parcel company.",
+    greeting: "Dear Hiring Manager,",
+    paragraphs: [
+      "I am applying for the Multi-drop Delivery Driver role at Northway Parcels in Sheffield, advertised on your careers page. I hold a full UK driving licence with no points and have two years of experience on residential and business routes.",
+      "At Yorkshire Home Deliveries I complete routes of up to 110 drops a day, using a handheld scanner to record proof of delivery. I plan my loading order before leaving the depot so that I can keep to delivery windows, and I let customers know promptly if a delay is likely.",
+      "I carry out daily vehicle checks, report defects before starting a shift and follow safe manual handling procedures for larger items. I am happy to work early starts, weekends and peak-season overtime.",
+      "Thank you for considering my application. I would be glad to attend an interview or a driving assessment at short notice.",
+    ],
+    signOff: "Yours faithfully,",
+    name: "James Wilson",
+    whyItWorks: [
+      "Licence status comes first, because most driving adverts screen on it.",
+      "Gives concrete scale (drops per day) and the habits behind reliable delivery.",
+      "Mentions vehicle checks and availability, which employers need to know early.",
+    ],
+  },
+  {
+    slug: "warehouse-operative",
+    role: "Warehouse operative",
+    searchLabel: "warehouse cover letter example",
+    cvHref: "/cv-template-warehouse-uk",
+    context: "Callum works in a fulfilment centre and is applying for a warehouse operative role closer to home.",
+    greeting: "Dear Sir or Madam,",
+    paragraphs: [
+      "I would like to apply for the Warehouse Operative position at Midshire Distribution in Leicester. I have two years of experience in goods-in, picking and dispatch, and your site's day-shift pattern would suit me well.",
+      "At Midlands Fulfilment Centre I pick and pack orders using a handheld scanner, check goods in against delivery notes and help with weekly stock counts. I keep to pick-rate targets while double-checking labels, because a wrong item means a return and an unhappy customer.",
+      "I follow safe manual handling and site safety rules, and I am used to working as part of a team during busy periods. I am currently working towards my counterbalance forklift licence.",
+      "Thank you for considering my application. I am available for interview and can start with one week's notice.",
+    ],
+    signOff: "Yours faithfully,",
+    name: "Callum Patel",
+    whyItWorks: [
+      "Names the exact tasks warehouse adverts list: goods-in, picking, dispatch and stock counts.",
+      "Shows accuracy and speed together, with a reason why accuracy matters.",
+      "States safety habits, training in progress and notice period honestly.",
     ],
   },
 ];

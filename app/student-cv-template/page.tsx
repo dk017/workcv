@@ -80,6 +80,7 @@ const config: EarlyCareerPageConfig = {
     { question: "How long should a student CV be?", answer: "One complete page often works, but two readable pages are acceptable when you have relevant placements, projects or employment. Do not add filler to reach a target length." },
   ],
   relatedLinks: [
+    ["Student cover letter example", "/cover-letter-examples-uk#part-time-student"],
     ["Graduate CV template", "/cv-template-graduate-uk"],
     ["CV with no experience", "/cv-no-experience-uk"],
     ["School leaver CV example", "/school-leaver-cv-example"],

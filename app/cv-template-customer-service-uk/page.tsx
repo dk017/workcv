@@ -197,6 +197,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Customer service cover letter example", "/cover-letter-examples-uk#customer-service"],
   ["Customer service personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],

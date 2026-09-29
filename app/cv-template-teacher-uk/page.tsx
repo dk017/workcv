@@ -179,6 +179,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Teacher cover letter example", "/cover-letter-examples-uk#teacher"],
   ["Career change CV", "/career-change-cv-uk"],
   ["Return to work CV", "/return-to-work-cv-uk"],
   ["CV personal statement UK", "/cv-personal-statement-uk"],

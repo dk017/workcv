@@ -180,6 +180,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Graduate cover letter example", "/cover-letter-examples-uk#internship"],
   ["Student CV template", "/student-cv-template"],
   ["CV no experience UK", "/cv-no-experience-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],

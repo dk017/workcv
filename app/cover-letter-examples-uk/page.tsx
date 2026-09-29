@@ -9,15 +9,15 @@ import { coverLetterExamples, exampleWordCount } from "@/lib/cover-letter-exampl
 import { site } from "@/lib/site";
 
 const path = "/cover-letter-examples-uk";
-const reviewed = "26 September 2026";
+const reviewed = "29 September 2026";
 
 export const metadata: Metadata = {
-  title: "Cover Letter Examples UK: 10 Samples by Role (2026)",
+  title: "Cover Letter Examples UK: 13 Samples by Role (2026)",
   description:
-    "10 UK cover letter examples for customer service, retail, teaching, care, internships, engineering, law, finance, apprenticeships and student jobs, with notes on why each works.",
+    "13 UK cover letter examples for customer service, retail, teaching, care, nursing, driving, warehouse, internships, engineering, law, finance, apprenticeships and student jobs, with notes on why each works.",
   alternates: { canonical: path },
   openGraph: {
-    title: "Cover Letter Examples UK: 10 Samples by Role",
+    title: "Cover Letter Examples UK: 13 Samples by Role",
     description: "Realistic UK cover letter examples by role, with the correct greeting, sign-off and structure.",
     url: path,
   },
@@ -50,10 +50,10 @@ const schemas = [
   {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: "Cover Letter Examples UK: 10 Samples by Role",
+    headline: "Cover Letter Examples UK: 13 Samples by Role",
     description: metadata.description,
     datePublished: "2026-09-26",
-    dateModified: "2026-09-26",
+    dateModified: "2026-09-29",
     author: { "@type": "Organization", name: "WorkCV Editorial Team", url: site.url },
     publisher: { "@type": "Organization", name: "WorkCV", url: site.url },
     mainEntityOfPage: `${site.url}${path}`,
@@ -89,7 +89,7 @@ export default function CoverLetterExamplesPage() {
           <div className="max-w-4xl">
             <SectionLabel>UK cover letter examples</SectionLabel>
             <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">
-              Cover letter examples UK: 10 samples by role.
+              Cover letter examples UK: 13 samples by role.
             </h1>
             <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
               Realistic UK cover letters for common jobs, from customer service and retail to teaching, law and
@@ -97,7 +97,7 @@ export default function CoverLetterExamplesPage() {
               reasoning to your own application.
             </p>
             <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
-              <span className="flex items-center gap-2"><Mail className="h-5 w-5 text-gold" />10 role examples</span>
+              <span className="flex items-center gap-2"><Mail className="h-5 w-5 text-gold" />13 role examples</span>
               <span className="flex items-center gap-2"><CheckCircle2 className="h-5 w-5 text-success" />UK greeting and sign-off</span>
               <span className="flex items-center gap-2"><ShieldCheck className="h-5 w-5 text-[#63788c]" />Reviewed {reviewed}</span>
             </div>
@@ -163,6 +163,11 @@ export default function CoverLetterExamplesPage() {
                     <li key={point} className="flex gap-2"><CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-success" />{point}</li>
                   ))}
                 </ul>
+                {example.cvHref ? (
+                  <Link href={example.cvHref} className="mt-4 inline-block text-sm font-bold text-navy underline underline-offset-4">
+                    See the matching CV example
+                  </Link>
+                ) : null}
               </div>
               {index % 3 === 0 && (
                 <div className="rounded-lg border border-gold bg-gold-tint p-5">

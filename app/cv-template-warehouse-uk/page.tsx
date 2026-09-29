@@ -179,6 +179,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Warehouse cover letter example", "/cover-letter-examples-uk#warehouse-operative"],
   ["Warehouse personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],

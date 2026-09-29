@@ -21,5 +21,5 @@ test("examples are complete, one-page letters without placeholders", () => {
     assert.ok(!/\[[^\]]+\]/.test(example.paragraphs.join(" ")), `${example.slug} has a placeholder`);
     assert.ok(example.whyItWorks.length >= 2, example.slug);
   }
-  assert.equal(coverLetterExamples.length, 10);
+  assert.equal(coverLetterExamples.length, 13);
 });
