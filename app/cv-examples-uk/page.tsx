@@ -29,33 +29,6 @@ export const metadata: Metadata = {
   },
 };
 
-const examples = [
-  {
-    title: "Customer service CV example",
-    href: "/cv-template-customer-service-uk",
-    role: "customer-service" as const,
-    body: "Best for adviser, assistant, contact-centre and support roles where complaint handling, CRM and calm communication matter.",
-  },
-  {
-    title: "Engineer CV example",
-    href: "/cv-template-engineer-uk",
-    role: "engineer" as const,
-    body: "Best for technical applicants who need to show discipline fit, tools, projects, safety and engineering judgement.",
-  },
-  {
-    title: "Driver CV example",
-    href: "/cv-template-driver-uk",
-    role: "driver" as const,
-    body: "Best for delivery, van, courier and transport roles where licence, route reliability and records matter.",
-  },
-  {
-    title: "Nurse CV example",
-    href: "/cv-template-nurse-uk",
-    role: "nurse" as const,
-    body: "Best for nursing applicants who need to show NMC status, safe practice, clinical evidence and setting fit.",
-  },
-];
-
 type GalleryItem = {
   role: "general" | "customer-service" | "nurse" | "teacher" | "care-worker" | "engineer" | "driver" | "warehouse" | "graduate" | "student" | "school-leaver";
   title: string;
@@ -171,63 +144,58 @@ export default function CvExamplesUkPage() {
           }),
         }}
       />
-      <section className="quiet-grid bg-paper py-20 md:py-28">
-        <div className="container-page grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
+      <section className="quiet-grid border-b border-line bg-paper pb-14 pt-14 md:pb-16 md:pt-20">
+        <div className="container-page grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
-            <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              CV examples UK
-            </p>
-            <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
+            <p className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-navy">CV examples UK</p>
+            <h1 className="max-w-2xl font-display text-4xl font-semibold leading-[1.08] text-navy md:text-6xl">
               UK CV examples you can open and edit free.
             </h1>
-            <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Eleven complete UK CV examples by job and career stage, each with
-              notes on why it works. Open the closest one in the editor, replace
-              the sample wording with your own evidence and preview it free.
+            <p className="mt-6 max-w-xl text-lg leading-8 text-muted">
+              Eleven complete UK CV examples by job and career stage, each with notes on why it works. Open the closest
+              one in the editor and replace the sample wording with your own evidence.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor?template=classic&roleTemplate=general&new=1">
-                Edit a CV example
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <ButtonLink href="#examples">Browse all 11 examples</ButtonLink>
+              <ButtonLink href="/editor?template=classic&roleTemplate=general&new=1" variant="secondary">
+                Edit an example free
               </ButtonLink>
-              <ButtonLink href="#examples" variant="secondary">Browse examples</ButtonLink>
             </div>
-            <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
-              <Link href="/how-to-write-a-cv-uk" className="underline underline-offset-4">
-                Read the UK CV writing guide
-              </Link>
-              <Link href="/how-long-should-a-cv-be-uk" className="underline underline-offset-4">
-                How long should a CV be?
-              </Link>
-              <Link
-                href="/cv-builder-no-subscription-uk"
-                className="underline underline-offset-4"
-              >
-                How the no-subscription builder works
-              </Link>
-            </div>
+            <p className="mt-6 text-sm text-muted">
+              Related guides:{" "}
+              <Link href="/how-to-write-a-cv-uk" className="font-bold text-navy hover:underline">How to write a CV</Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/how-long-should-a-cv-be-uk" className="font-bold text-navy hover:underline">How long should a CV be?</Link>
+              <span aria-hidden="true"> · </span>
+              <Link href="/cover-letter-examples-uk" className="font-bold text-navy hover:underline">Cover letter examples</Link>
+            </p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            {examples.slice(0, 4).map((example) => (
-              <Link
-                key={example.href}
-                href={example.href}
-                className="group rounded-xl border border-line bg-white p-4 shadow-sm transition hover:-translate-y-1 hover:border-navy"
-              >
-                <div className="template-page-preview overflow-hidden rounded-lg border border-line bg-[#eef6f3] p-2">
-                  <div className="gallery-preview-document pointer-events-none mx-auto" style={{ width: 794 }}>
-                    <CvDocument cv={getRoleCvTemplate(example.role)} compactPreview />
-                  </div>
-                </div>
-                <h2 className="mt-4 font-display text-2xl font-semibold text-navy">{example.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-muted">{example.body}</p>
-                <span className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-navy">
-                  Open editable example <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-                </span>
-              </Link>
+          <figure className="relative mx-auto hidden w-full max-w-[440px] sm:block">
+            <div className="absolute -inset-4 rounded-2xl bg-gold-tint/60" aria-hidden="true" />
+            <div className="relative h-[480px] overflow-hidden rounded-xl border border-line-strong bg-white shadow-soft">
+              <div className="pointer-events-none mx-auto" style={{ width: 794, zoom: 0.55 }}>
+                <CvDocument cv={getRoleCvTemplate("customer-service")} compactPreview />
+              </div>
+              <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white to-white/0" aria-hidden="true" />
+            </div>
+            <figcaption className="relative mt-4 flex items-center justify-between gap-3 text-sm">
+              <span className="font-bold text-navy">Contact centre adviser CV example</span>
+              <Link href="/cv-template-customer-service-uk" className="font-bold text-navy underline underline-offset-4">View full example</Link>
+            </figcaption>
+          </figure>
+        </div>
+
+        <nav aria-label="Jump to an example" className="container-page mt-10">
+          <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted">Jump to an example</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {gallery.map((item) => (
+              <a key={item.role} href={`#example-${item.role}`} className="rounded-md border border-line-strong bg-white px-3 py-2 text-sm font-bold text-navy hover:border-navy">
+                {item.title}
+              </a>
             ))}
           </div>
-        </div>
+        </nav>
       </section>
 
       <section className="bg-surface py-24">
@@ -259,7 +227,7 @@ export default function CvExamplesUkPage() {
           </h2>
           <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {gallery.map((item) => (
-              <article key={item.role} className="flex flex-col rounded-xl border border-line bg-white p-5 shadow-sm">
+              <article key={item.role} id={`example-${item.role}`} className="flex scroll-mt-24 flex-col rounded-xl border border-line bg-white p-5 shadow-sm">
                 <h3 className="font-display text-2xl font-semibold text-navy">{item.title}</h3>
                 <p className="mt-1 text-sm font-bold text-muted">{item.forWho}</p>
                 <ul className="mt-4 flex-1 space-y-2 text-sm leading-6 text-muted">
@@ -360,8 +328,12 @@ export default function CvExamplesUkPage() {
                 Ready to turn an example into your CV?
               </h2>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Build first, preview the result, then pay {site.price} only
-                when the PDF is ready.
+                Build and preview free, then pay {site.price} once to download
+                your CV and a matching cover letter as PDF and Word.{" "}
+                <Link href="/cv-builder-no-subscription-uk" className="font-bold text-navy underline underline-offset-4">
+                  No subscription
+                </Link>
+                .
               </p>
             </div>
           </div>
