@@ -93,3 +93,14 @@ test("keeps an enhanced scenario separate from the statutory result", () => {
   assert.equal(result.statutoryPay, 17 * 751);
   assert.equal(result.enhancedEstimate, 17 * 900 * 1.5);
 });
+
+test("worked examples by age follow the statutory rules", async () => {
+  const { redundancyExamples } = await import("../lib/redundancy-examples.ts");
+  const rows = Object.fromEntries(redundancyExamples().map((row) => [row.age, row]));
+  assert.equal(rows[25].weeks, 3.5); // one year under 22 at half a week
+  assert.equal(rows[45].weeks, 12); // 6 years at 1 week + 4 years at 1.5
+  assert.equal(rows[58].counted, 20); // only the latest 20 years count
+  assert.equal(rows[62].weeks, 30);
+  assert.equal(rows[62].atCap, 22_530); // statutory maximum for 2026/27
+  assert.equal(rows[35].atFiveHundred, 5_000);
+});

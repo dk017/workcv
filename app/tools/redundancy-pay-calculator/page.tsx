@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { redundancyExampleCap, redundancyExamples } from "@/lib/redundancy-examples";
 import Link from "next/link";
 import { Calculator, Scale, ShieldCheck } from "lucide-react";
 
@@ -21,7 +22,22 @@ export const metadata: Metadata = {
   },
 };
 
+const examples = redundancyExamples();
+const gbp = (value: number) => {
+  const decimals = Number.isInteger(value) ? 0 : 2;
+  return `£${value.toLocaleString("en-GB", { minimumFractionDigits: decimals, maximumFractionDigits: decimals })}`;
+};
+const exampleFor = (age: number) => examples.find((row) => row.age === age)!;
+
 const faqItems = [
+  {
+    question: "How much redundancy pay will I get at 50?",
+    answer: `It depends on your years of service and weekly pay. At 49 with 15 years' service, statutory pay is ${exampleFor(49).weeks} weeks' pay: ${gbp(exampleFor(49).atFiveHundred)} at £500 a week, or ${gbp(exampleFor(49).atCap)} if you earn above the £${redundancyExampleCap} weekly cap. Enter your own dates in the calculator for an exact figure.`,
+  },
+  {
+    question: "How much redundancy pay will I get at 55 or 60 with 20 years' service?",
+    answer: `With 20 or more years of service, the most you can count is 20 years. At 55 with 20 years, that is ${exampleFor(55).weeks} weeks' pay (up to ${gbp(exampleFor(55).atCap)}). From about age 61 with 20 years, every counted year is at 1.5 weeks, the maximum of 30 weeks (${gbp(exampleFor(62).atCap)} at the cap).`,
+  },
   {
     question: "Who normally qualifies for statutory redundancy pay?",
     answer:
@@ -117,6 +133,47 @@ export default function RedundancyPayCalculatorPage() {
           <div className="mt-10 rounded-lg border border-line-strong bg-surface p-5 shadow-soft md:p-7">
             <RedundancyPayCalculator />
           </div>
+        </div>
+      </section>
+
+      <section id="examples-by-age" className="border-y border-line bg-paper py-20">
+        <div className="container-page">
+          <SectionLabel>Examples by age</SectionLabel>
+          <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
+            Statutory redundancy pay examples by age and service.
+          </h2>
+          <p className="mt-5 max-w-3xl text-base leading-8 text-muted">
+            Worked examples from this calculator for redundancy on 1 October 2026 in Great Britain, with continuous
+            service. Only the latest 20 years count. Use the calculator above for your exact dates.
+          </p>
+          <div className="mt-8 overflow-x-auto rounded-xl border border-line bg-white">
+            <table className="w-full min-w-[620px] text-left text-sm">
+              <thead className="bg-surface text-navy">
+                <tr>
+                  <th scope="col" className="p-4">Age</th>
+                  <th scope="col" className="p-4">Years of service</th>
+                  <th scope="col" className="p-4">Weeks&apos; pay</th>
+                  <th scope="col" className="p-4">At £500 a week</th>
+                  <th scope="col" className="p-4">At or above £{redundancyExampleCap} cap</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-line">
+                {examples.map((row) => (
+                  <tr key={row.age}>
+                    <th scope="row" className="p-4 font-bold text-navy">{row.age}</th>
+                    <td className="p-4 text-muted">{row.years}{row.years > row.counted ? ` (${row.counted} counted)` : ""}</td>
+                    <td className="p-4 text-muted">{row.weeks}</td>
+                    <td className="p-4 font-bold text-navy">{gbp(row.atFiveHundred)}</td>
+                    <td className="p-4 font-bold text-navy">{gbp(row.atCap)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-sm leading-6 text-muted">
+            Statutory amounts only. Your employer may pay more under an enhanced scheme. Up to £30,000 of redundancy
+            pay is usually free of Income Tax; notice pay and holiday pay are taxed separately.
+          </p>
         </div>
       </section>
 
