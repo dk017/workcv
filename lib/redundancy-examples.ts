@@ -11,6 +11,7 @@ export const redundancyExampleScenarios = [
   { age: 35, years: 10 },
   { age: 45, years: 10 },
   { age: 49, years: 15 },
+  { age: 50, years: 15 },
   { age: 55, years: 20 },
   { age: 58, years: 25 },
   { age: 62, years: 30 },

@@ -165,7 +165,7 @@ export default function CoverLetterExamplesPage() {
                 </ul>
                 {example.cvHref ? (
                   <Link href={example.cvHref} className="mt-4 inline-block text-sm font-bold text-navy underline underline-offset-4">
-                    See the matching CV example
+                    See a CV example for this role
                   </Link>
                 ) : null}
               </div>

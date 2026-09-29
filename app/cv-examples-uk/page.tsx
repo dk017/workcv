@@ -85,7 +85,7 @@ const cvTypes = [
   ["Returning after a break", "Explains a career break briefly and focuses on current, relevant skills.", "/return-to-work-cv-uk"],
   ["No work experience", "Uses education, projects, volunteering and responsibilities as evidence.", "/cv-no-experience-uk"],
   ["Graduate CV", "Degree, projects and placements first; work history second.", "/cv-template-graduate-uk"],
-  ["ATS-friendly CV", "A simple single-column layout that application tracking systems read cleanly.", "/ats-cv-template-uk"],
+  ["ATS-friendly CV", "A simple single-column layout that applicant tracking systems read cleanly.", "/ats-cv-template-uk"],
 ];
 
 const faqs = [
@@ -270,7 +270,7 @@ export default function CvExamplesUkPage() {
                 <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-navy">
                   <Link href={`/editor?template=classic&roleTemplate=${item.role}&new=1`} className="underline underline-offset-4">Edit this example free</Link>
                   <Link href={item.href} className="underline underline-offset-4">See full example</Link>
-                  {item.letterHref ? <Link href={item.letterHref} className="underline underline-offset-4">Matching cover letter</Link> : null}
+                  {item.letterHref ? <Link href={item.letterHref} className="underline underline-offset-4">Cover letter example</Link> : null}
                 </div>
               </article>
             ))}
@@ -376,7 +376,7 @@ export default function CvExamplesUkPage() {
       <FaqSection faqs={faqs} title="UK CV example questions." />
       <FinalCta
         heading="Use examples as a starting point, not a script."
-        body={`Choose a UK CV example, edit it around your own evidence, then pay ${site.price} only when you download the finished PDF.`}
+        body={`Choose a UK CV example, edit it around your own evidence, then pay ${site.price} once to download your CV and a matching cover letter as PDF and Word.`}
         primaryHref="/editor?template=classic&roleTemplate=general&new=1"
         primary="Edit a CV example"
         secondaryHref="/templates"

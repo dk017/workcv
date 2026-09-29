@@ -99,6 +99,7 @@ test("worked examples by age follow the statutory rules", async () => {
   const rows = Object.fromEntries(redundancyExamples().map((row) => [row.age, row]));
   assert.equal(rows[25].weeks, 3.5); // one year under 22 at half a week
   assert.equal(rows[45].weeks, 12); // 6 years at 1 week + 4 years at 1.5
+  assert.equal(rows[50].weeks, 19.5); // 6 at 1 week + 9 at 1.5 (ages 35–49)
   assert.equal(rows[58].counted, 20); // only the latest 20 years count
   assert.equal(rows[62].weeks, 30);
   assert.equal(rows[62].atCap, 22_530); // statutory maximum for 2026/27

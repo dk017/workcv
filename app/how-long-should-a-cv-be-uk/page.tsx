@@ -33,11 +33,11 @@ const byStage = [
 
 const cuts = [
   ["Summarise older roles", "Prospects suggests summarising detail from more than ten years ago. Keep the title, employer and dates, and cut the bullets."],
-  ["Keep 2 to 3 lines per achievement", "The National Careers Service suggests describing what you did in about two to three lines. Cut repeated duties."],
+  ["Keep each role short", "The National Careers Service suggests describing what you did in each role in about two to three lines. Cut repeated duties and keep the detail for recent, relevant jobs."],
   ["Remove personal details", "Leave out age, date of birth, marital status, nationality and a photo. UK guidance says not to include them."],
   ["Drop \"References available on request\"", "Employers ask for referees when they need them. The line takes space and adds nothing."],
   ["Merge thin sections", "Short hobby, language or IT sections can become one line in Skills or Additional information."],
-  ["Tighten, don't shrink", "Cut words before shrinking the font. Text below about 10pt or margins below about 1.5cm are harder to read."],
+  ["Tighten, don't shrink", "Cut words before shrinking the font or margins. Very small text and cramped margins make a CV harder to read, especially on screen."],
 ];
 
 const faqs = [

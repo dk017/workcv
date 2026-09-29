@@ -32,7 +32,7 @@ const exampleFor = (age: number) => examples.find((row) => row.age === age)!;
 const faqItems = [
   {
     question: "How much redundancy pay will I get at 50?",
-    answer: `It depends on your years of service and weekly pay. At 49 with 15 years' service, statutory pay is ${exampleFor(49).weeks} weeks' pay: ${gbp(exampleFor(49).atFiveHundred)} at £500 a week, or ${gbp(exampleFor(49).atCap)} if you earn above the £${redundancyExampleCap} weekly cap. Enter your own dates in the calculator for an exact figure.`,
+    answer: `It depends on your years of service and weekly pay. At 50 with 15 years' service, statutory pay is ${exampleFor(50).weeks} weeks' pay: ${gbp(exampleFor(50).atFiveHundred)} at £500 a week, or ${gbp(exampleFor(50).atCap)} if you earn above the £${redundancyExampleCap} weekly cap. Enter your own dates in the calculator for an exact figure.`,
   },
   {
     question: "How much redundancy pay will I get at 55 or 60 with 20 years' service?",
