@@ -10,19 +10,19 @@ import {
 } from "lucide-react";
 
 import { CvDocument } from "@/components/cv-editor";
-import { ButtonLink, FinalCta, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "CV Examples UK - Editable Examples for UK Jobs",
+  title: "UK CV Examples: 11 Samples by Job and Career Stage",
   description:
-    "Browse UK CV examples for customer service, engineering, driving, nursing, teaching, warehouse, graduate and care roles. Open an editable template and tailor it before download.",
+    "11 UK CV examples for customer service, nursing, teaching, care, engineering, driving, warehouse, graduate, student and school leaver roles, with notes on why each works. Edit any example free.",
   alternates: {
     canonical: "/cv-examples-uk",
   },
   openGraph: {
-    title: "CV Examples UK - WorkCV",
+    title: "UK CV Examples: 11 Samples by Job and Career Stage",
     description:
       "Use UK CV examples as starting points, then edit the wording to match your own evidence before downloading.",
     url: "/cv-examples-uk",
@@ -56,13 +56,44 @@ const examples = [
   },
 ];
 
-const moreExamples = [
-  ["Teacher CV example", "/cv-template-teacher-uk"],
-  ["Warehouse CV example", "/cv-template-warehouse-uk"],
-  ["Graduate CV example", "/cv-template-graduate-uk"],
-  ["Care worker CV example", "/cv-template-care-worker-uk"],
-  ["UK CV template", "/professional-cv-template-uk"],
-  ["ATS CV template", "/ats-cv-template-uk"],
+type GalleryItem = {
+  role: "general" | "customer-service" | "nurse" | "teacher" | "care-worker" | "engineer" | "driver" | "warehouse" | "graduate" | "student" | "school-leaver";
+  title: string;
+  forWho: string;
+  href: string;
+  letterHref?: string;
+  why: string[];
+};
+
+const gallery: GalleryItem[] = [
+  { role: "general", title: "Customer service adviser", forWho: "The standard chronological UK CV", href: "/professional-cv-template-uk", letterHref: "/cover-letter-examples-uk#customer-service", why: ["Recent roles first with dates, employer and location on one line.", "Bullets describe what was done and the result, not personality claims."] },
+  { role: "customer-service", title: "Contact centre adviser", forWho: "Phone, email and complaint-handling roles", href: "/cv-template-customer-service-uk", letterHref: "/cover-letter-examples-uk#customer-service", why: ["Shows CRM accuracy and complaint resolution, which adverts usually list.", "Retail and volunteering are kept brief under the main role."] },
+  { role: "nurse", title: "Registered nurse", forWho: "NHS and private ward roles", href: "/cv-template-nurse-uk", why: ["NMC registration and revalidation are visible near the top.", "Clinical skills such as NEWS2 and medicines administration are named precisely."] },
+  { role: "teacher", title: "Secondary teacher", forWho: "QTS holders and early career teachers", href: "/cv-template-teacher-uk", letterHref: "/cover-letter-examples-uk#teacher", why: ["QTS and Key Stage focus stated up front.", "Includes adaptive teaching, SEND and safeguarding evidence."] },
+  { role: "care-worker", title: "Care worker", forWho: "Residential and home care", href: "/cv-template-care-worker-uk", letterHref: "/cover-letter-examples-uk#care-worker", why: ["Person-centred care and dignity described through real tasks.", "Safeguarding, moving and handling and care notes all covered."] },
+  { role: "engineer", title: "Mechanical engineer", forWho: "Design, test and manufacturing roles", href: "/cv-template-engineer-uk", letterHref: "/cover-letter-examples-uk#graduate-engineer", why: ["Technical tools and methods named, such as CAD and root cause analysis.", "Graduate trainee experience kept to show progression."] },
+  { role: "driver", title: "Delivery driver", forWho: "Multi-drop, van and courier roles", href: "/cv-template-driver-uk", why: ["Licence and vehicle checks listed where screeners look first.", "Proof-of-delivery records show reliability without big claims."] },
+  { role: "warehouse", title: "Warehouse operative", forWho: "Picking, packing, goods-in and dispatch", href: "/cv-template-warehouse-uk", why: ["Scanner and stock-check experience match typical adverts.", "Safe manual handling included as a skill, not an afterthought."] },
+  { role: "graduate", title: "Graduate business analyst", forWho: "Recent graduates with placements", href: "/cv-template-graduate-uk", letterHref: "/cover-letter-examples-uk#internship", why: ["Placement and final-year project count as real experience.", "Excel, SQL and research skills are backed up by projects."] },
+  { role: "student", title: "Student part-time job", forWho: "Students applying for retail or hospitality", href: "/student-cv-template", letterHref: "/cover-letter-examples-uk#part-time-student", why: ["Volunteering and society roles fill a short work history honestly.", "One page, focused on availability and customer skills."] },
+  { role: "school-leaver", title: "School leaver", forWho: "Apprenticeships and first jobs", href: "/school-leaver-cv-example", letterHref: "/cover-letter-examples-uk#apprenticeship", why: ["GCSE coursework, enterprise projects and volunteering as evidence.", "Skills like organisation are tied to a specific example."] },
+];
+
+const cvTypes = [
+  ["Chronological CV", "The standard UK CV: most recent role first. Right for most applicants with a work history.", "/professional-cv-template-uk"],
+  ["Skills-based CV", "Leads with skills and evidence. Useful for a career change or when your recent job is less relevant.", "/career-change-cv-uk"],
+  ["Returning after a break", "Explains a career break briefly and focuses on current, relevant skills.", "/return-to-work-cv-uk"],
+  ["No work experience", "Uses education, projects, volunteering and responsibilities as evidence.", "/cv-no-experience-uk"],
+  ["Graduate CV", "Degree, projects and placements first; work history second.", "/cv-template-graduate-uk"],
+  ["ATS-friendly CV", "A simple single-column layout that application tracking systems read cleanly.", "/ats-cv-template-uk"],
+];
+
+const faqs = [
+  { question: "What does a good UK CV look like?", answer: "A clear one- or two-page A4 document with your contact details, a short profile, recent-first work history with evidence-led bullet points, education and relevant skills. It leaves out a photo, date of birth and marital status for most UK jobs." },
+  { question: "Which CV format should I use?", answer: "Most UK applicants should use a reverse chronological CV. A skills-based CV can help if you are changing career or your most recent job is not relevant to the role." },
+  { question: "Can I copy a CV example?", answer: "Use the structure, not the wording. Replace every name, employer, date and claim with your own accurate details, and tailor it to the job advert. Examples on this page are fictional." },
+  { question: "How long should a UK CV be?", answer: "Two A4 pages for most people and one page for many school leavers, students and graduates. See our CV length guide for measured word counts per page." },
+  { question: "Are these CV examples free?", answer: `Yes. You can read every example and open any of them in the WorkCV editor to edit and preview free. Downloading your finished CV and a matching cover letter as PDF and Word costs ${site.price} once, with no subscription.` },
 ];
 
 const exampleRules = [
@@ -130,6 +161,16 @@ const sourceNotes = [
 export default function CvExamplesUkPage() {
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: faqs.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer } })),
+          }),
+        }}
+      />
       <section className="quiet-grid bg-paper py-20 md:py-28">
         <div className="container-page grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
@@ -137,12 +178,12 @@ export default function CvExamplesUkPage() {
               CV examples UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Start from a UK CV example, then make every claim yours.
+              UK CV examples you can open and edit free.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Browse role-specific CV examples, open the closest editable
-              template and replace the sample wording with accurate evidence
-              from your own work, study or training.
+              Eleven complete UK CV examples by job and career stage, each with
+              notes on why it works. Open the closest one in the editor, replace
+              the sample wording with your own evidence and preview it free.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/editor?template=classic&roleTemplate=general&new=1">
@@ -153,6 +194,9 @@ export default function CvExamplesUkPage() {
             <div className="mt-5 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
               <Link href="/how-to-write-a-cv-uk" className="underline underline-offset-4">
                 Read the UK CV writing guide
+              </Link>
+              <Link href="/how-long-should-a-cv-be-uk" className="underline underline-offset-4">
+                How long should a CV be?
               </Link>
               <Link
                 href="/cv-builder-no-subscription-uk"
@@ -209,19 +253,41 @@ export default function CvExamplesUkPage() {
 
       <section id="examples" className="bg-paper py-24">
         <div className="container-page">
-          <SectionLabel>Editable role examples</SectionLabel>
+          <SectionLabel>All UK CV examples</SectionLabel>
           <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
             Choose the closest example, then tailor it to the advert.
           </h2>
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {moreExamples.map(([label, href]) => (
-              <Link
-                key={href}
-                href={href}
-                className="group flex min-h-24 items-center justify-between gap-4 rounded-xl border border-line bg-white p-5 text-navy shadow-sm transition hover:-translate-y-1 hover:border-navy"
-              >
-                <span className="font-bold">{label}</span>
-                <ArrowRight className="h-5 w-5 shrink-0 transition group-hover:translate-x-1" />
+          <div className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {gallery.map((item) => (
+              <article key={item.role} className="flex flex-col rounded-xl border border-line bg-white p-5 shadow-sm">
+                <h3 className="font-display text-2xl font-semibold text-navy">{item.title}</h3>
+                <p className="mt-1 text-sm font-bold text-muted">{item.forWho}</p>
+                <ul className="mt-4 flex-1 space-y-2 text-sm leading-6 text-muted">
+                  {item.why.map((point) => (
+                    <li key={point} className="flex gap-2"><Check className="mt-1 h-4 w-4 shrink-0 text-success" />{point}</li>
+                  ))}
+                </ul>
+                <div className="mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm font-bold text-navy">
+                  <Link href={`/editor?template=classic&roleTemplate=${item.role}&new=1`} className="underline underline-offset-4">Edit this example free</Link>
+                  <Link href={item.href} className="underline underline-offset-4">See full example</Link>
+                  {item.letterHref ? <Link href={item.letterHref} className="underline underline-offset-4">Matching cover letter</Link> : null}
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="cv-types" className="bg-surface py-20">
+        <div className="container-page">
+          <SectionLabel>CV examples by type</SectionLabel>
+          <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">Which kind of CV do you need?</h2>
+          <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {cvTypes.map(([title, body, href]) => (
+              <Link key={title} href={href} className="group rounded-xl border border-line bg-white p-5 transition hover:-translate-y-1 hover:border-navy">
+                <h3 className="font-display text-xl font-semibold text-navy">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">{body}</p>
+                <ArrowRight className="mt-4 h-4 w-4 text-navy transition group-hover:translate-x-1" />
               </Link>
             ))}
           </div>
@@ -307,6 +373,7 @@ export default function CvExamplesUkPage() {
         </div>
       </section>
 
+      <FaqSection faqs={faqs} title="UK CV example questions." />
       <FinalCta
         heading="Use examples as a starting point, not a script."
         body={`Choose a UK CV example, edit it around your own evidence, then pay ${site.price} only when you download the finished PDF.`}
