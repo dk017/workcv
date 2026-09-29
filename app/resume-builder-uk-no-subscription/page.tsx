@@ -183,7 +183,7 @@ const faqItems = [
 
 const relatedLinks = [
   ["CV vs resume UK", "/cv-vs-resume-uk"],
-  ["UK resume template", "/resume-template-uk"],
+  ["UK CV and resume template", "/professional-cv-template-uk"],
   ["CV builder without subscription", "/cv-builder-no-subscription-uk"],
   ["Compare CV builder pricing", "/pricing"],
   ["Professional CV template UK", "/professional-cv-template-uk"],

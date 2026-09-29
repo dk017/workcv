@@ -4,12 +4,12 @@ import { TemplateGallery } from "@/components/template-gallery";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Editable UK CV Templates - Open in the CV Editor",
+  title: "CV Designs: Classic, Modern and Compact Layouts",
   description:
-    "Compare editable UK CV templates, open any layout in the editor and preview every page before paying for your finished PDF.",
+    "Compare the Classic, Modern and Compact CV designs, open any layout in the editor and preview every page before you pay.",
   alternates: { canonical: "/templates" },
   openGraph: {
-    title: "Editable UK CV Templates - WorkCV",
+    title: "CV Designs: Classic, Modern and Compact - WorkCV",
     description:
       "Choose a UK CV layout, replace the example with your details and preview the finished pages before paying.",
     url: "/templates",

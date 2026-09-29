@@ -42,7 +42,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: "/cv-template-uk", destination: "/templates", permanent: true },
+      { source: "/cv-template-uk", destination: "/professional-cv-template-uk", permanent: true },
+      { source: "/resume-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       {
         source: "/cv-builder-uk",
         destination: "/cv-builder-no-subscription-uk",

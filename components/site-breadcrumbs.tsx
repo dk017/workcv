@@ -18,8 +18,7 @@ const sections = {
 const pages: Record<string, { name: string; parent?: keyof typeof sections }> = {
   "/templates": { name: "CV templates" },
   "/ats-cv-template-uk": { name: "ATS CV template", parent: "templates" },
-  "/professional-cv-template-uk": { name: "Professional CV template", parent: "templates" },
-  "/resume-template-uk": { name: "Resume template", parent: "templates" },
+  "/professional-cv-template-uk": { name: "UK CV template", parent: "templates" },
   "/student-cv-template": { name: "Student CV template", parent: "templates" },
   "/school-leaver-cv-example": { name: "School leaver CV", parent: "templates" },
   "/cv-template-care-worker-uk": { name: "Care worker CV", parent: "templates" },

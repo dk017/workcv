@@ -18,14 +18,14 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Professional CV Template UK - Editable Example",
+  title: "CV Template UK: Professional, Editable Example",
   description:
-    "Use an editable professional CV template for UK jobs. Follow a clear structure, tailor your evidence and build a recruiter-readable PDF.",
+    "A professional UK CV template with an editable example, the sections UK employers expect and role-specific versions. Download as PDF or Word; no subscription.",
   alternates: {
     canonical: "/professional-cv-template-uk",
   },
   openGraph: {
-    title: "Professional CV Template UK - WorkCV",
+    title: "CV Template UK: Professional, Editable Example",
     description:
       "Use an editable UK CV example with clear sections, evidence-led wording and current UK careers guidance.",
     url: "/professional-cv-template-uk",
@@ -44,6 +44,24 @@ const jsonLd = {
   "@context": "https://schema.org",
   "@type": "FAQPage",
   mainEntity: [
+    {
+      "@type": "Question",
+      name: "Is a resume template the same as a CV template in the UK?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "For most UK job applications, yes. UK employers usually say CV where other countries say resume. Use a UK CV template, keep it focused on the job and follow any wording or format the advert asks for.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How long should a UK CV be?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Many UK CVs fit on two A4 pages. A first-job CV is often one page, while some specialist or senior CVs need more. Include only relevant evidence rather than padding or squeezing the layout.",
+      },
+    },
     {
       "@type": "Question",
       name: "What should a professional CV include in the UK?",
@@ -179,6 +197,26 @@ const sourceNotes = [
   ],
 ];
 
+const templateRoutes = [
+  ["Three designs", "Classic, Modern and Compact layouts. Open any of them in the editor and preview every page free.", "/templates"],
+  ["Free Word template", "A blank UK CV for Microsoft Word or Google Docs. No account needed.", "/tools/blank-cv-template-uk"],
+  ["UK CV examples", "Complete example CVs for common UK jobs, with notes on what makes each work.", "/cv-examples-uk"],
+  ["ATS-friendly template", "A single-column layout that application tracking systems can read.", "/ats-cv-template-uk"],
+  ["Graduate CV template", "For recent graduates with limited work history.", "/cv-template-graduate-uk"],
+  ["Student CV template", "For part-time and first jobs while studying.", "/student-cv-template"],
+];
+
+const roleTemplateLinks = [
+  ["Care worker", "/cv-template-care-worker-uk"],
+  ["Customer service", "/cv-template-customer-service-uk"],
+  ["Driver", "/cv-template-driver-uk"],
+  ["Engineer", "/cv-template-engineer-uk"],
+  ["Nurse", "/cv-template-nurse-uk"],
+  ["Teacher", "/cv-template-teacher-uk"],
+  ["Warehouse", "/cv-template-warehouse-uk"],
+  ["School leaver", "/school-leaver-cv-example"],
+];
+
 const relatedLinks = [
   ["How to write a CV UK", "/how-to-write-a-cv-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
@@ -203,10 +241,10 @@ export default function ProfessionalCvTemplateUkPage() {
         <div className="container-page grid items-center gap-12 lg:grid-cols-[0.92fr_1.08fr]">
           <div>
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              Professional CV template UK
+              CV template UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Professional means relevant, clear and easy to verify.
+              A UK CV template that is professional, clear and easy to tailor.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Log in by email code, start with an editable UK CV example,
@@ -215,7 +253,7 @@ export default function ProfessionalCvTemplateUkPage() {
               content; it does not replace it.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={editorHref}>Use professional CV template</ButtonLink>
+              <ButtonLink href={editorHref}>Use this CV template</ButtonLink>
               <ButtonLink href="#example" variant="secondary">
                 See editable example
               </ButtonLink>
@@ -248,6 +286,53 @@ export default function ProfessionalCvTemplateUkPage() {
                 <CvDocument cv={professionalCv} compactPreview />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="choose-template" className="border-y border-line bg-surface py-16">
+        <div className="container-page">
+          <SectionLabel>Choose your UK CV template</SectionLabel>
+          <h2 className="max-w-3xl font-display text-3xl font-semibold text-navy md:text-4xl">
+            Start from the version that fits your application.
+          </h2>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {templateRoutes.map(([title, body, href]) => (
+              <Link key={href} href={href} className="group rounded-xl border border-line bg-white p-5 transition hover:-translate-y-1 hover:border-navy">
+                <h3 className="font-display text-xl font-semibold text-navy">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-muted">{body}</p>
+                <ArrowRight className="mt-4 h-4 w-4 text-navy transition group-hover:translate-x-1" />
+              </Link>
+            ))}
+          </div>
+          <p className="mt-8 text-sm font-bold text-navy">CV templates by job:</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {roleTemplateLinks.map(([label, href]) => (
+              <Link key={href} href={href} className="rounded-md border border-line-strong bg-white px-3 py-2 text-sm font-bold text-navy hover:border-navy">
+                {label}
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section id="cv-or-resume" className="bg-paper py-16">
+        <div className="container-page grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
+          <div>
+            <SectionLabel>CV or resume template?</SectionLabel>
+            <h2 className="font-display text-3xl font-semibold text-navy md:text-4xl">In the UK, a resume template is a CV template.</h2>
+          </div>
+          <div className="space-y-4 text-base leading-8 text-muted">
+            <p>
+              UK employers usually ask for a CV. If you are searching for a resume template for a UK job, use a UK CV
+              structure: contact details, a short profile, relevant skills, recent-first work history, education and a
+              brief line about references.
+            </p>
+            <p>
+              Leave out a photo, date of birth, marital status and nationality unless the application explicitly asks
+              for them, and keep most CVs to two A4 pages. Coming from another country? See how to{" "}
+              <Link href="/convert-resume-to-uk-cv" className="font-bold text-navy underline">convert a resume to a UK CV</Link>.
+            </p>
           </div>
         </div>
       </section>
@@ -435,13 +520,13 @@ export default function ProfessionalCvTemplateUkPage() {
           question: item.name,
           answer: item.acceptedAnswer.text,
         }))}
-        title="Professional CV template questions."
+        title="UK CV template questions."
       />
       <FinalCta
         heading="Build a professional CV from evidence you can stand behind."
-        body={`Log in by email code, replace the editable example with your own details, then pay ${site.price} to unlock the selected saved CV PDF.`}
+        body={`Log in by email code, replace the editable example with your own details, then pay ${site.price} once to download that CV and a matching cover letter as PDF and Word.`}
         primaryHref={editorHref}
-        primary="Use professional CV template"
+        primary="Use this CV template"
         secondaryHref="/how-to-write-a-cv-uk"
         secondary="Read the CV guide"
       />

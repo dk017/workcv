@@ -226,7 +226,7 @@ export function TemplateGallery() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/resume-template-uk"
+                href="/professional-cv-template-uk"
                 className="inline-flex items-center gap-2 text-sm font-bold text-navy"
               >
                 Use the UK resume template

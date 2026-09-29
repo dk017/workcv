@@ -204,7 +204,7 @@ const relatedLinks = [
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Editable UK CV templates", "/templates"],
   ["Professional CV template", "/professional-cv-template-uk"],
-  ["Resume template UK", "/resume-template-uk"],
+  ["UK CV template", "/professional-cv-template-uk"],
 ];
 
 export default function CustomerServiceCvTemplateUkPage() {

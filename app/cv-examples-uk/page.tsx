@@ -61,7 +61,7 @@ const moreExamples = [
   ["Warehouse CV example", "/cv-template-warehouse-uk"],
   ["Graduate CV example", "/cv-template-graduate-uk"],
   ["Care worker CV example", "/cv-template-care-worker-uk"],
-  ["Professional CV template", "/professional-cv-template-uk"],
+  ["UK CV template", "/professional-cv-template-uk"],
   ["ATS CV template", "/ats-cv-template-uk"],
 ];
 
