@@ -1,3 +1,4 @@
+import { RolePackLinks } from "@/components/role-application-pack";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -318,6 +319,8 @@ export default function CvExamplesUkPage() {
           </div>
         </div>
       </section>
+
+      <RolePackLinks context="cv_examples" />
 
       <FaqSection faqs={faqs} title="UK CV example questions." />
       <FinalCta

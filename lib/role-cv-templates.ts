@@ -1,6 +1,7 @@
 import type { CvData, TemplateId } from "@/lib/editor-data";
 
 export type RoleTemplateId =
+  | "retail"
   | "general"
   | "customer-service"
   | "engineer"
@@ -322,7 +323,7 @@ const studentCv: CvData = {
   location: "Nottingham, UK",
   linkedin: "",
   profile:
-    "Second-year business student seeking a part-time retail role, with customer-facing volunteering, group-project and student-society experience. Confident explaining information clearly, organising competing deadlines and using Microsoft 365. Available for evening and weekend shifts during term time.",
+    "Business management student seeking a part-time retail role, with customer-facing volunteering, group-project and student-society experience. Confident explaining information clearly, organising competing deadlines and using Microsoft 365. Available for evening and weekend shifts during term time.",
   skills:
     "Customer communication\nTeamwork\nMicrosoft 365\nCash-handling awareness\nEvent organisation\nWritten communication\nTime management\nReliable evening and weekend availability",
   experience: [
@@ -366,7 +367,7 @@ const studentCv: CvData = {
       start: "2022",
       end: "2024",
       details:
-        "Add grades only when requested or when they strengthen the application. Include GCSE English and maths where the advert asks for them.",
+        "Completed A levels before starting university.",
     },
   ],
 };
@@ -643,8 +644,51 @@ const driverCv: CvData = {
   ],
 };
 
+const retailCv: CvData = {
+  "template": "classic",
+  "fullName": "Maya Lewis",
+  "targetRole": "Retail Sales Assistant",
+  "email": "maya.lewis@example.com",
+  "phone": "07700 900123",
+  "location": "Birmingham, UK",
+  "linkedin": "",
+  "profile": "Retail sales assistant with experience helping customers choose products, processing till transactions and replenishing shop-floor stock. Confident checking prices, following returns procedures and keeping displays tidy during busy shifts. Available for evening and weekend work.",
+  "skills": "Customer service\nTill transactions\nProduct advice\nStock replenishment\nPrice and display checks\nReturns procedures\nTeamwork\nEvening and weekend availability",
+  "experience": [
+    {
+      "id": "retail-exp-1",
+      "role": "Sales Assistant",
+      "company": "Birch Home and Gifts",
+      "location": "Birmingham",
+      "start": "Oct 2024",
+      "end": "Present",
+      "bullets": "Help customers compare products and check stock availability before suggesting alternatives.\nProcess cash and card transactions, check prices and refer returns outside store policy to the supervisor.\nReplenish shelves, rotate seasonal displays and keep aisles clear during deliveries.\nShare stock queries and unfinished tasks with colleagues at shift handover."
+    },
+    {
+      "id": "retail-exp-2",
+      "role": "Volunteer Shop Assistant",
+      "company": "Community Reuse Shop",
+      "location": "Birmingham",
+      "start": "Feb 2024",
+      "end": "Sep 2024",
+      "bullets": "Sorted donated items and prepared labelled displays under the shop manager's direction.\nWelcomed visitors and helped them locate items, asking colleagues for help with unfamiliar queries."
+    }
+  ],
+  "education": [
+    {
+      "id": "retail-edu-1",
+      "qualification": "GCSEs including English and Maths",
+      "institution": "Birmingham Community School",
+      "location": "Birmingham",
+      "start": "2019",
+      "end": "2024",
+      "details": ""
+    }
+  ]
+};
+
 export function parseRoleTemplate(value: string | null): RoleTemplateId | undefined {
-  return value === "general" ||
+  return value === "retail" || value === "general" ||
     value === "customer-service" ||
     value === "engineer" ||
     value === "driver" ||
@@ -661,7 +705,9 @@ export function parseRoleTemplate(value: string | null): RoleTemplateId | undefi
 
 export function getRoleCvTemplate(role: RoleTemplateId, template?: TemplateId): CvData {
   const source =
-    role === "general"
+    role === "retail"
+      ? retailCv
+      : role === "general"
       ? generalCv
       : role === "customer-service"
       ? customerServiceCv

@@ -9,9 +9,9 @@ import { site } from "@/lib/site";
 const slug = "/student-cv-template";
 
 export const metadata: Metadata = {
-  title: "Student CV Template UK - Part-Time Job Example",
+  title: "Student CV Template UK + First-Job Cover Letter",
   description:
-    "Use an editable UK student CV template for part-time jobs, placements and internships, with education, volunteering, society and project examples.",
+    "See a student CV and matching first-job cover letter, get a free checklist and build your own application using study, projects and volunteering.",
   alternates: { canonical: slug },
   openGraph: {
     title: "Student CV Template UK - WorkCV",
@@ -24,6 +24,7 @@ export const metadata: Metadata = {
 const config: EarlyCareerPageConfig = {
   slug,
   roleTemplate: "student",
+  applicationPackId: "student",
   kicker: "Student CV template UK",
   heading: "Build a student CV from education, projects and real responsibilities.",
   intro:
@@ -87,8 +88,8 @@ const config: EarlyCareerPageConfig = {
     ["ATS CV template", "/ats-cv-template-uk"],
   ],
   finalHeading: "Start with a student CV that gives education useful context.",
-  finalBody: `Edit the student draft with your real course, projects and responsibilities, then pay ${site.price} only when you download the final PDF.`,
-  primaryLabel: "Use student CV template",
+  finalBody: `Build and preview your own CV and letter free. Pay ${site.price} once for one saved pair in PDF and Word. Edits and redownloads of the same pair are included.`,
+  primaryLabel: "Build my CV and letter",
 };
 
 export default function StudentCvTemplatePage() {
