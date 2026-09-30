@@ -215,6 +215,23 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-11 w-auto max-w-full border-0"
             />
           </a>
+          <a
+            href="https://codehype.ai/product/workcv?utm_source=codehype_badge"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block"
+            aria-label="WorkCV featured on CodeHype"
+          >
+            <img
+              src="https://codehype.ai/badges/workcv.svg?variant=find-us&v=20"
+              alt="Featured on CodeHype"
+              width={180}
+              height={65}
+              loading="lazy"
+              decoding="async"
+              className="block h-auto max-h-[65px] w-[180px] max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
