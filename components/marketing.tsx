@@ -198,6 +198,23 @@ export function Footer({ line = site.summary }: { line?: string }) {
               className="block h-[55px] w-auto max-w-full border-0"
             />
           </a>
+          <a
+            href="https://listmysaas.xyz"
+            target="_blank"
+            rel="noopener"
+            className="inline-block"
+            aria-label="WorkCV featured on ListMySaaS"
+          >
+            <img
+              src="https://listmysaas.xyz/listmysaasbadgenormal.svg"
+              alt="Featured on ListMySaaS"
+              width={125}
+              height={44}
+              loading="lazy"
+              decoding="async"
+              className="block h-11 w-auto max-w-full border-0"
+            />
+          </a>
         </div>
       </div>
     </footer>
