@@ -1,4 +1,6 @@
+import { RolePackLinks } from "@/components/role-application-pack";
 import type { Metadata } from "next";
+import { roleApplicationPacks } from "@/lib/role-application-packs";
 import { TrackedLink } from "@/components/tracked-link";
 import Link from "next/link";
 import { CheckCircle2, FileText, Mail, ShieldCheck } from "lucide-react";
@@ -177,7 +179,7 @@ export default function CoverLetterExamplesPage() {
                     and preview free, then download your CV and matching letter as PDF and Word for {site.price} once.
                   </p>
                   <div className="mt-4">
-                    <ButtonLink href="/editor?new=1" trackingLabel={analyticsPlacements.coverLetterExamplesInline}>Start my CV and letter</ButtonLink>
+                    <ButtonLink href={roleApplicationPacks[example.slug === "part-time-student" ? "student" : example.slug]?.path || "/editor?new=1"} trackingLabel={analyticsPlacements.coverLetterExamplesInline}>Start my CV and letter</ButtonLink>
                   </div>
                   <p className="mt-3 text-sm"><TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.coverLetterExamplesBundleMoney} className="font-bold text-navy underline underline-offset-4">See what the {site.price} CV and cover-letter payment includes</TrackedLink></p>
                 </div>
@@ -209,6 +211,8 @@ export default function CoverLetterExamplesPage() {
           </div>
         </div>
       </section>
+
+      <RolePackLinks context="cover_letter_examples" />
 
       <FaqSection faqs={faqs} title="UK cover letter example questions." />
 
