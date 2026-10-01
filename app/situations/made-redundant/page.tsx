@@ -217,6 +217,9 @@ export default function MadeRedundantPage() {
               <Link href="/tools/ats-score-checker" className="inline-flex items-center gap-2">
                 Target the next vacancy <ArrowRight className="h-4 w-4" />
               </Link>
+              <Link href="/tools/job-application-tracker-uk" className="inline-flex items-center gap-2">
+                Track your applications <ArrowRight className="h-4 w-4" />
+              </Link>
             </div>
           </div>
         </div>

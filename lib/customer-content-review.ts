@@ -17,7 +17,7 @@ export const customerContentReview = {
   "/tools/cv-bullet-point-generator": "2026-09-23",
   "/top-job-boards-uk": "2026-09-23",
   "/contact": "2026-09-23",
-  "/privacy": "2026-09-28",
+  "/privacy": "2026-10-01",
 } as const satisfies Record<string, string>;
 
 export function customerReviewDate(path: string): string | undefined {

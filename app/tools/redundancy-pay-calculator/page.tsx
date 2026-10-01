@@ -286,6 +286,12 @@ export default function RedundancyPayCalculatorPage() {
               Calculate your statutory notice dates
             </Link>
             <Link
+              href="/tools/job-application-tracker-uk"
+              className="rounded-md border border-line bg-white p-4 hover:border-navy"
+            >
+              Track your job applications
+            </Link>
+            <Link
               href="/cv-employment-gap-uk"
               className="rounded-md border border-line bg-white p-4 hover:border-navy"
             >

@@ -40,6 +40,7 @@ const categories: HubCategory[] = [
       { title: "21 common interview questions", href: "/common-job-interview-questions-uk", description: "See what each question tests, how to structure the answer and which common mistake to avoid." },
       { title: "Five interview follow-up emails", href: "/thank-you-email-after-interview-uk", description: "Copy examples for first, panel and final interviews, requested documents and delayed decisions." },
       { title: "Job Application Pack", href: "/tools/job-application-pack-uk", description: "Turn one vacancy and your real evidence into a reviewable application pack." },
+  { title: "Job Application Tracker", href: "/tools/job-application-tracker-uk", description: "Track applications, follow-ups and closing dates in your browser, with an Excel template." },
       { title: "Cover letter generator", href: "/tools/cover-letter-generator-uk", description: "Connect your experience to the job advert in a focused UK draft." },
       { title: "ATS score checker", href: "/tools/ats-score-checker", description: "Find relevant terms and evidence gaps before you submit." },
     ],

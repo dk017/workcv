@@ -260,6 +260,7 @@ export default function AtsScoreCheckerPage() {
         title="Keep improving your CV."
         links={[
           ["Write stronger CV bullets", "/tools/cv-bullet-point-generator"],
+          ["Track your job applications", "/tools/job-application-tracker-uk"],
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],
           ["Use an ATS CV template", "/ats-cv-template-uk"],
           ["Read the UK CV guide", "/how-to-write-a-cv-uk"],

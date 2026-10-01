@@ -40,6 +40,7 @@ const routes = [
   { path: "/tools/uk-living-wage-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-23" },
   { path: "/tools/cover-letter-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/job-application-pack-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-13" },
+  { path: "/tools/job-application-tracker-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-01" },
   { path: "/tools/cv-bullet-point-generator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/cv-summary-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/cv-word-count-checker", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },

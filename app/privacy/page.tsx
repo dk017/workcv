@@ -153,6 +153,10 @@ export default function PrivacyPage() {
           body: <><p>The PDF/DOCX format checker reads the selected file in your browser. File contents, previews and extracted text are not uploaded during this check. The supporting-statement planner also runs locally without sending your worksheet text to our server or an AI provider. Close the page or clear the result when finished on a shared device.</p><p>If you choose to continue from a file check or application pack into the editor, the handoff is temporarily held in this tab. Extracted CV text is sent to our authenticated import service for structured drafting. Content saved in the editor, including original CV text and application-pack notes, becomes part of your account's saved draft. These notes are separate from the CV PDF. The ordinary usage events described above do not contain the file or worksheet contents.</p></>,
         },
         {
+          title: "Job application tracker",
+          body: <><p>The job application tracker stores the jobs you add only in your browser&apos;s local storage on your device. We do not receive them, and clearing your browser data deletes them. Exported CSV files and printed logs stay on your device.</p><p>If you choose &ldquo;Tailor my CV for this job&rdquo;, that job&apos;s title, employer and advert text are held temporarily in this browser tab and used to fill in the Job Application Pack. They are only sent to our server if you then submit that tool. Usage events record that the tracker was used, never the jobs you entered.</p></>,
+        },
+        {
           title: "Storage and retention",
           body: (
             <>

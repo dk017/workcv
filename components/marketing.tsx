@@ -61,6 +61,7 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <Link href="/how-to-write-a-cv-uk">CV guide</Link>
             <Link href="/tools">Free tools</Link>
             <Link href="/tools/ats-score-checker">ATS checker</Link>
+            <Link href="/tools/job-application-tracker-uk">Job tracker</Link>
             <Link href="/tools/cv-word-count-checker">CV length checker</Link>
             <Link href="/tools/uk-salary-by-job-title">UK salary checker</Link>
             <Link href="/tools/cv-summary-generator-uk">Statement generator</Link>

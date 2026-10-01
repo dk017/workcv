@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
   ArrowRight,
@@ -22,6 +22,7 @@ import {
 import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
 import { buildCoverLetterPatch } from "@/lib/cover-letter-handoff";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { jobPackPrefillKey, readJobPackPrefill } from "@/lib/job-tracker";
 import { commercialRoutes, site } from "@/lib/site";
 
 type Fields = JobApplicationPackInput;
@@ -60,6 +61,25 @@ export function JobApplicationPack() {
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState("");
   const resultsRef = useRef<HTMLDivElement>(null);
+  const [fromTracker, setFromTracker] = useState<{ role: string; hasAdvert: boolean } | null>(null);
+
+  // A job sent from the job application tracker pre-fills the role, employer and advert.
+  useEffect(() => {
+    try {
+      const prefill = readJobPackPrefill(window.sessionStorage.getItem(jobPackPrefillKey));
+      window.sessionStorage.removeItem(jobPackPrefillKey);
+      if (!prefill) return;
+      setFields((current) => ({
+        ...current,
+        targetRole: prefill.targetRole,
+        company: prefill.company,
+        jobDescription: prefill.jobDescription || current.jobDescription,
+      }));
+      setFromTracker({ role: prefill.targetRole, hasAdvert: prefill.jobDescription.trim().length >= 200 });
+    } catch {
+      // Storage can be blocked; the form simply starts empty.
+    }
+  }, []);
 
   function update(name: keyof Fields, value: string) {
     setFields((current) => ({ ...current, [name]: value }));
@@ -181,6 +201,14 @@ export function JobApplicationPack() {
 
   return (
     <div>
+      {fromTracker ? (
+        <p role="status" className="mb-5 rounded-md border border-success/30 bg-greensoft p-4 text-sm leading-6 text-navy">
+          <strong>Added from your job tracker: {fromTracker.role}.</strong>{" "}
+          {fromTracker.hasAdvert
+            ? "Now paste your CV so the pack can match your evidence to this advert."
+            : "Paste the job advert and your CV to tailor your application."}
+        </p>
+      ) : null}
       <form onSubmit={handleSubmit}>
         <div className="grid gap-5 md:grid-cols-3">
           <TextField label="Your name" name="fullName" value={fields.fullName} onChange={update} required maxLength={100} placeholder="e.g. Amira Khan" />
