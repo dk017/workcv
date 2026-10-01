@@ -12,8 +12,10 @@ import {
   RotateCcw,
   ShieldCheck,
   Target,
+  Upload,
 } from "lucide-react";
 
+import { trackFunnelEvent } from "@/components/attribution-capture";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import {
@@ -23,6 +25,9 @@ import {
 } from "@/lib/ats-keyword-checker";
 import type { CvFitAssessment } from "@/lib/cv-fit-assessment";
 import { writeCvFitHandoff } from "@/lib/cv-fit-handoff";
+import { readCvFile, type CvFileText } from "@/lib/cv-file-text";
+import { cvReadabilityReport, type ReadabilityReport, type ReadabilityStatus } from "@/lib/cv-readability-check";
+import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
 import { site } from "@/lib/site";
 
 const examples = {
@@ -139,6 +144,99 @@ function KeywordList({
   );
 }
 
+const readabilityStyles: Record<ReadabilityStatus, { label: string; className: string }> = {
+  pass: { label: "Good", className: "bg-greensoft text-success" },
+  warn: { label: "Check", className: "bg-[#fff5e7] text-[#8a5a00]" },
+  fail: { label: "Fix", className: "bg-redsoft text-[#963c3c]" },
+};
+
+const cleanCvEditorRoute = "/editor?template=classic&new=1&from=career-tool";
+
+function ReadabilityResult({
+  report,
+  compact,
+  fileName,
+  onAddAdvert,
+  onOpenEditor,
+}: {
+  report: ReadabilityReport;
+  compact: boolean;
+  fileName: string | null;
+  onAddAdvert?: () => void;
+  onOpenEditor: () => void;
+}) {
+  const colour = report.score >= 80 ? "#2D7D52" : report.score >= 55 ? "#B7791F" : "#B54242";
+  const toFix = report.checks.filter((check) => check.status !== "pass").length;
+  return (
+    <div className="overflow-hidden rounded-lg border border-line-strong bg-white shadow-soft">
+      <div className={`grid gap-6 border-b border-line bg-paper p-6 md:p-8 ${compact ? "" : "lg:grid-cols-[200px_1fr] lg:items-center"}`}>
+        {!compact ? (
+          <div className="flex justify-center">
+            <div className="relative grid h-40 w-40 place-items-center rounded-full" style={{ background: `conic-gradient(${colour} ${report.score * 3.6}deg, #e5e2db 0deg)` }}>
+              <div className="grid h-32 w-32 place-items-center rounded-full bg-white text-center">
+                <div>
+                  <p className="font-display text-5xl font-semibold leading-none text-navy">{report.score}</p>
+                  <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">out of 100</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : null}
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: colour }}>
+            CV readability{compact ? `: ${report.score}/100` : ""}
+          </p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-navy">
+            {toFix === 0 ? "Your CV reads cleanly." : `${toFix} thing${toFix === 1 ? "" : "s"} to check before you apply.`}
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
+            {fileName ? `Read from ${fileName} in your browser. ` : ""}
+            This checks whether your CV&apos;s text, sections, dates and contact details can be picked out clearly.
+            It is not an employer&apos;s ATS score; systems and recruiters differ.
+          </p>
+        </div>
+      </div>
+      <ul className="divide-y divide-line">
+        {report.checks.map((check) => (
+          <li key={check.id} className="grid gap-2 p-5 md:grid-cols-[160px_1fr_auto] md:items-start md:px-8">
+            <span className="font-bold text-navy">{check.label}</span>
+            <span className="text-sm leading-6 text-muted">{check.detail}</span>
+            <span className={`justify-self-start rounded-md px-3 py-1 text-xs font-bold ${readabilityStyles[check.status].className}`}>
+              {readabilityStyles[check.status].label}
+            </span>
+          </li>
+        ))}
+      </ul>
+      {!compact ? (
+        <div className="grid gap-4 border-t border-line bg-[#edf4f8] p-6 md:grid-cols-[1fr_auto] md:items-center md:p-8">
+          <div>
+            <p className="font-display text-2xl font-semibold text-navy">Next: check it against a real job advert.</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
+              Paste an advert to see which requirements and keywords your CV evidences. Or rebuild it in a clean,
+              single-column UK layout; you only pay {site.price} if you download.
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
+            {onAddAdvert ? (
+              <button type="button" onClick={onAddAdvert} className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">
+                Add a job advert <ArrowRight className="h-4 w-4" />
+              </button>
+            ) : null}
+            <TrackedLink
+              href={cleanCvEditorRoute}
+              placement={analyticsPlacements.atsReadabilityEditor}
+              onClick={onOpenEditor}
+              className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy hover:border-navy"
+            >
+              Rebuild in a clean layout
+            </TrackedLink>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 export function AtsScoreChecker() {
   const [jobDescription, setJobDescription] = useState("");
   const [cvText, setCvText] = useState("");
@@ -146,6 +244,12 @@ export function AtsScoreChecker() {
   const [fallback, setFallback] = useState<AtsAnalysis | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [readability, setReadability] = useState<ReadabilityReport | null>(null);
+  const [fileInfo, setFileInfo] = useState<(Omit<CvFileText, "text"> & { name: string }) | null>(null);
+  const [readingFile, setReadingFile] = useState(false);
+  const [fileError, setFileError] = useState("");
+  const fileRef = useRef<HTMLInputElement>(null);
+  const jobRef = useRef<HTMLTextAreaElement>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const jobWords = useMemo(() => countWords(jobDescription), [jobDescription]);
   const cvWords = useMemo(() => countWords(cvText), [cvText]);
@@ -155,16 +259,34 @@ export function AtsScoreChecker() {
     setError("");
     setAssessment(null);
     setFallback(null);
+    setReadability(null);
 
-    if (jobWords < 40) {
-      setError("Paste at least 40 words from the job advert so there is enough detail to compare.");
-      return;
-    }
     if (cvWords < 80) {
-      setError("Paste at least 80 words from your CV so the assessment can review more than one section.");
+      setError("Upload your CV or paste at least 80 words of it so the check can review more than one section.");
+      return;
+    }
+    if (jobWords > 0 && jobWords < 40) {
+      setError("Paste at least 40 words from the job advert, or clear it to check your CV on its own.");
       return;
     }
 
+    const report = cvReadabilityReport({
+      text: cvText,
+      emptyPages: fileInfo?.emptyPages,
+      multiColumnPages: fileInfo?.multiColumnPages,
+      source: fileInfo ? "file" : "paste",
+    });
+    setReadability(report);
+
+    // No advert: the readability check runs entirely in the browser.
+    if (jobWords === 0) {
+      trackFunnelEvent("tool_started", { tool: "ats_checker", placement: analyticsPlacements.atsModeReadability });
+      trackFunnelEvent("tool_completed", { tool: "ats_checker", result: "success", placement: analyticsPlacements.atsModeReadability });
+      window.setTimeout(() => resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 0);
+      return;
+    }
+
+    trackFunnelEvent("tool_started", { tool: "ats_checker", placement: analyticsPlacements.atsModeMatch });
     setLoading(true);
     try {
       const response = await fetch("/api/tools/cv-fit-assessment", {
@@ -184,7 +306,9 @@ export function AtsScoreChecker() {
         );
       }
       setAssessment(data);
+      trackFunnelEvent("tool_completed", { tool: "ats_checker", result: "success", placement: analyticsPlacements.atsModeMatch });
     } catch (requestError) {
+      trackFunnelEvent("tool_completed", { tool: "ats_checker", result: "error", placement: analyticsPlacements.atsModeMatch });
       const keywordResult = analyseAtsKeywords(jobDescription, cvText);
       setFallback(keywordResult);
       setError(
@@ -204,7 +328,10 @@ export function AtsScoreChecker() {
     setCvText(examples.cv);
     setAssessment(null);
     setFallback(null);
+    setReadability(null);
+    setFileInfo(null);
     setError("");
+    setFileError("");
   }
 
   function reset() {
@@ -212,7 +339,41 @@ export function AtsScoreChecker() {
     setCvText("");
     setAssessment(null);
     setFallback(null);
+    setReadability(null);
+    setFileInfo(null);
     setError("");
+    setFileError("");
+  }
+
+  async function handleFile(file: File | undefined) {
+    if (!file) return;
+    setFileError("");
+    setReadingFile(true);
+    trackFunnelEvent("tool_started", { tool: "ats_checker", placement: analyticsPlacements.atsCvUpload });
+    try {
+      const { text, ...info } = await readCvFile(file);
+      if (text.length > 30_000) throw new Error("This CV has more than 30,000 characters of text. Check a shorter version.");
+      setCvText(text);
+      setFileInfo({ ...info, name: file.name });
+      setAssessment(null);
+      setFallback(null);
+      setReadability(null);
+      if (text.trim().length < 20) {
+        setFileError("Almost no text could be read from this file. It may be a scanned image. Export it again from Word or your CV builder, or paste the text.");
+      }
+    } catch (cause) {
+      setFileError(cause instanceof Error ? cause.message : "This file could not be read. Try exporting a fresh PDF or Word file.");
+    } finally {
+      setReadingFile(false);
+    }
+  }
+
+  function openCleanEditor() {
+    try {
+      writeCvToolHandoff({ source: "ats-readability", sourceText: cvText.slice(0, 30_000) });
+    } catch {
+      // The editor still opens; the visitor can paste their CV there.
+    }
   }
 
   function prepareEditorHandoff() {
@@ -239,42 +400,75 @@ export function AtsScoreChecker() {
     <div>
       <form onSubmit={handleSubmit} className="grid gap-5">
         <div className="grid gap-5 lg:grid-cols-2">
+          <div>
+            <div className="flex items-end justify-between gap-4">
+              <label htmlFor="ats-cv-text">
+                <span className="block text-sm font-bold text-navy">1. Your CV</span>
+                <span className="mt-1 block text-xs leading-5 text-muted">
+                  Upload a PDF or Word file, or paste the text.
+                </span>
+              </label>
+              <span className="shrink-0 text-xs font-bold text-muted">{cvWords} words</span>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-3">
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={readingFile || loading}
+                className="inline-flex min-h-11 items-center gap-2 rounded-md border border-navy bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:opacity-60"
+              >
+                {readingFile ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                {readingFile ? "Reading your CV..." : "Upload PDF or Word"}
+              </button>
+              {fileInfo ? (
+                <span className="text-xs font-bold text-success">
+                  <Check className="mr-1 inline h-4 w-4" />
+                  {fileInfo.name} read in your browser
+                </span>
+              ) : (
+                <span className="text-xs text-muted">The file stays on your device.</span>
+              )}
+              <input
+                ref={fileRef}
+                type="file"
+                accept=".pdf,.docx"
+                className="hidden"
+                aria-label="Upload your CV as PDF or Word"
+                onChange={(event) => {
+                  void handleFile(event.target.files?.[0]);
+                  event.target.value = "";
+                }}
+              />
+            </div>
+            {fileError ? <p role="alert" className="mt-2 text-sm font-bold text-[#8d3030]">{fileError}</p> : null}
+            <textarea
+              id="ats-cv-text"
+              value={cvText}
+              onChange={(event) => setCvText(event.target.value)}
+              placeholder="...or paste your CV text here"
+              className="mt-3 min-h-[300px] w-full resize-y rounded-md border border-line-strong bg-white p-4 text-[16px] leading-7 text-ink outline-none transition placeholder:text-muted/70 focus:border-navy focus:ring-2 focus:ring-navy/15"
+              maxLength={30_000}
+              aria-describedby="privacy-note"
+            />
+          </div>
+
           <label className="block">
             <span className="flex items-end justify-between gap-4">
               <span>
-                <span className="block text-sm font-bold text-navy">1. Job description</span>
+                <span className="block text-sm font-bold text-navy">2. Job advert <span className="font-normal text-muted">(optional)</span></span>
                 <span className="mt-1 block text-xs leading-5 text-muted">
-                  Include responsibilities and essential criteria.
+                  Add one to check keywords and requirements. Leave blank for a CV-only check.
                 </span>
               </span>
               <span className="shrink-0 text-xs font-bold text-muted">{jobWords} words</span>
             </span>
             <textarea
+              ref={jobRef}
               value={jobDescription}
               onChange={(event) => setJobDescription(event.target.value)}
-              placeholder="Paste the full job advert here..."
+              placeholder="Paste the full job advert here (optional)..."
               className="mt-3 min-h-[300px] w-full resize-y rounded-md border border-line-strong bg-white p-4 text-[16px] leading-7 text-ink outline-none transition placeholder:text-muted/70 focus:border-navy focus:ring-2 focus:ring-navy/15"
               maxLength={20_000}
-              aria-describedby="privacy-note"
-            />
-          </label>
-
-          <label className="block">
-            <span className="flex items-end justify-between gap-4">
-              <span>
-                <span className="block text-sm font-bold text-navy">2. Your CV text</span>
-                <span className="mt-1 block text-xs leading-5 text-muted">
-                  Copy the text from the version you plan to submit.
-                </span>
-              </span>
-              <span className="shrink-0 text-xs font-bold text-muted">{cvWords} words</span>
-            </span>
-            <textarea
-              value={cvText}
-              onChange={(event) => setCvText(event.target.value)}
-              placeholder="Paste your CV text here..."
-              className="mt-3 min-h-[300px] w-full resize-y rounded-md border border-line-strong bg-white p-4 text-[16px] leading-7 text-ink outline-none transition placeholder:text-muted/70 focus:border-navy focus:ring-2 focus:ring-navy/15"
-              maxLength={30_000}
               aria-describedby="privacy-note"
             />
           </label>
@@ -293,7 +487,11 @@ export function AtsScoreChecker() {
         <div className="flex flex-col gap-4 border-t border-line pt-5 sm:flex-row sm:items-center sm:justify-between">
           <p id="privacy-note" className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            <span>Submitted CV text and the advert go to WorkCV’s server and then OpenAI for this assessment. Remove unnecessary contact or sensitive details first. <Link className="font-semibold underline" href="/tools/ats-score-checker#remove-personal-details">See an anonymised example</Link> and read the <Link className="font-semibold underline" href="/privacy">privacy policy</Link>.</span>
+            {jobWords === 0 ? (
+              <span>Without a job advert, the check runs in your browser and nothing is sent to WorkCV. If you add an advert, your CV text and the advert go to WorkCV’s server and then OpenAI for the match assessment. <Link className="font-semibold underline" href="/privacy">Privacy policy</Link>.</span>
+            ) : (
+              <span>With a job advert, your CV text and the advert go to WorkCV’s server and then OpenAI for this assessment. Remove unnecessary contact or sensitive details first. <Link className="font-semibold underline" href="/tools/ats-score-checker#remove-personal-details">See an anonymised example</Link> and read the <Link className="font-semibold underline" href="/privacy">privacy policy</Link>.</span>
+            )}
           </p>
           <div className="flex flex-wrap gap-2">
             <button
@@ -328,7 +526,7 @@ export function AtsScoreChecker() {
                 </>
               ) : (
                 <>
-                  Assess my CV fit
+                  {jobWords === 0 ? "Check my CV" : "Check my CV against this job"}
                   <ArrowRight className="h-4 w-4" />
                 </>
               )}
@@ -336,6 +534,21 @@ export function AtsScoreChecker() {
           </div>
         </div>
       </form>
+
+      {readability && !assessment && !fallback && !loading ? (
+        <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
+          <ReadabilityResult
+            report={readability}
+            compact={false}
+            fileName={fileInfo?.name ?? null}
+            onAddAdvert={() => {
+              jobRef.current?.focus();
+              jobRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+            }}
+            onOpenEditor={openCleanEditor}
+          />
+        </div>
+      ) : null}
 
       {assessment ? (
         <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
@@ -517,6 +730,12 @@ export function AtsScoreChecker() {
               </div>
             </div>
           </div>
+
+          {readability ? (
+            <div className="mt-5">
+              <ReadabilityResult report={readability} compact fileName={fileInfo?.name ?? null} onOpenEditor={openCleanEditor} />
+            </div>
+          ) : null}
 
           <div className="mt-5 flex items-start gap-3 rounded-md border border-line bg-white p-5 text-sm leading-6 text-muted">
             <FileSearch className="mt-0.5 h-5 w-5 shrink-0 text-gold" />

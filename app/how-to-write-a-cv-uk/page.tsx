@@ -409,6 +409,13 @@ export default function HowToWriteACvUkPage() {
               Tailoring does not mean rewriting every sentence. It means making
               the employer's important criteria easy to find and support.
             </p>
+            <p className="mt-4 text-base leading-7 text-muted">
+              Then upload your finished CV to the{" "}
+              <Link href="/tools/ats-score-checker" className="font-bold text-navy underline underline-offset-4">
+                free ATS CV checker
+              </Link>{" "}
+              to check how it reads, and add the job advert to see what it evidences.
+            </p>
           </div>
           <div className="grid gap-3">
             {finalChecks.map((item) => (

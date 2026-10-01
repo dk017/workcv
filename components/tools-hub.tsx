@@ -25,7 +25,7 @@ const categories: Category[] = [
     { title: "CV Summary Generator", href: "/tools/cv-summary-generator-uk", description: "Compare three concise UK CV summary options built around your target role and real evidence.", icon: FileText },
   ] },
   { title: "CV checkers", description: "Find content, targeting and length issues before you send an application.", tools: [
-    { title: "ATS Score Checker", href: "/tools/ats-score-checker", description: "Compare your CV with a job advert and find matched or missing role-specific terms.", icon: FileCheck2 },
+    { title: "ATS CV Checker", href: "/tools/ats-score-checker", description: "Upload your CV for a readability check, or compare it with a job advert to find matched or missing role-specific terms.", icon: FileCheck2 },
     { title: "CV Gap Detector", href: "/tools/cv-gap-detector-uk", description: "Paste CV text to find missing sections, dates, contact details and evidence signals.", icon: FileSearch },
     { title: "CV Word Count Checker", href: "/tools/cv-word-count-checker", description: "Count words, estimate A4 pages and get a result-specific UK CV length recommendation.", icon: FileText },
     { title: "CV Readability Checker", href: "/tools/cv-readability-checker", description: "Measure Flesch Reading Ease and review long sentences or possible passive wording.", icon: FileSearch },

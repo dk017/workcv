@@ -42,7 +42,7 @@ const categories: HubCategory[] = [
       { title: "Job Application Pack", href: "/tools/job-application-pack-uk", description: "Turn one vacancy and your real evidence into a reviewable application pack." },
   { title: "Job Application Tracker", href: "/tools/job-application-tracker-uk", description: "Track applications, follow-ups and closing dates in your browser, with an Excel template." },
       { title: "Cover letter generator", href: "/tools/cover-letter-generator-uk", description: "Connect your experience to the job advert in a focused UK draft." },
-      { title: "ATS score checker", href: "/tools/ats-score-checker", description: "Find relevant terms and evidence gaps before you submit." },
+      { title: "ATS CV checker", href: "/tools/ats-score-checker", description: "Upload your CV to check how it reads, then find evidence gaps for a job advert." },
     ],
   },
   {

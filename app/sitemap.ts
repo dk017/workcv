@@ -54,7 +54,7 @@ const routes = [
   { path: "/cover-letter-examples-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-30" },
   { path: "/tools/cover-letter-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
   { path: "/tools/redundancy-pay-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-30" },
-  { path: "/tools/ats-score-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
+  { path: "/tools/ats-score-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-01" },
   { path: "/tools/uk-salary-by-job-title", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
   { path: "/tools/notice-period-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
   { path: "/tools/cv-format-checker-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-24" },

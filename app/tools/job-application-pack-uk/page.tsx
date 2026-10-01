@@ -170,7 +170,7 @@ export default function JobApplicationPackPage() {
       </section>
 
       <MoneyPageCta heading="Turn the pack into a finished UK CV." body={`Build and preview the document behind your application, then pay ${site.price} once only if you download the PDF.`} trackingContext="job_application_pack_page" />
-      <RelatedLinksSection title="Continue with the application." links={[["Track your job applications", "/tools/job-application-tracker-uk"], ["Prepare for a job interview", "/how-to-prepare-for-a-job-interview-uk"], ["Common interview questions", "/common-job-interview-questions-uk"], ["Cover letter generator", "/tools/cover-letter-generator-uk"], ["ATS score checker", "/tools/ats-score-checker"], ["No-subscription CV builder", "/cv-builder-no-subscription-uk"]]} />
+      <RelatedLinksSection title="Continue with the application." links={[["Track your job applications", "/tools/job-application-tracker-uk"], ["Prepare for a job interview", "/how-to-prepare-for-a-job-interview-uk"], ["Common interview questions", "/common-job-interview-questions-uk"], ["Cover letter generator", "/tools/cover-letter-generator-uk"], ["ATS CV checker", "/tools/ats-score-checker"], ["No-subscription CV builder", "/cv-builder-no-subscription-uk"]]} />
       <FaqSection faqs={faqs} title="Job application pack questions." />
     </>
   );

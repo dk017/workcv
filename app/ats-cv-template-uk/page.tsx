@@ -212,6 +212,13 @@ export default function AtsCvTemplateUkPage() {
                 Check my approach
               </ButtonLink>
             </div>
+            <p className="mt-4 text-sm leading-6 text-muted">
+              Already have a CV?{" "}
+              <Link href="/tools/ats-score-checker" className="font-bold text-navy underline underline-offset-4">
+                Upload it to the free ATS CV checker
+              </Link>{" "}
+              to see how it reads.
+            </p>
           </div>
 
           <div className="rounded-2xl border border-line bg-white p-4 shadow-soft md:p-6">

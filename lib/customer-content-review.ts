@@ -6,7 +6,7 @@ export const customerContentReview = {
   "/tools/cv-template-word-uk": "2026-09-23",
   "/chatgpt-cv-to-pdf-uk": "2026-09-23",
   "/tools/job-application-pack-uk": "2026-09-24",
-  "/tools/ats-score-checker": "2026-09-23",
+  "/tools/ats-score-checker": "2026-10-01",
   "/canva-cv-alternative-uk": "2026-09-23",
   "/cv-word-or-pdf-uk": "2026-09-23",
   "/shorten-cv-to-two-pages": "2026-09-23",
