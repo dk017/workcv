@@ -40,7 +40,6 @@ export const analyticsPlacements = {
   passSwitchingScams: "pass_switching_scams",
   passSwitchingAlternative: "pass_switching_alternative",
   passSwitchingCancel: "pass_switching_cancel",
-  passTailoringCanva: "pass_tailoring_canva",
   passRightToWork: "pass_right_to_work",
   passRedundancy: "pass_redundancy",
   passAtsChecker: "pass_ats_checker",

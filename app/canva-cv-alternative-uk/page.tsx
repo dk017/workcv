@@ -21,8 +21,6 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
-import { PassOffer } from "@/components/pass-offer";
-import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = "13 June 2026";
 
@@ -391,7 +389,6 @@ export default function CanvaCvAlternativeUkPage() {
         </div>
       </section>
 
-      <PassOffer audience="tailoring" trackingLabel={analyticsPlacements.passTailoringCanva} />
       <FaqSection faqs={faqItems} title="Questions about Canva CV alternatives." />
       <FinalCta
         heading="Build a CV for applications, not a design board."

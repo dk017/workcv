@@ -936,6 +936,12 @@ export function CvEditor() {
     setCheckoutLoading(true);
     setCheckoutError(null);
     trackEditorEvent("payment_started", draftId, { plan });
+    // Remember the plan so "Return to checkout" after a cancelled payment reopens the same one.
+    try {
+      window.sessionStorage.setItem("workcv-plan-intent", plan);
+    } catch {
+      // Storage can be blocked; the retry then falls back to the plan picker default.
+    }
 
     try {
       const saved = await saveManagerRef.current?.flush();
@@ -1408,8 +1414,8 @@ export function CvEditor() {
                 onClick={() => {
                   setPaymentState(null);
                   setForceNewCheckout(true);
-                  trackEditorEvent("checkout_opened", draftId, { retry: true });
-                  void startCheckout(cv.email);
+                  trackEditorEvent("checkout_opened", draftId, { retry: true, plan: checkoutPlan });
+                  void startCheckout(cv.email, checkoutPlan);
                 }}
                 disabled={checkoutLoading}
                 className="inline-flex min-h-10 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white disabled:cursor-wait disabled:opacity-60"
