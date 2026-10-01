@@ -3,10 +3,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
-import { createDodoCheckout } from "@/lib/dodo";
+import { createDodoCheckout, createDodoUpgradeDiscount } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { DIGITAL_CONTENT_CONSENT_VERSION, isWorkcvPlan, productIdForPlan } from "@/lib/commerce";
-import { getPassStatus } from "@/lib/cv-entitlement";
+import { getPassStatus, getUpgradeOffer } from "@/lib/cv-entitlement";
 import { isApprovedTestUser } from "@/lib/test-orders";
 import { sanitizeSaleAttribution } from "@/lib/attribution";
 
@@ -43,6 +43,8 @@ export async function POST(request: NextRequest) {
   const email = payload.email;
   const consentAccepted = payload.consentAccepted === true;
   const forceNew = payload.forceNew === true;
+  // The editor says whether it showed the upgrade price, so we never charge more than shown.
+  const expectedUpgrade = payload.expectedUpgrade === true;
   if (payload.plan !== undefined && !isWorkcvPlan(payload.plan)) {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
   }
@@ -129,14 +131,47 @@ export async function POST(request: NextRequest) {
       `,
       [draftId, user.id, planProductId],
     );
-    if (!forceNew && existing.rows[0]?.checkout_url) {
+    // An eligible upgrade always gets a fresh checkout with its own credit, so a
+    // reused full-price Pass checkout can never be returned instead.
+    const upgrade =
+      plan === "pass"
+        ? await getUpgradeOffer(user).catch((error) => {
+            console.error("upgrade_offer_lookup_failed", error);
+            return { eligible: false } as const;
+          })
+        : ({ eligible: false } as const);
+    if (expectedUpgrade && plan === "pass" && !upgrade.eligible) {
+      return NextResponse.json(
+        {
+          error: "The upgrade price is no longer available, so the Job Search Pass is now the full price. Close this window to see the current price.",
+          upgradeEnded: true,
+        },
+        { status: 409 },
+      );
+    }
+    if (!upgrade.eligible && !forceNew && existing.rows[0]?.checkout_url) {
       return NextResponse.json({ checkoutUrl: existing.rows[0].checkout_url });
+    }
+
+    let discountCode: string | undefined;
+    if (upgrade.eligible) {
+      try {
+        discountCode = await createDodoUpgradeDiscount(upgrade.creditMinor);
+      } catch (error) {
+        console.error("dodo_upgrade_discount_failed", error);
+        return NextResponse.json(
+          { error: "The upgrade price is unavailable right now. Please try again in a minute; you have not been charged." },
+          { status: 409 },
+        );
+      }
     }
 
     const checkout = await createDodoCheckout({
       draftId,
       email: isValidEmail(email) ? email : undefined,
       plan,
+      discountCode,
+      upgradeCreditMinor: upgrade.eligible ? upgrade.creditMinor : undefined,
     });
 
     await getPool().query(

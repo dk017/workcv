@@ -29,6 +29,8 @@ export const editorEventNames = [
   "checkout_plan_selected",
   "pass_offer_shown",
   "pass_offer_clicked",
+  "upgrade_offer_shown",
+  "upgrade_offer_clicked",
   "cv_duplicated",
   "ai_suggestion_generated",
   "ai_suggestion_applied",

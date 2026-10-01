@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
-import { getPassStatus, hasPaidCvOrder } from "@/lib/cv-entitlement";
+import { getPassStatus, getUpgradeOffer, hasPaidCvOrder } from "@/lib/cv-entitlement";
 import { getPool, hasDatabaseUrl } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -28,13 +28,18 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "CV not found" }, { status: 404 });
     }
 
-    const [unlocked, pass] = await Promise.all([
+    const [unlocked, pass, upgrade] = await Promise.all([
       hasPaidCvOrder(user.id, draftId),
       getPassStatus(user.id),
+      // The upgrade is optional; a lookup failure must not block payment status.
+      getUpgradeOffer(user).catch((error) => {
+        console.error("upgrade_offer_lookup_failed", error);
+        return { eligible: false } as const;
+      }),
     ]);
 
     if (unlocked) {
-      return NextResponse.json({ paid: true, status: "paid", pass });
+      return NextResponse.json({ paid: true, status: "paid", pass, upgrade });
     }
 
     const checkout = await getPool().query<{ status: string }>(
@@ -53,6 +58,7 @@ export async function GET(request: NextRequest) {
       status:
         status === "failed" || status === "cancelled" ? status : "pending",
       pass,
+      upgrade,
     });
   } catch (error) {
     console.error("payment_status_check_failed", error);

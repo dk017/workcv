@@ -14,6 +14,7 @@ import { ensurePaymentTables, getPool } from "@/lib/db";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
 import { planForProductId } from "@/lib/commerce";
 import { passExpiry, refundRevokesAccess } from "@/lib/pass-rules";
+import { getUpgradeOffer } from "@/lib/cv-entitlement";
 
 export const runtime = "nodejs";
 
@@ -261,6 +262,11 @@ export async function POST(request: NextRequest) {
 
       if (claimed.rows.length > 0) {
         try {
+          // Tell a single-CV buyer about the upgrade only if they can actually use it.
+          const upgrade =
+            plan === "cv" && checkoutUserId
+              ? await getUpgradeOffer({ id: checkoutUserId, email }).catch(() => ({ eligible: false }) as const)
+              : ({ eligible: false } as const);
           await sendPurchaseConfirmationEmail({
             to: email,
             orderId: paymentId,
@@ -269,6 +275,7 @@ export async function POST(request: NextRequest) {
             editorUrl: `${getAppUrl()}/editor?draftId=${encodeURIComponent(draftId)}`,
             plan,
             passEndsAt: plan === "pass" ? passExpiry(new Date()) : null,
+            upgrade: upgrade.eligible ? { priceMinor: upgrade.priceMinor, creditMinor: upgrade.creditMinor, endsAt: new Date(upgrade.endsAt) } : null,
           });
           await getPool().query(
             `

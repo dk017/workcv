@@ -44,6 +44,7 @@ import {
   templates,
 } from "@/lib/editor-data";
 import { site } from "@/lib/site";
+import { formatPence } from "@/lib/pass-upgrade";
 import {
   pollPaymentStatus,
   type PaymentState,
@@ -119,6 +120,8 @@ export function CvEditor() {
   const [purposeSurveyOpen, setPurposeSurveyOpen] = useState(false);
   const [paymentState, setPaymentState] = useState<PaymentState | null>(null);
   const [passStatus, setPassStatus] = useState<PaymentStatusResult["pass"] | null>(null);
+  const [upgradeOffer, setUpgradeOffer] = useState<PaymentStatusResult["upgrade"] | null>(null);
+  const upgradeShownRef = useRef(false);
   const [checkoutPlan, setCheckoutPlan] = useState<"cv" | "pass">("cv");
   const [forceNewCheckout, setForceNewCheckout] = useState(false);
   const [templatePickerOpen, setTemplatePickerOpen] = useState(false);
@@ -465,6 +468,7 @@ export function CvEditor() {
         | null;
       if (!response.ok || !data) throw new Error("Payment status unavailable");
       if (data.pass) setPassStatus(data.pass);
+      if (data.upgrade) setUpgradeOffer(data.upgrade);
       return data;
     };
     const checkPaidStatus = async () => {
@@ -960,10 +964,12 @@ export function CvEditor() {
           email,
           consentAccepted: true,
           forceNew: forceNewCheckout,
+          expectedUpgrade: plan === "pass" && upgradeOffer?.eligible === true,
           attribution: readCheckoutAttribution(),
         }),
       });
-      const data = (await response.json()) as { checkoutUrl?: string; error?: string };
+      const data = (await response.json()) as { checkoutUrl?: string; error?: string; upgradeEnded?: boolean };
+      if (data.upgradeEnded) setUpgradeOffer({ eligible: false });
 
       if (!response.ok || !data.checkoutUrl) {
         throw new Error(
@@ -1000,6 +1006,12 @@ export function CvEditor() {
           ? "Unsaved changes"
           : saveSnapshot.error || "Save failed";
 
+  useEffect(() => {
+    if (paymentState !== "paid" || !upgradeOffer?.eligible || passStatus?.active || upgradeShownRef.current) return;
+    upgradeShownRef.current = true;
+    trackEditorEvent("upgrade_offer_shown", draftId, { placement: "payment_confirmed" });
+  }, [paymentState, upgradeOffer, passStatus, draftId]);
+
   const checkPaymentAgain = async () => {
     if (!draftId) return;
     setPaymentState("checking");
@@ -1014,6 +1026,7 @@ export function CvEditor() {
         | null;
       if (!response.ok || !data) throw new Error();
       if (data.pass) setPassStatus(data.pass);
+      if (data.upgrade) setUpgradeOffer(data.upgrade);
       if (data.paid) {
         setPdfUnlocked(true);
         setPaymentState("paid");
@@ -1398,7 +1411,28 @@ export function CvEditor() {
                   This can take a few seconds after checkout. Do not start another payment.
                 </p>
               )}
+              {paymentState === "paid" && upgradeOffer?.eligible && !passStatus?.active && (
+                <p className="mt-1 text-sm leading-6 text-navy">
+                  Applying for more jobs? Upgrade to the Job Search Pass for{" "}
+                  <strong>{formatPence(upgradeOffer.priceMinor)}</strong>: your{" "}
+                  {formatPence(upgradeOffer.creditMinor)} counts. Unlimited CVs and cover letters for {site.passDays} days,
+                  until {formatUkDate(upgradeOffer.endsAt)}.
+                </p>
+              )}
             </div>
+            {paymentState === "paid" && upgradeOffer?.eligible && !passStatus?.active && (
+              <button
+                type="button"
+                onClick={() => {
+                  trackEditorEvent("upgrade_offer_clicked", draftId, { placement: "payment_confirmed" });
+                  setCheckoutPlan("pass");
+                  setReviewOpen(true);
+                }}
+                className="inline-flex min-h-10 shrink-0 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white"
+              >
+                Upgrade for {formatPence(upgradeOffer.priceMinor)}
+              </button>
+            )}
             {paymentState === "pending" && (
               <button
                 type="button"
@@ -1617,6 +1651,7 @@ export function CvEditor() {
           plan={checkoutPlan}
           passAvailable={!passStatus?.active}
           cvAvailable={!pdfUnlocked}
+          upgrade={upgradeOffer?.eligible ? upgradeOffer : null}
           onPlanChange={(plan) => {
             setCheckoutPlan(plan);
             trackEditorEvent("checkout_plan_selected", draftId, { plan });
@@ -1674,6 +1709,10 @@ function AiReviewModal({ review, onClose, onApply }: { review: AiReview; onClose
   );
 }
 
+function formatUkDate(iso: string) {
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "long", timeZone: "Europe/London" });
+}
+
 function CheckoutSheet({
   issues,
   checkoutError,
@@ -1684,6 +1723,7 @@ function CheckoutSheet({
   plan,
   passAvailable,
   cvAvailable = true,
+  upgrade = null,
   onPlanChange,
 }: {
   issues: string[];
@@ -1695,10 +1735,12 @@ function CheckoutSheet({
   plan: "cv" | "pass";
   passAvailable: boolean;
   cvAvailable?: boolean;
+  upgrade?: { creditMinor: number; priceMinor: number; endsAt: string } | null;
   onPlanChange: (plan: "cv" | "pass") => void;
 }) {
   const selectedPlan = !cvAvailable ? "pass" : passAvailable ? plan : "cv";
-  const selectedPrice = selectedPlan === "pass" ? site.passPrice : site.price;
+  const passPriceLabel = upgrade ? formatPence(upgrade.priceMinor) : site.passPrice;
+  const selectedPrice = selectedPlan === "pass" ? passPriceLabel : site.price;
   const [digitalAccessAccepted, setDigitalAccessAccepted] = useState(false);
   const dialogRef = useAccessibleDialog(onClose, !checkoutLoading);
   return (
@@ -1743,7 +1785,8 @@ function CheckoutSheet({
             <label className={`flex cursor-pointer gap-3 rounded-lg border p-4 ${selectedPlan === "pass" ? "border-navy bg-paper" : "border-line bg-white"}`}>
               <input type="radio" name="workcv-plan" className="mt-1 h-4 w-4 accent-navy" checked={selectedPlan === "pass"} onChange={() => onPlanChange("pass")} />
               <span className="min-w-0 flex-1">
-                <span className="flex items-baseline justify-between gap-3"><span className="font-bold text-navy">Job Search Pass <span className="ml-1 rounded bg-gold-tint px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-navy">3+ applications</span></span><span className="font-display text-2xl font-semibold text-navy">{site.passPrice}</span></span>
+                <span className="flex items-baseline justify-between gap-3"><span className="font-bold text-navy">Job Search Pass <span className="ml-1 rounded bg-gold-tint px-1.5 py-0.5 text-[11px] font-bold uppercase tracking-[0.08em] text-navy">3+ applications</span></span><span className="text-right">{upgrade ? <span className="mr-1.5 text-sm text-muted line-through">{site.passPrice}</span> : null}<span className="font-display text-2xl font-semibold text-navy">{passPriceLabel}</span></span></span>
+                {upgrade ? <span className="mt-1 block text-xs font-bold leading-5 text-success">Upgrade price: your {formatPence(upgrade.creditMinor)} CV purchase counts until {formatUkDate(upgrade.endsAt)}.</span> : null}
                 <span className="mt-1 block text-xs leading-5 text-muted">Unlimited CVs and matching cover letters for {site.passDays} days. Duplicate your CV for each job. Every CV you make stays yours to edit and download.</span>
               </span>
             </label>
