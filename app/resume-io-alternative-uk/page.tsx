@@ -19,6 +19,7 @@ import {
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Resume.io Alternative UK - WorkCV",
     description:
-      "A focused UK CV builder for people who want one CV PDF without a monthly CV builder subscription.",
+      "A focused UK CV and cover letter builder for people who want to pay once, without a monthly CV builder subscription.",
     url: "/resume-io-alternative-uk",
   },
 };
@@ -42,8 +43,8 @@ const comparisonRows = [
   ["Renewal", competitorPricing.resumeIo.renewal, "No monthly renewal"],
   ["Download access", "Trial includes download formats", `${site.priceGbp} when ready`],
   ["Cancellation", "Needed before renewal", "Nothing to cancel"],
-  ["Cover letters", "Included in trial/premium tools", "Not included in this version"],
-  ["Best fit", "Broader CV and cover-letter platform", "One finished UK CV PDF"],
+  ["Cover letters", "Included in trial/premium tools", "Matching cover letter included with each CV"],
+  ["Best fit", "Broader CV and cover-letter platform", "A finished UK CV and cover letter, PDF and Word"],
 ];
 
 const benefits = [
@@ -59,12 +60,12 @@ const faqItems = [
   {
     question: "What is a good Resume.io alternative in the UK?",
     answer:
-      `If you want to avoid monthly renewal, WorkCV is a focused UK alternative. You build and preview first, then pay ${site.priceGbp} when you download the finished CV PDF.`,
+      `If you want to avoid monthly renewal, WorkCV is a focused UK alternative. You build and preview first, then pay ${site.priceGbp} once when you download the finished CV and cover letter as PDF and Word.`,
   },
   {
     question: "How is WorkCV different from Resume.io?",
     answer:
-      "Resume.io is a broader CV/resume and cover-letter platform with a 7-day trial that can renew. WorkCV focuses on one UK CV PDF download with no monthly CV builder subscription.",
+      "Resume.io is a broader CV/resume and cover-letter platform with a 7-day trial that can renew. WorkCV focuses on UK CVs with matching cover letters, paid once, with no monthly CV builder subscription.",
   },
   {
     question: "How much does Resume.io cost in the UK?",
@@ -74,7 +75,7 @@ const faqItems = [
   {
     question: "Does WorkCV include cover letters?",
     answer:
-      "Not in this version. WorkCV is currently focused on helping UK job seekers create and download a clear CV PDF.",
+      "Yes. Each saved CV includes a matching cover letter, and both download as PDF and editable Word for the same one-time payment.",
   },
   {
     question: "Do I need to cancel WorkCV?",
@@ -85,7 +86,7 @@ const faqItems = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder positioned as a no-subscription alternative for people who need one finished CV PDF.",
+    "UK CV and cover letter builder positioned as a no-subscription alternative for people who want to pay once.",
   url: `${site.url}/resume-io-alternative-uk`,
 });
 
@@ -125,8 +126,8 @@ export default function ResumeIoAlternativeUkPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Resume.io includes multiple resume formats, cover letters and
-              renewable access. WorkCV focuses on a saved UK CV and a{" "}
-              {site.price} PDF unlock without a monthly WorkCV plan.
+              renewable access. WorkCV focuses on a saved UK CV with a matching cover
+              letter and a {site.price} one-time unlock, without a monthly WorkCV plan.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -177,7 +178,7 @@ export default function ResumeIoAlternativeUkPage() {
               ))}
             </ul>
             <p className="mt-7 text-sm leading-6 text-muted">
-              Best for job seekers who need a finished UK CV PDF and do not want
+              Best for job seekers who need a finished UK CV and cover letter and do not want
               a recurring CV builder plan.
             </p>
           </div>
@@ -306,6 +307,7 @@ export default function ResumeIoAlternativeUkPage() {
           ["Resume.io terms", "https://resume.io/terms-of-service"],
         ]}
       />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about Resume.io alternatives." />
       <FinalCta
         heading="Build your CV without the monthly renewal."

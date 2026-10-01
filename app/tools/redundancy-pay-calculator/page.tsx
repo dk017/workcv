@@ -7,6 +7,7 @@ import { FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { RedundancyPayCalculator } from "@/components/redundancy-pay-calculator";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { PassOffer } from "@/components/pass-offer";
 
 // Annual refresh: recheck the GB and Northern Ireland weekly caps and maximum awards each April.
 export const metadata: Metadata = {
@@ -294,6 +295,7 @@ export default function RedundancyPayCalculatorPage() {
         </div>
       </section>
 
+      <PassOffer audience="redundancy" trackingLabel={analyticsPlacements.passRedundancy} />
       <FaqSection faqs={faqItems} title="UK redundancy pay questions." />
       <FinalCta
         heading="Preparing for your next role after redundancy?"

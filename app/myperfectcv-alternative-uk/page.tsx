@@ -18,6 +18,8 @@ import {
 } from "@/lib/competitor-pricing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -31,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "MyPerfectCV Alternative UK - WorkCV",
     description:
-      "A focused UK CV builder for people who want one CV PDF without a monthly CV builder subscription.",
+      "A focused UK CV and cover letter builder for people who want to pay once, without a monthly CV builder subscription.",
     url: "/myperfectcv-alternative-uk",
   },
 };
@@ -41,8 +43,8 @@ const comparisonRows = [
   ["Renewal", competitorPricing.myPerfectCv.renewal, "No monthly renewal"],
   ["PDF download", "Included with premium access", `${site.priceGbp} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
-  ["Cover letters", "Included in premium tools", "Not included in this version"],
-  ["Best fit", "Ongoing CV and cover-letter access", "One finished UK CV PDF"],
+  ["Cover letters", "Included in premium tools", "Matching cover letter included with each CV"],
+  ["Best fit", "Ongoing CV and cover-letter access", "A finished UK CV and cover letter, PDF and Word"],
 ];
 
 const workCvBenefits = [
@@ -63,7 +65,7 @@ const faqItems = [
   {
     question: "How is WorkCV different from MyPerfectCV?",
     answer:
-      "MyPerfectCV offers broader CV and cover-letter tools with premium access that can renew. WorkCV is narrower: it focuses on one UK CV PDF download with no monthly CV builder subscription.",
+      "MyPerfectCV offers broader CV and cover-letter tools with premium access that can renew. WorkCV is narrower: it focuses on UK CVs with matching cover letters, paid once, with no monthly CV builder subscription.",
   },
   {
     question: "How much does MyPerfectCV cost?",
@@ -73,7 +75,7 @@ const faqItems = [
   {
     question: "Does WorkCV include cover letters?",
     answer:
-      "Not in this version. WorkCV is currently focused on helping you build and download a clean UK CV PDF.",
+      "Yes. Each saved CV includes a matching cover letter, and both download as PDF and editable Word for the same one-time payment.",
   },
   {
     question: "Do I need to cancel WorkCV?",
@@ -84,7 +86,7 @@ const faqItems = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder positioned as a no-subscription alternative for people who need one finished CV PDF.",
+    "UK CV and cover letter builder positioned as a no-subscription alternative for people who want to pay once.",
   url: `${site.url}/myperfectcv-alternative-uk`,
 });
 
@@ -125,7 +127,7 @@ export default function MyPerfectCvAlternativeUkPage() {
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               MyPerfectCV combines CV and cover-letter tools with account support
               and renewable access. WorkCV is narrower: build one UK CV, inspect
-              it, then pay {site.price} to unlock that saved document.
+              it, then pay {site.price} once for that CV and its matching cover letter.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -167,7 +169,7 @@ export default function MyPerfectCvAlternativeUkPage() {
               ))}
             </ul>
             <p className="mt-7 text-sm leading-6 text-muted">
-              Best for job seekers who need a finished CV PDF and do not want a
+              Best for job seekers who need a finished CV and cover letter and do not want a
               recurring CV builder plan.
             </p>
           </div>
@@ -198,7 +200,7 @@ export default function MyPerfectCvAlternativeUkPage() {
               <p className="mt-6 text-lg leading-8 text-muted">
                 The question is not whether MyPerfectCV has more features. It
                 does. The question is whether you need a broader premium toolset
-                or just one finished UK CV PDF.
+                or just a finished UK CV and cover letter.
               </p>
             </div>
             <div className="rounded-xl border border-line bg-paper p-5">
@@ -292,6 +294,7 @@ export default function MyPerfectCvAlternativeUkPage() {
           ["MyPerfectCV terms", "https://www.myperfectcv.co.uk/terms-of-use"],
         ]}
       />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about MyPerfectCV alternatives." />
       <FinalCta
         heading="Build your CV without the monthly renewal."

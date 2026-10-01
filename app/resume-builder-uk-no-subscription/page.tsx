@@ -20,11 +20,13 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
   title: `Resume Builder UK No Subscription - ${site.price} PDF`,
   description:
-    `Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay ${site.price} to unlock your saved CV PDF.`,
+    `Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`,
   alternates: {
     canonical: "/resume-builder-uk-no-subscription",
   },
@@ -194,7 +196,7 @@ const relatedLinks = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    `UK CV and resume builder with saved documents, a ${site.price} PDF unlock and no monthly subscription in the standard CV flow.`,
+    `UK CV and resume builder with saved documents, a matching cover letter, a ${site.price} one-time unlock for PDF and Word, and no monthly subscription.`,
   url: `${site.url}/resume-builder-uk-no-subscription`,
 });
 
@@ -235,8 +237,8 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Searched for a UK resume builder? WorkCV helps you create the
               document usually called a CV in UK applications. Log in by email
-              code, build and preview first, then pay {site.price} to unlock the
-              selected saved CV PDF.
+              code, build and preview first, then pay {site.price} once for the
+              saved CV and its matching cover letter, as PDF and Word.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -267,7 +269,7 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
           {[
             "Email-code login",
             "Saved CV editor",
-            `${site.price} PDF unlock`,
+            `${site.price} one-time unlock`,
             "Nothing renews",
           ].map((item) => (
             <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
@@ -443,6 +445,7 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
         </div>
       </section>
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingNoSubscription} />
       <FaqSection faqs={faqItems} title="Questions about UK resume builders without subscriptions." />
       <FinalCta
         heading="Build the CV first. Pay only when this saved CV is ready."

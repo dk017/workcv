@@ -14,6 +14,7 @@ import {
 } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
 
 export const metadata: Metadata = {
   title: "CV Builder Scams UK? Avoid Trial Renewal Charges",
@@ -258,7 +259,7 @@ export default function CvBuilderScamsUkPage() {
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-muted">
                   WorkCV uses a narrower model. Build and preview first, then
-                  pay {site.price} once to unlock that saved CV. There is no
+                  pay {site.price} once to unlock that saved CV and its matching cover letter. There is no
                   trial conversion, subscription, or automatic renewal. You can
                   return to the same CV, edit it, and download the updated PDF
                   without paying again. A separate new CV has its own one-time
@@ -312,6 +313,7 @@ export default function CvBuilderScamsUkPage() {
         </section>
       </article>
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingScams} />
       <FaqSection faqs={faqItems} title="Questions about CV builder charges." />
       <FinalCta
         heading="Build your CV without starting a subscription."

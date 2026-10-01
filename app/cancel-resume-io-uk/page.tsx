@@ -22,6 +22,8 @@ import {
 } from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -313,7 +315,7 @@ export default function CancelResumeIoUkPage() {
               </h2>
               <p className="mt-6 text-lg leading-8 text-muted">
                 Resume.io gives full trial access to CV tools, templates, cover
-                letters, and download formats. If you only need one UK CV PDF,
+                letters, and download formats. If you only need one UK CV and cover letter,
                 WorkCV keeps the model narrower: build first, pay {site.price}
                 when you download.
               </p>
@@ -375,6 +377,7 @@ export default function CancelResumeIoUkPage() {
       </section>
 
       <CancelGuideLinks current="/cancel-resume-io-uk" />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingCancel} />
       <FaqSection faqs={faqItems} title="Questions about cancelling Resume.io." />
       <FinalCta
         heading="Build your next CV without a renewal."

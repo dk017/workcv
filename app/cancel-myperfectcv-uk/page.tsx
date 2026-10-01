@@ -23,6 +23,8 @@ import {
 } from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -388,6 +390,7 @@ export default function CancelMyPerfectCvUkPage() {
       </section>
 
       <CancelGuideLinks current="/cancel-myperfectcv-uk" />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingCancel} />
       <FaqSection faqs={faqItems} title="Questions about cancelling MyPerfectCV." />
       <FinalCta
         heading="Build your next CV without a renewal."

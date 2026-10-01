@@ -29,6 +29,7 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { underTenCvBuilderAnswer } from "@/lib/price-copy";
+import { PassOffer } from "@/components/pass-offer";
 
 export const metadata: Metadata = {
   title: `CV Builder No Subscription UK - ${site.price} CV + Letter`,
@@ -124,7 +125,7 @@ const truthChecks = [
   {
     title: "No subscription, not a free PDF claim",
     body:
-      "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV PDF purchase.",
+      "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV purchase.",
   },
   {
     title: "Email-code login, not no-account editing",
@@ -570,6 +571,7 @@ export default function NoSubscriptionUkPage() {
 
       <SampleCvProof trackingContext={analyticsPlacements.noSubscriptionSample} />
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingNoSubscription} />
       <FaqSection
         faqs={faqItems}
         title="Questions about no-subscription CV builders."

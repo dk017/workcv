@@ -24,6 +24,7 @@ export default async function EditorPage({
     roleTemplate?: string;
     new?: string;
     from?: string;
+    plan?: string;
   };
 }) {
   const user = await getCurrentUser();
@@ -36,6 +37,7 @@ export default async function EditorPage({
     if (searchParams.roleTemplate) editorParams.set("roleTemplate", searchParams.roleTemplate);
     if (searchParams.new) editorParams.set("new", searchParams.new);
     if (searchParams.from) editorParams.set("from", searchParams.from);
+    if (searchParams.plan === "pass") editorParams.set("plan", "pass");
     redirect(
       buildLoginHref(
         `/editor${editorParams.toString() ? `?${editorParams.toString()}` : ""}`,

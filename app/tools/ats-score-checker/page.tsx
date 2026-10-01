@@ -19,6 +19,7 @@ import { AtsScoreChecker } from "@/components/ats-score-checker";
 import { FaqSection, FinalCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { PassOffer } from "@/components/pass-offer";
 
 export const metadata: Metadata = {
   title: "Free ATS CV Checker UK - Match Your CV to a Job",
@@ -265,6 +266,7 @@ export default function AtsScoreCheckerPage() {
           ["Build without a subscription", commercialRoutes.moneyPage],
         ]}
       />
+      <PassOffer audience="tailoring" trackingLabel={analyticsPlacements.passAtsChecker} />
       <FaqSection faqs={faqItems} title="ATS CV checker questions." />
       <FinalCta
         heading="Turn the evidence you found into a clearer CV."

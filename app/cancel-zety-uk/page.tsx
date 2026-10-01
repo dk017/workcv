@@ -24,6 +24,7 @@ import {
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
+import { PassOffer } from "@/components/pass-offer";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -320,7 +321,7 @@ export default function CancelZetyUkPage() {
               </h2>
               <p className="mt-6 text-lg leading-8 text-muted">
                 Zety is a broad CV and cover letter platform. If you only need a
-                focused UK CV PDF, WorkCV lets you build first and pay{" "}
+                focused UK CV and cover letter, WorkCV lets you build first and pay{" "}
                 {site.price} only when you download.
               </p>
             </div>
@@ -391,6 +392,7 @@ export default function CancelZetyUkPage() {
       </section>
 
       <CancelGuideLinks current="/cancel-zety-uk" />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingCancel} />
       <FaqSection faqs={faqItems} title="Questions about cancelling Zety." />
       <FinalCta
         heading="Build your next CV without a renewal."

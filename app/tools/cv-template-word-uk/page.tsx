@@ -264,7 +264,7 @@ export default function CvTemplateWordUkPage() {
               Want the layout handled?
             </p>
             <h3 className="mt-4 font-display text-3xl font-semibold text-navy">
-              Build online, preview first, pay once for the PDF.
+              Build online, preview first, pay once for PDF and Word with a matching cover letter.
             </h3>
             <p className="mt-4 text-sm leading-7 text-muted">
               WorkCV's guided builder is free to start. The one-time {site.price}{" "}

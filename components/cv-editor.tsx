@@ -170,6 +170,19 @@ export function CvEditor() {
     };
   }, [modalOpen]);
 
+  // Visitors who chose the Job Search Pass on a marketing page arrive with plan=pass.
+  useEffect(() => {
+    const intentKey = "workcv-plan-intent";
+    try {
+      if (new URLSearchParams(window.location.search).get("plan") === "pass") {
+        window.sessionStorage.setItem(intentKey, "pass");
+      }
+      if (window.sessionStorage.getItem(intentKey) === "pass") setCheckoutPlan("pass");
+    } catch {
+      // Storage can be blocked; the plan picker still works without it.
+    }
+  }, []);
+
   useEffect(() => {
     let cancelled = false;
 

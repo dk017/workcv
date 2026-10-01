@@ -49,7 +49,7 @@ export function SampleCvProof({
           </h2>
           <p className="mt-5 text-lg leading-8 text-muted">
             Build and preview your CV first. When this saved CV is ready, pay
-            {" "}{site.price} once to unlock the PDF download. There is no monthly
+            {" "}{site.price} once to download it and a matching cover letter as PDF and Word. There is no monthly
             subscription or automatic renewal in the standard flow.
           </p>
           <div className="mt-6 grid gap-3">
@@ -59,7 +59,7 @@ export function SampleCvProof({
             </div>
             <div className="flex gap-3 rounded-lg border border-line bg-white p-4 text-sm font-bold text-navy">
               <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-success" />
-              Pay once per saved CV PDF
+              Pay once per saved CV and cover letter
             </div>
           </div>
           <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:flex-wrap">

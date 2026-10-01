@@ -23,6 +23,8 @@ import {
 } from "@/lib/competitor-pricing";
 import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -315,7 +317,7 @@ export default function CancelLiveCareerUkPage() {
               <p className="mt-6 text-lg leading-8 text-muted">
                 LiveCareer includes CV and cover-letter tools, templates, and
                 ongoing account storage. WorkCV is deliberately narrower for UK
-                job seekers who need one clean CV PDF and no monthly renewal.
+                job seekers who need a clean UK CV and cover letter and no monthly renewal.
               </p>
             </div>
             <ComparisonTable
@@ -375,6 +377,7 @@ export default function CancelLiveCareerUkPage() {
       </section>
 
       <CancelGuideLinks current="/cancel-livecareer-uk" />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingCancel} />
       <FaqSection faqs={faqItems} title="Questions about cancelling LiveCareer." />
       <FinalCta
         heading="Build your next CV without a renewal."

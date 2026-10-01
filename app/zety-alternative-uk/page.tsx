@@ -19,6 +19,7 @@ import {
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Zety Alternative UK - WorkCV",
     description:
-      "A focused UK CV builder for people who want one CV PDF without automatic renewal.",
+      "A focused UK CV and cover letter builder for people who want to pay once, without automatic renewal.",
     url: "/zety-alternative-uk",
   },
 };
@@ -43,8 +44,8 @@ const comparisonRows = [
   ["UK price check", competitorPricing.zety.note, "Price is shown before checkout"],
   ["PDF download", "Included with paid access", `${site.price} when ready`],
   ["Cancellation", "Needed to stop renewal", "Nothing to cancel"],
-  ["Cover letters", "Included in Zety tools", "Not included in this version"],
-  ["Best fit", "Ongoing CV and cover-letter platform", "One finished UK CV PDF"],
+  ["Cover letters", "Included in Zety tools", "Matching cover letter included with each CV"],
+  ["Best fit", "Ongoing CV and cover-letter platform", "A finished UK CV and cover letter, PDF and Word"],
 ];
 
 const benefits = [
@@ -60,12 +61,12 @@ const faqItems = [
   {
     question: "What is a good Zety alternative in the UK?",
     answer:
-      `If you want a CV builder without automatic renewal, WorkCV is a focused UK alternative. You build and preview first, then pay ${site.price} when you download the finished CV PDF.`,
+      `If you want a CV builder without automatic renewal, WorkCV is a focused UK alternative. You build and preview first, then pay ${site.price} once when you download the finished CV and cover letter as PDF and Word.`,
   },
   {
     question: "How is WorkCV different from Zety?",
     answer:
-      "Zety is a broader CV and cover-letter platform with a 14-day trial and renewal model. WorkCV is narrower: it focuses on one UK CV PDF download with no monthly CV builder subscription.",
+      "Zety is a broader CV and cover-letter platform with a 14-day trial and renewal model. WorkCV is narrower: it focuses on UK CVs with matching cover letters, paid once, with no monthly CV builder subscription.",
   },
   {
     question: "How much does Zety cost in the UK?",
@@ -75,7 +76,7 @@ const faqItems = [
   {
     question: "Does WorkCV include cover letters?",
     answer:
-      "Not in this version. WorkCV is currently focused on helping UK job seekers create and download a clear CV PDF.",
+      "Yes. Each saved CV includes a matching cover letter, and both download as PDF and editable Word for the same one-time payment.",
   },
   {
     question: "Do I need to cancel WorkCV?",
@@ -86,7 +87,7 @@ const faqItems = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder positioned as a no-subscription alternative for people who need one finished CV PDF.",
+    "UK CV and cover letter builder positioned as a no-subscription alternative for people who want to pay once.",
   url: `${site.url}/zety-alternative-uk`,
 });
 
@@ -178,7 +179,7 @@ export default function ZetyAlternativeUkPage() {
               ))}
             </ul>
             <p className="mt-7 text-sm leading-6 text-muted">
-              Best for job seekers who need a finished UK CV PDF and do not want
+              Best for job seekers who need a finished UK CV and cover letter and do not want
               a recurring CV builder plan.
             </p>
           </div>
@@ -247,7 +248,7 @@ export default function ZetyAlternativeUkPage() {
             <p className="mt-6 text-lg leading-8 text-muted">
               If your immediate goal is to update a CV and start applying, you
               may not need a recurring CV and cover-letter platform. WorkCV keeps
-              the workflow focused on a practical UK CV PDF.
+              the workflow focused on a practical UK CV and cover letter.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -309,6 +310,7 @@ export default function ZetyAlternativeUkPage() {
           ["Zety terms", "https://zety.com/uk/terms-of-use"],
         ]}
       />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about Zety alternatives." />
       <FinalCta
         heading="Build your CV without the automatic renewal."

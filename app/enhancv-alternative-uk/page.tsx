@@ -19,13 +19,15 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = "21 June 2026";
 
 export const metadata: Metadata = {
   title: "Enhancv Alternative UK - No Subscription CV Builder",
   description:
-    `Compare Enhancv with WorkCV for UK applications. See verified differences in subscriptions, AI tools, cover letters, templates and the ${site.price} saved-CV PDF unlock.`,
+    `Compare Enhancv with WorkCV for UK applications. See verified differences in subscriptions, AI tools, cover letters, templates and the ${site.price} one-time CV and cover letter bundle.`,
   alternates: {
     canonical: "/enhancv-alternative-uk",
   },
@@ -99,7 +101,7 @@ const faqItems = [
   {
     question: "How is WorkCV different from Enhancv?",
     answer:
-      "Enhancv is a broader resume platform with AI tools, cover letters, ATS checking, application tracking and renewable Pro plans. WorkCV is narrower: it provides a saved UK CV editor, three layouts and a no-subscription PDF unlock for one saved CV.",
+      "Enhancv is a broader resume platform with AI tools, cover letters, ATS checking, application tracking and renewable Pro plans. WorkCV is narrower: it provides a saved UK CV editor with a matching cover letter, three layouts and one-time payments with no subscription.",
   },
   {
     question: "How much does Enhancv cost in the UK?",
@@ -190,8 +192,8 @@ export default function EnhancvAlternativeUkPage() {
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Enhancv combines resume design, AI feedback, cover letters and
               job-search tools in renewable Pro plans. WorkCV is narrower: build
-              a UK CV, preview it, and pay {site.price} to unlock the selected
-              saved CV without starting a monthly subscription.
+              a UK CV, preview it, and pay {site.price} once for that CV and its matching
+              cover letter, without starting a monthly subscription.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -423,10 +425,11 @@ export default function EnhancvAlternativeUkPage() {
         </div>
       </section>
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about Enhancv alternatives in the UK." />
       <FinalCta
         heading="Use the wider platform when you need it. Pay for one CV when you do not."
-        body={`WorkCV costs ${site.price} to unlock the selected saved CV PDF. No monthly WorkCV subscription and no automatic renewal.`}
+        body={`WorkCV costs ${site.price} once for a saved CV and its matching cover letter, as PDF and Word. No monthly WorkCV subscription and no automatic renewal.`}
         primaryHref="/editor"
         primary="Build my UK CV"
         secondaryHref="/cancel-enhancv-uk"

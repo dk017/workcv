@@ -18,6 +18,8 @@ import {
 } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = "13 June 2026";
 
@@ -371,6 +373,7 @@ export default function CancelEnhancvUkPage() {
       </section>
 
       <CancelGuideLinks current="/cancel-enhancv-uk" />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingCancel} />
       <FaqSection faqs={faqItems} title="Questions about cancelling Enhancv." />
       <FinalCta
         heading="Build your next CV without a renewal."

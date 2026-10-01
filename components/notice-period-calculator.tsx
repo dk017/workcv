@@ -487,8 +487,8 @@ export function NoticePeriodCalculator() {
                     Planning your next application?
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted">
-                    Build and preview your UK CV free, then unlock the selected
-                    PDF once for {site.price}. No subscription.
+                    Build and preview your UK CV free, then pay {site.price} once for
+                    the CV and a matching cover letter. No subscription.
                   </p>
                 </div>
                 <Link

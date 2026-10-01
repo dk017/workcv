@@ -13,6 +13,8 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export type FocusedAlternativeConfig = {
   brand: string;
@@ -179,10 +181,11 @@ export function FocusedAlternativePage({
       </section>
 
       <OfficialSourcesSection brand={config.brand} sources={config.sources} />
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={config.faqs} title={`Questions about ${config.brand} alternatives.`} />
       <FinalCta
         heading="Build one UK CV without starting another monthly plan."
-        body={`WorkCV costs ${site.price} to unlock the selected saved CV PDF. No monthly WorkCV subscription and no automatic renewal.`}
+        body={`WorkCV costs ${site.price} once for a saved CV and its matching cover letter, as PDF and Word. No monthly WorkCV subscription and no automatic renewal.`}
         primaryHref="/editor"
         primary="Build my UK CV"
         secondaryHref="/pricing"

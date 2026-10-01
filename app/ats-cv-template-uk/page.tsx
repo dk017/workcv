@@ -75,7 +75,7 @@ const faqSchema = {
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "An editable, single-column UK CV template with standard headings, PDF preview and a one-time PDF unlock.",
+    "An editable, single-column UK CV template with standard headings, a free preview and a one-time unlock for PDF and Word, with a matching cover letter.",
   url: "/ats-cv-template-uk",
 });
 
@@ -191,7 +191,7 @@ export default function AtsCvTemplateUkPage() {
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Start with a clean single-column CV, replace the example with
               accurate evidence and tailor it to the vacancy. Preview every page
-              before deciding whether to unlock the PDF.
+              before deciding whether to pay.
             </p>
             <div className="mt-7 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[

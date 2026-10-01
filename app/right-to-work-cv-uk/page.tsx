@@ -14,6 +14,7 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { TrackedLink } from "@/components/tracked-link";
+import { PassOffer } from "@/components/pass-offer";
 
 export const metadata: Metadata = {
   title: "Right to Work CV UK - What to Include",
@@ -316,6 +317,7 @@ export default function RightToWorkCvUkPage() {
         </div>
       </section>
 
+      <PassOffer audience="sponsorship" trackingLabel={analyticsPlacements.passRightToWork} />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

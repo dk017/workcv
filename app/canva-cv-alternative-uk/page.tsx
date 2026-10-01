@@ -21,6 +21,8 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { PassOffer } from "@/components/pass-offer";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = "13 June 2026";
 
@@ -46,7 +48,7 @@ const comparisonRows = [
   ["Formatting control", "Flexible canvas editing", "Consistent recruiter-readable layout"],
   ["ATS formatting", "Multi-column or graphic templates can reduce parsing; simple layouts can parse cleanly", "Clean CV sections by default"],
   ["Payment model", "Canva Free plus optional paid design plans", `Free to build, ${site.price} PDF download`],
-  ["Best fit", "Creative visual CVs and broader design work", "One practical UK CV PDF"],
+  ["Best fit", "Creative visual CVs and broader design work", "A practical UK CV and cover letter"],
 ];
 
 const benefits = [
@@ -389,6 +391,7 @@ export default function CanvaCvAlternativeUkPage() {
         </div>
       </section>
 
+      <PassOffer audience="tailoring" trackingLabel={analyticsPlacements.passTailoringCanva} />
       <FaqSection faqs={faqItems} title="Questions about Canva CV alternatives." />
       <FinalCta
         heading="Build a CV for applications, not a design board."
