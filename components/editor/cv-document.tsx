@@ -53,10 +53,10 @@ function CvSection({
 }) {
   const headingClass =
     template === "modern"
-      ? "mb-4 border-l-4 border-gold bg-[#fbf6e8] px-3 py-2 text-sm font-bold uppercase tracking-[0.16em] text-navy"
+      ? "mb-4 border-l-4 border-gold bg-[#fbf6e8] px-3 py-2 text-sm font-bold uppercase tracking-[0.04em] text-navy"
       : template === "compact"
-        ? "mb-2 border-b border-line pb-1 text-xs font-bold uppercase tracking-[0.14em] text-navy"
-        : "mb-3 border-b border-line pb-2 text-sm font-bold uppercase tracking-[0.16em] text-navy";
+        ? "mb-2 border-b border-line pb-1 text-xs font-bold uppercase tracking-[0.04em] text-navy"
+        : "mb-3 border-b border-line pb-2 text-sm font-bold uppercase tracking-[0.04em] text-navy";
 
   return (
     <section
@@ -96,7 +96,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
         <CvName cv={cv} template="modern" />
-        <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-gold-tint">
+        <p className="mt-3 text-sm font-bold uppercase tracking-[0.04em] text-gold-tint">
           {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
         </p>
         <div className="mt-8 space-y-5 text-sm leading-6 text-white/85">
@@ -333,7 +333,7 @@ function SidebarBlock({
 }) {
   return (
     <section>
-      <h3 className="mb-3 border-b border-white/25 pb-2 text-xs font-bold uppercase tracking-[0.16em] text-gold-tint">
+      <h3 className="mb-3 border-b border-white/25 pb-2 text-xs font-bold uppercase tracking-[0.04em] text-gold-tint">
         {title}
       </h3>
       {children}

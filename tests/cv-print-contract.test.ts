@@ -35,3 +35,16 @@ test("preview does not render misleading page guide boundaries", () => {
   assert.doesNotMatch(editorSource, /Page count is an estimate/);
   assert.match(editorSource, /Math\.ceil\(document\.scrollHeight \/ 1123\)/);
 });
+
+test("CV headings keep letter spacing low enough to extract as whole words", () => {
+  // pdf.js, pdfminer and PyMuPDF split uppercase headings into single letters
+  // ("P R O F I L E") from about 0.12em; 0.1em was the widest value that still
+  // extracted cleanly, so stay well below it on screen and use normal in print.
+  const trackingValues = Array.from(documentSource.matchAll(/tracking-\[(\d*\.?\d+)em\]/g)).map((m) => Number(m[1]));
+  assert.ok(trackingValues.length > 0);
+  trackingValues.forEach((value) => assert.ok(value <= 0.05, `tracking ${value}em is too wide`));
+  assert.doesNotMatch(documentSource, /tracking-(?:wide|wider|widest)\b/);
+  assert.match(printCss, /\.print-document h3,\s*\.print-document \.cv-sidebar > p\s*{\s*letter-spacing: normal !important;/);
+  const cssSpacing = Array.from(printCss.matchAll(/letter-spacing:\s*(\d*\.?\d+)em/g)).map((m) => Number(m[1]));
+  cssSpacing.forEach((value) => assert.ok(value <= 0.05, `letter-spacing ${value}em is too wide`));
+});

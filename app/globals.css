@@ -7,7 +7,6 @@
 .cv-preset-compact-single .cv-entry { margin-top: .6rem; }
 .cv-preset-compact-single .cv-entry li { line-height: 1.45; }
 .cv-preset-compact-single .cv-header { padding-bottom: 1rem; }
-.cv-preset-experienced .cv-section h3 { letter-spacing: .06em; }
 .cv-preset-experienced .cv-entry { break-inside: avoid; }
 
 :root {
@@ -515,7 +514,6 @@ main section.py-24 {
 
   .print-document h3 {
     font-size: 8.4pt !important;
-    letter-spacing: 0.12em !important;
     margin-bottom: 2mm !important;
     padding-bottom: 1.5mm !important;
   }
