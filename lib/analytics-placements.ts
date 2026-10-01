@@ -42,6 +42,7 @@ export const analyticsPlacements = {
   passSwitchingCancel: "pass_switching_cancel",
   passRightToWork: "pass_right_to_work",
   passRedundancy: "pass_redundancy",
+  passRedundancyGuide: "pass_redundancy_guide",
   passAtsChecker: "pass_ats_checker",
   trackerJobAdded: "tracker_job_added",
   trackerThreeJobs: "tracker_three_jobs",

@@ -134,6 +134,18 @@ export default function RedundancyPayCalculatorPage() {
           <div className="mt-10 rounded-lg border border-line-strong bg-surface p-5 shadow-soft md:p-7">
             <RedundancyPayCalculator />
           </div>
+          <div className="mt-5 flex flex-col gap-3 rounded-lg border border-gold bg-white p-5 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm leading-6 text-navy">
+              <strong>Made redundant?</strong> Work through notice, tax, benefits and your job search with the
+              step-by-step checklist.
+            </p>
+            <Link
+              href="/situations/made-redundant"
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
+            >
+              What to do next
+            </Link>
+          </div>
         </div>
       </section>
 

@@ -32,7 +32,7 @@ const routes = [
   { path: "/career-change-cv-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/return-to-work-cv-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/cv-employment-gap-uk", priority: 0.85, changeFrequency: "monthly" },
-  { path: "/situations/made-redundant", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-30" },
+  { path: "/situations/made-redundant", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-01" },
   { path: "/cv-personal-statement-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-08-25" },
   { path: "/ats-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
   { path: "/tools", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-07-10" },
