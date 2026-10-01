@@ -80,7 +80,8 @@ export async function createDodoCheckout(input: {
   }
   if (input.discountCode) {
     body.discount_codes = [input.discountCode];
-    (body.metadata as Record<string, unknown>).upgrade_credit_minor = input.upgradeCreditMinor ?? null;
+    // Dodo metadata values are strings.
+    (body.metadata as Record<string, unknown>).upgrade_credit_minor = String(input.upgradeCreditMinor ?? "");
   }
 
   const response = await fetch(`${DODO_API_BASE}/checkouts`, {
