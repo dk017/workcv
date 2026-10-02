@@ -13,19 +13,54 @@
     "/tools/notice-period-calculator": "employment-changes",
     "/tools/uk-salary-by-job-title": "employment-changes",
     "/cv-builder-no-subscription-uk": "core-commercial",
-    "/pricing": "core-commercial"
+    "/pricing": "core-commercial",
+    "/tailor-cv-to-job-description-uk": "applications",
+    "/tools/job-application-tracker-uk": "job-search"
   },
   "prefixRoutes": [
-    ["/cv-template-", "job-search"],
-    ["/tools/cover-letter", "applications"],
-    ["/tools/ats-score", "applications"],
-    ["/tools/cv-bullet", "applications"],
-    ["/tools/cv-summary", "applications"],
-    ["/tools/first-job", "applications"],
-    ["/career-change-cv-", "career-progression"],
-    ["/return-to-work-cv-", "employment-changes"],
-    ["/cv-employment-gap-", "employment-changes"],
-    ["/tools/take-home-pay", "employment-changes"],
-    ["/tools/uk-living-wage", "employment-changes"]
+    [
+      "/cv-template-",
+      "job-search"
+    ],
+    [
+      "/tools/cover-letter",
+      "applications"
+    ],
+    [
+      "/tools/ats-score",
+      "applications"
+    ],
+    [
+      "/tools/cv-bullet",
+      "applications"
+    ],
+    [
+      "/tools/cv-summary",
+      "applications"
+    ],
+    [
+      "/tools/first-job",
+      "applications"
+    ],
+    [
+      "/career-change-cv-",
+      "career-progression"
+    ],
+    [
+      "/return-to-work-cv-",
+      "employment-changes"
+    ],
+    [
+      "/cv-employment-gap-",
+      "employment-changes"
+    ],
+    [
+      "/tools/take-home-pay",
+      "employment-changes"
+    ],
+    [
+      "/tools/uk-living-wage",
+      "employment-changes"
+    ]
   ]
 }

@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 
 import { trackFunnelEvent } from "@/components/attribution-capture";
+import { PassOfferView } from "@/components/pass-offer-view";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import {
@@ -74,9 +75,9 @@ function exampleJobs(today: string): TrackedJob[] {
   };
   const now = Date.now();
   return [
-    { id: newId(), role: "Customer Service Adviser", employer: "Northline Energy", location: "Leeds", source: "Indeed", status: "interview", appliedDate: shift(-9), nextAction: "Prepare STAR examples for interview", nextActionDate: shift(2), createdAt: now, updatedAt: now },
-    { id: newId(), role: "Team Leader, Contact Centre", employer: "Harbour Insurance", location: "Bradford", source: "Reed", status: "applied", appliedDate: shift(-6), nextAction: "Email the recruiter for an update", nextActionDate: shift(-1), createdAt: now, updatedAt: now },
-    { id: newId(), role: "Complaints Handler", employer: "Yorkshire Water", location: "Hybrid", source: "Company website", status: "saved", closingDate: shift(2), nextAction: "Tailor CV and apply", createdAt: now, updatedAt: now },
+    { id: newId(), isExample: true, role: "Customer Service Adviser", employer: "Northline Energy", location: "Leeds", source: "Indeed", status: "interview", appliedDate: shift(-9), nextAction: "Prepare STAR examples for interview", nextActionDate: shift(2), createdAt: now, updatedAt: now },
+    { id: newId(), isExample: true, role: "Team Leader, Contact Centre", employer: "Harbour Insurance", location: "Bradford", source: "Reed", status: "applied", appliedDate: shift(-6), nextAction: "Email the recruiter for an update", nextActionDate: shift(-1), createdAt: now, updatedAt: now },
+    { id: newId(), isExample: true, role: "Complaints Handler", employer: "Westmere Utilities (example)", location: "Hybrid", source: "Company website", status: "saved", closingDate: shift(2), nextAction: "Tailor CV and apply", createdAt: now, updatedAt: now },
   ];
 }
 
@@ -100,6 +101,7 @@ export function JobApplicationTracker() {
   const [today, setToday] = useState("");
   const fileRef = useRef<HTMLInputElement>(null);
   const startedRef = useRef(false);
+  const realJobCount = jobs.filter(job => !job.isExample).length;
   const completedRef = useRef(false);
 
   useEffect(() => {
@@ -107,7 +109,12 @@ export function JobApplicationTracker() {
     try {
       const { jobs: stored, dropped } = parseTrackerState(window.localStorage.getItem(trackerStorageKey));
       setJobs(stored);
-      if (stored.length >= passOfferThreshold) completedRef.current = true;
+      const realStored = stored.filter(job => !job.isExample).length;
+      if (realStored > 0 && !startedRef.current) {
+        startedRef.current = true;
+        trackFunnelEvent("tool_started", { tool, placement: "tracker_returning_use" });
+      }
+      if (realStored >= passOfferThreshold) completedRef.current = true;
       if (dropped) setNotice(`${dropped} saved entr${dropped === 1 ? "y" : "ies"} could not be read and ${dropped === 1 ? "was" : "were"} skipped.`);
     } catch {
       setStorageOk(false);
@@ -127,15 +134,15 @@ export function JobApplicationTracker() {
   // Measure use without sending any job details: first job added, then 3+ jobs tracked.
   useEffect(() => {
     if (!loaded) return;
-    if (jobs.length > 0 && !startedRef.current) {
+    if (realJobCount > 0 && !startedRef.current) {
       startedRef.current = true;
       trackFunnelEvent("tool_started", { tool, placement: analyticsPlacements.trackerJobAdded });
     }
-    if (jobs.length >= passOfferThreshold && !completedRef.current) {
+    if (realJobCount >= passOfferThreshold && !completedRef.current) {
       completedRef.current = true;
       trackFunnelEvent("tool_completed", { tool, result: "success", placement: analyticsPlacements.trackerThreeJobs });
     }
-  }, [jobs.length, loaded]);
+  }, [realJobCount, loaded]);
 
   const sorted = useMemo(() => (today ? sortJobs(jobs, today) : jobs), [jobs, today]);
   const summary = useMemo(() => summarizeJobs(jobs, today || todayIso()), [jobs, today]);
@@ -153,6 +160,7 @@ export function JobApplicationTracker() {
     }
     const parsed = trackedJobSchema.safeParse({
       ...draft,
+      isExample: existing?.isExample,
       id: existing?.id ?? newId(),
       createdAt: existing?.createdAt ?? now,
       updatedAt: now,
@@ -198,6 +206,7 @@ export function JobApplicationTracker() {
   }
 
   function exportCsv() {
+    if (realJobCount > 0) trackFunnelEvent("tool_completed", { tool, result: "success", placement: "tracker_csv_export" });
     const blob = new Blob([jobsToCsv(sorted)], { type: "text/csv;charset=utf-8" });
     const link = document.createElement("a");
     link.href = URL.createObjectURL(blob);
@@ -303,11 +312,11 @@ export function JobApplicationTracker() {
         {job.status === "saved" || job.status === "applied" || job.status === "interview" ? (
           <TrackedLink
             href={packHref}
-            placement={analyticsPlacements.trackerTailorJob}
+            placement={job.isExample ? "tracker_demo_tailor" : analyticsPlacements.trackerTailorJob}
             onClick={() => rememberForPack(job)}
             className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-navy underline underline-offset-4"
           >
-            <Wand2 className="h-4 w-4" aria-hidden="true" /> Tailor my CV for this job
+            <Wand2 className="h-4 w-4" aria-hidden="true" /> {job.isExample ? "Try the example application" : "Tailor my CV for this job"}
           </TrackedLink>
         ) : null}
       </article>
@@ -376,17 +385,18 @@ export function JobApplicationTracker() {
           }}
         />
       </div>
+      {jobs.some(job => job.isExample) ? <p className="mt-3 text-sm font-bold text-muted">These are fictional practice jobs. Use “Add a job” to track your own application.</p> : null}
       <p className="mt-3 text-sm text-muted">
         Saved only in this browser. Nothing is sent to WorkCV.{jobs.length >= 5 ? " Export a CSV now and then so you have a backup." : ""}
       </p>
 
-      {jobs.length >= passOfferThreshold ? (
+      {realJobCount >= passOfferThreshold ? (
         <div className="mt-5 flex flex-col gap-4 rounded-lg border-2 border-gold bg-white p-5 md:flex-row md:items-center md:justify-between">
           <div>
-            <p className="font-display text-xl font-semibold text-navy">You&rsquo;re applying to {jobs.length} jobs.</p>
+            <PassOfferView placement={analyticsPlacements.trackerPassOffer}><p className="font-display text-xl font-semibold text-navy">Keeping separate versions for your {realJobCount} tracked jobs?</p>
             <p className="mt-1 text-sm leading-6 text-muted">
-              Tailor a CV and cover letter for each one with the Job Search Pass: unlimited for {site.passDays} days, {site.passPrice} once, never renews.
-            </p>
+              Keep separate saved CVs and letters with the Job Search Pass: new CVs for {site.passDays} days, {site.passPrice} once, never renews. Or keep editing one saved pair for {site.price} once.
+            </p></PassOfferView>
           </div>
           <TrackedLink href={passHref} placement={analyticsPlacements.trackerPassOffer} className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover">
             Start with the Job Search Pass

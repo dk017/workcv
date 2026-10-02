@@ -19,8 +19,8 @@ test("customer-facing WorkCV prices use the UK pound symbol", () => {
 
 test("pricing keeps the evidence while removing repeated reassurance sections", () => {
   assert.match(pricingSource, /id="compare"/);
-  assert.match(pricingSource, /Competitor prices checked/);
-  assert.match(pricingSource, /source:\s*"https:\/\/www\.myperfectcv\.co\.uk\/pricing"/);
+  assert.match(pricingSource, /checked on 2 October 2026/);
+  assert.match(pricingSource, /href="https:\/\/www\.myperfectcv\.co\.uk\/pricing"/);
   assert.doesNotMatch(pricingSource, /No hidden fees guarantee/);
   assert.doesNotMatch(pricingSource, /When a subscription might make sense/);
 });

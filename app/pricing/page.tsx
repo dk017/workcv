@@ -1,264 +1,60 @@
+import { SampleCvProof } from "@/components/sample-cv-proof";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
 import { TrackedLink } from "@/components/tracked-link";
 import { customerQuestionHref } from "@/lib/customer-questions";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
-import { ArrowRight, Check, ExternalLink } from "lucide-react";
-
-import {
-  ButtonLink,
-  FaqSection,
-  FinalCta,
-  SectionLabel,
-} from "@/components/marketing";
-import { SampleCvProof } from "@/components/sample-cv-proof";
-import {
-  competitorPricing,
-  competitorPricingCheckedDate,
-} from "@/lib/competitor-pricing";
+import { ButtonLink, FaqSection } from "@/components/marketing";
+import { PassOfferView } from "@/components/pass-offer-view";
+import { passStartHref } from "@/components/pass-offer";
+import { buildLoginHref } from "@/lib/safe-redirect";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
-export const metadata: Metadata = {
-  title: `CV Builder Pricing UK - ${site.priceGbp} Once`,
-  description:
-    `Compare UK CV builder costs. WorkCV is ${site.priceGbp} once for your CV and a matching cover letter, as PDF and Word, with no monthly subscription or automatic renewal.`,
-  alternates: {
-    canonical: "/pricing",
-  },
-  openGraph: {
-    title: "CV Builder Pricing UK - WorkCV",
-    description:
-      `Pay ${site.priceGbp} once for one saved CV and matching cover letter, each as PDF and Word. Build and preview free. No subscription or renewal.`,
-    url: "/pricing",
-  },
-};
-
-const checkedDate = competitorPricingCheckedDate;
-
-const competitors = [
-  {
-    builder: "MyPerfectCV",
-    entry: competitorPricing.myPerfectCv.entry,
-    renewal: competitorPricing.myPerfectCv.renewal,
-    ongoing: "Check the current total for your intended access period",
-    cancellation: "Yes",
-    source: "https://www.myperfectcv.co.uk/pricing",
-  },
-  {
-    builder: "Resume.io UK",
-    entry: competitorPricing.resumeIo.entry,
-    renewal: competitorPricing.resumeIo.renewal,
-    ongoing: "Check the current total for your intended access period",
-    cancellation: "Yes",
-    source: "https://resume.io/uk/pricing",
-  },
-  {
-    builder: "LiveCareer UK",
-    entry: competitorPricing.liveCareer.entry,
-    renewal: competitorPricing.liveCareer.renewal,
-    ongoing: "Check the current total for your intended access period",
-    cancellation: "Yes",
-    source: "https://www.livecareer.co.uk/pricing",
-  },
-  {
-    builder: "CVMaker UK",
-    entry: competitorPricing.cvMaker.entry,
-    renewal: competitorPricing.cvMaker.renewal,
-    ongoing: "Check the current total for your intended access period",
-    cancellation: "Yes",
-    source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
-  },
-  {
-    builder: "WorkCV",
-    entry: "Free to build",
-    renewal: `${site.priceGbp} when you download`,
-    ongoing: "No monthly renewal",
-    cancellation: "No",
-    source: "/cv-builder-no-subscription-uk",
-    featured: true,
-  },
+const title = `WorkCV Pricing: ${site.priceGbp} CV or ${site.passPrice} Job Search Pass`;
+const description = `Compare one saved CV and letter for ${site.priceGbp} with the ${site.passPrice}, ${site.passDays}-day Job Search Pass. PDF and Word included. No automatic renewal.`;
+export const metadata: Metadata = { title, description, alternates: { canonical: "/pricing" }, openGraph: { title, description, url: "/pricing" } };
+const faqs = [
+  { question: "How much does WorkCV cost?", answer: `One saved CV and matching letter costs ${site.priceGbp} once. The ${site.passPrice} Job Search Pass covers existing CVs and unlimited new CVs created during its ${site.passDays}-day window. Both include PDF and Word. Build and preview free first.` },
+  { question: "Does either plan renew automatically?", answer: "No. Both are one-time payments, with no automatic renewal and nothing to cancel." },
+  { question: "Can I edit one paid CV for another application?", answer: "Yes. You can edit and redownload the same saved CV and its letter without paying again. The Pass helps when you want to keep separate saved versions." },
+  { question: "What happens when the Pass expires?", answer: "CVs covered by your Pass remain editable and downloadable afterwards. A new CV created after the window ends needs a new purchase. See the terms for refund and access rules." },
 ];
-
-const included = [
-  "Guided UK CV editor",
-  "Clean CV templates",
-  "Live preview before paying",
-  `CV + cover letter, PDF + Word, for ${site.priceGbp}`,
-  "Edit and redownload this saved CV without paying again",
-  "No monthly CV builder subscription",
-  "No automatic renewal",
-];
-
-const pricingFaqs = [
-  {
-    question: "How much does WorkCV cost in the UK?",
-    answer:
-      `WorkCV costs ${site.priceGbp} once when you download your final CV. The payment includes the CV and a matching cover letter, each as a PDF and an editable Word (.docx) file. You can build and preview your CV before paying.`,
-  },
-  {
-    question: "Is WorkCV a subscription?",
-    answer:
-      "No. WorkCV does not use a monthly subscription for the standard CV download flow. There is no automatic renewal and no CV builder plan to cancel later.",
-  },
-  {
-    question: "When do I pay?",
-    answer:
-      "Pay when you are ready to download. One payment unlocks your saved CV and its matching cover letter as PDF and Word. You can use the editor and preview before paying.",
-  },
-  {
-    question: "How much does MyPerfectCV cost?",
-    answer:
-      `On its official pricing page checked ${checkedDate}, MyPerfectCV listed ${competitorPricing.myPerfectCv.entry}, followed by automatic renewal at ${competitorPricing.myPerfectCv.renewal}.`,
-  },
-  {
-    question: "How much does Resume.io cost in the UK?",
-    answer:
-      `On its pricing page checked ${checkedDate}, Resume.io listed ${competitorPricing.resumeIo.entry}, followed by automatic renewal at ${competitorPricing.resumeIo.renewal}.`,
-  },
-];
-
-const productSchema = buildWorkCvProductSchema({
-  description:
-    `UK CV builder: ${site.priceGbp} once for one saved CV and matching cover letter, each as PDF and Word. No subscription or automatic renewal.`,
-  url: `${site.url}/pricing`,
-});
-
-const faqSchema = {
-  "@context": "https://schema.org",
-  "@type": "FAQPage",
-  mainEntity: pricingFaqs.map((faq) => ({
-    "@type": "Question",
-    name: faq.question,
-    acceptedAnswer: {
-      "@type": "Answer",
-      text: faq.answer,
-    },
-  })),
-};
-
 export default function PricingPage() {
-  return (
-    <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-
-      <section className="quiet-grid bg-paper py-20 md:py-28">
-        <div className="container-page grid gap-12 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              CV builder pricing UK
-            </p>
-            <h1 className="max-w-3xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Your CV and cover letter. {site.priceGbp} once.
-            </h1>
-            <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Build and preview first. One payment includes your saved CV and
-              matching cover letter, each as a PDF and an editable Word file.
-              No monthly subscription or automatic renewal.
-            </p>
-            <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
-              {[
-                "Free to build before paying",
-                "PDF + editable Word included",
-                "No recurring billing",
-                "Always priced in GBP",
-              ].map((item) => (
-                <div key={item} className="flex items-center gap-2">
-                  <Check className="h-5 w-5 shrink-0 text-success" />
-                  {item}
-                </div>
-              ))}
-            </div>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingHeroEditor}>Start building free</ButtonLink>
-              <ButtonLink href="#compare" variant="secondary" trackingLabel={analyticsPlacements.pricingHeroCompare}>
-                Compare prices
-              </ButtonLink>
-            </div>
-          </div>
-
-          <div className="rounded-[20px] border-2 border-navy bg-white p-8 shadow-soft">
-            <h2 className="font-display text-3xl font-semibold text-navy">WorkCV</h2>
-            <div className="mt-6 font-display text-6xl font-semibold leading-none text-navy">
-              {site.priceGbp}
-            </div>
-            <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">
-              one saved CV + matching cover letter
-            </p>
-            <ul className="mt-7 space-y-3">
-              {included.map((item) => (
-                <li key={item} className="flex gap-3 text-sm font-bold text-navy">
-                  <Check className="h-5 w-5 shrink-0 text-success" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-7 leading-7 text-muted">
-              Edit and download this same saved CV and its letter again without
-              paying again. A separate new CV needs its own one-time payment,
-              or use the Job Search Pass below.
-            </p>
-            <div className="mt-8">
-              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingCardEditor}>Start building</ButtonLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section id="job-search-pass" className="border-y border-line bg-surface py-16 md:py-20">
-        <div className="container-page grid gap-10 lg:grid-cols-[1fr_0.9fr] lg:items-center">
-          <div>
-            <p className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-success">Applying for 3 or more jobs?</p>
-            <h2 className="font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
-              Job Search Pass: a tailored CV and cover letter for every application.
-            </h2>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-              Careers advisers recommend tailoring your CV to each job. The pass gives you unlimited CVs and matching
-              cover letters for {site.passDays} days, so you can duplicate your CV for every vacancy instead of sending
-              the same one everywhere.
-            </p>
-            <p className="mt-5 max-w-2xl text-sm leading-6 text-navy">
-              Subscription CV builders charge {competitorPricing.myPerfectCv.renewal} or more. Over a three-month search
-              that is £50 or more. The pass is {site.passPrice}, once.
-            </p>
-          </div>
-          <div className="rounded-[20px] border-2 border-gold bg-white p-8 shadow-soft">
-            <h3 className="font-display text-3xl font-semibold text-navy">Job Search Pass</h3>
-            <div className="mt-5 font-display text-6xl font-semibold leading-none text-navy">{site.passPrice}</div>
-            <p className="mt-3 text-sm font-bold uppercase tracking-[0.14em] text-muted">once · {site.passDays} days · never renews</p>
-            <ul className="mt-6 space-y-3">
-              {[
-                `Unlimited CVs and cover letters for ${site.passDays} days`,
-                "Duplicate your CV for each job in one click",
-                "PDF and editable Word for everything",
-                "Keep every CV you make: edit and download anytime",
-                "No subscription and nothing to cancel",
-              ].map((item) => (
-                <li key={item} className="flex gap-3 text-sm font-bold text-navy">
-                  <Check className="h-5 w-5 shrink-0 text-success" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-6 text-sm leading-6 text-muted">
-              Build your first CV free, then choose the Job Search Pass at checkout.
-            </p>
-            <div className="mt-6">
-              <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingPassEditor}>Start building</ButtonLink>
-            </div>
-          </div>
-        </div>
-      </section>
-
+ return <>
+  <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(buildWorkCvProductSchema({description, url: `${site.url}/pricing`})) }} />
+  <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({"@context":"https://schema.org","@type":"FAQPage",mainEntity:faqs.map(f=>({"@type":"Question",name:f.question,acceptedAnswer:{"@type":"Answer",text:f.answer}}))}) }} />
+  <section className="quiet-grid bg-paper py-12 md:py-20"><div className="container-page">
+   <p className="text-sm font-bold uppercase tracking-wide text-navy">CV builder pricing UK</p>
+   <h1 className="mt-4 max-w-4xl font-display text-4xl font-semibold leading-tight text-navy md:text-6xl">Choose one saved CV or a pass for your job search.</h1>
+   <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">Build and preview free. Both options include your CV and matching cover letter as PDF and editable Word. One payment, no automatic renewal.</p>
+   <nav aria-label="Compare plans" className="mt-5 flex flex-wrap gap-4 font-bold underline"><a href="#single-cv">{site.price} one saved CV</a><a href="#job-search-pass">{site.passPrice} Job Search Pass</a></nav>
+   <div className="mt-8 grid items-start gap-6 md:grid-cols-2">
+    <article id="single-cv" className="scroll-mt-24 rounded-xl border-2 border-navy bg-white p-6 md:p-8">
+     <h2 className="font-display text-3xl font-semibold text-navy">One saved CV</h2>
+     <p className="mt-4 font-display text-5xl font-semibold text-navy">{site.priceGbp} <span className="font-sans text-base">once</span></p>
+     <p className="mt-4 leading-7">For keeping and editing the same CV and matching letter.</p>
+     <ul className="my-5 list-disc space-y-2 pl-5 leading-7"><li>PDF and Word for this saved pair</li><li>Edit and redownload it without paying again</li><li>You can revise this same CV for another application</li></ul>
+     <ButtonLink href={buildLoginHref("/editor?plan=cv")} trackingLabel={analyticsPlacements.pricingCardEditor}>Start with one CV</ButtonLink>
+     <p className="mt-4 text-sm leading-6 text-muted">A separate saved CV needs its own payment, unless covered by a Pass.</p>
+    </article>
+    <article id="job-search-pass" className="scroll-mt-24 rounded-xl border-2 border-gold bg-white p-6 md:p-8">
+     <PassOfferView placement={analyticsPlacements.pricingPassEditor}><h2 className="font-display text-3xl font-semibold text-navy">Job Search Pass</h2><p className="mt-4 font-display text-5xl font-semibold text-navy">{site.passPrice} <span className="font-sans text-base">once</span></p><p className="mt-4 leading-7">Keep a separate version for each vacancy.</p></PassOfferView>
+     <ul className="my-5 list-disc space-y-2 pl-5 leading-7"><li>Unlimited new CVs and matching letters for {site.passDays} days</li><li>Existing CVs are covered too</li><li>PDF and Word for covered documents</li><li>Covered CVs stay editable and downloadable after expiry</li></ul>
+     <ButtonLink href={passStartHref} trackingLabel={analyticsPlacements.pricingPassEditor}>Start with the Job Search Pass</ButtonLink>
+     <p className="mt-4 text-sm leading-6 text-muted">Your choice carries through sign-in. Preview first; pay at download. New CVs created after expiry need a new purchase. The Pass never renews.</p>
+    </article>
+   </div>
+   <p className="mt-6 max-w-4xl text-sm leading-7 text-muted">Four separately purchased saved CVs cost £31.96; the Pass costs £6.97 less. Four job applications do not require four purchases: you can edit the same paid CV for another application. Choose the Pass when keeping separate saved versions helps you.</p>
+  </div></section>
+  <section className="border-y border-line bg-surface py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">How separate versions help</h2><ol className="mt-5 grid gap-4 sm:grid-cols-2">{[
+    ["Start with your real experience", "Build a CV, then choose Duplicate for another job in the editor."],
+    ["Choose the evidence that fits", "Adjust the profile and bullets yourself. Duplication copies your draft; it does not rewrite it for the job."],
+    ["Match the letter", "Check the employer, role and examples before downloading both documents."],
+    ["Keep track", "Record which version you sent and when you plan to follow up."]
+   ].map(([heading,body],i)=><li key={heading} className="rounded-lg border border-line bg-white p-5"><strong>{i+1}. {heading}</strong><p className="mt-2 leading-7">{body}</p></li>)}</ol><div className="mt-6 flex flex-wrap gap-5 font-bold underline"><Link href="/tailor-cv-to-job-description-uk">See one applicant tailor a CV and letter for two vacancies</Link><Link href="/tools/job-application-tracker-uk">Use the free application tracker</Link></div></div></section>
       <CustomerQuestionNav ids={["Q02", "Q05", "Q06"]} />
       <section className="bg-surface py-16"><div className="container-page max-w-5xl space-y-14">
         <CustomerAnswer questionId="Q02">
@@ -271,177 +67,15 @@ export default function PricingPage() {
           <ol className="list-decimal space-y-2 pl-6"><li>Sign in to the account used for the original payment and open <Link className="font-semibold underline" href="/my-cvs">My CVs</Link>.</li><li>Reopen the paid saved document and make your changes.</li><li>Download its PDF or Word file again. If payment is still being confirmed or you see another payment request, <Link className="font-semibold underline" href={customerQuestionHref("Q24")}>follow the support checks</Link> before paying again.</li></ol>
         </CustomerAnswer>
         <CustomerAnswer questionId="Q06">
-          <ul className="list-disc space-y-2 pl-6"><li>Revise paid document A: covered.</li><li>Download document A again: covered.</li><li>Create separate saved document B: a separate payment is required for its downloads.</li></ul>
+          <ul className="list-disc space-y-2 pl-6"><li>Revise paid document A: covered.</li><li>Download document A again: covered.</li><li>Create separate saved document B: a separate payment is required unless covered by your Job Search Pass.</li></ul>
           <p>Read the <Link className="font-semibold underline" href="/terms">terms</Link> for the purchase scope. Use <Link className="font-semibold underline" href="/my-cvs">My CVs</Link> to reopen the document you already paid for.</p>
         </CustomerAnswer>
         <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/pricing"]}>{displayReviewDate(customerContentReview["/pricing"])}</time>.</p>
       </div></section>
-      <section id="compare" className="bg-surface py-24">
-        <div className="container-page">
-          <SectionLabel>Compare pricing</SectionLabel>
-          <div className="grid gap-8 lg:grid-cols-[0.85fr_1.15fr] lg:items-end">
-            <div>
-              <h2 className="max-w-4xl font-display text-4xl font-semibold text-navy md:text-5xl">
-                The trial price is not the full cost.
-              </h2>
-              <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-                Several UK CV builders advertise a low trial price, then renew
-                every month or every 4 weeks unless cancelled. Current official
-                examples include {competitorPricing.liveCareer.entry} followed
-                by {competitorPricing.liveCareer.renewal}, and{" "}
-                {competitorPricing.myPerfectCv.entry} followed by{" "}
-                {competitorPricing.myPerfectCv.renewal}. WorkCV uses a narrower
-                one-time model.
-              </p>
-            </div>
-            <div className="rounded-xl border border-line bg-paper p-5">
-              <p className="text-sm leading-6 text-muted">
-                Competitor prices checked {checkedDate} from official pricing
-                or help pages. Pricing can change, so verify on the official
-                site before making a payment decision.
-              </p>
-            </div>
-          </div>
 
-          <div
-            className="mt-10 overflow-x-auto rounded-xl border border-line bg-white"
-            role="region"
-            aria-label="UK CV builder pricing comparison"
-            tabIndex={0}
-          >
-            <table className="w-full min-w-[920px] border-collapse text-left text-sm">
-              <caption className="sr-only">
-                UK CV builder pricing comparison, checked {checkedDate}
-              </caption>
-              <thead className="bg-navy text-white">
-                <tr>
-                  {[
-                    "Builder",
-                    "Entry price",
-                    "Then",
-                    "Approx. ongoing cost",
-                    "Cancel needed",
-                    "Source",
-                  ].map((heading) => (
-                    <th key={heading} scope="col" className="px-5 py-4 font-bold">
-                      {heading}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {competitors.map((row) => (
-                  <tr
-                    key={row.builder}
-                    className={`border-t border-line align-top ${
-                      row.featured ? "bg-greensoft" : ""
-                    }`}
-                  >
-                    <th scope="row" className="p-5 text-left font-bold text-navy">
-                      {row.builder}
-                    </th>
-                    <td className="p-5 leading-7 text-ink">{row.entry}</td>
-                    <td className="p-5 leading-7 text-ink">{row.renewal}</td>
-                    <td className="p-5 leading-7 text-muted">{row.ongoing}</td>
-                    <td className="p-5 leading-7 text-ink">{row.cancellation}</td>
-                    <td className="p-5 leading-7">
-                      {row.source.startsWith("http") ? (
-                        <a
-                          href={row.source}
-                          className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
-                          rel="nofollow noopener noreferrer"
-                          target="_blank"
-                        >
-                          Check <ExternalLink className="h-3.5 w-3.5" />
-                        </a>
-                      ) : (
-                        <Link
-                          href={row.source}
-                          className="inline-flex items-center gap-1 font-bold text-navy underline decoration-line-strong underline-offset-4"
-                        >
-                          Details <ArrowRight className="h-3.5 w-3.5" />
-                        </Link>
-                      )}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <p className="mt-4 text-sm leading-6 text-muted">
-            Ongoing cost estimates show the renewal amount repeated over roughly
-            a year. They do not include any free/basic plan or annual discount
-            option competitors may also offer.
-          </p>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
-            <ButtonLink href="/editor" trackingLabel={analyticsPlacements.pricingComparisonEditor}>Build my CV</ButtonLink>
-            <ButtonLink href="/cv-builder-no-subscription-uk" variant="secondary" trackingLabel={analyticsPlacements.pricingComparisonNoSubscription}>
-              Why no subscription?
-            </ButtonLink>
-          </div>
-        </div>
-      </section>
-
-      <section className="bg-paper py-24">
-        <div className="container-page grid gap-10 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <SectionLabel>What is included</SectionLabel>
-            <h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">
-              Everything needed to finish a practical UK CV.
-            </h2>
-            <p className="mt-6 text-lg leading-8 text-muted">
-              WorkCV is intentionally focused. It is not trying to be a broad
-              career subscription platform. It helps you create a clear CV,
-              check the preview, and download the finished PDF.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {included.map((item) => (
-              <div key={item} className="rounded-xl border border-line bg-white p-5">
-                <Check className="h-5 w-5 text-success" />
-                <p className="mt-4 text-sm font-bold leading-6 text-navy">{item}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="border-y border-line bg-surface py-16">
-        <div className="container-page">
-          <SectionLabel>Choose your starting point</SectionLabel>
-          <h2 className="font-display text-3xl font-semibold text-navy md:text-4xl">
-            Free document, guided builder, or role-specific example.
-          </h2>
-          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {[
-              ["Free blank Word CV template", "/tools/blank-cv-template-uk"],
-              ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
-              ["No-subscription builder", "/cv-builder-no-subscription-uk"],
-              ["CV personal statement examples", "/cv-personal-statement-uk"],
-            ].map(([label, href]) => (
-              <Link
-                key={href}
-                href={href}
-                className="group flex min-h-20 items-center justify-between gap-3 rounded-md border border-line bg-white p-4 text-sm font-bold text-navy hover:border-navy"
-              >
-                {label}
-                <ArrowRight className="h-4 w-4 shrink-0 transition group-hover:translate-x-1" />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <SampleCvProof trackingContext={analyticsPlacements.pricingSample} />
-
-      <FaqSection faqs={pricingFaqs} title="Common questions about CV builder costs." />
-      <FinalCta
-        heading="Pay once. Download your CV. Done."
-        body={`Build free first. Pay ${site.price} once for your CV and matching cover letter as PDF and Word. No subscription and no automatic renewal.`}
-        secondaryHref="/cv-builder-no-subscription-uk"
-        secondary="No-subscription details"
-        trackingContext={analyticsPlacements.pricingFinal}
-      />
-    </>
-  );
+  <section id="compare" className="bg-paper py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">Compare the payment terms, not just the trial price</h2><p className="mt-5 leading-8 text-muted">Check the download formats, renewal interval and total for the time you need. Some builders have subscriptions; others offer one-time purchases. WorkCV's two options above never renew.</p><p className="mt-4 leading-7 text-muted">One named example: MyPerfectCV's official pricing page showed £2.95 for 14 days, then £16.95 every four weeks, when checked on 2 October 2026. Its annual option was £59.40 upfront with yearly renewal. Verify the current terms before paying. <a href="https://www.myperfectcv.co.uk/pricing" className="font-bold underline">MyPerfectCV pricing source</a>.</p></div></section>
+  <section className="bg-white py-10"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">Choose a starting point</h2><div className="mt-5 flex flex-wrap gap-5 font-bold underline"><Link href="/tools/blank-cv-template-uk">Free blank Word CV template</Link><Link href="/tools/cv-template-word-uk">How to edit a CV in Word</Link><Link href="/cv-personal-statement-uk">CV personal statement examples</Link></div></div></section>
+  <SampleCvProof trackingContext={analyticsPlacements.pricingSample} />
+  <FaqSection faqs={faqs} title="Questions about the two plans" />
+ </>;
 }

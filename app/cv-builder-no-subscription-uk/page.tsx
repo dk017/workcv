@@ -569,6 +569,7 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
+      <section className="bg-white py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">Choose the saved versions you need</h2><p className="mt-5 leading-8">For {site.price} once, keep editing and downloading the same saved CV and matching letter, including for another application. For {site.passPrice} once, the Job Search Pass covers existing CVs and unlimited new CVs created during {site.passDays} days. Covered documents remain editable and downloadable after expiry; new documents created later need a new purchase.</p><div className="mt-5 flex flex-wrap gap-5 font-bold underline"><TrackedLink href="/pricing#job-search-pass" placement="no_subscription_versions_pricing">Compare the two plans</TrackedLink><Link href="/tailor-cv-to-job-description-uk">See when separate versions help</Link></div></div></section>
       <SampleCvProof trackingContext={analyticsPlacements.noSubscriptionSample} />
 
       <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingNoSubscription} />

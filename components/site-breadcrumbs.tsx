@@ -29,6 +29,8 @@ const pages: Record<string, { name: string; parent?: keyof typeof sections }> = 
   "/cv-template-nurse-uk": { name: "Nurse CV", parent: "templates" },
   "/cv-template-teacher-uk": { name: "Teacher CV", parent: "templates" },
   "/cv-template-warehouse-uk": { name: "Warehouse CV", parent: "templates" },
+  "/tailor-cv-to-job-description-uk": { name: "Tailor your CV to a job description" },
+  "/cv-template-retail-uk": { name: "Retail CV", parent: "templates" },
   "/pricing": { name: "Pricing" },
   "/cv-builder-no-subscription-uk": { name: "No-subscription CV builder", parent: "pricing" },
   "/resume-builder-uk-no-subscription": { name: "No-subscription resume builder", parent: "pricing" },

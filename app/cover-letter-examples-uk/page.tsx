@@ -1,3 +1,4 @@
+import { PassOffer } from "@/components/pass-offer";
 import { RolePackLinks } from "@/components/role-application-pack";
 import type { Metadata } from "next";
 import { roleApplicationPacks } from "@/lib/role-application-packs";
@@ -11,7 +12,7 @@ import { coverLetterExamples, exampleWordCount } from "@/lib/cover-letter-exampl
 import { site } from "@/lib/site";
 
 const path = "/cover-letter-examples-uk";
-const reviewed = "29 September 2026";
+const reviewed = "2 October 2026";
 
 export const metadata: Metadata = {
   title: "Cover Letter Examples UK: 13 Samples by Role (2026)",
@@ -55,7 +56,7 @@ const schemas = [
     headline: "Cover Letter Examples UK: 13 Samples by Role",
     description: metadata.description,
     datePublished: "2026-09-26",
-    dateModified: "2026-09-29",
+    dateModified: "2026-10-02",
     author: { "@type": "Organization", name: "WorkCV Editorial Team", url: site.url },
     publisher: { "@type": "Organization", name: "WorkCV", url: site.url },
     mainEntityOfPage: `${site.url}${path}`,
@@ -171,6 +172,7 @@ export default function CoverLetterExamplesPage() {
                   </Link>
                 ) : null}
               </div>
+              {roleApplicationPacks[example.slug === "part-time-student" ? "student" : example.slug === "warehouse-operative" ? "warehouse" : example.slug] ? <Link href={roleApplicationPacks[example.slug === "part-time-student" ? "student" : example.slug === "warehouse-operative" ? "warehouse" : example.slug].path + "#application-pack"} className="inline-block text-sm font-bold text-navy underline">See a complete {example.role.toLowerCase()} CV and matching letter pack</Link> : null}
               {index % 3 === 0 && (
                 <div className="rounded-lg border border-gold bg-gold-tint p-5">
                   <p className="font-bold text-navy">Make your own version</p>
@@ -179,7 +181,7 @@ export default function CoverLetterExamplesPage() {
                     and preview free, then download your CV and matching letter as PDF and Word for {site.price} once.
                   </p>
                   <div className="mt-4">
-                    <ButtonLink href={roleApplicationPacks[example.slug === "part-time-student" ? "student" : example.slug]?.path || "/editor?new=1"} trackingLabel={analyticsPlacements.coverLetterExamplesInline}>Start my CV and letter</ButtonLink>
+                    <ButtonLink href={roleApplicationPacks[example.slug === "part-time-student" ? "student" : example.slug === "warehouse-operative" ? "warehouse" : example.slug]?.path || "/editor?new=1"} trackingLabel={analyticsPlacements.coverLetterExamplesInline}>Start my CV and letter</ButtonLink>
                   </div>
                   <p className="mt-3 text-sm"><TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.coverLetterExamplesBundleMoney} className="font-bold text-navy underline underline-offset-4">See what the {site.price} CV and cover-letter payment includes</TrackedLink></p>
                 </div>
@@ -212,6 +214,8 @@ export default function CoverLetterExamplesPage() {
         </div>
       </section>
 
+      <section className="bg-paper py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">Changing a letter for a second employer</h2><p className="mt-5 leading-8">Change more than the company name. For a customer service vacancy, Sam opens with product enquiries and clear handovers. For an admin vacancy, Sam opens with checking booking details and maintaining records. The next paragraph supplies the matching evidence; the employment history stays the same.</p><p className="mt-4 leading-8">Before sending, check the role title, employer, greeting, dates and every claim against your CV. <Link href="/tailor-cv-to-job-description-uk" className="font-bold underline">Read Sam's two complete worked applications</Link>.</p><p className="mt-4 leading-8">Keep a named copy of what you send. You can revise one paid saved pair for {site.price}; the Pass helps when you want separate saved CVs and letters. <TrackedLink href="/pricing#job-search-pass" placement="cover_letter_versions_pricing" className="font-bold underline">Compare one saved CV with the Job Search Pass</TrackedLink>.</p></div></section>
+      <PassOffer audience="tailoring" trackingLabel="cover_letter_hub_pass" />
       <RolePackLinks context="cover_letter_examples" />
 
       <FaqSection faqs={faqs} title="UK cover letter example questions." />

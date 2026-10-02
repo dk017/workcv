@@ -5,6 +5,7 @@ import { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.
 export { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.ts";
 
 export const publicFunnelEventNames = [
+  "public_pass_offer_viewed",
   "landing_view",
   "page_view",
   "marketing_cta_clicked",
@@ -125,6 +126,7 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
       ? (input.metadata as Record<string, unknown>)
       : {};
   const allowedMetadata = new Set([
+    "offer_version",
     "destination",
     "placement",
     "tool",
@@ -134,6 +136,10 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
   const metadataEntries: Array<[string, string | number | boolean]> = [];
   for (const [key, item] of Object.entries(metadataInput)) {
     if (!allowedMetadata.has(key)) continue;
+    if (key === "offer_version" && item === "saved_versions_v2") {
+      metadataEntries.push([key, item]);
+      continue;
+    }
     if (key === "destination") {
       const destination = sanitizeSameOriginPath(item);
       if (destination) metadataEntries.push([key, destination]);
@@ -172,6 +178,7 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
     }
   }
   const metadata = Object.fromEntries(metadataEntries);
+  if (eventName === "public_pass_offer_viewed" && (!isPublicMeasurementPath(path) || !metadata.placement || metadata.offer_version !== "saved_versions_v2")) return null;
 
   if (
     (eventName === "tool_started" || eventName === "tool_completed") &&

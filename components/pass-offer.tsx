@@ -1,8 +1,8 @@
 import Link from "next/link";
+import { PassOfferView } from "@/components/pass-offer-view";
 import { Check } from "lucide-react";
 
 import { ButtonLink } from "@/components/marketing";
-import { competitorPricing, competitorPricingCheckedDate } from "@/lib/competitor-pricing";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 
@@ -53,18 +53,13 @@ export function PassOffer({ audience, trackingLabel }: { audience: PassAudience;
               {heading}
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-8 text-muted">{body}</p>
-            {audience === "switching" ? (
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-muted">
-                For comparison, subscription builders such as MyPerfectCV list {competitorPricing.myPerfectCv.renewal}{" "}
-                after the trial (checked {competitorPricingCheckedDate}).
-              </p>
-            ) : null}
+
           </div>
           <div>
-            <div className="flex items-baseline gap-3">
+            <PassOfferView placement={trackingLabel}><div className="flex flex-wrap items-baseline gap-3">
               <span className="font-display text-5xl font-semibold leading-none text-navy">{site.passPrice}</span>
               <span className="text-sm font-bold uppercase tracking-[0.14em] text-muted">once · {site.passDays} days</span>
-            </div>
+            </div></PassOfferView>
             <ul className="mt-5 space-y-2">
               {features.map((item) => (
                 <li key={item} className="flex gap-2 text-sm font-bold text-navy">
@@ -79,7 +74,7 @@ export function PassOffer({ audience, trackingLabel }: { audience: PassAudience;
               </ButtonLink>
             </div>
             <p className="mt-3 text-sm leading-6 text-muted">
-              Build and preview free first; you only pay when you download.{" "}
+              Covered CVs stay editable and downloadable after the 90 days. You can also keep editing one saved CV and letter for {site.price} once. Build and preview free first.{" "}
               <Link href="/pricing#job-search-pass" className="font-bold text-navy underline underline-offset-4">
                 Compare plans
               </Link>

@@ -195,3 +195,12 @@ test("hashes browser identifiers before persistence", () => {
   assert.match(hash, /^[a-f0-9]{64}$/);
   assert.equal(hash, hashAnalyticsIdentifier(value));
 });
+
+
+test("public Pass visibility requires a public page, a placement and a fixed offer version", () => {
+  const event = { ...validEvent, eventName: "public_pass_offer_viewed", metadata: { placement: "pricing_pass_editor", offer_version: "saved_versions_v2", employer: "private" } };
+  assert.deepEqual(sanitizeFunnelEvent(event)?.metadata, { placement: "pricing_pass_editor", offer_version: "saved_versions_v2" });
+  assert.equal(sanitizeFunnelEvent({ ...event, path: "/editor" }), null);
+  assert.equal(sanitizeFunnelEvent({ ...event, metadata: { placement: "pricing_pass_editor", offer_version: "private content" } }), null);
+  assert.equal(sanitizeFunnelEvent({ ...event, metadata: { offer_version: "saved_versions_v2" } }), null);
+});

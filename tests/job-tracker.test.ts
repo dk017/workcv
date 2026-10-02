@@ -123,3 +123,13 @@ test("a tracked job hands its role, employer and advert to the Job Application P
   assert.equal(readJobPackPrefill("nope"), null);
   assert.equal(readJobPackPrefill(JSON.stringify({ company: "x" })), null);
 });
+
+
+test("demo rows retain their label after reload, so they cannot inflate real-job milestones", () => {
+  const rows = [job({ isExample: true }), job({ isExample: true }), job()];
+  const restored = parseTrackerState(serializeTrackerState(rows)).jobs;
+  assert.equal(restored.filter(row => !row.isExample).length, 1);
+  assert.equal(restored.filter(row => row.isExample).length, 2);
+  const imported = csvToJobs(jobsToCsv(rows), makeId).jobs;
+  assert.equal(imported.filter(row => row.isExample).length, 2);
+});

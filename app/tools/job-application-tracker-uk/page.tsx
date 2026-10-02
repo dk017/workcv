@@ -10,7 +10,7 @@ import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Free Job Application Tracker UK – No Signup",
+  title: "Free Job Application Tracker UK: Online Tool & Excel Template",
   description:
     "Track every job you apply for: status, follow-ups and closing dates. Free, no signup, saved in your browser. Export to Excel and tailor your CV for each role.",
   alternates: { canonical: "/tools/job-application-tracker-uk" },
@@ -112,7 +112,8 @@ export default function JobApplicationTrackerPage() {
             </div>
           </div>
 
-          <div className="mt-8 rounded-lg border border-line-strong bg-surface p-5 shadow-soft md:p-7">
+          <div className="mt-6 flex flex-wrap gap-4 font-bold"><a href="#online-tracker" className="rounded-md bg-navy px-5 py-3 text-white">Use the free online tracker</a><TrackedLink href={templateHref} download placement={analyticsPlacements.trackerTemplateDownload} className="rounded-md border border-line bg-white px-5 py-3 text-navy">Download the free Excel template</TrackedLink></div>
+          <div id="online-tracker" className="mt-8 scroll-mt-24 rounded-lg border border-line-strong bg-surface p-5 shadow-soft md:p-7">
             <JobApplicationTracker />
           </div>
         </div>
@@ -217,12 +218,13 @@ export default function JobApplicationTrackerPage() {
         </div>
       </section>
 
-      <PassOffer audience="tailoring" trackingLabel={analyticsPlacements.trackerEditor} />
+      <section className="bg-paper py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">From a saved job to a tailored application</h2><p className="mt-5 leading-8">Example: Sam saves a customer service vacancy, pastes the advert into the job record and sets the next action to “Choose two customer examples”. “Tailor my CV for this job” carries that advert, employer and role to the application-pack tool. Sam adds their own evidence, reviews the draft, then records the final filename and submission date back in the tracker.</p><p className="mt-4 leading-8"><Link href="/tailor-cv-to-job-description-uk" className="font-bold underline">Follow Sam's worked CV and letter example</Link>, or start with the <Link href="/cv-template-retail-uk" className="font-bold underline">retail pack</Link> or <Link href="/cv-template-warehouse-uk" className="font-bold underline">warehouse pack</Link>.</p><h3 className="mt-7 text-xl font-bold text-navy">Spreadsheet-style preview: fictional rows</h3><div className="mt-4 grid gap-4 md:grid-cols-3">{[["Customer Service Adviser", "Northbank Homeware", "Saved", "Choose two customer examples"],["Junior Administrator", "Eastmere Community Centre", "Applied", "Check follow-up instructions"],["Retail Assistant", "Westbridge Stores", "Interview", "Review the CV version sent"]].map(([role,employer,status,next])=><article key={role} className="rounded-lg border border-line bg-white p-5"><h4 className="font-bold">{role}</h4><p className="mt-2">{employer}</p><p className="mt-2 text-sm">Status: {status}</p><p className="mt-2 text-sm leading-6">Next: {next}</p></article>)}</div><p className="mt-4 text-sm leading-7 text-muted">These examples are not your saved applications. Download the Excel template to work offline, or export CSV from the online tracker for a backup. Browser storage does not sync between devices.</p></div></section>
+      <PassOffer audience="tailoring" trackingLabel="tracker_footer_pass" />
 
       <RelatedLinksSection
         title="More help with your job search."
         links={[
-          ["Tailor a CV to a job advert", "/tools/job-application-pack-uk"],
+          ["How to tailor your CV: worked examples", "/tailor-cv-to-job-description-uk"],
           ["Check your CV against an advert", "/tools/ats-score-checker"],
           ["Cover letter examples", "/cover-letter-examples-uk"],
           ["What to do after redundancy", "/situations/made-redundant"],

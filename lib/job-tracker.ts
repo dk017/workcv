@@ -41,6 +41,7 @@ const optionalText = (max: number) => z.string().trim().max(max).optional();
 
 export const trackedJobSchema = z.object({
   id: z.string().min(1).max(64),
+  isExample: z.boolean().optional(),
   role: z.string().trim().min(1).max(120),
   employer: z.string().trim().min(1).max(120),
   status: z.enum(jobStatuses.map((status) => status.id) as [JobStatus, ...JobStatus[]]),
@@ -194,6 +195,7 @@ const csvColumns: Array<{ header: string; key: keyof TrackedJob }> = [
   { header: "Contact", key: "contact" },
   { header: "Notes", key: "notes" },
   { header: "Job advert text", key: "advertText" },
+  { header: "Example row", key: "isExample" },
 ];
 
 // Spreadsheet apps treat cells starting with these characters as formulas.
@@ -270,6 +272,7 @@ const headerAliases: Record<string, keyof TrackedJob> = {
   contact: "contact",
   notes: "notes",
   "job advert text": "advertText", "job description": "advertText",
+  "example row": "isExample",
 };
 
 function importDate(value: string) {
@@ -308,6 +311,7 @@ export function csvToJobs(text: string, makeId: () => string, now = Date.now()) 
     const draft: Record<string, unknown> = { id: makeId(), status: "saved", createdAt: now, updatedAt: now };
     keys.forEach((key, index) => {
       if (!key) return;
+      if (key === "isExample") { draft.isExample = cells[index]?.trim().toLowerCase() === "true"; return; }
       // Undo the formula guard added on export.
       const value = (cells[index] ?? "").replace(/^'(?=[=+\-@])/, "").trim();
       if (!value) return;

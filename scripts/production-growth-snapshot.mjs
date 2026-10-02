@@ -180,12 +180,34 @@ export async function collectSnapshot(client, environment = process.env) {
       const ctas = await query(`SELECT coalesce(metadata->>'placement','unlabelled') placement,
         count(*)::int clicks,count(DISTINCT session_hash)::int sessions
         FROM f WHERE event_name='marketing_cta_clicked' GROUP BY 1 ORDER BY sessions DESC,placement`);
+      const pageViews = await query(`SELECT ${safePath("path")} path,
+        count(*)::int views,count(DISTINCT session_hash)::int sessions
+        FROM f WHERE event_name='page_view' AND ${publicPath} GROUP BY 1 ORDER BY sessions DESC`);
+      const passOffers = await query(`SELECT ${safePath("path")} path,
+        metadata->>'placement' placement,metadata->>'offer_version' offer_version,
+        count(DISTINCT session_hash)::int visible_sessions
+        FROM f WHERE event_name='public_pass_offer_viewed' GROUP BY 1,2,3 ORDER BY visible_sessions DESC`);
+      const pageCtas = await query(`SELECT ${safePath("path")} path,metadata->>'placement' placement,
+        count(*)::int clicks,count(DISTINCT session_hash)::int sessions
+        FROM f WHERE event_name='marketing_cta_clicked' GROUP BY 1,2 ORDER BY sessions DESC`);
+      const planEvents = await query(`SELECT event_name,
+        CASE WHEN metadata->>'plan' IN ('cv','pass') THEN metadata->>'plan' ELSE 'unspecified' END plan,
+        CASE WHEN metadata->>'placement' ~ '^[a-z0-9_]{3,80}$' THEN metadata->>'placement' ELSE 'unspecified' END placement,
+        count(*)::int events,count(DISTINCT user_id)::int users
+        FROM e WHERE event_name IN ('editor_viewed','checkout_plan_selected','pass_offer_shown','pass_offer_clicked',
+          'upgrade_offer_shown','upgrade_offer_clicked','payment_started','payment_failed','payment_cancelled')
+        GROUP BY 1,2,3 ORDER BY 1,2,3`);
+      const passOrders = await query(`SELECT upper(coalesce(currency,'UNKNOWN')) currency,
+        CASE WHEN upper(coalesce(currency,''))<>'GBP' THEN 'other_currency' WHEN amount_cents=2499 THEN 'full_price' WHEN amount_cents<2499 THEN 'discounted' ELSE 'other_amount' END price_group,
+        count(*)::int orders,sum(amount_cents)::bigint gross_minor_units,
+        count(*) FILTER (WHERE refunded_at IS NOT NULL)::int refunded_orders
+        FROM o WHERE product_id='${passProductId}' GROUP BY 1,2 ORDER BY 1,2`);
       const quality = (await client.query(`SELECT
         (SELECT count(*)::int FROM workcv_funnel_events WHERE created_at >= $1 AND created_at < $2 AND is_test) test_events_excluded,
         (SELECT count(*)::int FROM workcv_orders WHERE paid_at >= $1 AND paid_at < $2 AND (is_test OR coalesce(user_id,'')=ANY($3::text[]))) test_operator_orders_excluded,
         (SELECT count(*)::int FROM workcv_orders WHERE paid_at >= $1 AND paid_at < $2 AND coalesce(amount_cents,0)<=0) zero_value_orders,
         (SELECT count(*)::int FROM workcv_orders WHERE paid_at >= $1 AND paid_at < $2 AND NOT is_test AND amount_cents>0 AND user_id IS NULL) paid_orders_without_user`, params)).rows[0];
-      report.windows.push({ days,start,end,activity,revenue,cohort,sales,tools,answers,ctas,quality });
+      report.windows.push({ days,start,end,activity,revenue,cohort,sales,tools,answers,ctas,pageViews,passOffers,pageCtas,planEvents,passOrders,quality });
     }
     await client.query("COMMIT");
     return report;

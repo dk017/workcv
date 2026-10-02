@@ -535,6 +535,7 @@ export function AtsScoreChecker() {
         </div>
       </form>
 
+      {(readability || assessment || fallback) && !loading ? <p className="mt-6 rounded-lg border border-line bg-paper p-5 leading-7">Choose a genuine example for each requirement. <a href="/tailor-cv-to-job-description-uk" className="font-bold text-navy underline">See how to turn an advert into CV and letter edits</a>. A checker score is guidance, not a hiring decision.</p> : null}
       {readability && !assessment && !fallback && !loading ? (
         <div ref={resultsRef} className="scroll-mt-24 pt-12" aria-live="polite">
           <ReadabilityResult

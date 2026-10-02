@@ -1,4 +1,5 @@
 "use client";
+import { readCheckoutPlanIntent } from "@/lib/checkout-plan-intent";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
@@ -175,15 +176,9 @@ export function CvEditor() {
 
   // Visitors who chose the Job Search Pass on a marketing page arrive with plan=pass.
   useEffect(() => {
-    const intentKey = "workcv-plan-intent";
-    try {
-      if (new URLSearchParams(window.location.search).get("plan") === "pass") {
-        window.sessionStorage.setItem(intentKey, "pass");
-      }
-      if (window.sessionStorage.getItem(intentKey) === "pass") setCheckoutPlan("pass");
-    } catch {
-      // Storage can be blocked; the plan picker still works without it.
-    }
+    let storage: Storage | undefined;
+    try { storage = window.sessionStorage; } catch { /* Blocked browser storage. */ }
+    setCheckoutPlan(readCheckoutPlanIntent(window.location.search, storage));
   }, []);
 
   useEffect(() => {
@@ -252,7 +247,7 @@ export function CvEditor() {
             window.history.replaceState(null, "", nextUrl);
           }
           setLoaded(true);
-          trackEditorEvent("editor_viewed", data.document.id);
+          trackEditorEvent("editor_viewed", data.document.id, { plan: params.get("plan") === "pass" ? "pass" : params.get("plan") === "cv" ? "cv" : "unspecified" });
         }
       } catch {
         if (!cancelled) {
@@ -1103,7 +1098,10 @@ export function CvEditor() {
       cancelled: "payment_cancelled",
     };
     const event = eventByState[paymentState];
-    if (event) trackEditorEvent(event, draftId);
+    if (event) {
+      const plan = new URLSearchParams(window.location.search).get("plan");
+      trackEditorEvent(event, draftId, { plan: plan === "pass" || plan === "cv" ? plan : "unspecified" });
+    }
   }, [draftId, paymentState]);
 
   return (
@@ -1654,6 +1652,7 @@ export function CvEditor() {
           upgrade={upgradeOffer?.eligible ? upgradeOffer : null}
           onPlanChange={(plan) => {
             setCheckoutPlan(plan);
+            try { window.sessionStorage.setItem("workcv-plan-intent", plan); } catch { /* Optional persistence. */ }
             trackEditorEvent("checkout_plan_selected", draftId, { plan });
           }}
           onConsentAccepted={() =>

@@ -27,6 +27,7 @@ type TouchAttribution = {
 };
 
 type FunnelMetadata = {
+  offer_version?: "saved_versions_v2";
   destination?: string;
   placement?: string;
   tool?: string;
@@ -117,6 +118,7 @@ function deviceClass() {
 
 export function trackFunnelEvent(
   eventName:
+    | "public_pass_offer_viewed"
     | "landing_view"
     | "page_view"
     | "marketing_cta_clicked"

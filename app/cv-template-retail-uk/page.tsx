@@ -1,3 +1,4 @@
+import { FirstJobExample } from "@/components/first-job-example";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CvDocument } from "@/components/cv-editor";
@@ -6,8 +7,8 @@ import { RoleApplicationPack } from "@/components/role-application-pack";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 export const metadata: Metadata = {
-  title: "Retail CV Template UK + Matching Cover Letter",
-  description: "See a retail sales assistant CV and matching cover letter, download a free application checklist and build your own UK retail application from real experience.",
+  title: "Retail CV Examples UK: First Job, Experienced & Cover Letter",
+  description: "Read complete UK retail CV and cover letter examples with and without experience. Get a free checklist and prepare a shop assistant application from your own facts.",
   alternates: { canonical: "/cv-template-retail-uk" },
 };
 export default function RetailCvPage() {
@@ -17,13 +18,14 @@ export default function RetailCvPage() {
         <div><p className="text-sm font-bold uppercase tracking-wide text-navy">Retail CV template UK</p>
           <h1 className="mt-5 font-display text-5xl font-semibold text-navy md:text-6xl">A retail CV and letter built around how you help customers.</h1>
           <p className="mt-6 text-xl leading-8 text-muted">Use this sales assistant example to connect customer service, till accuracy and stock work to the vacancy. Read the matching letter, then build your own application with facts you can explain at interview.</p>
-          <div className="mt-8"><ButtonLink href="#application-pack" trackingLabel="role_pack_retail_hero">Build my CV and letter</ButtonLink></div>
+          <nav aria-label="Choose a retail example" className="mt-6 flex flex-wrap gap-4 font-bold underline"><a href="#application-pack">Experienced example and own application</a><a href="#no-experience-example">First retail job: CV and letter</a></nav><div className="mt-8"><ButtonLink href="#application-pack" trackingLabel="role_pack_retail_hero">Build my CV and letter</ButtonLink></div>
           <p className="mt-4 text-sm leading-6 text-muted">Preview free. {site.price} once for one saved CV and matching letter, each in PDF and Word.</p>
         </div>
         <div className="min-w-0 overflow-hidden rounded-xl border border-line bg-white p-4 shadow-soft"><h2 className="mb-4 text-lg font-bold text-navy">Fictional retail CV example: Maya Lewis</h2><div className="template-page-preview overflow-hidden rounded-lg border border-line bg-[#eef6f3] p-3"><div className="gallery-preview-document pointer-events-none mx-auto" style={{width:794}}><CvDocument cv={getRoleCvTemplate("retail")} compactPreview /></div></div></div>
       </div>
     </section>
     <RoleApplicationPack id="retail" />
+    <FirstJobExample id="retail" />
     <section className="bg-paper py-16"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">What to include in a retail CV</h2><div className="mt-6 grid gap-5 md:grid-cols-3">{[
       ["Customer help", "Explain how you checked a need, found a product or resolved a question. Use actual product knowledge and avoid unsupported claims about sales results."],
       ["Accurate shop routines", "Describe checking prices, handling transactions, replenishing stock or handing tasks over. List only systems and responsibilities you have used."],

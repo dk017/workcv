@@ -320,6 +320,7 @@ export default function CvExamplesUkPage() {
         </div>
       </section>
 
+      <section className="bg-white py-10"><div className="container-page"><h2 className="font-display text-3xl font-semibold text-navy">Adapt the example to your vacancy</h2><p className="mt-4 leading-8"><Link href="/tailor-cv-to-job-description-uk" className="font-bold underline">Follow a worked example of tailoring a CV and letter</Link>: the same experience, two adverts and different evidence priorities.</p></div></section>
       <RolePackLinks context="cv_examples" />
 
       <FaqSection faqs={faqs} title="UK CV example questions." />

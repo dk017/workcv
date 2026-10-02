@@ -338,6 +338,7 @@ export default function AtsScoreCheckerPage() {
       <RelatedLinksSection
         title="Keep improving your CV."
         links={[
+          ["Tailor your CV: two worked applications", "/tailor-cv-to-job-description-uk"],
           ["Write stronger CV bullets", "/tools/cv-bullet-point-generator"],
           ["Track your job applications", "/tools/job-application-tracker-uk"],
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],

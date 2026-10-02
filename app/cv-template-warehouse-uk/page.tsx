@@ -1,3 +1,4 @@
+import { FirstJobExample } from "@/components/first-job-example";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -18,9 +19,9 @@ import { site } from "@/lib/site";
 import { RoleApplicationPack } from "@/components/role-application-pack";
 
 export const metadata: Metadata = {
-  title: "Warehouse Operative CV Template UK + Cover Letter",
+  title: "Warehouse CV Examples UK: With and Without Experience",
   description:
-    "See a UK warehouse CV and matching cover letter, get a free checklist and build your own application using real picking, packing and stock experience.",
+    "Complete UK warehouse CV and cover letter examples with and without experience. Show genuine picking, packing or transferable skills, with a free application checklist.",
   alternates: { canonical: "/cv-template-warehouse-uk" },
   openGraph: {
     title: "Warehouse CV Template UK - WorkCV",
@@ -252,7 +253,9 @@ export default function WarehouseCvTemplateUkPage() {
         </div>
       </section>
 
+      <nav aria-label="Choose a warehouse example" className="container-page flex flex-wrap gap-4 py-5 font-bold underline"><a href="#application-pack">Experienced example and own application</a><a href="#no-experience-example">First warehouse job: CV and letter</a></nav>
       <RoleApplicationPack id="warehouse" />
+      <FirstJobExample id="warehouse" />
 
       <section className="bg-surface py-24">
         <div className="container-page">
