@@ -12,7 +12,7 @@ Audit: compared wording with commerce and pass unlock rules. The Pass link retai
 
 Completed: public price-block exposure after at least 50% visibility for one continuous second in a foreground tab, once per session/page/placement/version. Sanitizer accepts only the fixed offer version and a bounded placement, on public paths. Shared offers, pricing and the contextual tracker prompt use it. Existing editor events now appear in the encrypted aggregate report, including plan selection, payment starts/failures/cancellation, Pass/upgrade offers and editor arrival. Added actual route views, page-level clicks, Pass price groups and refund flags.
 
-Audit: ingestion/privacy and encrypted-report tests passed. No CV text, advert, employer, email or customer identifier is added to reporting. A discounted order is labelled discounted, not asserted to be an upgrade. Non-GBP orders are not compared with a GBP amount. Refund flags do not measure partial refunds or net receipts; the dashboard states these limits. Historical absent exposure is not described as zero views. Production query execution remains a release verification item below.
+Audit: ingestion/privacy and encrypted-report tests passed. No CV text, advert, employer, email or customer identifier is added to reporting. A discounted order is labelled discounted, not asserted to be an upgrade. Non-GBP orders are not compared with a GBP amount. Refund flags do not measure partial refunds or net receipts; the dashboard states these limits. Historical absent exposure is not described as zero views. Production query execution passed; both reporting windows contain all five new report arrays. See release verification below.
 
 ## 3. Tailoring guide
 
@@ -71,10 +71,14 @@ Audit: no required application quota, benefit eligibility promise or legal outco
 ## Verification
 
 - Full test suite: 296 passed, 0 failed after review fixes.
-- Source-only TypeScript check: passed before final small helper/link updates; clean release build is the final compilation gate.
+- Source-only TypeScript check passed. Final clean Linux production build, lint/type validation and Docker PDF runtime smoke check also passed.
 - Browser: pricing at desktop width; guide, retail and warehouse at 390px; Pass link to sign-in; tracker demo behaviour.
 - Local HTTP audit: 14 changed pages returned 200, each with one H1, the expected canonical and no noindex. New guide is in the sitemap. Seven referenced downloads returned 200.
-- Clean production build and live verification: results to be appended after completion.
+- Production build and deployment succeeded for commit `f2dc87f`: https://github.com/dk017/workcv/actions/runs/37043041328.
+- Live HTTP audit on 2 October: all 14 changed pages passed status, single-H1, canonical and indexability checks; seven downloads returned nonempty files; the new guide appears in the sitemap. Updated pricing and both first-job examples were present.
+- Live browser: the Job Search Pass button reached `/login?next=%2Feditor%3Fplan%3Dpass`; sign-in rendered correctly. Temporary viewport override was reset.
+- Read-only encrypted production report succeeded at 17:50 UTC: https://github.com/dk017/workcv/actions/runs/37043441200. Both 7-day and 30-day windows contain page views, offer exposures, page CTA clicks, plan events and Pass order breakdowns. Ingestion is enabled. Private data remains in the ignored local report directory; no customer data or credentials were published. This verifies query execution and report structure, not a completed customer purchase or every browser event end to end.
+- IndexNow accepted all 14 changed URLs. Acceptance does not guarantee crawling, indexing or ranking.
 - No real purchase, authenticated checkout, discounted-upgrade transaction or fresh Search Console export was performed.
 
 ## Deliberately deferred
