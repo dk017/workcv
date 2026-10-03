@@ -88,6 +88,8 @@ const targetingSchema = z
           .strict(),
       )
       .max(10),
+    // Advert keywords the user said are not part of their experience.
+    skippedKeywords: z.array(z.string().max(120)).max(100).optional(),
   })
   .strict();
 

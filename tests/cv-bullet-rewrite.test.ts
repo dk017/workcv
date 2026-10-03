@@ -55,7 +55,9 @@ test("rewrite quality rejects invented numbers, weak openings and repeats", () =
 
   const invented = [...validOptions];
   invented[0] = "Assisted around 200 customers a day in locating books and answered product questions throughout each shift";
-  assert.ok(assessRewriteQuality(invented, parsed).issues.includes("Do not introduce numbers that were not supplied."));
+  const inventedResult = assessRewriteQuality(invented, parsed);
+  assert.ok(inventedResult.issues.includes("Do not introduce numbers that were not supplied."));
+  assert.deepEqual(inventedResult.options, validOptions.slice(1), "only the invented option is dropped");
 
   const weak = [...validOptions];
   weak[1] = "Helped with finding suitable titles for shoppers by answering daily questions about stock and authors in store";
@@ -63,7 +65,9 @@ test("rewrite quality rejects invented numbers, weak openings and repeats", () =
 
   const repeated = [...validOptions];
   repeated[2] = validOptions[0];
-  assert.ok(assessRewriteQuality(repeated, parsed).issues.includes("Every option must be distinct."));
+  const repeatedResult = assessRewriteQuality(repeated, parsed);
+  assert.ok(repeatedResult.issues.includes("Every option must be distinct."));
+  assert.deepEqual(repeatedResult.options, validOptions.slice(0, 2));
 
   const withAvoid = cvBulletRewriteInputSchema.parse({ ...input, avoid: [validOptions[0]] });
   assert.ok(assessRewriteQuality(validOptions, withAvoid).issues.includes("Do not repeat the original bullet or an earlier suggestion."));
@@ -75,14 +79,25 @@ test("returns three vetted options and a follow-up question", async () => {
   assert.equal(result.followUpQuestion, question);
 });
 
-test("retries once with the quality issues, then succeeds", async () => {
+test("returns the good options when one of them fails, without retrying", async () => {
+  let calls = 0;
+  const original = cvBulletRewriteInputSchema.parse(input).bullet;
+  const result = await rewriteCvBullet(input, async () => {
+    calls += 1;
+    return { options: [original, validOptions[1], validOptions[2]], followUpQuestion: question };
+  });
+  assert.equal(calls, 1);
+  assert.deepEqual(result.options, validOptions.slice(1));
+});
+
+test("retries once when no option passes, then succeeds", async () => {
   const corrections: Array<string | undefined> = [];
   let calls = 0;
   const result = await rewriteCvBullet(input, async (_input, correction) => {
     corrections.push(correction);
     calls += 1;
     if (calls === 1) {
-      return { options: [validOptions[0], validOptions[1], "Assisted around 200 customers a day in locating books and answered product questions daily"], followUpQuestion: question };
+      return { options: ["Assisted around 200 customers a day in locating books and answering questions", "Helped with stock and customer questions across the shop floor each day", "I answered customer questions about books and stock in the shop"], followUpQuestion: question };
     }
     return { options: validOptions, followUpQuestion: question };
   });

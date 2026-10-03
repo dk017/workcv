@@ -51,6 +51,8 @@ export type CvTargeting = {
     title: string;
     action: string;
   }>;
+  /** Advert keywords the user said are not part of their experience. */
+  skippedKeywords?: string[];
 };
 
 export type CvData = {

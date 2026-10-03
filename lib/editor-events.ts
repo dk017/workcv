@@ -36,6 +36,7 @@ export const editorEventNames = [
   "ai_suggestion_applied",
   "ai_suggestion_rejected",
   "skill_suggestions_opened",
+  "keyword_triage_answered",
   "job_tailoring_saved",
   "mobile_view_changed",
   "checkout_opened",

@@ -25,6 +25,7 @@
     "test:tools": "node --no-warnings --test --experimental-strip-types tests/*.test.ts",
     "test:pdf-runtime": "node scripts/pdf-runtime-smoke.mjs",
     "test:pdf-parity": "node tests/pdf-parity.mjs",
+    "test:editor-flows": "node --no-warnings --experimental-strip-types scripts/verify-editor-fix-flows.mjs",
     "test:mcp": "node --no-warnings --experimental-strip-types --test tests/mcp-pilot.test.ts",
     "smoke:mcp": "node --no-warnings --experimental-strip-types scripts/mcp-pilot-smoke.mjs"
   },
