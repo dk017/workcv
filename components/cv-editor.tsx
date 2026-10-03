@@ -85,9 +85,10 @@ const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
 type TabId = "profile" | "experience" | "education" | "skills" | "template" | "cover-letter";
 type AiReview = {
-  kind: "profile" | "bullets" | "skills";
+  kind: "profile" | "bullets" | "bullet" | "skills";
   title: string;
   targetId?: string;
+  bulletIndex?: number;
   original: string;
   options: Array<{ label: string; value: string }>;
   questions?: string[];
@@ -639,6 +640,22 @@ export function CvEditor() {
       setAiReview({ kind: "bullets", targetId: id, title: `Review suggestions for ${item.role}`, original: item.bullets, options: data.bullets.map((value, index) => ({ label: `Suggestion ${index + 1}`, value })), questions: data.followUpQuestions });
       trackEditorEvent("ai_suggestion_generated", draftId, { section: "experience" });
     } catch (error) { setAiError(error instanceof Error ? error.message : "Bullet suggestions are unavailable."); }
+    finally { setAiLoading(null); }
+  };
+
+  const rewriteBullet = async (id: string, index: number, avoid: string[] = []) => {
+    if (aiLoading) return;
+    const item = cv.experience.find((entry) => entry.id === id); if (!item) return;
+    const bullet = item.bullets.split("\n")[index]?.trim() || "";
+    setAiLoading("bullet"); setAiError(null);
+    try {
+      if (!item.role.trim()) throw new Error("Add the job title for this role first.");
+      const response = await fetch("/api/tools/cv-bullet-rewrite", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, bullet, targetRole: cv.targetRole, jobDescription: cv.targeting?.jobDescription || "", avoid }) });
+      const data = await response.json() as { options?: string[]; followUpQuestion?: string; error?: string };
+      if (!response.ok || !data.options) throw new Error(data.error || "Bullet rewrites are unavailable.");
+      setAiReview({ kind: "bullet", targetId: id, bulletIndex: index, title: `Rewrite this ${item.role} bullet`, original: bullet, options: data.options.map((value, optionIndex) => ({ label: `Option ${optionIndex + 1}`, value })), questions: data.followUpQuestion ? [data.followUpQuestion] : undefined });
+      trackEditorEvent("ai_suggestion_generated", draftId, { section: "bullet", retry: avoid.length > 0 });
+    } catch (error) { setAiError(error instanceof Error ? error.message : "Bullet rewrites are unavailable."); }
     finally { setAiLoading(null); }
   };
 
@@ -1397,7 +1414,7 @@ export function CvEditor() {
         <section className="editor-chrome border-b border-red-200 bg-redsoft" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 sm:w-[min(1540px,calc(100%-48px))]"><p className="text-sm font-bold text-navy">{aiError}</p><button type="button" onClick={() => setAiError(null)} aria-label="Dismiss message" className="text-navy"><X className="h-5 w-5" /></button></div></section>
       )}
       {aiLoading && (
-        <section className="editor-chrome border-b border-line bg-gold-tint" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center gap-3 py-3 sm:w-[min(1540px,calc(100%-48px))]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-navy/20 border-t-navy" /><p className="text-sm font-bold text-navy">Preparing fact-checked {aiLoading === "profile" ? "profile versions" : "bullet suggestions"}...</p></div></section>
+        <section className="editor-chrome border-b border-line bg-gold-tint" aria-live="polite"><div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center gap-3 py-3 sm:w-[min(1540px,calc(100%-48px))]"><span className="h-4 w-4 animate-spin rounded-full border-2 border-navy/20 border-t-navy" /><p className="text-sm font-bold text-navy">Preparing fact-checked {aiLoading === "profile" ? "profile versions" : aiLoading === "bullet" ? "bullet rewrites" : "bullet suggestions"}...</p></div></section>
       )}
 
       {(recoveryCv || otherTabUpdated) && (
@@ -1592,6 +1609,7 @@ export function CvEditor() {
                     moveEntry("experience", index, direction)
                   }
                   onImproveBullets={(id) => void improveBullets(id)}
+                  onRewriteBullet={(id, index) => void rewriteBullet(id, index)}
                   assistanceBusy={Boolean(aiLoading)}
                 />
               )}
@@ -1691,12 +1709,16 @@ export function CvEditor() {
         />
       )}
       {aiReview && (
-        <AiReviewModal review={aiReview} onClose={() => {
+        <AiReviewModal key={`${aiReview.kind}-${aiReview.options[0]?.value ?? ""}`} review={aiReview} retrying={Boolean(aiLoading)} onRetry={aiReview.kind === "bullet" && aiReview.targetId && aiReview.bulletIndex !== undefined ? () => void rewriteBullet(aiReview.targetId!, aiReview.bulletIndex!, aiReview.options.map((option) => option.value)) : undefined} onClose={() => {
           trackEditorEvent("ai_suggestion_rejected", draftId, { section: aiReview.kind });
           setAiReview(null);
         }} onApply={(values) => {
           if (aiReview.kind === "profile") updateField("profile", values[0] || aiReview.original);
           if (aiReview.kind === "bullets" && aiReview.targetId) updateExperience(aiReview.targetId, "bullets", values.join("\n"));
+          if (aiReview.kind === "bullet" && aiReview.targetId && aiReview.bulletIndex !== undefined && values[0]) {
+            const item = cv.experience.find((entry) => entry.id === aiReview.targetId);
+            if (item) { const next = item.bullets.split("\n"); next[aiReview.bulletIndex] = values[0]; updateExperience(item.id, "bullets", next.join("\n")); }
+          }
           if (aiReview.kind === "skills") updateField("skills", Array.from(new Set([...lines(cv.skills), ...values])).join("\n"));
           trackEditorEvent("ai_suggestion_applied", draftId, { section: aiReview.kind, count: values.length }); setAiReview(null);
         }} />
@@ -1721,18 +1743,19 @@ export function CvEditor() {
   );
 }
 
-function AiReviewModal({ review, onClose, onApply }: { review: AiReview; onClose: () => void; onApply: (values: string[]) => void }) {
+function AiReviewModal({ review, onClose, onApply, onRetry, retrying = false }: { review: AiReview; onClose: () => void; onApply: (values: string[]) => void; onRetry?: () => void; retrying?: boolean }) {
+  const singleChoice = review.kind === "profile" || review.kind === "bullet";
   const [selected, setSelected] = useState<number[]>(review.kind === "profile" ? [0] : []);
   const dialogRef = useAccessibleDialog(onClose);
-  const toggle = (index: number) => setSelected((current) => review.kind === "profile" ? [index] : current.includes(index) ? current.filter((item) => item !== index) : [...current, index]);
+  const toggle = (index: number) => setSelected((current) => singleChoice ? [index] : current.includes(index) ? current.filter((item) => item !== index) : [...current, index]);
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-navy/50 p-4">
       <div ref={dialogRef} role="dialog" aria-modal="true" aria-labelledby="ai-review-title" className="my-auto max-h-[calc(100dvh-2rem)] w-full max-w-4xl overflow-y-auto rounded-xl border border-line bg-white p-5 shadow-soft sm:p-6">
         <div className="flex items-start justify-between gap-4"><div><p className="text-xs font-bold uppercase tracking-[0.12em] text-success">Fact-safe suggestion</p><h2 id="ai-review-title" className="mt-1 font-display text-3xl font-semibold text-navy">{review.title}</h2><p className="mt-2 text-sm leading-6 text-muted">Compare before applying. WorkCV will never apply AI text without your confirmation.</p></div><button type="button" onClick={onClose} aria-label="Close suggestions" className="rounded border border-line p-2 text-muted hover:text-navy"><X className="h-5 w-5" /></button></div>
         {review.original && <div className="mt-5 rounded-md border border-line bg-paper p-4"><p className="text-xs font-bold uppercase tracking-[0.1em] text-muted">Current text</p><p className="mt-2 whitespace-pre-line text-sm leading-6 text-ink">{review.original}</p></div>}
-        <fieldset className="mt-5 space-y-3"><legend className="text-sm font-bold text-navy">{review.kind === "profile" ? "Choose one version" : "Select only accurate suggestions"}</legend>{review.options.map((option, index) => <label key={`${option.label}-${index}`} className={`flex cursor-pointer gap-3 rounded-md border p-4 ${selected.includes(index) ? "border-navy bg-greensoft" : "border-line bg-white"}`}><input type={review.kind === "profile" ? "radio" : "checkbox"} name="ai-option" checked={selected.includes(index)} onChange={() => toggle(index)} className="mt-1 h-4 w-4 accent-navy" /><span><strong className="text-sm text-navy">{option.label}</strong><span className="mt-1 block text-sm leading-6 text-ink">{option.value}</span></span></label>)}</fieldset>
+        <fieldset className="mt-5 space-y-3"><legend className="text-sm font-bold text-navy">{singleChoice ? "Choose one version" : "Select only accurate suggestions"}</legend>{review.options.map((option, index) => <label key={`${option.label}-${index}`} className={`flex cursor-pointer gap-3 rounded-md border p-4 ${selected.includes(index) ? "border-navy bg-greensoft" : "border-line bg-white"}`}><input type={singleChoice ? "radio" : "checkbox"} name="ai-option" checked={selected.includes(index)} onChange={() => toggle(index)} className="mt-1 h-4 w-4 accent-navy" /><span><strong className="text-sm text-navy">{option.label}</strong><span className="mt-1 block text-sm leading-6 text-ink">{option.value}</span></span></label>)}</fieldset>
         {review.questions?.length ? <div className="mt-5 rounded-md border border-gold bg-gold-tint p-4"><p className="text-sm font-bold text-navy">Evidence that would strengthen this section</p><ul className="mt-2 space-y-1 text-sm leading-6 text-muted">{review.questions.map((question) => <li key={question}>{question}</li>)}</ul></div> : null}
-        <div className="mt-6 flex justify-end gap-3"><button type="button" onClick={onClose} className="min-h-11 rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy">Keep current text</button><button type="button" disabled={!selected.length} onClick={() => onApply(selected.map((index) => review.options[index].value))} className="min-h-11 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:opacity-50">Apply selected</button></div>
+        <div className="mt-6 flex flex-wrap justify-end gap-3"><button type="button" onClick={onClose} className="min-h-11 rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy">Keep current text</button>{onRetry && <button type="button" disabled={retrying} onClick={onRetry} className="inline-flex min-h-11 items-center gap-2 rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy disabled:cursor-wait disabled:opacity-60"><Sparkles className="h-4 w-4" aria-hidden="true" />{retrying ? "Trying again…" : "Try again"}</button>}<button type="button" disabled={!selected.length} onClick={() => onApply(selected.map((index) => review.options[index].value))} className="min-h-11 rounded-md bg-navy px-5 text-sm font-bold text-white disabled:opacity-50">Apply selected</button></div>
       </div>
     </div>
   );

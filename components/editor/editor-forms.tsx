@@ -15,6 +15,7 @@ import {
   ExperienceItem,
   templates,
 } from "@/lib/editor-data";
+import { assessExistingBullet } from "@/lib/cv-bullet-rules";
 
 export function ProfileForm({
   cv,
@@ -89,6 +90,7 @@ export function ExperienceForm({
   removeExperience,
   moveExperience,
   onImproveBullets,
+  onRewriteBullet,
   assistanceBusy = false,
 }: {
   cv: CvData;
@@ -97,6 +99,7 @@ export function ExperienceForm({
   removeExperience: (id: string) => void;
   moveExperience: (index: number, direction: -1 | 1) => void;
   onImproveBullets: (id: string) => void;
+  onRewriteBullet: (id: string, index: number) => void;
   assistanceBusy?: boolean;
 }) {
   return (
@@ -182,6 +185,8 @@ export function ExperienceForm({
             <BulletEditor
               value={item.bullets}
               onChange={(value) => updateExperience(item.id, "bullets", value)}
+              onRewrite={(index) => onRewriteBullet(item.id, index)}
+              rewriteBusy={assistanceBusy}
             />
           </div>
         ))}
@@ -393,9 +398,13 @@ function FormSection({
 function BulletEditor({
   value,
   onChange,
+  onRewrite,
+  rewriteBusy = false,
 }: {
   value: string;
   onChange: (value: string) => void;
+  onRewrite?: (index: number) => void;
+  rewriteBusy?: boolean;
 }) {
   const bullets = value === "" ? [""] : value.split("\n");
   const commit = (next: string[]) => onChange(next.join("\n"));
@@ -416,11 +425,11 @@ function BulletEditor({
     <fieldset>
       <legend className="mb-2 text-sm font-bold text-navy">Bullet points</legend>
       <div className="space-y-2">
-        {bullets.map((bullet, index) => (
-          <div
-            key={index}
-            className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]"
-          >
+        {bullets.map((bullet, index) => {
+          const reasons = assessExistingBullet(bullet);
+          return (
+          <div key={index}>
+          <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto]">
             <input
               value={bullet}
               aria-label={`Bullet point ${index + 1}`}
@@ -467,7 +476,25 @@ function BulletEditor({
               </IconButton>
             </div>
           </div>
-        ))}
+          {reasons.length > 0 && (
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted">
+              <span><span className="font-bold text-red-800">Weak bullet:</span> {reasons.join(" · ")}</span>
+              {onRewrite && (
+                <button
+                  type="button"
+                  disabled={rewriteBusy}
+                  onClick={() => onRewrite(index)}
+                  className="inline-flex min-h-8 items-center gap-1 rounded border border-line bg-white px-2 font-bold text-navy hover:border-navy disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  Rewrite with AI
+                </button>
+              )}
+            </div>
+          )}
+          </div>
+          );
+        })}
       </div>
     </fieldset>
   );
