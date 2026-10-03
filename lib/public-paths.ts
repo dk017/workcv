@@ -22,6 +22,8 @@ export function isPublicMeasurementPath(pathname: string) {
   const path = sanitizeSameOriginPath(pathname);
   if (!path) return false;
   return !(
+    path === "/admin" ||
+    path.startsWith("/admin/") ||
     path === "/login" ||
     path === "/editor" ||
     path === "/my-cvs" ||

@@ -91,16 +91,23 @@ jobs:
           WORKCV_IMAGE: ${{ needs.build.outputs.image }}:${{ needs.build.outputs.tag }}
           GHCR_USER: ${{ github.actor }}
           GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+          ANALYTICS_ADMIN_EMAILS: ${{ secrets.ANALYTICS_ADMIN_EMAILS }}
         with:
           host: ${{ secrets.HETZNER_HOST }}
           username: ${{ secrets.HETZNER_USER }}
           key: ${{ secrets.HETZNER_SSH_KEY }}
-          envs: WORKCV_IMAGE,GHCR_USER,GHCR_TOKEN
+          envs: WORKCV_IMAGE,GHCR_USER,GHCR_TOKEN,ANALYTICS_ADMIN_EMAILS
           script: |
             set -eu
             cd "${{ github.event.inputs.deploy_dir }}"
             if [ -n "${GHCR_TOKEN:-}" ]; then
               echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            fi
+            if [ -n "${ANALYTICS_ADMIN_EMAILS:-}" ]; then
+              umask 077
+              awk '!/^ANALYTICS_ADMIN_EMAILS=/' .env > .env.analytics-tmp
+              printf 'ANALYTICS_ADMIN_EMAILS=%s\n' "$ANALYTICS_ADMIN_EMAILS" >> .env.analytics-tmp
+              mv .env.analytics-tmp .env
             fi
             image_repository="${WORKCV_IMAGE%:*}"
             # Record WorkCV image IDs before pulling, so only these can be
@@ -111,6 +118,16 @@ jobs:
             docker run --rm --env-file .env --network werkcv_default --entrypoint node "$WORKCV_IMAGE" scripts/prepare-growth-schema.mjs
             docker compose -p workcv -f docker-compose.ghcr.yml up -d app
             docker compose -p workcv -f docker-compose.ghcr.yml ps
+            healthy=false
+            for attempt in $(seq 1 30); do
+              if curl --fail --silent http://127.0.0.1:3004/api/health >/dev/null; then
+                healthy=true
+                break
+              fi
+              sleep 2
+            done
+            [ "$healthy" = true ] || { echo "App health check failed; keeping old images"; exit 1; }
+            docker compose -p workcv -f docker-compose.ghcr.yml exec -T app node -e 'if (!process.env.ANALYTICS_ADMIN_EMAILS) process.exit(1); console.log("Analytics admin allowlist configured")'
             container_ids="$(docker ps -aq)"
             if [ -n "$container_ids" ]; then
               used_image_ids="$(docker inspect --format '{{.Image}}' $container_ids)"

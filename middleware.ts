@@ -22,6 +22,7 @@ export function middleware(request: NextRequest) {
 
   const response = NextResponse.next();
   const privatePath =
+    pathname === "/admin" || pathname.startsWith("/admin/") ||
     pathname === "/editor" ||
     pathname === "/my-cvs" ||
     pathname.startsWith("/cv-pdf/");
@@ -30,6 +31,13 @@ export function middleware(request: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, follow, noarchive");
   } else if (privatePath) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+
+  if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+    response.headers.set("Cache-Control", "private, no-store, max-age=0");
+    response.headers.set("Referrer-Policy", "no-referrer");
+    response.headers.set("X-Frame-Options", "DENY");
+    response.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   }
 
   if (pathname === "/") {
@@ -41,5 +49,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/editor", "/my-cvs", "/cv-pdf/:path*"],
+  matcher: ["/", "/login", "/editor", "/my-cvs", "/cv-pdf/:path*", "/admin/:path*"],
 };

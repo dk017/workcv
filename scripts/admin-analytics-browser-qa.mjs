@@ -1,0 +1,11 @@
+import { chromium } from 'playwright-core';
+import assert from 'node:assert/strict';
+const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true});
+const base='http://127.0.0.1:43189';
+try {
+ const guest=await browser.newContext();const gr=await guest.request.get(base+'/admin/analytics',{maxRedirects:0});assert.equal(gr.status(),307);assert.match(gr.headers().location,/login/);assert.match(gr.headers()['cache-control'],/no-store/);await guest.close();
+ const customer=await browser.newContext();await customer.addCookies([{name:'workcv_session',value:'synthetic-customer-token',url:base}]);const cr=await customer.request.get(base+'/admin/analytics');assert.equal(cr.status(),404);assert.ok(!(await cr.text()).includes('Gross revenue'));await customer.close();
+ const context=await browser.newContext({viewport:{width:1440,height:1000}});await context.addCookies([{name:'workcv_session',value:'synthetic-admin-token',url:base}]);const page=await context.newPage();const errors=[];const external=[];page.on('pageerror',e=>errors.push(e.message));page.on('request',r=>{if(!r.url().startsWith(base))external.push(r.url());});
+ for(const view of ['overview','live','acquisition','conversion','checkout','pass','activity']){const response=await page.goto(base+'/admin/analytics?view='+view);assert.equal(response.status(),200);await page.locator('h1').waitFor();assert.ok(!(await page.locator('body').innerText()).includes('Analytics is temporarily unavailable'));if(view==='overview')await page.screenshot({path:'tmp/analytics-desktop.png',fullPage:true});}
+ await page.goto(base+'/admin/analytics?view=overview&range=24h');await page.getByRole('button',{name:'Refresh',exact:true}).click();await page.getByRole('button',{name:'Refresh',exact:true}).waitFor();await page.setViewportSize({width:390,height:844});await page.screenshot({path:'tmp/analytics-mobile.png',fullPage:true});assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>window.innerWidth),false);assert.deepEqual(errors,[]);assert.deepEqual(external,[]);console.log('PASS: guest redirect, customer denial, seven admin views, refresh, mobile width, no external analytics requests or browser errors');await context.close();
+}finally{await browser.close();}

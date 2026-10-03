@@ -6,13 +6,14 @@ import Link from "next/link";
 export function HeaderAuth() {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [analyticsAdmin, setAnalyticsAdmin] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     fetch("/api/auth/me")
       .then((response) => (response.ok ? response.json() : null))
-      .then((data: { user?: { email?: string } } | null) => {
-        if (!cancelled) setUserEmail(data?.user?.email || null);
+      .then((data: { user?: { email?: string }; analyticsAdmin?: boolean } | null) => {
+        if (!cancelled) { setUserEmail(data?.user?.email || null); setAnalyticsAdmin(data?.analyticsAdmin === true); }
       })
       .catch(() => {
         if (!cancelled) setUserEmail(null);
@@ -37,6 +38,7 @@ export function HeaderAuth() {
 
   return (
     <div className="flex items-center gap-2">
+      {analyticsAdmin && <a href="/admin/analytics" className="inline-flex min-h-10 items-center rounded-md bg-navy px-3 text-sm font-bold text-white">Analytics</a>}
       <Link
         href="/my-cvs"
         className="inline-flex min-h-10 items-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"

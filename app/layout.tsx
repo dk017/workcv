@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import { DM_Sans, Fraunces } from "next/font/google";
-import Script from "next/script";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
 import { AttributionCapture } from "@/components/attribution-capture";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
-import { SiteBreadcrumbs } from "@/components/site-breadcrumbs";
+import { SiteFrame } from "@/components/site-frame";
 import { site, founder } from "@/lib/site";
 import "./globals.css";
 
@@ -91,13 +90,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
       <head>
-        <Script
-          defer
-          data-site="hq2xtnu4"
-          data-domain="workcv.co.uk"
-          src="https://piqo.app/piqo.js"
-          strategy="beforeInteractive"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
@@ -106,10 +98,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-sans antialiased">
         <AttributionCapture />
-        <Header />
-        <SiteBreadcrumbs />
-        <main>{children}</main>
-        <Footer />
+        <SiteFrame header={<Header />} footer={<Footer />}>{children}</SiteFrame>
       </body>
     </html>
   );
