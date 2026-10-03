@@ -47,6 +47,7 @@ export const analyticsPlacements = {
   trackerJobAdded: "tracker_job_added",
   trackerThreeJobs: "tracker_three_jobs",
   trackerTailorJob: "tracker_tailor_job",
+  trackerApplicationPack: "tracker_application_pack",
   trackerPassOffer: "tracker_pass_offer",
   trackerTemplateDownload: "tracker_template_download",
   trackerEditor: "tracker_editor",

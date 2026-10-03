@@ -11,6 +11,7 @@ import {
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 import { parseCvData, repairCvData } from "@/lib/cv-schema";
 import { duplicateTitle, prepareDuplicateCv } from "@/lib/cv-duplicate";
+import { tailorCvForJob, tailoredCvTitle, type TailorJob } from "@/lib/job-tailor";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
 import { WORKCV_PASS, WORKCV_PASS_PRODUCT_ID } from "@/lib/commerce";
 import { unlockedDocumentSql } from "@/lib/pass-rules";
@@ -209,7 +210,8 @@ export async function createCvDocument(
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
 }
 
-export async function duplicateCvDocument(userId: string, sourceId: string) {
+// With a job, the copy is created already pointed at that vacancy and named after it.
+export async function duplicateCvDocument(userId: string, sourceId: string, job?: TailorJob) {
   await ensureAuthTables();
   const source = await getPool().query<{ title: string; data: CvData; template_id: string }>(
     "SELECT title, data, template_id FROM workcv_cv_documents WHERE id = $1 AND user_id = $2",
@@ -217,7 +219,9 @@ export async function duplicateCvDocument(userId: string, sourceId: string) {
   );
   const row = source.rows[0];
   if (!row) return null;
-  const data = parseCvData(prepareDuplicateCv(repairCvData(row.data, parseTemplate(row.template_id))));
+  const copy = prepareDuplicateCv(repairCvData(row.data, parseTemplate(row.template_id)));
+  const data = parseCvData(job ? tailorCvForJob(copy, job) : copy);
+  const fallbackTitle = duplicateTitle(row.title || data.fullName || "My CV");
   const id = crypto.randomUUID();
   const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
     `
@@ -225,7 +229,7 @@ export async function duplicateCvDocument(userId: string, sourceId: string) {
       VALUES ($1, $2, $3, $4::jsonb, $5)
       RETURNING id, data, updated_at
     `,
-    [id, userId, duplicateTitle(row.title || data.fullName || "My CV"), JSON.stringify(data), data.template],
+    [id, userId, job ? tailoredCvTitle(job, fallbackTitle) : fallbackTitle, JSON.stringify(data), data.template],
   );
   const created = result.rows[0];
   await recordServerEditorEvent({
@@ -233,7 +237,7 @@ export async function duplicateCvDocument(userId: string, sourceId: string) {
     documentId: created.id,
     eventName: "document_created",
     eventKey: `document_created:${created.id}`,
-    metadata: { creation_method: "duplicate" },
+    metadata: { creation_method: job ? "job_tailor" : "duplicate" },
   });
   return { id: created.id, data: repairCvData(created.data), updatedAt: created.updated_at.toISOString() };
 }

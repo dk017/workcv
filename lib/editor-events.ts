@@ -32,6 +32,7 @@ export const editorEventNames = [
   "upgrade_offer_shown",
   "upgrade_offer_clicked",
   "cv_duplicated",
+  "job_tailor_started",
   "ai_suggestion_generated",
   "ai_suggestion_applied",
   "ai_suggestion_rejected",

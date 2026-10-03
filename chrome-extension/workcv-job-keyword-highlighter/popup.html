@@ -3,23 +3,26 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>WorkCV Job Keyword Highlighter</title>
+    <title>WorkCV: Tailor Your CV to This Job</title>
     <link rel="stylesheet" href="popup.css">
   </head>
   <body>
     <main class="shell">
       <header class="hero">
-        <p class="eyebrow">UK job-page scanner</p>
-        <h1>WorkCV Keyword Highlighter</h1>
-        <p>Spot skills and qualifications worth considering when you tailor your CV.</p>
+        <p class="eyebrow">UK job adverts</p>
+        <h1>Tailor your CV to this job</h1>
+        <p>Copy your saved WorkCV CV for this vacancy and see which advert keywords it covers.</p>
       </header>
 
       <section class="panel">
         <p class="meta-label">Current page</p>
         <p class="page-title" id="pageTitle">Loading tab…</p>
         <p class="page-url" id="pageUrl"></p>
+        <button id="tailorButton" class="primary wide" type="button">Tailor my CV for this job</button>
+        <p class="hint">Tip: if the wrong text is picked up, select the advert on the page first.</p>
+        <p class="meta-label section-label">Or check the page here</p>
         <div class="actions">
-          <button id="scanButton" class="primary" type="button">Scan this page</button>
+          <button id="scanButton" class="secondary" type="button">Highlight keywords</button>
           <button id="clearButton" class="secondary" type="button">Remove highlights</button>
         </div>
         <p class="status" id="statusMessage">Ready to scan.</p>
@@ -34,13 +37,14 @@
       </section>
 
       <footer class="panel footer">
-        <p>Runs locally on the active tab. No account, history or background scraping.</p>
+        <p>Reads only the tab you choose, only when you click. The job is sent to WorkCV only when you choose Tailor. No history or background scraping.</p>
         <a href="https://workcv.co.uk/tools/ats-score-checker?utm_source=chrome_extension&utm_medium=referral&utm_campaign=job_keyword_highlighter" target="_blank" rel="noreferrer">
-          Compare a job advert with your CV on WorkCV
+          Or compare an advert with your CV without signing in
         </a>
       </footer>
     </main>
     <script src="shared.js"></script>
+    <script src="job-link.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

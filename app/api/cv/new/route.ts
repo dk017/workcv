@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { createCvDocument, duplicateCvDocument, parseTemplate } from "@/lib/cv-documents";
+import { parseTailorJob } from "@/lib/job-tailor";
 import { parseRoleTemplate } from "@/lib/role-cv-templates";
 
 export async function POST(request: NextRequest) {
@@ -13,7 +14,10 @@ export async function POST(request: NextRequest) {
     if (!/^[a-zA-Z0-9_-]{12,80}$/.test(body.copyFrom)) {
       return NextResponse.json({ error: "Invalid CV" }, { status: 400 });
     }
-    const copy = await duplicateCvDocument(user.id, body.copyFrom);
+    // An optional job turns the copy into a CV tailored for that vacancy.
+    const job = body.job === undefined ? undefined : parseTailorJob(body.job);
+    if (job === null) return NextResponse.json({ error: "Invalid job details" }, { status: 400 });
+    const copy = await duplicateCvDocument(user.id, body.copyFrom, job);
     if (!copy) return NextResponse.json({ error: "CV not found" }, { status: 404 });
     return NextResponse.json({ document: copy });
   }

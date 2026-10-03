@@ -4,9 +4,9 @@ import Link from "next/link";
 import { SectionLabel } from "@/components/marketing";
 
 export const metadata: Metadata = {
-  title: "WorkCV Job Keyword Highlighter for Chrome",
+  title: "WorkCV: Tailor Your CV to This Job – Chrome extension",
   description:
-    "Highlight CV-relevant skills, qualifications and wording on the UK job page you choose.",
+    "Send the UK job advert you are viewing to WorkCV to tailor a copy of your CV, and highlight the skills it asks for.",
   alternates: { canonical: "/chrome/job-keyword-highlighter" },
 };
 
@@ -19,12 +19,13 @@ export default function ChromeExtensionPage() {
             Free Chrome extension
           </p>
           <h1 className="mt-4 font-display text-4xl font-semibold leading-tight text-navy md:text-6xl">
-            See the language a job advert is asking for.
+            Tailor your CV to the job you are looking at.
           </h1>
           <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-            Scan the job page you are reading, highlight skills and
-            qualifications, and review repeated wording before tailoring your CV.
-            Analysis stays in your browser.
+            One click sends the advert to WorkCV, which makes a separate copy of
+            your saved CV for that vacancy and shows which keywords it already
+            covers. You can also highlight skills and qualifications on the page
+            itself; that part stays in your browser.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <span className="inline-flex min-h-12 items-center rounded-md bg-navy px-5 text-sm font-bold text-white">
@@ -49,8 +50,9 @@ export default function ChromeExtensionPage() {
             </h2>
             <p className="mt-5 text-base leading-8 text-muted">
               The extension uses active-tab access and packaged local code. It
-              does not monitor other tabs, create an account, upload page text or
-              keep a history of the jobs you view.
+              does not monitor other tabs or keep a history of the jobs you view.
+              The advert reaches WorkCV only when you choose to tailor your CV,
+              and you check it before anything is saved.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">

@@ -32,6 +32,8 @@ $runtimeFiles = @(
     "manifest.json",
     "shared.js",
     "content.js",
+    "job-capture.js",
+    "job-link.js",
     "highlighter.css",
     "popup.html",
     "popup.css",

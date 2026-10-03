@@ -1,4 +1,5 @@
 var elements = {
+  tailor: document.getElementById("tailorButton"),
   scan: document.getElementById("scanButton"),
   clear: document.getElementById("clearButton"),
   status: document.getElementById("statusMessage"),
@@ -25,6 +26,7 @@ function status(message, tone) {
 }
 
 function busy(value) {
+  elements.tailor.disabled = value;
   elements.scan.disabled = value;
   elements.clear.disabled = value;
 }
@@ -92,6 +94,33 @@ async function scan() {
   }
 }
 
+// Reads the job from the page and opens it on WorkCV in a new tab.
+async function tailor() {
+  var tab = await activeTab();
+  if (!tab || !supported(tab.url)) {
+    status("Open a job advert first.", "error");
+    return;
+  }
+  busy(true);
+  status("Reading the job advert…");
+  try {
+    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["job-capture.js"] });
+    var results = await chrome.scripting.executeScript({
+      target: { tabId: tab.id },
+      func: function () { return globalThis.WorkCVCaptureJob(document, window); }
+    });
+    var job = results && results[0] && results[0].result;
+    if (!job || (!job.role && (!job.advertText || job.advertText.length < 80))) {
+      throw new Error("no job advert was found");
+    }
+    await chrome.tabs.create({ url: WorkCVJobLink.buildTailorUrl(job), index: tab.index + 1 });
+    window.close();
+  } catch (error) {
+    status("Unable to read this job: " + error.message + ". Select the advert text on the page and try again.", "error");
+    busy(false);
+  }
+}
+
 async function clear() {
   var tab = await activeTab();
   if (!tab || !supported(tab.url)) return;
@@ -108,6 +137,7 @@ async function clear() {
   }
 }
 
+elements.tailor.addEventListener("click", tailor);
 elements.scan.addEventListener("click", scan);
 elements.clear.addEventListener("click", clear);
 
@@ -116,6 +146,7 @@ activeTab().then(function (tab) {
   elements.url.textContent = tab && tab.url ? tab.url : "";
   if (!tab || !supported(tab.url)) {
     status("Open a regular job page to use this extension.", "error");
+    elements.tailor.disabled = true;
     elements.scan.disabled = true;
     elements.clear.disabled = true;
   }

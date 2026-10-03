@@ -19,6 +19,7 @@ import { trackFunnelEvent } from "@/components/attribution-capture";
 import { PassOfferView } from "@/components/pass-offer-view";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { jobTailorEditorPath, jobTailorHandoffKey, minAdvertLength, parseTailorJob, serializeJobTailorHandoff } from "@/lib/job-tailor";
 import {
   buildJobPackPrefill,
   cleanJob,
@@ -251,6 +252,17 @@ export function JobApplicationTracker() {
     popup.print();
   }
 
+  // The editor copies the visitor's saved CV for this job (sign-in first if needed).
+  function rememberForTailoring(job: TrackedJob) {
+    const tailorJob = parseTailorJob({ role: job.role, employer: job.employer, advertText: job.advertText ?? "", source: "job-tracker" });
+    if (!tailorJob) return;
+    try {
+      window.sessionStorage.setItem(jobTailorHandoffKey, serializeJobTailorHandoff(tailorJob));
+    } catch {
+      // The editor explains that the job details did not arrive.
+    }
+  }
+
   function rememberForPack(job: TrackedJob) {
     try {
       window.sessionStorage.setItem(jobPackPrefillKey, JSON.stringify(buildJobPackPrefill(job)));
@@ -309,15 +321,32 @@ export function JobApplicationTracker() {
             <Pencil className="h-4 w-4" aria-hidden="true" /> Edit
           </button>
         </div>
-        {job.status === "saved" || job.status === "applied" || job.status === "interview" ? (
+        {(job.status === "saved" || job.status === "applied" || job.status === "interview") && job.isExample ? (
           <TrackedLink
             href={packHref}
-            placement={job.isExample ? "tracker_demo_tailor" : analyticsPlacements.trackerTailorJob}
+            placement="tracker_demo_tailor"
             onClick={() => rememberForPack(job)}
             className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-navy underline underline-offset-4"
           >
-            <Wand2 className="h-4 w-4" aria-hidden="true" /> {job.isExample ? "Try the example application" : "Tailor my CV for this job"}
+            <Wand2 className="h-4 w-4" aria-hidden="true" /> Try the example application
           </TrackedLink>
+        ) : job.status === "saved" || job.status === "applied" || job.status === "interview" ? (
+          <div className="mt-3 flex flex-col items-start gap-1">
+            <TrackedLink
+              href={jobTailorEditorPath}
+              placement={analyticsPlacements.trackerTailorJob}
+              onClick={() => rememberForTailoring(job)}
+              className="inline-flex items-center gap-1.5 text-sm font-bold text-navy underline underline-offset-4"
+            >
+              <Wand2 className="h-4 w-4" aria-hidden="true" /> Tailor my CV for this job
+            </TrackedLink>
+            <span className="text-xs leading-5 text-muted">
+              {job.advertText && job.advertText.trim().length >= minAdvertLength ? "Copies your saved CV and checks it against this advert." : "Copies your saved CV. Add the advert text to check keywords."}{" "}
+              <TrackedLink href={packHref} placement={analyticsPlacements.trackerApplicationPack} onClick={() => rememberForPack(job)} className="underline underline-offset-2">
+                Or get a free application pack
+              </TrackedLink>
+            </span>
+          </div>
         ) : null}
       </article>
     );

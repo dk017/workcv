@@ -54,6 +54,15 @@ import {
 import { calculateCvReadiness, type ReadinessIssue } from "@/lib/cv-readiness";
 import { analyseAtsKeywords } from "@/lib/ats-keyword-checker";
 import { addSkillLine, addSkippedKeyword, buildKeywordTriage } from "@/lib/keyword-triage";
+import {
+  cvHasContent,
+  jobTailorHandoffKey,
+  minAdvertLength,
+  parseJobTailorHandoff,
+  tailorCvForJob,
+  vacancyTargeting,
+  type TailorJob,
+} from "@/lib/job-tailor";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
 import {
   trackEditorEvent,
@@ -152,6 +161,10 @@ export function CvEditor() {
   const [fitImportError, setFitImportError] = useState<string | null>(null);
   const [toolHandoffState, setToolHandoffState] = useState<"idle" | "importing" | "complete">("idle");
   const [toolHandoffError, setToolHandoffError] = useState<string | null>(null);
+  const [jobTailor, setJobTailor] = useState<{ mode: "copied" | "attached"; role: string; employer: string; hasAdvert: boolean } | null>(null);
+  const [jobTailorError, setJobTailorError] = useState<string | null>(null);
+  const jobTailorStartedRef = useRef(false);
+  const jobTailorOfferTrackedRef = useRef(false);
   const previewRef = useRef<HTMLDivElement>(null);
   const handoffStartedRef = useRef(false);
   const toolHandoffStartedRef = useRef(false);
@@ -416,6 +429,53 @@ export function CvEditor() {
       }
     })();
   }, [cv.template, draftId, loaded]);
+
+  // A job sent from the tracker or the Chrome extension: make a separate copy of
+  // the saved CV for that vacancy, or fill in a CV that has no details yet.
+  useEffect(() => {
+    if (!loaded || !draftId || jobTailorStartedRef.current) return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from") !== "job-tailor") return;
+
+    jobTailorStartedRef.current = true;
+    params.delete("from");
+    window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+    let job: TailorJob | null = null;
+    try { job = parseJobTailorHandoff(window.sessionStorage.getItem(jobTailorHandoffKey)); } catch { /* Blocked browser storage. */ }
+    if (!job) {
+      setJobTailorError("The job details expired or could not be read. Open the job again and choose Tailor my CV for this job. Your saved CV has not been changed.");
+      return;
+    }
+
+    const tailoringJob = job;
+    const hasAdvert = tailoringJob.advertText.length >= minAdvertLength;
+    const mode = cvHasContent(cv) ? "copied" : "attached";
+    trackEditorEvent("job_tailor_started", draftId, { source: tailoringJob.source, mode, advert: hasAdvert });
+    const finish = () => {
+      try { window.sessionStorage.removeItem(jobTailorHandoffKey); } catch { /* Blocked browser storage. */ }
+      setJobTailor({ mode, role: tailoringJob.role, employer: tailoringJob.employer, hasAdvert });
+      if (!hasAdvert) {
+        setJobDescriptionDraft("");
+        setTailoringOpen(true);
+      }
+    };
+    if (mode === "attached") {
+      setCv((current) => tailorCvForJob(current, tailoringJob));
+      finish();
+      return;
+    }
+    void resetDraft(draftId, tailoringJob).then((created) => {
+      if (created) finish();
+      else setJobTailorError("We could not copy your CV for this job. Your saved CV has not been changed. Reload the page to try again.");
+    });
+  }, [cv, draftId, loaded]);
+
+  const showJobTailorPassOffer = jobTailor?.mode === "copied" && Boolean(passStatus && !passStatus.active) && !pdfUnlocked;
+  useEffect(() => {
+    if (!showJobTailorPassOffer || jobTailorOfferTrackedRef.current) return;
+    jobTailorOfferTrackedRef.current = true;
+    trackEditorEvent("pass_offer_shown", draftId, { placement: "job_tailor" });
+  }, [showJobTailorPassOffer, draftId]);
 
   useEffect(() => {
     const preview = previewRef.current;
@@ -770,8 +830,9 @@ export function CvEditor() {
     });
   };
 
-  const resetDraft = async (copyFrom?: string) => {
-    if (creatingNew) return;
+  // With a job, the copy is created already tailored to that vacancy. Resolves true once the new CV is open.
+  const resetDraft = async (copyFrom?: string, job?: TailorJob): Promise<boolean> => {
+    if (creatingNew) return false;
     const manager = saveManagerRef.current;
     if (
       manager?.hasUnsavedChanges() &&
@@ -779,9 +840,10 @@ export function CvEditor() {
         "This CV has unsaved changes. Save them before creating a new CV?",
       )
     ) {
-      return;
+      return false;
     }
-    if (manager?.hasUnsavedChanges() && !(await manager.flush())) return;
+    if (manager?.hasUnsavedChanges() && !(await manager.flush())) return false;
+    if (!job) setJobTailor(null);
     setCreatingNew(true);
     setSaveSnapshot((current) => ({
       ...current,
@@ -795,7 +857,7 @@ export function CvEditor() {
       const response = await fetch("/api/cv/new", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(copyFrom ? { copyFrom } : { template: cv.template }),
+        body: JSON.stringify(copyFrom ? { copyFrom, ...(job ? { job } : {}) } : { template: cv.template }),
       });
       const data = (await response.json()) as {
         document?: { id: string; data: CvData; updatedAt: string };
@@ -805,9 +867,11 @@ export function CvEditor() {
         throw new Error(data.error || "Could not create a new CV");
       }
       if (copyFrom) {
-        trackEditorEvent("cv_duplicated", data.document.id, { pass_active: Boolean(passStatus?.active) });
-        setJobDescriptionDraft("");
-        setTailoringOpen(true);
+        trackEditorEvent("cv_duplicated", data.document.id, { pass_active: Boolean(passStatus?.active), ...(job ? { source: "job_tailor" } : {}) });
+        if (!job) {
+          setJobDescriptionDraft("");
+          setTailoringOpen(true);
+        }
       }
 
       window.localStorage.removeItem(storageKey);
@@ -829,6 +893,7 @@ export function CvEditor() {
       params.delete("payment");
       params.set("draftId", data.document.id);
       window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+      return true;
     } catch (error) {
       setSaveSnapshot((current) => ({
         ...current,
@@ -836,6 +901,7 @@ export function CvEditor() {
         error: error instanceof Error ? error.message : "Could not create a new CV",
         errorKind: "general",
       }));
+      return false;
     } finally {
       setCreatingNew(false);
     }
@@ -1420,10 +1486,9 @@ export function CvEditor() {
             <label className="block"><span className="text-sm font-bold text-navy">Job description</span><span className="mt-1 block text-xs leading-5 text-muted">Paste the duties and essential criteria. Suggestions only use claims already supported by your CV.</span><textarea value={jobDescriptionDraft} onChange={(event) => setJobDescriptionDraft(event.target.value)} maxLength={5000} rows={5} className="mt-2 w-full rounded-md border border-line bg-white px-3 py-3 text-sm leading-6 text-ink outline-none focus:border-navy focus:ring-2 focus:ring-gold-tint" placeholder="Paste the vacancy here..." /></label>
             <div className="flex gap-2"><button type="button" onClick={() => setTailoringOpen(false)} className="min-h-11 rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy">Cancel</button><button type="button" onClick={() => {
               if (jobDescriptionDraft.trim().length < 80) { setAiError("Paste at least 80 characters from the vacancy."); return; }
-              const analysis = analyseAtsKeywords(jobDescriptionDraft, cvEvidenceText());
-              const missing = analysis.missing.slice(0, 3);
-              setCv((current) => ({ ...current, targeting: { role: current.targetRole, jobDescription: jobDescriptionDraft.trim(), priorities: missing.map((item) => ({ category: item.category === "Skill or tool" ? "vacancy-relevance" : "evidence", title: item.term, action: `Add this only where your real experience supports it (${item.importance.toLowerCase()} requirement).` })) } }));
-              setTailoringOpen(false); setAiError(null); trackEditorEvent("job_tailoring_saved", draftId, { score: analysis.score, missing: analysis.missing.length });
+              const analysis = vacancyTargeting(cv.targetRole, jobDescriptionDraft, cvEvidenceText());
+              setCv((current) => ({ ...current, targeting: { ...analysis.targeting, role: current.targetRole } }));
+              setTailoringOpen(false); setAiError(null); trackEditorEvent("job_tailoring_saved", draftId, { score: analysis.score, missing: analysis.missing });
             }} className="min-h-11 rounded-md bg-navy px-4 text-sm font-bold text-white">Analyse vacancy</button></div>
           </div>
         </section>
@@ -1521,6 +1586,61 @@ export function CvEditor() {
                 {checkoutLoading ? "Opening checkout..." : "Return to checkout"}
               </button>
             )}
+          </div>
+        </section>
+      )}
+
+      {(jobTailor || jobTailorError) && (
+        <section className="editor-chrome border-b border-line bg-white" aria-live="polite">
+          <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-start justify-between gap-4 py-4 sm:w-[min(1540px,calc(100%-48px))]">
+            {jobTailorError ? (
+              <p className="flex items-start gap-3 text-sm font-bold leading-6 text-[#8d3030]">
+                <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
+                {jobTailorError}
+              </p>
+            ) : jobTailor ? (
+              <div className="grid flex-1 gap-3 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div className="text-sm leading-6">
+                  <p className="font-bold text-navy">
+                    {jobTailor.mode === "copied" ? "A separate CV for " : "Your CV is set up for "}
+                    {[jobTailor.role, jobTailor.employer].filter(Boolean).join(" at ") || "this job"}.
+                  </p>
+                  <p className="text-muted">
+                    {jobTailor.mode === "copied" ? (
+                      <>Your original CV is unchanged; both are in <Link href="/my-cvs" className="font-bold text-navy underline underline-offset-4">My CVs</Link>. </>
+                    ) : null}
+                    {jobTailor.hasAdvert
+                      ? "Work through the advert keywords below, adding only what you have really done."
+                      : "Paste the job advert below to see which keywords it asks for."}
+                  </p>
+                  {jobTailor.mode === "copied" && passStatus?.active ? (
+                    <p className="mt-1 font-bold text-success">Included in your Job Search Pass · {passStatus.daysLeft} {passStatus.daysLeft === 1 ? "day" : "days"} left.</p>
+                  ) : null}
+                  {showJobTailorPassOffer ? (
+                    <p className="mt-1 text-ink">
+                      Applying for more than one job? The <strong>Job Search Pass</strong> covers every CV and letter you make for {site.passDays} days:{" "}
+                      <strong>{upgradeOffer?.eligible ? formatPence(upgradeOffer.priceMinor) : site.passPrice} once</strong>, never renews. Or download just this CV for {site.price}.
+                    </p>
+                  ) : null}
+                </div>
+                {showJobTailorPassOffer ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackEditorEvent("pass_offer_clicked", draftId, { placement: "job_tailor" });
+                      setCheckoutPlan("pass");
+                      setReviewOpen(true);
+                    }}
+                    className="inline-flex min-h-11 items-center justify-center rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
+                  >
+                    Compare download options
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+            <button type="button" onClick={() => { setJobTailor(null); setJobTailorError(null); }} aria-label="Dismiss this message" className="shrink-0 rounded p-1 text-muted hover:bg-paper hover:text-navy">
+              <X className="h-4 w-4" />
+            </button>
           </div>
         </section>
       )}
