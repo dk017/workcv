@@ -40,3 +40,16 @@ test("partially populated entries block readiness", () => {
   assert.equal(result.ready, false);
   assert.ok(result.issues.some((issue) => issue.section === "experience"));
 });
+
+test("issues carry the AI action that fixes them", () => {
+  const cv = createBlankCv();
+  cv.experience[0] = { ...cv.experience[0], role: "Assistant", company: "Shop", start: "2020", bullets: "Served customers\nHandled cash" };
+
+  const result = calculateCvReadiness(cv);
+  const byId = (id: string) => result.issues.find((issue) => issue.id === id);
+  assert.equal(byId("profile")?.action, "improve-profile");
+  assert.equal(byId("skills")?.action, "suggest-skills");
+  assert.equal(byId(`evidence-${cv.experience[0].id}`)?.action, "improve-bullets");
+  assert.equal(byId(`evidence-${cv.experience[0].id}`)?.targetId, cv.experience[0].id);
+  assert.equal(byId("contact")?.action, undefined);
+});

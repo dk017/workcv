@@ -51,7 +51,7 @@ import {
   type PaymentState,
   type PaymentStatusResult,
 } from "@/lib/payment-polling";
-import { calculateCvReadiness } from "@/lib/cv-readiness";
+import { calculateCvReadiness, type ReadinessIssue } from "@/lib/cv-readiness";
 import { analyseAtsKeywords } from "@/lib/ats-keyword-checker";
 import {
   trackEditorEvent,
@@ -615,7 +615,8 @@ export function CvEditor() {
     try {
       const background = [...cv.experience.map((item) => `${item.role} at ${item.company}`), ...cv.education.map((item) => `${item.qualification} at ${item.institution}`)].filter((value) => value.replace(/\s+at\s*$/, "").trim()).join(". ");
       const evidence = [cv.skills, ...cv.experience.map((item) => item.bullets), ...cv.education.map((item) => item.details)].filter(Boolean).join("\n");
-      if (!cv.targetRole.trim() || background.length < 40 || evidence.length < 40) throw new Error("Add a target role and more evidence in experience, education or skills first.");
+      if (!cv.targetRole.trim()) throw new Error("Add a target role first so the profile has a clear direction.");
+      if (background.length < 40 || evidence.length < 40) throw new Error("Add more evidence first: complete a role or education entry and a few bullets or skills.");
       const response = await fetch("/api/tools/cv-summary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ background, targetRole: cv.targetRole, evidence, jobDescription: cv.targeting?.jobDescription || "", careerStage: cv.experience.some((item) => item.role.trim()) ? "experienced" : "early" }) });
       const data = await response.json() as { variants?: Array<{ label: string; summary: string }>; followUpQuestions?: string[]; error?: string };
       if (!response.ok || !data.variants) throw new Error(data.error || "Profile suggestions are unavailable.");
@@ -651,6 +652,14 @@ export function CvEditor() {
     if (!options.length) { setAiError("No additional supported skill terms were found in this vacancy."); return; }
     setAiReview({ kind: "skills", title: "Confirm skills you genuinely possess", original: cv.skills, options });
     trackEditorEvent("skill_suggestions_opened", draftId, { count: options.length });
+  };
+
+  const runReadinessAction = (issue: ReadinessIssue) => {
+    setMobileView("edit");
+    setActiveTab(issue.section);
+    if (issue.action === "improve-profile") void improveProfile();
+    else if (issue.action === "improve-bullets" && issue.targetId) void improveBullets(issue.targetId);
+    else if (issue.action === "suggest-skills") suggestSkills();
   };
 
   const updateEducation = (
@@ -1345,6 +1354,27 @@ export function CvEditor() {
               </button>
             )}
           </div>
+          {readiness.issues.length > 1 && (
+            <details className="mx-auto w-[min(1540px,calc(100%-32px))] pb-3 sm:w-[min(1540px,calc(100%-48px))]">
+              <summary className="cursor-pointer text-xs font-bold text-navy">
+                Show all {readiness.issues.length} things to {readiness.fixCount ? "fix or improve" : "improve"}
+              </summary>
+              <ul className="mt-2 grid gap-2">
+                {readiness.issues.map((issue) => (
+                  <li key={issue.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-white px-3 py-2">
+                    <span className="flex min-w-0 items-start gap-2 text-sm text-ink">
+                      <span className={`mt-0.5 shrink-0 rounded px-1.5 text-[11px] font-bold uppercase ${issue.severity === "fix" ? "bg-red-100 text-red-800" : "bg-gold-tint text-navy"}`}>{issue.severity === "fix" ? "Fix" : "Improve"}</span>
+                      {issue.message}
+                    </span>
+                    <button type="button" disabled={Boolean(aiLoading)} onClick={() => runReadinessAction(issue)} className="inline-flex min-h-9 shrink-0 items-center gap-1.5 rounded-md border border-line-strong bg-white px-3 text-xs font-bold text-navy disabled:cursor-wait disabled:opacity-60">
+                      {issue.action && <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />}
+                      {issue.action === "improve-profile" ? "Suggest profile" : issue.action === "improve-bullets" ? "Suggest bullets" : issue.action === "suggest-skills" ? "Suggest skills" : "Go to section"}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
         </section>
       )}
 
