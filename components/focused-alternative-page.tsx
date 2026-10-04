@@ -25,19 +25,24 @@ export type FocusedAlternativeConfig = {
   intro: string;
   competitorFit: string[];
   comparisonRows: string[][];
+  /** A WorkCV cancellation guide, or the provider's official page when there is no guide. */
   cancellationHref: string;
   cancellationCopy: string;
+  /** Free-plan answer for "Is {brand} free?", shown as its own section when set. */
+  freePlan?: string;
+  /** Head-to-head comparison pages involving this brand. */
+  relatedComparisons?: Array<[string, string]>;
   sources: Array<[string, string]>;
   faqs: Array<{ question: string; answer: string }>;
 };
 
 const workCvFit = [
-  "One saved UK CV is the immediate job",
+  "A finished UK CV and matching cover letter is the immediate job",
   "You want to inspect the whole preview before checkout",
-  `${site.price} unlock for the selected saved CV`,
-  "No monthly WorkCV subscription or automatic renewal",
-  "Three clean layouts rather than a large design catalogue",
-  "No need for built-in cover letters or application tracking",
+  `${site.price} once for one saved CV and its letter, as PDF and Word`,
+  `${site.passPrice} once for ${site.passDays} days if you are applying for several jobs`,
+  "No WorkCV subscription or automatic renewal",
+  "Three clean UK layouts rather than a large design catalogue",
 ];
 
 export function FocusedAlternativePage({
@@ -107,8 +112,9 @@ export function FocusedAlternativePage({
               unlock for the selected saved CV
             </p>
             <p className="mt-7 text-sm leading-7 text-muted">
-              Email-code login is required. WorkCV currently does not include a
-              cover-letter builder, AI writing, ATS scoring or application tracking.
+              Email-code login is required. Each CV includes a matching cover
+              letter. The ATS CV checker and job application tracker are free, and
+              AI suggestions are only applied when you approve them.
             </p>
           </div>
         </div>
@@ -164,19 +170,54 @@ export function FocusedAlternativePage({
         </div>
       </section>
 
+      {config.freePlan ? (
+        <section className="bg-paper py-20">
+          <div className="container-page max-w-4xl rounded-xl border border-line bg-white p-7">
+            <h2 className="font-display text-3xl font-semibold text-navy">
+              Is {config.brand} free?
+            </h2>
+            <p className="mt-4 leading-7 text-muted">{config.freePlan}</p>
+            {config.relatedComparisons?.length ? (
+              <ul className="mt-5 flex flex-wrap gap-3">
+                {config.relatedComparisons.map(([label, href]) => (
+                  <li key={href}>
+                    <Link href={href} className="inline-flex items-center gap-2 rounded-md border border-line-strong px-4 py-2 text-sm font-bold text-navy hover:border-navy">
+                      {label}
+                      <ArrowRight className="h-4 w-4" aria-hidden="true" />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
+
       <section className="bg-surface py-20">
         <div className="container-page rounded-xl border border-line bg-white p-7">
           <h2 className="font-display text-3xl font-semibold text-navy">
             Already paying for {config.brand}?
           </h2>
           <p className="mt-4 max-w-3xl leading-7 text-muted">{config.cancellationCopy}</p>
-          <Link
-            href={config.cancellationHref}
-            className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline underline-offset-4"
-          >
-            Read the sourced cancellation guide
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+          {config.cancellationHref.startsWith("http") ? (
+            <a
+              href={config.cancellationHref}
+              target="_blank"
+              rel="nofollow noopener noreferrer"
+              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline underline-offset-4"
+            >
+              Read {config.brand}&apos;s official subscription terms
+              <ArrowRight className="h-4 w-4" />
+            </a>
+          ) : (
+            <Link
+              href={config.cancellationHref}
+              className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline underline-offset-4"
+            >
+              Read the sourced cancellation guide
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          )}
         </div>
       </section>
 

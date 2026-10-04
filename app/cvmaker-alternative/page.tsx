@@ -41,7 +41,7 @@ const config: FocusedAlternativeConfig = {
     ["Paid model", "Subscription terms shown by CVMaker", `${site.price} once per saved CV, or ${site.passPrice} once for ${site.passDays} days`],
     ["Renewal", "Check the current renewal terms before paying", "No automatic WorkCV renewal"],
     ["Documents", "Broader service and template catalogue", "A UK CV and matching cover letter, as PDF and Word"],
-    ["Current limits", "Features depend on the selected CVMaker service", "No application tracking"],
+    ["Current limits", "Features depend on the selected CVMaker service", "Three CV layouts; no online profile or job board"],
     ["Best fit", "Users who value the broader ongoing service", "UK CVs and cover letters without recurring billing"],
   ],
   cancellationHref: "/cancel-cvmaker-uk",

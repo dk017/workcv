@@ -4,7 +4,11 @@ import {
   FocusedAlternativePage,
   type FocusedAlternativeConfig,
 } from "@/components/focused-alternative-page";
+import { competitorPlans, formatMinor } from "@/lib/competitor-plans";
 import { site } from "@/lib/site";
+
+const liveCareer = competitorPlans.liveCareer;
+const gbp = (minor: number) => formatMinor(minor, "GBP");
 
 const slug = "/livecareer-alternative";
 
@@ -24,7 +28,7 @@ export const metadata: Metadata = {
 const config: FocusedAlternativeConfig = {
   brand: "LiveCareer",
   slug,
-  checkedDate: "23 July 2026",
+  checkedDate: liveCareer.checked,
   kicker: "LiveCareer alternative UK",
   heading: "LiveCareer combines CV and cover-letter tools. WorkCV keeps one UK CV separate.",
   intro:
@@ -37,14 +41,17 @@ const config: FocusedAlternativeConfig = {
   ],
   comparisonRows: [
     ["Primary focus", "CV, cover-letter and career-document platform", "Focused UK CV builder"],
-    ["Before payment", "Check current trial and download access", "Build and inspect the preview"],
-    ["Paid model", "Trial or subscription terms shown by LiveCareer", `${site.price} once per saved CV, or ${site.passPrice} once for ${site.passDays} days`],
-    ["Renewal", "Check the live renewal terms before paying", "No automatic WorkCV renewal"],
+    ["Before payment", "Build free; free downloads are TXT only", "Build and inspect the preview"],
+    ["Paid model", `${gbp(liveCareer.trial.entryMinor)} for 14 days, or ${gbp(liveCareer.annual.totalMinor)} a year`, `${site.price} once per saved CV, or ${site.passPrice} once for ${site.passDays} days`],
+    ["Renewal", `${gbp(liveCareer.trial.renewalMinor)} every 4 weeks after the trial until cancelled`, "No automatic WorkCV renewal"],
     ["Cover letters", "Available within LiveCareer's wider tool set", "Matching cover letter included with each CV"],
-    ["Current limits", "Features and access depend on the selected plan", "No application tracking"],
+    ["Current limits", "Features and access depend on the selected plan", "Three CV layouts; no expert review service"],
+    ["Company", `${liveCareer.operator}, which also runs MyPerfectCV and Zety`, "WorkCV, an independent UK CV builder"],
     ["Best fit", "Several career documents and ongoing tools", "UK CVs and cover letters without recurring billing"],
   ],
   cancellationHref: "/cancel-livecareer-uk",
+  freePlan: `Partly. ${liveCareer.freePlan} The 14-day trial costs ${gbp(liveCareer.trial.entryMinor)} and then renews at ${gbp(liveCareer.trial.renewalMinor)} every four weeks unless you cancel. LiveCareer is run by ${liveCareer.operator}, which also runs MyPerfectCV.`,
+  relatedComparisons: [["MyPerfectCV vs LiveCareer", "/myperfectcv-vs-livecareer-uk"]],
   cancellationCopy:
     "Starting a WorkCV document does not stop LiveCareer billing. Cancel through LiveCareer's official route, save the confirmation and check the next payment statement.",
   sources: [
@@ -56,6 +63,7 @@ const config: FocusedAlternativeConfig = {
     { question: "What is a good LiveCareer alternative in the UK?", answer: `WorkCV may suit someone who wants UK CVs and cover letters without an ongoing subscription. It costs ${site.price} once for one saved CV and its matching cover letter as PDF and Word.` },
     { question: "How is WorkCV different from LiveCareer?", answer: "LiveCareer offers a wider set of career-document tools. WorkCV is narrower: UK CVs with matching cover letters, three layouts and no monthly WorkCV subscription." },
     { question: "Does WorkCV include cover letters?", answer: "Yes. Each saved CV includes a matching cover letter, and both download as PDF and editable Word for the same one-time payment." },
+    { question: "Is LiveCareer free?", answer: `Partly. ${liveCareer.freePlan} The 14-day trial costs ${gbp(liveCareer.trial.entryMinor)}, then ${gbp(liveCareer.trial.renewalMinor)} every four weeks unless cancelled (checked ${liveCareer.checked}).` },
     { question: "How do I cancel LiveCareer?", answer: "Use LiveCareer's official account or support route. The separate WorkCV guide links to official sources and explains what evidence to keep." },
   ],
 };

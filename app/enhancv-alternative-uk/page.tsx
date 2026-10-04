@@ -44,7 +44,7 @@ const comparisonRows = [
   ["Free access", "Seven-day free plan with limits and Enhancv branding", "Build and preview before payment"],
   ["Paid model", "Pro subscription", `${site.price} unlock for the selected saved CV`],
   ["Renewal", "Monthly, quarterly or semiannual plans renew automatically unless cancelled", "No monthly plan or automatic renewal"],
-  ["Documents", "Multiple resumes and cover letters on Pro", "One saved CV per payment; no cover-letter builder currently"],
+  ["Documents", "Multiple resumes and cover letters on Pro", `One saved CV and matching cover letter per payment, or unlimited for ${site.passDays} days with the Pass`],
   ["AI tools", "Content suggestions, ATS check, tailoring, feedback and generators", "No AI scoring or interview guarantee"],
   ["Job-search tools", "Application tracking and additional career features", "CV editor, saved document and PDF access"],
   ["Templates", "Broad resume template and design catalogue", "Classic, modern and compact UK CV layouts"],

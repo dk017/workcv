@@ -7,6 +7,7 @@ import { ComparisonTable } from "@/components/comparison-table";
 import { competitorPricing, competitorPricingCheckedDate } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { ComparisonLinks } from "@/components/competitor-vs-page";
 
 const slug = "/best-cv-builder-uk";
 
@@ -286,6 +287,14 @@ export default function BestCvBuilderUkPage() {
         </div>
       </section>
 
+      <ComparisonLinks
+        heading="Head-to-head comparisons"
+        links={[
+          ["MyPerfectCV vs LiveCareer", "/myperfectcv-vs-livecareer-uk"],
+          ["Zety vs MyPerfectCV", "/zety-vs-myperfectcv-uk"],
+          ["Kickresume alternative", "/kickresume-alternative-uk"],
+        ]}
+      />
       <FaqSection faqs={faqs} title="Questions before choosing a CV builder." />
       <FinalCta
         heading="Start with the CV you actually need."

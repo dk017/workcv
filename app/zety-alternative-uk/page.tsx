@@ -20,6 +20,8 @@ import { analyticsPlacements } from "@/lib/analytics-placements";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { PassOffer } from "@/components/pass-offer";
+import { ComparisonLinks } from "@/components/competitor-vs-page";
+import { competitorPlans, formatMinor } from "@/lib/competitor-plans";
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -57,7 +59,17 @@ const benefits = [
   "Clean templates for job applications",
 ];
 
+const zetyPlans = competitorPlans.zety;
+
 const faqItems = [
+  {
+    question: "Is Zety free?",
+    answer: `Partly. ${zetyPlans.freePlan} Zety's US-dollar pricing page lists a ${formatMinor(zetyPlans.trial.entryMinor, "USD")} 14-day trial that renews at ${formatMinor(zetyPlans.trial.renewalMinor, "USD")} every four weeks unless cancelled (checked ${zetyPlans.checked}).`,
+  },
+  {
+    question: "Who owns Zety?",
+    answer: `Zety's terms of use name ${zetyPlans.operator} as the company you contract with. The same company runs MyPerfectCV and LiveCareer (checked ${zetyPlans.checked}).`,
+  },
   {
     question: "What is a good Zety alternative in the UK?",
     answer:
@@ -310,6 +322,7 @@ export default function ZetyAlternativeUkPage() {
           ["Zety terms", "https://zety.com/uk/terms-of-use"],
         ]}
       />
+      <ComparisonLinks heading="Comparing Zety with another builder?" links={[["Zety vs MyPerfectCV", "/zety-vs-myperfectcv-uk"]]} />
       <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about Zety alternatives." />
       <FinalCta

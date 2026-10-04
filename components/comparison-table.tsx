@@ -4,7 +4,7 @@ export function ComparisonTable({
   rows,
 }: {
   caption: string;
-  headers: [string, string, string] | [string, string];
+  headers: [string, string, string, string] | [string, string, string] | [string, string];
   rows: string[][];
 }) {
   return (
@@ -29,7 +29,7 @@ export function ComparisonTable({
           {rows.map((row) => (
             <tr key={row.join("|")} className="border-t border-line align-top">
               {row.map((cell, index) =>
-                index === 0 && headers.length === 3 ? (
+                index === 0 && headers.length >= 3 ? (
                   <th key={index} scope="row" className="bg-paper p-5 font-bold text-navy">
                     {cell}
                   </th>

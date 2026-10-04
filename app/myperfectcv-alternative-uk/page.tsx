@@ -19,6 +19,8 @@ import {
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { PassOffer } from "@/components/pass-offer";
+import { ComparisonLinks } from "@/components/competitor-vs-page";
+import { competitorPlans, formatMinor } from "@/lib/competitor-plans";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const checkedDate = competitorPricingCheckedDate;
@@ -56,7 +58,17 @@ const workCvBenefits = [
   "Clean, practical templates",
 ];
 
+const mpcv = competitorPlans.myPerfectCv;
+
 const faqItems = [
+  {
+    question: "Is MyPerfectCV free?",
+    answer: `Partly. ${mpcv.freePlan} The 14-day trial costs ${formatMinor(mpcv.trial.entryMinor, "GBP")}, then renews at ${formatMinor(mpcv.trial.renewalMinor, "GBP")} every four weeks unless you cancel (checked ${mpcv.checked}).`,
+  },
+  {
+    question: "Is MyPerfectCV the same company as Zety and LiveCareer?",
+    answer: `Yes. The terms of use for MyPerfectCV, Zety and LiveCareer all name ${mpcv.operator} as the company you contract with (checked ${mpcv.checked}).`,
+  },
   {
     question: "What is a good MyPerfectCV alternative in the UK?",
     answer:
@@ -293,6 +305,10 @@ export default function MyPerfectCvAlternativeUkPage() {
           ["MyPerfectCV contact", "https://www.myperfectcv.co.uk/contact-us"],
           ["MyPerfectCV terms", "https://www.myperfectcv.co.uk/terms-of-use"],
         ]}
+      />
+      <ComparisonLinks
+        heading="Comparing MyPerfectCV with another builder?"
+        links={[["MyPerfectCV vs LiveCareer", "/myperfectcv-vs-livecareer-uk"], ["Zety vs MyPerfectCV", "/zety-vs-myperfectcv-uk"]]}
       />
       <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingAlternative} />
       <FaqSection faqs={faqItems} title="Questions about MyPerfectCV alternatives." />
