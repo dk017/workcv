@@ -88,8 +88,27 @@ const targetingSchema = z
           .strict(),
       )
       .max(10),
-    // Advert keywords the user said are not part of their experience.
-    skippedKeywords: z.array(z.string().max(120)).max(100).optional(),
+    // Advert keywords and requirements the user said are not part of their experience.
+    skippedKeywords: z.array(z.string().max(180)).max(100).optional(),
+    requirements: z
+      .array(
+        z
+          .object({
+            requirement: z.string().max(180),
+            status: z.enum(["partly-supported", "not-evidenced"]),
+            explanation: z.string().max(260),
+            watch: z.array(z.string().max(80)).max(6).optional(),
+          })
+          .strict(),
+      )
+      .max(8)
+      .optional(),
+    evidencedRequirements: z.array(z.string().max(180)).max(8).optional(),
+    answeredRequirements: z.array(z.string().max(180)).max(8).optional(),
+    vaguePhrases: z
+      .array(z.object({ phrase: z.string().max(160), reason: z.string().max(220) }).strict())
+      .max(5)
+      .optional(),
   })
   .strict();
 

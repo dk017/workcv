@@ -42,8 +42,15 @@ function fixtureCv({ withRoles = true } = {}) {
 const checks = [];
 const pass = (name) => { checks.push(name); console.log(`  ok  ${name}`); };
 
-async function session(browser, { cv, viewport = { width: 1440, height: 1000 } }) {
+async function session(browser, { cv, viewport = { width: 1440, height: 1000 }, handoff = null, importedCv = null }) {
   const page = await browser.newPage({ viewport });
+  if (handoff) {
+    await page.addInitScript((value) => {
+      if (!window.sessionStorage.getItem("workcv-cv-fit-handoff-v1")) {
+        window.sessionStorage.setItem("workcv-cv-fit-handoff-v1", JSON.stringify({ ...value, createdAt: Date.now() }));
+      }
+    }, handoff);
+  }
   const state = { saved: parseCvData(cv), version: new Date().toISOString(), saves: 0, requests: [], events: [], rewriteMode: "ok" };
   let rewriteCalls = 0;
   await page.route("**/api/**", async (route) => {
@@ -59,6 +66,7 @@ async function session(browser, { cv, viewport = { width: 1440, height: 1000 } }
       return route.fulfill({ status: 200, json: { document: { id: "11111111-1111-4111-8111-111111111111", data: state.saved, updatedAt: state.version } } });
     }
     if (url.pathname === "/api/auth/me") return route.fulfill({ status: 200, json: { user: { id: "fixture", email: "fixture@example.invalid" } } });
+    if (url.pathname === "/api/cv/import-text" && importedCv) return route.fulfill({ status: 200, json: { cv: importedCv } });
     if (url.pathname === "/api/events/editor") { state.events.push(body); return route.fulfill({ status: 200, json: {} }); }
     if (url.pathname.startsWith("/api/tools/")) state.requests.push({ path: url.pathname, body });
     if (url.pathname === "/api/tools/cv-summary") {
@@ -81,7 +89,7 @@ async function session(browser, { cv, viewport = { width: 1440, height: 1000 } }
     }
     return route.fulfill({ status: 200, json: {} });
   });
-  await page.goto(`${base}/cv-pdf-parity?sample=editor`, { waitUntil: "networkidle", timeout: 120_000 });
+  await page.goto(`${base}/cv-pdf-parity?sample=editor${handoff ? "&from=cv-fit-assessment" : ""}`, { waitUntil: "networkidle", timeout: 120_000 });
   await page.getByRole("button", { name: "Profile", exact: true }).waitFor({ timeout: 60_000 });
   const waitForSave = async (predicate, message) => {
     for (let i = 0; i < 40; i += 1) {
@@ -248,9 +256,9 @@ try {
     const keyword = await currentKeyword();
     await panel().getByRole("button", { name: "Yes, write a bullet" }).click();
     const draft = panel().getByRole("button", { name: "Draft bullet" });
-    await panel().getByPlaceholder(/^e\.g\. Used/).fill("Too sh");
+    await panel().getByPlaceholder(/^e\.g\. Logged/).fill("Too sh");
     assert.equal(await draft.isDisabled(), true);
-    await panel().getByPlaceholder(/^e\.g\. Used/).fill(`logged customer cases in ${keyword} every shift`);
+    await panel().getByPlaceholder(/^e\.g\. Logged/).fill(`logged customer cases in ${keyword} every shift`);
     await panel().getByLabel("Add it to").selectOption("role-b");
     assert.equal(await draft.isDisabled(), false);
     pass("Draft bullet stays disabled until the note has real content");
@@ -284,11 +292,11 @@ try {
     for (let i = 0; i < 12 && (await panel().getByRole("button", { name: "Skip, not relevant" }).count()); i += 1) {
       await panel().getByRole("button", { name: "Skip, not relevant" }).click();
     }
-    await panel().getByText("You have answered every advert keyword.").waitFor();
+    await panel().getByText("You have answered every advert requirement and keyword.").waitFor();
     pass("the card says when every keyword has been answered");
 
     await page.reload({ waitUntil: "networkidle" });
-    await panel().getByText("You have answered every advert keyword.").waitFor();
+    await panel().getByText("You have answered every advert requirement and keyword.").waitFor();
     pass("answers survive a reload");
 
     await openTailor("We are hiring a friendly person to join our small team. You will be kind, punctual and reliable, and enjoy helping people each day.");
@@ -301,6 +309,155 @@ try {
     assert.equal(overflow, 0);
     pass("no horizontal scroll at 375px");
     await page.screenshot({ path: `${outDir}/mobile.png`, fullPage: false });
+    await page.close();
+  }
+
+
+  // ---------------------------------------------------------------- phase 1
+  console.log("Checker hand-off (Phase 1)");
+  {
+    const imported = fixtureCv();
+    imported.targeting = undefined;
+    imported.targetRole = "";
+    imported.profile = "Hard working and passionate person looking for a new challenge.";
+    imported.skills = "Customer service\nTeamwork\nCash handling\nTime keeping\nMicrosoft Word";
+    imported.experience[0].bullets = "Responsible for helping customers\nDealt with customer complaints";
+    imported.experience[1].bullets = "Picked and packed orders";
+    imported.experience[1].start = "March 2019";
+    imported.experience[1].end = "12/2020";
+    const handoff = {
+      version: 1,
+      source: "cv-fit-assessment",
+      cvText: "Sam Patel\nsam.patel@example.test\nProfile\nHard working and passionate person looking for a new challenge.\n".repeat(8),
+      jobDescription: advert,
+      targetRole: "Customer Service Advisor",
+      priorities: [
+        { category: "evidence", title: "Show CRM experience", action: "Add any exact CRM systems used, if applicable." },
+        { category: "evidence", title: "Evidence Excel use", action: "Include a factual example of using Excel if that experience exists." },
+        { category: "evidence", title: "Strengthen written communication evidence", action: "Replace the general claim with an example." },
+      ],
+      requirements: [
+        { requirement: "Previous customer service experience, including complaint handling", status: "supported", explanation: "Complaint handling is evidenced." },
+        { requirement: "Experience using a CRM system such as Salesforce or Zendesk", status: "not-evidenced", explanation: "No CRM system is mentioned anywhere in the CV." },
+        { requirement: "Good Microsoft Excel skills", status: "not-evidenced", explanation: "The skills section lists Microsoft Word, but not Excel." },
+        { requirement: "Answer customer calls and emails, log cases and follow up with customers", status: "not-evidenced", explanation: "No calls, emails or case logging are mentioned." },
+        { requirement: "Excellent written communication", status: "partly-supported", explanation: "The CV claims communication skills but not written communication." },
+      ],
+      vaguePhrases: [
+        { phrase: "Hard working and passionate person looking for a new challenge.", reason: "Generic; does not show relevant evidence." },
+        { phrase: "Responsible for helping customers", reason: "Vague about what was actually done." },
+      ],
+    };
+    active = await session(browser, { cv: createBlankCv(), handoff, importedCv: imported });
+    const { page, state, waitForSave, panel, errorBanner, dismissError } = active;
+    await panel().waitFor({ timeout: 60_000 });
+    const questionText = async () => (await panel().locator("p", { hasText: /^The advert asks for/ }).first().textContent())?.replace(/\s+/g, " ").trim() ?? "";
+
+    await waitForSave((cv) => Boolean(cv.targeting?.requirements?.length), "hand-off saved");
+    assert.equal(state.saved.targetRole, "", "the vacancy title is not written as the user's headline");
+    assert.equal(state.saved.targeting.role, "Customer Service Advisor");
+    assert.equal(state.saved.targeting.requirements.length, 4);
+    assert.equal(state.saved.targeting.evidencedRequirements.length, 1);
+    assert.ok(!(await page.locator(".print-document").first().innerText()).includes("Customer Service Advisor"), "the preview does not show the vacancy title under the name");
+    pass("hand-off keeps the vacancy title out of the headline and saves the requirements");
+
+    assert.equal(await page.getByText(/^Fix \d$/).count(), 0, "static Fix 1/2/3 cards are gone");
+    await page.locator("summary", { hasText: /top 3 fixes/ }).waitFor();
+    pass("the three priorities are collapsed, not shown as static cards");
+
+    await page.locator("details", { has: page.getByText(/^Show all \d+ things to/) }).evaluate((element) => { element.open = true; });
+    assert.match(await page.locator("details li", { hasText: "This advert is for" }).first().innerText(), /Customer Service Advisor/);
+    pass("the readiness list asks for a headline and names the advert's title");
+
+    assert.match(await questionText(), /The advert asks for Experience using a CRM system such as Salesforce or Zendesk/);
+    assert.match(await panel().innerText(), /not evidenced/i);
+    assert.match(await panel().innerText(), /What the checker found: No CRM system is mentioned anywhere in the CV\./);
+    pass("the first question is the checker's unmet CRM requirement, with the checker's reason");
+
+    await panel().getByRole("button", { name: "Skip, not relevant" }).click();
+    await waitForSave((cv) => cv.targeting.skippedKeywords?.includes("Experience using a CRM system such as Salesforce or Zendesk"), "requirement skip saved");
+    assert.match(await questionText(), /Good Microsoft Excel skills/);
+    pass("skipping a requirement saves it and moves to the next one");
+
+    await panel().getByRole("button", { name: "Yes, write a bullet" }).click();
+    await panel().getByPlaceholder(/^e\.g\. Logged/).fill("kept the weekly stock counts in excel spreadsheets");
+    await panel().getByLabel("Add it to").selectOption("role-b");
+    await panel().getByRole("button", { name: "Draft bullet" }).click();
+    const dialog = page.getByRole("dialog");
+    await dialog.waitFor();
+    const request = state.requests.at(-1).body;
+    assert.equal(request.requirement, "Good Microsoft Excel skills");
+    assert.equal(request.keyword, "");
+    assert.equal(request.jobTitle, "Retail Assistant");
+    assert.equal(request.targetRole, "Customer Service Advisor", "the AI is aimed at the vacancy role when there is no headline");
+    await dialog.locator("label").first().click();
+    await dialog.getByRole("button", { name: "Apply selected" }).click();
+    await waitForSave((cv) => cv.targeting.answeredRequirements?.includes("Good Microsoft Excel skills"), "requirement answered");
+    assert.equal(state.saved.experience[1].bullets.split("\n").length, 2);
+    assert.equal(state.saved.targetRole, "", "answering does not set a headline");
+    pass("a drafted bullet answers the requirement: appended to the chosen role, marked answered, sent with the requirement");
+
+    assert.match(await questionText(), /Answer customer calls and emails/);
+    await panel().getByRole("button", { name: "Skip, not relevant" }).click();
+    assert.match(await questionText(), /Excellent written communication/);
+    assert.match(await panel().innerText(), /partly evidenced/i);
+    await panel().getByRole("button", { name: "Skip, not relevant" }).click();
+    pass("requirements come in order: not evidenced first, partly evidenced last");
+
+    const keywordQuestion = await questionText();
+    assert.match(keywordQuestion, /The advert asks for Driving licence/);
+    for (const covered of ["CRM", "Salesforce", "Excel", "Complaint handling"]) {
+      assert.ok(!keywordQuestion.includes(`asks for ${covered}`), `${covered} is covered by a requirement and must not be a separate question`);
+    }
+    pass("keywords covered by a requirement are not asked again; Driving licence still is");
+
+    await panel().getByRole("button", { name: "Skip, not relevant" }).click();
+    await panel().getByText("You have answered every advert requirement and keyword.").waitFor();
+    assert.match(await panel().getByText(/Skipped as not relevant/).innerText(), /Experience using a CRM system/);
+    pass("everything answered: the card says so and lists what was skipped");
+
+    // Vague phrases.
+    assert.equal(await panel().locator("li", { hasText: "Rewrite with AI" }).count(), 2);
+    await panel().locator("li", { hasText: "Hard working and passionate" }).getByRole("button", { name: "Rewrite with AI" }).click();
+    await page.getByRole("dialog").waitFor();
+    assert.equal(state.requests.at(-1).path, "/api/tools/cv-summary");
+    assert.equal(state.requests.at(-1).body.targetRole, "Customer Service Advisor");
+    await page.getByRole("dialog").getByRole("button", { name: "Apply selected" }).click();
+    await waitForSave((cv) => cv.profile.startsWith("Customer service assistant with retail"), "profile rewritten");
+    await panel().locator("li", { hasText: "Hard working and passionate" }).waitFor({ state: "detached" });
+    assert.equal(await panel().locator("li", { hasText: "Rewrite with AI" }).count(), 1);
+    pass("a vague profile phrase opens the profile rewrite and drops off the list once fixed");
+
+    await panel().locator("li", { hasText: "Responsible for helping customers" }).getByRole("button", { name: "Rewrite with AI" }).click();
+    await page.getByRole("dialog").waitFor();
+    assert.equal(state.requests.at(-1).path, "/api/tools/cv-bullet-rewrite");
+    assert.equal(state.requests.at(-1).body.bullet, "Responsible for helping customers");
+    await page.getByRole("dialog").locator("label").first().click();
+    await page.getByRole("dialog").getByRole("button", { name: "Apply selected" }).click();
+    await waitForSave((cv) => !cv.experience[0].bullets.includes("Responsible for helping customers"), "bullet rewritten");
+    await panel().locator("li", { hasText: "Rewrite with AI" }).waitFor({ state: "detached" });
+    pass("a vague bullet opens that bullet's rewrite and drops off the list once fixed");
+
+    await page.reload({ waitUntil: "networkidle" });
+    await panel().getByText("You have answered every advert requirement and keyword.").waitFor({ timeout: 60_000 });
+    assert.equal(state.saved.targeting.vaguePhrases.length, 2, "the saved phrases stay; only those still in the CV are listed");
+    assert.equal(await panel().locator("li", { hasText: "Rewrite with AI" }).count(), 0);
+    pass("answers and fixes survive a reload");
+    await page.close();
+  }
+
+  console.log("Checker hand-off without requirements (older hand-off)");
+  {
+    const imported = fixtureCv();
+    imported.targeting = undefined;
+    imported.targetRole = "";
+    const legacy = { version: 1, source: "cv-fit-assessment", cvText: "Sam Patel ".repeat(60), jobDescription: advert, targetRole: "Customer Service Advisor", priorities: [{ category: "evidence", title: "Show CRM experience", action: "Add any exact CRM systems used, if applicable." }] };
+    active = await session(browser, { cv: createBlankCv(), handoff: legacy, importedCv: imported });
+    const { page, panel } = active;
+    await panel().waitFor({ timeout: 60_000 });
+    await page.getByText("Fix 1", { exact: true }).waitFor();
+    assert.equal(await page.locator("summary", { hasText: /top \d fixes/ }).count(), 0);
+    pass("an older hand-off without requirements still shows the three priorities and the keyword card");
     await page.close();
   }
 

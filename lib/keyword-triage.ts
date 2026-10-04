@@ -14,12 +14,13 @@ export type KeywordTriage = {
 const sameTerm = (a: string, b: string) => a.trim().toLocaleLowerCase("en-GB") === b.trim().toLocaleLowerCase("en-GB");
 
 /**
- * Turns an advert analysis into a one-at-a-time triage queue. Action verbs are
- * left out: "Yes, I have done this" only makes sense for skills,
- * qualifications and job titles.
+ * Turns an advert analysis into a one-at-a-time triage queue. Action verbs and
+ * job titles are left out: "Yes, I have done this" only makes sense for skills
+ * and qualifications. (The vacancy's own title is always in the advert; asking
+ * whether it is "part of your experience" is noise.)
  */
 export function buildKeywordTriage(analysis: AtsAnalysis, skippedTerms: string[] = []): KeywordTriage {
-  const relevant = (keyword: AtsKeyword) => keyword.category !== "Action verb";
+  const relevant = (keyword: AtsKeyword) => keyword.category !== "Action verb" && keyword.category !== "Job title";
   const isSkipped = (keyword: AtsKeyword) => skippedTerms.some((term) => sameTerm(term, keyword.term));
   const missing = analysis.missing.filter(relevant).sort((a, b) => b.weight - a.weight || a.term.localeCompare(b.term));
   const found = analysis.found.filter(relevant);

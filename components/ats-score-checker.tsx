@@ -387,6 +387,8 @@ export function AtsScoreChecker() {
       jobDescription,
       targetRole: assessment.targetRole,
       priorities: assessment.priorities,
+      requirements: assessment.requirements.map(({ requirement, status, explanation }) => ({ requirement, status, explanation })),
+      vaguePhrases: assessment.vaguePhrases.map(({ phrase, reason }) => ({ phrase, reason })),
       source: "cv-fit-assessment",
     });
   }

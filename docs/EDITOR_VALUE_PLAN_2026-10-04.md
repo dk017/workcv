@@ -189,3 +189,27 @@ Layout controls / fit-to-one-page, LinkedIn import, more templates, share link, 
 Checks: 11 new tests in `tests/phase0-trust-fixes.test.ts` plus the existing suite (344 pass, 0 fail, 1 pre-existing skip that needs a real PostgreSQL); typecheck clean; `scripts/verify-editor-fix-flows.mjs` 22/22 on three consecutive runs; the real checker page re-run on the same weak CV and advert: CRM, Excel and Salesforce cased correctly, "Driving licence" is Relevant, "drive" is gone, no nested quotes, "at entry level".
 
 Not changed: the checker still lists action verbs ("Resolve") as keywords to review. That is noise rather than an error and belongs with Phase 2.
+
+## Phase 1 results (2026-10-04, working tree, not committed)
+
+What a user now gets after "Fix these issues in my CV":
+
+- **Header (F7):** the advert's job title is no longer written under the user's name. It stays in `targeting.role`. AI suggestions fall back to it when the user has no headline. The readiness list says: "Add the job title you want under your name. This advert is for "X"; use it only if it matches your real experience."
+- **The checker's findings survive the hand-off (F2):** unmet and partly-evidenced requirements (with the checker's reason), requirements it judged evidenced, and the vague phrases are saved with the CV (`targeting.requirements`, `evidencedRequirements`, `answeredRequirements`, `vaguePhrases`), clamped to the strict schema.
+- **One question at a time, in order:** unmet requirements first (not evidenced before partly), each with "What the checker found: …" and Yes, write a bullet / Skip. The bullet is drafted from the user's own one-line note and the requirement, added to the role they choose, and the requirement is marked answered. Keyword questions come after.
+- **Checker and editor agree (F3):** a requirement the checker judged evidenced is never asked about, and its keywords count as found. Keywords inside an unmet requirement are asked through the requirement, not twice.
+- **Vague phrases:** listed with where they are (profile or a named role) and a Rewrite with AI button that opens the existing profile or bullet rewrite. A phrase drops off the list once the user edits it away.
+- **The three static "Fix 1/2/3" cards** are collapsed under "The checker's top 3 fixes (answered below)". An older hand-off without requirements still shows them as before.
+
+Defects found by testing Phase 1 and fixed before this report:
+
+1. **A requirement could silently disappear.** My first rule treated a requirement as answered once the CV contained its skill words. A live run showed "Excellent written communication" and "Log cases… with the sales team" vanish because "communication" and "sales" were already in the CV, even though the checker had judged them unmet. Now a requirement is only dismissed automatically when every skill keyword that was *missing when the checker ran* is now present (for example the user adds Excel). With no CV text at hand-off, nothing is dismissed automatically.
+2. **Job titles were being asked about** ("Is *Customer service advisor* part of your real experience?"). Job titles are now left out of the keyword card, like action verbs.
+3. The modal labelled the user's own note "Current text" for requirement drafts; it now says "Your note".
+
+Checks: 15 tests in `tests/vacancy-fit.test.ts`; the whole suite 360 pass, 0 fail, 1 skip that needs PostgreSQL; typecheck clean; `scripts/verify-editor-fix-flows.mjs` 35/35 on three consecutive runs, including a mocked checker hand-off (header, order, covered keywords, vague phrases, reload, older hand-off). A real run with live AI also passed: checker (3 not evidenced, 2 partly, 1 evidenced) → hand-off → editor showing the user's own title "Sales Assistant" in the header, the CRM requirement first, then a live Excel bullet drafted from a one-line note and applied.
+
+Known, left alone:
+
+- When the checker flags several vague phrases inside the profile, each gets its own "Rewrite with AI" button and they all open the same profile rewrite. It is harmless but repetitive.
+- Fixes still use the checker's judgement as of the hand-off; they are not re-assessed by AI after the user edits. (Phase 2 counts-only panel covers feedback while editing.)

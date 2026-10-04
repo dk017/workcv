@@ -142,7 +142,17 @@ export function calculateCvReadiness(cv: CvData) {
 
   const profileWords = cv.profile.trim().split(/\s+/).filter(Boolean).length;
   if (profileWords > 100) issues.push({ id: "profile-length", section: "profile", severity: "improve", message: `Shorten the profile from ${profileWords} words to 100 or fewer.`, action: "improve-profile" });
-  if (!cv.targetRole.trim()) issues.push({ id: "target-role", section: "profile", severity: "improve", message: "Add a specific target role so the CV has a clear direction." });
+  if (!cv.targetRole.trim()) {
+    const vacancyRole = cv.targeting?.role?.trim();
+    issues.push({
+      id: "target-role",
+      section: "profile",
+      severity: "improve",
+      message: vacancyRole
+        ? `Add the job title you want under your name. This advert is for "${vacancyRole}"; use it only if it matches your real experience.`
+        : "Add a specific target role so the CV has a clear direction.",
+    });
+  }
   cv.experience.forEach((item, index) => {
     const bullets = item.bullets.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
     if (item.role.trim() && bullets.length < 2) issues.push({ id: `bullets-${item.id}`, section: "experience", severity: "improve", message: `Add at least two evidence-led bullets to role ${index + 1}.`, action: "improve-bullets", targetId: item.id });

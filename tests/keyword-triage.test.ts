@@ -65,3 +65,13 @@ test("lower-case analyser terms are shown and saved in sentence case", () => {
   assert.equal(displayKeyword("NVQ"), "NVQ");
   assert.equal(addSkillLine("Teamwork", "salesforce"), "Teamwork\nSalesforce");
 });
+
+test("job titles are not asked about, and do not inflate the keyword count", () => {
+  const analysis = analyseAtsKeywords(advert + " We need a Customer Service Advisor.", "Customer service");
+  assert.ok([...analysis.found, ...analysis.missing].some((keyword) => keyword.category === "Job title"), "the analyser does extract the job title");
+  const triage = buildKeywordTriage(analysis);
+  for (const keyword of [...triage.found, ...triage.queue, ...triage.skipped]) {
+    assert.notEqual(keyword.category, "Job title");
+    assert.notEqual(keyword.category, "Action verb");
+  }
+});

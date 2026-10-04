@@ -4,22 +4,36 @@ import { useState } from "react";
 import { Check, Sparkles } from "lucide-react";
 
 import type { ExperienceItem } from "@/lib/editor-data";
-import { canAddToSkills, displayKeyword, type KeywordTriage } from "@/lib/keyword-triage";
+import { canAddToSkills, displayKeyword } from "@/lib/keyword-triage";
+import type { VacancyTriage, VaguePhraseItem } from "@/lib/vacancy-fit";
+
+type Requirement = VacancyTriage["requirements"]["queue"][number];
+type Keyword = VacancyTriage["queue"][number];
 
 type Handlers = {
   onAddSkill: (term: string) => void;
-  onSkip: (term: string) => void;
-  onDraftBullet: (term: string, roleId: string, note: string) => void;
+  onSkipKeyword: (term: string) => void;
+  onSkipRequirement: (requirement: string) => void;
+  /** `requirement` is set when the note answers an advert requirement, `keyword` when it answers a keyword. */
+  onDraftBullet: (draft: { roleId: string; note: string; keyword?: string; requirement?: string }) => void;
+  onRewritePhrase: (item: VaguePhraseItem) => void;
   onResetSkipped: () => void;
 };
 
+const button = "inline-flex min-h-10 items-center gap-1.5 rounded-md border px-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50";
+
 export function KeywordTriagePanel({
   triage,
+  phrases,
   experience,
   busy,
   ...handlers
-}: { triage: KeywordTriage; experience: ExperienceItem[]; busy: boolean } & Handlers) {
-  const current = triage.queue[0];
+}: { triage: VacancyTriage; phrases: VaguePhraseItem[]; experience: ExperienceItem[]; busy: boolean } & Handlers) {
+  const requirement = triage.requirements.queue[0];
+  const keyword = requirement ? undefined : triage.queue[0];
+  const remaining = triage.requirements.queue.length + triage.queue.length - 1;
+  const skipped = [...triage.requirements.skipped.map((item) => item.requirement), ...triage.skipped.map((item) => displayKeyword(item.term))];
+
   return (
     <div className="mt-5 rounded-lg border border-line bg-white p-4">
       <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -29,28 +43,79 @@ export function KeywordTriagePanel({
         </p>
       </div>
 
-      {current ? (
-        <KeywordQuestion key={current.term} keyword={current} remaining={triage.queue.length - 1} experience={experience} busy={busy} {...handlers} />
+      {requirement ? (
+        <Question
+          key={`requirement-${requirement.requirement}`}
+          label={requirement.requirement}
+          lead="The advert asks for"
+          badge={requirement.status === "partly-supported" ? "Partly evidenced" : "Not evidenced"}
+          badgeTone={requirement.status === "partly-supported" ? "amber" : "red"}
+          finding={requirement.explanation}
+          roles={experience}
+          busy={busy}
+          remaining={remaining}
+          onDraft={(roleId, note) => handlers.onDraftBullet({ roleId, note, requirement: requirement.requirement })}
+          onSkip={() => handlers.onSkipRequirement(requirement.requirement)}
+        />
+      ) : keyword ? (
+        <Question
+          key={`keyword-${keyword.term}`}
+          label={displayKeyword(keyword.term)}
+          lead="The advert asks for"
+          badge={keyword.importance}
+          badgeTone={keyword.importance === "Essential" ? "red" : "amber"}
+          roles={experience}
+          busy={busy}
+          remaining={remaining}
+          canAddSkill={canAddToSkills(keyword)}
+          onAddSkill={() => handlers.onAddSkill(keyword.term)}
+          onDraft={(roleId, note) => handlers.onDraftBullet({ roleId, note, keyword: displayKeyword(keyword.term) })}
+          onSkip={() => handlers.onSkipKeyword(keyword.term)}
+        />
       ) : (
         <p className="mt-3 text-sm text-ink">
-          {triage.total ? "You have answered every advert keyword." : "No skill or qualification keywords were found in this advert."}
+          {triage.total || triage.requirements.answered.length || triage.requirements.skipped.length
+            ? "You have answered every advert requirement and keyword."
+            : "No skill or qualification keywords were found in this advert."}
         </p>
+      )}
+
+      {phrases.length > 0 && (
+        <div className="mt-5 border-t border-line pt-4">
+          <p className="text-sm font-bold text-navy">Phrases the checker called vague</p>
+          <ul className="mt-2 grid gap-2">
+            {phrases.map((item) => (
+              <li key={item.phrase} className="flex flex-wrap items-start justify-between gap-2 rounded-md border border-line bg-paper px-3 py-2">
+                <span className="min-w-0 text-sm text-ink">
+                  <strong className="text-navy">&ldquo;{item.phrase}&rdquo;</strong>
+                  <span className="mt-0.5 block text-xs leading-5 text-muted">
+                    {item.reason} ({item.where.kind === "profile" ? "in your profile" : `in ${item.where.roleTitle}`})
+                  </span>
+                </span>
+                <button type="button" disabled={busy} onClick={() => handlers.onRewritePhrase(item)} className={`${button} min-h-9 shrink-0 border-line-strong bg-white px-2 text-xs text-navy`}>
+                  <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                  Rewrite with AI
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
 
       {triage.found.length > 0 && (
         <ul className="mt-4 flex flex-wrap gap-1.5" aria-label="Advert keywords already on your CV">
-          {triage.found.slice(0, 14).map((keyword) => (
-            <li key={keyword.term} className="inline-flex items-center gap-1 rounded bg-greensoft px-2 py-1 text-xs font-bold text-navy">
+          {triage.found.slice(0, 14).map((item) => (
+            <li key={item.term} className="inline-flex items-center gap-1 rounded bg-greensoft px-2 py-1 text-xs font-bold text-navy">
               <Check className="h-3 w-3" aria-hidden="true" />
-              {displayKeyword(keyword.term)}
+              {displayKeyword(item.term)}
             </li>
           ))}
         </ul>
       )}
 
-      {triage.skipped.length > 0 && (
+      {skipped.length > 0 && (
         <p className="mt-3 text-xs text-muted">
-          Skipped as not relevant: {triage.skipped.map((keyword) => displayKeyword(keyword.term)).join(", ")}.{" "}
+          Skipped as not relevant: {skipped.join(", ")}.{" "}
           <button type="button" onClick={handlers.onResetSkipped} className="font-bold text-navy underline">
             Ask again
           </button>
@@ -60,42 +125,52 @@ export function KeywordTriagePanel({
   );
 }
 
-function KeywordQuestion({
-  keyword,
-  remaining,
-  experience,
+function Question({
+  label,
+  lead,
+  badge,
+  badgeTone,
+  finding,
+  roles: allRoles,
   busy,
+  remaining,
+  canAddSkill = false,
   onAddSkill,
+  onDraft,
   onSkip,
-  onDraftBullet,
 }: {
-  keyword: KeywordTriage["queue"][number];
-  remaining: number;
-  experience: ExperienceItem[];
+  label: string;
+  lead: string;
+  badge: string;
+  badgeTone: "red" | "amber";
+  finding?: string;
+  roles: ExperienceItem[];
   busy: boolean;
-} & Omit<Handlers, "onResetSkipped">) {
-  const roles = experience.filter((item) => item.role.trim());
-  const term = displayKeyword(keyword.term);
+  remaining: number;
+  canAddSkill?: boolean;
+  onAddSkill?: () => void;
+  onDraft: (roleId: string, note: string) => void;
+  onSkip: () => void;
+}) {
+  const roles = allRoles.filter((item) => item.role.trim());
   const [writing, setWriting] = useState(false);
   const [note, setNote] = useState("");
   const [roleId, setRoleId] = useState(roles[0]?.id ?? "");
   const noteReady = note.trim().length >= 8 && roles.some((role) => role.id === roleId);
-  const button = "inline-flex min-h-10 items-center gap-1.5 rounded-md border px-3 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-50";
 
   return (
     <div className="mt-3">
       <p className="text-sm leading-6 text-ink">
-        The advert asks for <strong className="text-navy">{term}</strong>{" "}
-        <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase ${keyword.importance === "Essential" ? "bg-red-100 text-red-800" : "bg-gold-tint text-navy"}`}>
-          {keyword.importance}
-        </span>
+        {lead} <strong className="text-navy">{label}</strong>{" "}
+        <span className={`rounded px-1.5 py-0.5 text-[11px] font-bold uppercase ${badgeTone === "red" ? "bg-red-100 text-red-800" : "bg-gold-tint text-navy"}`}>{badge}</span>
         . Is it part of your real experience?
       </p>
+      {finding && <p className="mt-1 text-xs leading-5 text-muted">What the checker found: {finding}</p>}
 
       {!writing ? (
         <div className="mt-3 flex flex-wrap gap-2">
-          {canAddToSkills(keyword) && (
-            <button type="button" onClick={() => onAddSkill(keyword.term)} className={`${button} border-navy bg-navy text-white`}>
+          {canAddSkill && onAddSkill && (
+            <button type="button" onClick={onAddSkill} className={`${button} border-navy bg-navy text-white`}>
               Yes, add to skills
             </button>
           )}
@@ -103,7 +178,7 @@ function KeywordQuestion({
             <Sparkles className="h-4 w-4" aria-hidden="true" />
             Yes, write a bullet
           </button>
-          <button type="button" onClick={() => onSkip(keyword.term)} className={`${button} border-transparent bg-transparent text-muted hover:text-navy`}>
+          <button type="button" onClick={onSkip} className={`${button} border-transparent bg-transparent text-muted hover:text-navy`}>
             Skip, not relevant
           </button>
         </div>
@@ -115,13 +190,13 @@ function KeywordQuestion({
       ) : (
         <div className="mt-3 grid gap-3">
           <label className="block">
-            <span className="text-xs font-bold text-navy">In one line, how did you use {term}? Only real facts.</span>
+            <span className="text-xs font-bold text-navy">In one line, how have you done this? Only real facts.</span>
             <input
               value={note}
               onChange={(event) => setNote(event.target.value)}
               maxLength={400}
               autoFocus
-              placeholder={`e.g. Used ${term} every shift to …`}
+              placeholder="e.g. Logged customer cases in …"
               className="mt-1 min-h-10 w-full rounded-md border border-line bg-white px-3 text-sm text-ink outline-none focus:border-navy focus:ring-2 focus:ring-gold-tint"
             />
           </label>
@@ -138,7 +213,7 @@ function KeywordQuestion({
             </label>
           )}
           <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={!noteReady || busy} onClick={() => onDraftBullet(term, roleId, note)} className={`${button} border-navy bg-navy text-white`}>
+            <button type="button" disabled={!noteReady || busy} onClick={() => onDraft(roleId, note)} className={`${button} border-navy bg-navy text-white`}>
               <Sparkles className="h-4 w-4" aria-hidden="true" />
               {busy ? "Drafting…" : "Draft bullet"}
             </button>
@@ -149,7 +224,7 @@ function KeywordQuestion({
         </div>
       )}
 
-      {remaining > 0 && <p className="mt-3 text-xs text-muted">{remaining} more advert keyword{remaining === 1 ? "" : "s"} to check after this one.</p>}
+      {remaining > 0 && <p className="mt-3 text-xs text-muted">{remaining} more to check after this one.</p>}
     </div>
   );
 }

@@ -51,8 +51,26 @@ export type CvTargeting = {
     title: string;
     action: string;
   }>;
-  /** Advert keywords the user said are not part of their experience. */
+  /** Advert keywords and requirements the user said are not part of their experience. */
   skippedKeywords?: string[];
+  /** Advert requirements the checker could not find clear evidence for (partly or not evidenced). */
+  requirements?: Array<{
+    requirement: string;
+    status: "partly-supported" | "not-evidenced";
+    explanation: string;
+    /**
+     * Skill keywords in this requirement that were missing from the CV when the checker ran.
+     * The requirement counts as answered once the CV has all of them. Empty means it can only
+     * be answered by the user, because the checker saw the words and still judged it unmet.
+     */
+    watch?: string[];
+  }>;
+  /** Advert requirements the checker judged clearly evidenced, so their keywords are not asked about again. */
+  evidencedRequirements?: string[];
+  /** Advert requirements the user has answered by adding a bullet. */
+  answeredRequirements?: string[];
+  /** Phrases in the CV the checker called vague, with why. */
+  vaguePhrases?: Array<{ phrase: string; reason: string }>;
 };
 
 export type CvData = {
