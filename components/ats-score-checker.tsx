@@ -186,7 +186,7 @@ function ReadabilityResult({
         ) : null}
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.14em]" style={{ color: colour }}>
-            CV readability{compact ? `: ${report.score}/100` : ""}
+            {compact ? "Layout and file checks" : "CV readability"}
           </p>
           <h2 className="mt-2 font-display text-3xl font-semibold text-navy">
             {toFix === 0 ? "Your CV reads cleanly." : `${toFix} thing${toFix === 1 ? "" : "s"} to check before you apply.`}
@@ -194,6 +194,7 @@ function ReadabilityResult({
           <p className="mt-3 max-w-3xl text-sm leading-7 text-muted">
             {fileName ? `Read from ${fileName} in your browser. ` : ""}
             This checks whether your CV&apos;s text, sections, dates and contact details can be picked out clearly.
+            {compact ? " These checks are separate from the score above and do not change it. " : " "}
             It is not an employer&apos;s ATS score; systems and recruiters differ.
           </p>
         </div>

@@ -213,3 +213,14 @@ Known, left alone:
 
 - When the checker flags several vague phrases inside the profile, each gets its own "Rewrite with AI" button and they all open the same profile rewrite. It is harmless but repetitive.
 - Fixes still use the checker's judgement as of the hand-off; they are not re-assessed by AI after the user edits. (Phase 2 counts-only panel covers feedback while editing.)
+
+## Phase 2 results (2026-10-04, working tree, not committed)
+
+Goal: one honest story about how good the CV is, and a visible feedback loop while editing.
+
+- **One score per screen (F1):** on the checker page with an advert, the second "CV readability: 86/100" figure is gone. The same checks now appear as an unnumbered "Layout and file checks" list that says it is separate from the score above and does not change it. The headline fit score is the only 0–100 number. In CV-only mode (no advert) the readability score is still the headline, because it is then the only score.
+- **Honest banner (F6):** with a vacancy targeted and requirements still open, the editor banner now says "Your CV is complete, but N advert requirement(s) still aren't evidenced" and points to the vacancy panel, instead of "ready to preview". It goes back to "Your CV is ready to preview" once none are open. Skipping a requirement closes it. An already-paid CV keeps "Your CV is unlocked."
+- **Live counts, no invented number (decision 3):** the vacancy panel shows four counts that change as the user edits and need no AI call: advert keywords on the CV (n of m), requirements answered (n of m; skipping is not progress), bullets showing a result (n of m), and bullets flagged as weak. Pure function `matchProgress` in `lib/vacancy-fit.ts`.
+- Not done on purpose: no combined estimated score and no re-check button (the AI-judged parts of the checker's score cannot be recomputed live). The checker still lists action verbs such as "Resolve" under "Keywords to review"; that noise is unchanged.
+
+Checks: 2 more unit tests (17 in `tests/vacancy-fit.test.ts`); whole suite 362 pass, 0 fail, 1 skip that needs PostgreSQL; typecheck clean; browser flows 37/37 on three consecutive runs, now also asserting the banner text at each step, the counts, and no horizontal scroll at 375px with the counts row (screenshots written to `tmp/editor-fix-flows/`); real checker page re-run with live AI: single 53/100 score, no second 0–100 figure.

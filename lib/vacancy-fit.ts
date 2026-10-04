@@ -3,6 +3,7 @@
 
 import { analyseAtsKeywords, type AtsAnalysis, type AtsKeyword } from "./ats-keyword-checker.ts";
 import type { CvFitHandoff } from "./cv-fit-handoff.ts";
+import { assessExistingBullet, hasOutcome } from "./cv-bullet-rules.ts";
 import type { CvData, CvTargeting } from "./editor-data.ts";
 import { buildKeywordTriage, type KeywordTriage } from "./keyword-triage.ts";
 
@@ -160,4 +161,35 @@ export function vaguePhraseItems(cv: CvData): VaguePhraseItem[] {
     }
   }
   return items;
+}
+
+export type MatchProgress = {
+  /** Advert keywords found on the CV out of those the card tracks. */
+  keywords: { found: number; total: number };
+  /** Unmet advert requirements the user has answered with a bullet (or whose skill is now on the CV). Null with no checker data. */
+  requirements: { handled: number; total: number } | null;
+  /** Bullets that show a result or number out of all bullets. */
+  bulletsWithResults: { count: number; total: number };
+  /** Bullets the editor currently flags as weak. */
+  flaggedBullets: number;
+};
+
+/**
+ * Counts that move as the user edits. Everything here is deterministic and
+ * needs no AI call, so it can update on every keystroke. It is deliberately
+ * not combined into one score: the AI-judged parts of the checker's score
+ * cannot be recomputed live.
+ */
+export function matchProgress(cv: CvData, triage: VacancyTriage): MatchProgress {
+  const bullets = cv.experience
+    .flatMap((role) => role.bullets.split("\n"))
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const requirements = cv.targeting?.requirements ?? [];
+  return {
+    keywords: { found: triage.found.length, total: triage.total },
+    requirements: requirements.length ? { handled: triage.requirements.answered.length, total: requirements.length } : null,
+    bulletsWithResults: { count: bullets.filter(hasOutcome).length, total: bullets.length },
+    flaggedBullets: bullets.filter((line) => assessExistingBullet(line).length > 0).length,
+  };
 }

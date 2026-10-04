@@ -218,7 +218,7 @@ try {
 
     await openTailor(advert);
     await panel().waitFor();
-    const counts = async () => (await panel().getByText(/advert keywords are on your CV/).textContent()).match(/(\d+) of (\d+)/).slice(1).map(Number);
+    const counts = async () => (await panel().locator("dl div", { hasText: "Advert keywords on your CV" }).first().locator("dd").textContent()).match(/(\d+) of (\d+)/).slice(1).map(Number);
     const [found0, total] = await counts();
     assert.ok(total >= 4, `expected several keywords, got ${total}`);
     assert.equal(await page.getByText(/^Fix \d$/).count(), 0, "keyword priorities are not duplicated above the card");
@@ -351,6 +351,8 @@ try {
     active = await session(browser, { cv: createBlankCv(), handoff, importedCv: imported });
     const { page, state, waitForSave, panel, errorBanner, dismissError } = active;
     await panel().waitFor({ timeout: 60_000 });
+    const stat = async (label) => (await panel().locator("dl div", { hasText: label }).first().locator("dd").textContent())?.trim();
+    const banner = () => page.locator("section[aria-live=polite]").first();
     const questionText = async () => (await panel().locator("p", { hasText: /^The advert asks for/ }).first().textContent())?.replace(/\s+/g, " ").trim() ?? "";
 
     await waitForSave((cv) => Boolean(cv.targeting?.requirements?.length), "hand-off saved");
@@ -374,9 +376,25 @@ try {
     assert.match(await panel().innerText(), /What the checker found: No CRM system is mentioned anywhere in the CV\./);
     pass("the first question is the checker's unmet CRM requirement, with the checker's reason");
 
+    assert.equal(await stat("Requirements answered"), "0 of 4");
+    assert.equal(await stat("Bullets showing a result"), "0 of 3");
+    assert.equal(await stat("Bullets flagged as weak"), "3");
+    await banner().getByText("Your CV is complete, but 4 advert requirements still aren't evidenced.").waitFor();
+    assert.ok(!(await banner().innerText()).includes("ready to preview"));
+    pass("the banner no longer says ready while requirements are unmet, and the counts start at zero");
+    await page.locator("div.mt-5", { has: page.getByText("Keyword targeting", { exact: true }) }).first().scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${outDir}/handoff-desktop.png` });
+    await page.setViewportSize({ width: 375, height: 812 });
+    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, "no horizontal scroll with the counts row at 375px");
+    await panel().scrollIntoViewIfNeeded();
+    await page.screenshot({ path: `${outDir}/handoff-mobile.png` });
+    await page.setViewportSize({ width: 1440, height: 1000 });
+
     await panel().getByRole("button", { name: "Skip, not relevant" }).click();
     await waitForSave((cv) => cv.targeting.skippedKeywords?.includes("Experience using a CRM system such as Salesforce or Zendesk"), "requirement skip saved");
     assert.match(await questionText(), /Good Microsoft Excel skills/);
+    await banner().getByText("Your CV is complete, but 3 advert requirements still aren't evidenced.").waitFor();
+    assert.equal(await stat("Requirements answered"), "0 of 4", "skipping is not progress");
     pass("skipping a requirement saves it and moves to the next one");
 
     await panel().getByRole("button", { name: "Yes, write a bullet" }).click();
@@ -395,6 +413,9 @@ try {
     await waitForSave((cv) => cv.targeting.answeredRequirements?.includes("Good Microsoft Excel skills"), "requirement answered");
     assert.equal(state.saved.experience[1].bullets.split("\n").length, 2);
     assert.equal(state.saved.targetRole, "", "answering does not set a headline");
+    assert.equal(await stat("Requirements answered"), "1 of 4");
+    await banner().getByText("Your CV is complete, but 2 advert requirements still aren't evidenced.").waitFor();
+    assert.equal(await stat("Bullets showing a result"), "0 of 4", "the new bullet is counted; it states no figure");
     pass("a drafted bullet answers the requirement: appended to the chosen role, marked answered, sent with the requirement");
 
     assert.match(await questionText(), /Answer customer calls and emails/);
@@ -415,6 +436,8 @@ try {
     await panel().getByText("You have answered every advert requirement and keyword.").waitFor();
     assert.match(await panel().getByText(/Skipped as not relevant/).innerText(), /Experience using a CRM system/);
     pass("everything answered: the card says so and lists what was skipped");
+    await banner().getByText("Your CV is ready to preview.").waitFor();
+    pass("once nothing is left open the banner says ready to preview again");
 
     // Vague phrases.
     assert.equal(await panel().locator("li", { hasText: "Rewrite with AI" }).count(), 2);

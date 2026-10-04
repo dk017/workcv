@@ -6,7 +6,7 @@ import type { CvFitHandoff } from "../lib/cv-fit-handoff.ts";
 import { parseCvData } from "../lib/cv-schema.ts";
 import { calculateCvReadiness } from "../lib/cv-readiness.ts";
 import { createBlankCv, type CvData } from "../lib/editor-data.ts";
-import { buildVacancyTriage, effectiveTargetRole, targetingFromFitHandoff, vaguePhraseItems } from "../lib/vacancy-fit.ts";
+import { buildVacancyTriage, effectiveTargetRole, matchProgress, targetingFromFitHandoff, vaguePhraseItems } from "../lib/vacancy-fit.ts";
 
 const advert = `Customer Service Advisor - Bradford
 
@@ -233,4 +233,33 @@ test("without the CV text there is no baseline, so nothing is dismissed automati
   cv.skills += ["", "Excel", "CRM", "Salesforce"].join(String.fromCharCode(10));
   assert.equal(triage(cv).requirements.answered.length, 0);
   assert.ok(triage(cv).requirements.queue.some((item) => item.requirement === "Good Microsoft Excel skills"));
+});
+
+test("progress counts move as the user fixes things, and need no AI", () => {
+  const cv = weakCv();
+  const before = matchProgress(cv, triage(cv));
+  assert.equal(before.bulletsWithResults.total, 3);
+  assert.equal(before.bulletsWithResults.count, 0);
+  assert.equal(before.flaggedBullets, 3);
+  assert.equal(before.requirements?.total, 5);
+  assert.equal(before.requirements?.handled, 0);
+
+  // A bullet with a real result, and a skill added: three counts move at once.
+  cv.experience[1].bullets += ["", "Reduced picking errors by 15% using a handheld scanner"].join(String.fromCharCode(10));
+  cv.skills += ["", "Excel"].join(String.fromCharCode(10));
+  const after = matchProgress(cv, triage(cv));
+  assert.equal(after.bulletsWithResults.count, 1);
+  assert.equal(after.bulletsWithResults.total, 4);
+  assert.equal(after.requirements?.handled, 1, "adding Excel answers the Excel requirement");
+  assert.ok(after.keywords.found > before.keywords.found);
+
+  // Skipping is not progress.
+  cv.targeting!.skippedKeywords = ["Experience using a CRM system such as Salesforce or Zendesk"];
+  assert.equal(matchProgress(cv, triage(cv)).requirements?.handled, 1);
+});
+
+test("progress has no requirement count when there is no checker data", () => {
+  const cv = weakCv();
+  cv.targeting = { role: "Customer Service Advisor", jobDescription: advert, priorities: [] };
+  assert.equal(matchProgress(cv, triage(cv)).requirements, null);
 });

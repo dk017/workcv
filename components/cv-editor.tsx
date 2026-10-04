@@ -54,7 +54,7 @@ import {
 import { calculateCvReadiness, type ReadinessIssue } from "@/lib/cv-readiness";
 import { analyseAtsKeywords } from "@/lib/ats-keyword-checker";
 import { addSkillLine, addSkippedKeyword } from "@/lib/keyword-triage";
-import { buildVacancyTriage, effectiveTargetRole, targetingFromFitHandoff, vaguePhraseItems, type VaguePhraseItem } from "@/lib/vacancy-fit";
+import { buildVacancyTriage, effectiveTargetRole, matchProgress, targetingFromFitHandoff, vaguePhraseItems, type VaguePhraseItem } from "@/lib/vacancy-fit";
 import {
   cvHasContent,
   jobTailorHandoffKey,
@@ -733,6 +733,8 @@ export function CvEditor() {
   }, [cv]);
 
   const vaguePhrases = useMemo(() => vaguePhraseItems(cv), [cv]);
+  const progress = useMemo(() => (keywordTriage ? matchProgress(cv, keywordTriage) : null), [cv, keywordTriage]);
+  const openRequirements = keywordTriage?.requirements.queue.length ?? 0;
 
   const setSkippedKeywords = (update: (current: string[]) => string[]) =>
     setCv((current) => current.targeting ? { ...current, targeting: { ...current.targeting, skippedKeywords: update(current.targeting.skippedKeywords || []) } } : current);
@@ -1449,17 +1451,25 @@ export function CvEditor() {
       )}
 
       {loaded && readiness.score > 0 && (
-        <section className={`editor-chrome border-b border-line ${readiness.ready ? "bg-greensoft" : "bg-surface"}`} aria-live="polite">
+        <section className={`editor-chrome border-b border-line ${readiness.ready && !(openRequirements > 0 && !pdfUnlocked) ? "bg-greensoft" : "bg-surface"}`} aria-live="polite">
           <div className="mx-auto flex w-[min(1540px,calc(100%-32px))] items-center justify-between gap-4 py-3 sm:w-[min(1540px,calc(100%-48px))]">
             <div>
               <p className="text-sm font-bold text-navy">
-                {readiness.ready ? (pdfUnlocked ? "Your CV is unlocked." : "Your CV is ready to preview.") : `CV readiness: ${readiness.score}%`}
+                {readiness.ready
+                  ? pdfUnlocked
+                    ? "Your CV is unlocked."
+                    : openRequirements > 0
+                      ? `Your CV is complete, but ${openRequirements} advert requirement${openRequirements === 1 ? " still isn't" : "s still aren't"} evidenced.`
+                      : "Your CV is ready to preview."
+                  : `CV readiness: ${readiness.score}%`}
               </p>
               <p className="mt-1 text-xs leading-5 text-muted">
                 {readiness.ready
                   ? pdfUnlocked
                     ? "Use Download for your CV and cover letter as PDF or Word. Edits are included at no extra cost."
-                    : `Review the pages, then unlock this CV and its cover letter as PDF and Word for ${site.price} once.`
+                    : openRequirements > 0
+                      ? "Answer them in the vacancy panel below, or skip the ones that do not apply. You can preview and unlock at any time."
+                      : `Review the pages, then unlock this CV and its cover letter as PDF and Word for ${site.price} once.`
                   : readiness.issues[0]?.message || "Continue adding your real experience."}
               </p>
             </div>
@@ -1721,6 +1731,7 @@ export function CvEditor() {
               <KeywordTriagePanel
                 triage={keywordTriage}
                 phrases={vaguePhrases}
+                progress={progress!}
                 experience={cv.experience}
                 busy={Boolean(aiLoading)}
                 onAddSkill={(term) => { updateField("skills", addSkillLine(cv.skills, term)); trackEditorEvent("keyword_triage_answered", draftId, { answer: "skills" }); }}

@@ -5,7 +5,7 @@ import { Check, Sparkles } from "lucide-react";
 
 import type { ExperienceItem } from "@/lib/editor-data";
 import { canAddToSkills, displayKeyword } from "@/lib/keyword-triage";
-import type { VacancyTriage, VaguePhraseItem } from "@/lib/vacancy-fit";
+import type { MatchProgress, VacancyTriage, VaguePhraseItem } from "@/lib/vacancy-fit";
 
 type Requirement = VacancyTriage["requirements"]["queue"][number];
 type Keyword = VacancyTriage["queue"][number];
@@ -25,10 +25,11 @@ const button = "inline-flex min-h-10 items-center gap-1.5 rounded-md border px-3
 export function KeywordTriagePanel({
   triage,
   phrases,
+  progress,
   experience,
   busy,
   ...handlers
-}: { triage: VacancyTriage; phrases: VaguePhraseItem[]; experience: ExperienceItem[]; busy: boolean } & Handlers) {
+}: { triage: VacancyTriage; phrases: VaguePhraseItem[]; progress: MatchProgress; experience: ExperienceItem[]; busy: boolean } & Handlers) {
   const requirement = triage.requirements.queue[0];
   const keyword = requirement ? undefined : triage.queue[0];
   const remaining = triage.requirements.queue.length + triage.queue.length - 1;
@@ -36,12 +37,13 @@ export function KeywordTriagePanel({
 
   return (
     <div className="mt-5 rounded-lg border border-line bg-white p-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-2">
-        <p className="text-sm font-bold text-navy">Keyword targeting</p>
-        <p className="text-xs text-muted">
-          {triage.found.length} of {triage.total} advert keywords are on your CV
-        </p>
-      </div>
+      <p className="text-sm font-bold text-navy">Keyword targeting</p>
+      <dl className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4" aria-label="Progress against this advert">
+        <Stat label="Advert keywords on your CV" value={`${progress.keywords.found} of ${progress.keywords.total}`} />
+        {progress.requirements && <Stat label="Requirements answered" value={`${progress.requirements.handled} of ${progress.requirements.total}`} />}
+        <Stat label="Bullets showing a result" value={`${progress.bulletsWithResults.count} of ${progress.bulletsWithResults.total}`} />
+        <Stat label="Bullets flagged as weak" value={String(progress.flaggedBullets)} />
+      </dl>
 
       {requirement ? (
         <Question
@@ -121,6 +123,15 @@ export function KeywordTriagePanel({
           </button>
         </p>
       )}
+    </div>
+  );
+}
+
+function Stat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-md border border-line bg-paper px-3 py-2">
+      <dd className="font-display text-lg font-semibold leading-6 text-navy">{value}</dd>
+      <dt className="text-[11px] leading-4 text-muted">{label}</dt>
     </div>
   );
 }
