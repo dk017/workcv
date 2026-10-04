@@ -1,4 +1,5 @@
 import type { AtsAnalysis, AtsKeyword } from "./ats-keyword-checker.ts";
+import { formatKeyword } from "./keyword-format.ts";
 
 export type KeywordTriage = {
   /** Advert keywords the CV already covers. */
@@ -30,10 +31,9 @@ export function buildKeywordTriage(analysis: AtsAnalysis, skippedTerms: string[]
   };
 }
 
-/** The analyser stores some terms in lower case; show and save them in sentence case. */
+/** The analyser stores most terms in lower case; show and save them with proper casing (CRM, SQL, JavaScript). */
 export function displayKeyword(term: string) {
-  const text = term.trim();
-  return text === text.toLocaleLowerCase("en-GB") ? text.charAt(0).toLocaleUpperCase("en-GB") + text.slice(1) : text;
+  return formatKeyword(term);
 }
 
 /** Skills and qualifications can go straight into the skills list. */

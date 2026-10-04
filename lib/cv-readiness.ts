@@ -148,6 +148,20 @@ export function calculateCvReadiness(cv: CvData) {
     if (item.role.trim() && bullets.length < 2) issues.push({ id: `bullets-${item.id}`, section: "experience", severity: "improve", message: `Add at least two evidence-led bullets to role ${index + 1}.`, action: "improve-bullets", targetId: item.id });
     if (bullets.length && !bullets.some((bullet) => /\d|£|%/.test(bullet))) issues.push({ id: `evidence-${item.id}`, section: "experience", severity: "improve", message: `Add a number, scale or measurable outcome to role ${index + 1} where truthful.`, action: "improve-bullets", targetId: item.id });
   });
+  const dateValues = [
+    ...cv.experience.flatMap((item) => [item.start, item.end]),
+    ...cv.education.flatMap((item) => [item.start, item.end]),
+  ].map((value) => value.trim());
+  const wordDates = dateValues.filter((value) => /^[a-z]{3,9}\.?\s+(19|20)\d{2}$/i.test(value));
+  const numericDates = dateValues.filter((value) => /^(0?[1-9]|1[0-2])\/(19|20)\d{2}$/.test(value));
+  if (wordDates.length > 0 && numericDates.length > 0) {
+    issues.push({
+      id: "dates-format",
+      section: "experience",
+      severity: "improve",
+      message: `Dates use mixed formats (for example ${wordDates[0]} and ${numericDates[0]}). Pick one format throughout.`,
+    });
+  }
   const fixes = issues.filter((issue) => issue.severity === "fix");
   return {
     ready: fixes.length === 0,

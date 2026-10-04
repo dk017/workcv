@@ -26,6 +26,8 @@ import {
 import type { CvFitAssessment } from "@/lib/cv-fit-assessment";
 import { writeCvFitHandoff } from "@/lib/cv-fit-handoff";
 import { readCvFile, type CvFileText } from "@/lib/cv-file-text";
+import { formatKeyword } from "@/lib/keyword-format";
+import { seniorityLabel } from "@/lib/cv-fit-labels";
 import { cvReadabilityReport, type ReadabilityReport, type ReadabilityStatus } from "@/lib/cv-readability-check";
 import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
 import { site } from "@/lib/site";
@@ -126,7 +128,7 @@ function KeywordList({
               key={`${keyword.category}-${keyword.term}`}
               className={`inline-flex items-center gap-2 rounded-md border px-3 py-2 text-sm font-bold ${categoryStyles[keyword.category]}`}
             >
-              {keyword.term}
+              {formatKeyword(keyword.term)}
               <span className="text-[10px] font-bold uppercase text-current/65">
                 {keyword.importance}
               </span>
@@ -586,7 +588,7 @@ export function AtsScoreChecker() {
                 <p className="mt-4 max-w-3xl text-sm leading-7 text-muted">
                   The vacancy appears to target <strong className="text-navy">{assessment.targetRole}</strong>.
                   Your CV currently communicates <strong className="text-navy">{assessment.communicatedRole}</strong>{" "}
-                  at <strong className="text-navy">{assessment.seniority}</strong> level.
+                  at <strong className="text-navy">{seniorityLabel(assessment.seniority)}</strong>.
                 </p>
               </div>
             </div>
