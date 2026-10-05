@@ -10,18 +10,11 @@ Send the UK job advert you are viewing to WorkCV to tailor a copy of your CV, an
 
 ## Detailed description
 
-Looking at a job on Indeed, Reed, NHS Jobs or a company careers page? Click "Tailor my CV for this job" and WorkCV opens with the advert ready. It makes a separate copy of your saved CV for that vacancy, so your original stays as it is, and walks you through the advert's keywords one at a time, adding only what you have really done.
+Found a UK job you want to apply for? Click "Tailor my CV for this job" and WorkCV opens with the advert ready. It makes a separate copy of your saved CV for that vacancy, so your original stays as it is, and walks you through what the advert asks for one point at a time, so you add only what you have really done.
 
 Applying from outside the UK? "Check sponsor licence" looks up the employer on the Home Office register of licensed sponsors, so you can see whether it can sponsor a work visa before you apply.
 
-The extension can also scan the job page itself, highlighting CV-relevant wording and grouping the strongest terms in a compact popup.
-
-Use it to spot:
-
-- skills and tools such as Excel, customer service, Power BI, safeguarding or project management
-- UK qualifications such as GCSE, NVQ, DBS, NMC, QTS, CIPD or AAT
-- ways of working such as analytical, organised, collaborative or proactive
-- action verbs and repeated signals worth considering when tailoring a CV
+You can also highlight the advert itself: the extension marks the skills, qualifications and wording the employer emphasises, and groups them in the popup so you can see at a glance what to address in your CV.
 
 The extension is intentionally narrow:
 
@@ -34,6 +27,8 @@ The extension is intentionally narrow:
 - it does not scrape tabs in the background
 
 Only claim skills and qualifications you genuinely have. Reusing relevant language can make a CV clearer, but keyword matching cannot guarantee an interview or ATS result.
+
+Store rule: never list example keywords, qualifications or other sites' names in the description. Version 0.2.0 was rejected as keyword spam ("Yellow Argon") for a list of example qualifications.
 
 ## Single purpose
 
