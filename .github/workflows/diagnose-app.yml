@@ -7,7 +7,7 @@ on:
       mode:
         description: "Diagnostic operation"
         type: choice
-        options: [app_logs, growth_report]
+        options: [app_logs, growth_report, server_resources]
         default: app_logs
       report_public_key:
         description: "Growth report recipient RSA public key (base64 PEM); NEVER a private key"
@@ -26,7 +26,7 @@ on:
 
 jobs:
   app-logs:
-    if: ${{ inputs.mode != 'growth_report' }}
+    if: ${{ inputs.mode == 'app_logs' }}
     name: Read filtered app logs
     runs-on: ubuntu-latest
     permissions:
@@ -74,3 +74,35 @@ jobs:
             printf '%s' "$REPORT_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T \
               -e WORKCV_REPORT_EXECUTE=1 -e WORKCV_REPORT_PUBLIC_KEY="$REPORT_PUBLIC_KEY" \
               -e WORKCV_REPORT_ID="$REPORT_ID" app node --input-type=module
+
+  server-resources:
+    if: ${{ inputs.mode == 'server_resources' }}
+    name: Read server and app memory (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare read-only check
+        run: echo "CHECK_CODE=$(base64 -w0 scripts/server-resources-check.mjs)" >> "$GITHUB_ENV"
+      - name: Read resources
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: CHECK_CODE
+          command_timeout: 3m
+          script: |
+            set -eu
+            echo "== Host"
+            echo "CPUs: $(nproc)"
+            free -m
+            uptime
+            df -h / /tmp | sed -n '1,3p'
+            echo "== Container memory (all containers, read-only)"
+            docker stats --no-stream --format '{{.Name}}\t{{.MemUsage}}\t{{.CPUPerc}}'
+            echo "== WorkCV app container"
+            cd "${{ github.event.inputs.deploy_dir }}"
+            printf '%s' "$CHECK_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T app node --input-type=module
