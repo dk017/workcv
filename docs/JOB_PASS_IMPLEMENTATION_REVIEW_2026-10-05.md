@@ -1,5 +1,5 @@
 # Job Pass implementation and SEO/AEO review
-5 October 2026 · Local implementation · Not deployed
+5 October 2026 · Deployed and live
 
 ## Completed items and review decisions
 
@@ -89,5 +89,19 @@ Source quotes and numerical checks do not establish semantic truth. Unsupported 
 - The evidence selector hands reviewed bullets and original notes to the existing application-pack review area rather than importing a mixture of selected and excluded text as employment history. This avoids turning master-only notes into CV claims.
 - The comparison demonstrates version workflow in text and links to the existing worked guide. No fabricated editor screenshot or unsupported feature claim was added.
 - Optional reference PDF/Word downloads were not added. Full examples are HTML, with free text worksheet downloads. Personalised export entitlements are unchanged.
-- No deployment, real payment or provider-account changes were performed.
+- Deployment was subsequently authorised and completed as recorded below. No real payment or provider-account changes were performed.
 - Pre-existing editor, purpose-survey and production-report work was preserved.
+
+
+## Production release — 5 October 2026
+
+- Release commit: `59db89e34d6050438c4d0647c08bba78ecf04df5`.
+- Successful build and deployment: https://github.com/dk017/workcv/actions/runs/37277884513.
+- Production health passed after the container restart at approximately 13:01 IST.
+- Live checks passed on both alternative pages, both new career articles, tailoring tool, letter generator, tailoring guide and tracker: HTTP 200, single H1, canonical and indexability.
+- Both new articles appear in the production sitemap. The evidence-bank text download returns 200.
+- Unauthenticated editor redirect retains `plan=pass` and `from=career-tool` through the login return URL.
+- Cleanup deleted unused prior WorkCV image `sha-c78a0e6e52abb53d4f80bc22197f039f1c3f5c6f` and its unshared layers; active image `sha-59db89e34d6050438c4d0647c08bba78ecf04df5` remained. Cleanup was scoped to WorkCV images on the deployment host, not other repositories, volumes or container data. Registry images remain available for rollback.
+- Separate uncommitted editor-survey and production-report work was excluded from this release.
+- No live AI generation, email code, purchase or customer-data mutation was part of the smoke checks.
+- IndexNow accepted all 14 submitted new/updated public URLs; acceptance does not guarantee indexing or rankings.
