@@ -55,7 +55,7 @@ export function renderDashboard(report) {
     <details><summary>Visitor milestones by source and landing page</summary>${table(w.cohort)}</details>
     <h3>Paid orders by checkout attribution</h3><p>Legacy profile fallback can change after purchase. Source-less snapshots remain unknown; they are not silently replaced.</p>${table(w.sales)}
     <h3>Tool usage</h3><p>Events may repeat; a tool completion is not a purchase.</p>${table(w.tools)}
-    <h3>What buyers say the CV is for</h3><p>Optional question after a CV's first successful download, so respondents are mostly buyers. Counts are saved CVs, not people.</p>${table(w.answers || [])}
+    <h3>What buyers say: purpose, volume and what would have helped most</h3><p>Optional three-tap question after a CV's first successful download, so respondents are mostly buyers. Counts are saved CVs, not people. The cv_missing_feature_selected rows show which missing feature buyers would want most; read them against the number of answers, not as a poll.</p>${table(w.answers || [])}
     <h3>CTA clicks by placement</h3><p>A click is not a purchase. Compare with paid orders by landing page above.</p>${table(w.ctas || [])}
     <h3>Actual page views</h3><p>Route visits, including later visits to pricing. These are not first-landing cohorts.</p>${table(w.pageViews || [])}
     <h3>Public Pass offer exposure</h3><p>The price block was at least half visible for one continuous second in a foreground tab. Once per session, page, placement and offer version. Measurement began with this release; missing historical events do not mean zero exposure.</p>${table(w.passOffers || [])}

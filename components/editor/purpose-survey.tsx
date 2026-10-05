@@ -3,15 +3,28 @@
 import { useState } from "react";
 import { X } from "lucide-react";
 
-import { applicationVolumeOptions, cvPurposeOptions } from "@/lib/editor-events";
+import { applicationVolumeOptions, cvPurposeOptions, missingFeatureOptions } from "@/lib/editor-events";
 import { site } from "@/lib/site";
 
 const choice = "min-h-10 rounded-md border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:border-navy hover:bg-paper";
 
-// Optional two-tap question shown once per saved CV after a successful download.
+// The answers that are not a feature stay at the end; the rest are shuffled so the order does
+// not decide which one gets tapped.
+const fixedAtEnd = new Set<string>(["nothing", "other"]);
+function shuffledFeatureOptions() {
+  const features = missingFeatureOptions.filter(([value]) => !fixedAtEnd.has(value));
+  for (let index = features.length - 1; index > 0; index -= 1) {
+    const swap = Math.floor(Math.random() * (index + 1));
+    [features[index], features[swap]] = [features[swap], features[index]];
+  }
+  return [...features, ...missingFeatureOptions.filter(([value]) => fixedAtEnd.has(value))];
+}
+
+// Optional three-tap question shown once per saved CV after a successful download.
 export function PurposeSurvey({
   onPurpose,
   onVolume,
+  onMissingFeature,
   onClose,
   passOfferAvailable = false,
   onPassOfferShown,
@@ -19,12 +32,14 @@ export function PurposeSurvey({
 }: {
   onPurpose: (purpose: string) => void;
   onVolume: (volume: string) => void;
+  onMissingFeature: (feature: string) => void;
   onClose: (answered: boolean) => void;
   passOfferAvailable?: boolean;
   onPassOfferShown?: () => void;
   onPassOffer?: () => void;
 }) {
-  const [step, setStep] = useState<"purpose" | "volume" | "offer" | "done">("purpose");
+  const [step, setStep] = useState<"purpose" | "volume" | "offer" | "wish" | "done">("purpose");
+  const [featureOptions] = useState(shuffledFeatureOptions);
 
   return (
     <section className="editor-chrome border-b border-line bg-greensoft" aria-labelledby="purpose-survey-title">
@@ -54,7 +69,7 @@ export function PurposeSurvey({
                       onPassOfferShown?.();
                       setStep("offer");
                     } else {
-                      setStep("done");
+                      setStep("wish");
                     }
                   }}>
                     {label}
@@ -73,14 +88,26 @@ export function PurposeSurvey({
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
                 <button type="button" onClick={() => { onPassOffer?.(); onClose(true); }} className="min-h-10 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover">See the Job Search Pass</button>
-                <button type="button" onClick={() => setStep("done")} className={choice}>No thanks</button>
+                <button type="button" onClick={() => setStep("wish")} className={choice}>No thanks</button>
+              </div>
+            </>
+          )}
+          {step === "wish" && (
+            <>
+              <p id="purpose-survey-title" className="text-sm font-bold text-navy">Last one: if we could add one thing, what would have helped you most?</p>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {featureOptions.map(([value, label]) => (
+                  <button key={value} type="button" className={choice} onClick={() => { onMissingFeature(value); setStep("done"); }}>
+                    {label}
+                  </button>
+                ))}
               </div>
             </>
           )}
           {step === "done" && (
             <p id="purpose-survey-title" className="text-sm font-bold text-navy" role="status">Thank you. Good luck with your applications.</p>
           )}
-          {(step === "purpose" || step === "volume") && (
+          {(step === "purpose" || step === "volume" || step === "wish") && (
             <p className="mt-2 text-xs leading-5 text-muted">Your answer helps us improve WorkCV. It is never added to your CV or shared.</p>
           )}
         </div>

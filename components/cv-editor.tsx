@@ -1405,6 +1405,7 @@ export function CvEditor() {
         <PurposeSurvey
           onPurpose={(purpose) => trackEditorEvent("cv_purpose_selected", draftId, { purpose })}
           onVolume={(volume) => trackEditorEvent("cv_application_volume_selected", draftId, { volume })}
+          onMissingFeature={(feature) => trackEditorEvent("cv_missing_feature_selected", draftId, { feature })}
           passOfferAvailable={!passStatus?.active}
           onPassOfferShown={() => trackEditorEvent("pass_offer_shown", draftId, { placement: "post_download" })}
           onPassOffer={() => {

@@ -42,7 +42,7 @@ function fixtureCv({ withRoles = true } = {}) {
 const checks = [];
 const pass = (name) => { checks.push(name); console.log(`  ok  ${name}`); };
 
-async function session(browser, { cv, viewport = { width: 1440, height: 1000 }, handoff = null, importedCv = null }) {
+async function session(browser, { cv, viewport = { width: 1440, height: 1000 }, handoff = null, importedCv = null, paid = false }) {
   const page = await browser.newPage({ viewport });
   if (handoff) {
     await page.addInitScript((value) => {
@@ -66,6 +66,8 @@ async function session(browser, { cv, viewport = { width: 1440, height: 1000 }, 
       return route.fulfill({ status: 200, json: { document: { id: "11111111-1111-4111-8111-111111111111", data: state.saved, updatedAt: state.version } } });
     }
     if (url.pathname === "/api/auth/me") return route.fulfill({ status: 200, json: { user: { id: "fixture", email: "fixture@example.invalid" } } });
+    if (paid && url.pathname === "/api/payments/status") return route.fulfill({ status: 200, json: { paid: true } });
+    if (paid && url.pathname === "/api/cv/pdf") return route.fulfill({ status: 200, body: Buffer.from("%PDF-1.4 test"), contentType: "application/pdf" });
     if (url.pathname === "/api/cv/import-text" && importedCv) return route.fulfill({ status: 200, json: { cv: importedCv } });
     if (url.pathname === "/api/events/editor") { state.events.push(body); return route.fulfill({ status: 200, json: {} }); }
     if (url.pathname.startsWith("/api/tools/")) state.requests.push({ path: url.pathname, body });
@@ -482,6 +484,87 @@ try {
     assert.equal(await page.locator("summary", { hasText: /top \d fixes/ }).count(), 0);
     pass("an older hand-off without requirements still shows the three priorities and the keyword card");
     await page.close();
+  }
+
+
+  // ---------------------------------------------------------------- phase 3
+  console.log("Post-download survey (Phase 3)");
+  {
+    const downloadPdf = async (page) => {
+      await page.locator("details", { has: page.locator("summary", { hasText: /^\s*Download\s*$/ }) }).first().evaluate((element) => { element.open = true; });
+      await page.getByRole("button", { name: "CV as PDF", exact: true }).click();
+    };
+    const survey = (page) => page.locator("section[aria-labelledby=purpose-survey-title]");
+
+    active = await session(browser, { cv: fixtureCv(), paid: true });
+    const { page, state } = active;
+    await page.locator("summary", { hasText: /^\s*Download\s*$/ }).waitFor({ timeout: 60_000 });
+    assert.equal(await survey(page).count(), 0, "no survey before the first download");
+    await downloadPdf(page);
+    await survey(page).getByText("Quick optional question: what is this CV for?").waitFor();
+    await survey(page).getByRole("button", { name: "Looking for a new job" }).click();
+    await survey(page).getByText(/how many jobs will you apply for/).waitFor();
+    await survey(page).getByRole("button", { name: "1–2 jobs" }).click();
+    await survey(page).getByText("Last one: if we could add one thing, what would have helped you most?").waitFor();
+    const labels = await survey(page).locator("button").evaluateAll((buttons) => buttons.map((button) => button.textContent.trim()).filter((text) => text && text !== ""));
+    const answers = labels.filter((label) => !/Close question/.test(label));
+    assert.equal(answers.length, 9);
+    assert.deepEqual(answers.slice(-2), ["Nothing, it did what I needed", "Something else"], "the two non-feature answers always come last");
+    assert.equal(await survey(page).locator("input, textarea, [contenteditable]").count(), 0, "there is no free-text field");
+    assert.match(await survey(page).innerText(), /never added to your CV or shared/);
+    await survey(page).screenshot({ path: `${outDir}/survey-wish-desktop.png` });
+    pass("after the first download the survey asks purpose, volume, then what would have helped most: nine fixed answers, no free text");
+
+    await survey(page).getByRole("button", { name: "Import my details from LinkedIn" }).click();
+    await survey(page).getByText("Thank you. Good luck with your applications.").waitFor();
+    const sent = state.events.filter((event) => /^cv_(purpose|application_volume|missing_feature)_selected$/.test(event.eventName));
+    assert.deepEqual(sent.map((event) => [event.eventName, event.metadata]), [
+      ["cv_purpose_selected", { purpose: "new_job" }],
+      ["cv_application_volume_selected", { volume: "one_or_two" }],
+      ["cv_missing_feature_selected", { feature: "linkedin_import" }],
+    ]);
+    pass("each answer is sent as one fixed value and nothing else");
+
+    await page.reload({ waitUntil: "networkidle" });
+    await page.locator("summary", { hasText: /^\s*Download\s*$/ }).waitFor({ timeout: 60_000 });
+    await downloadPdf(page);
+    await page.waitForTimeout(1200);
+    assert.equal(await survey(page).count(), 0, "the survey is asked once per saved CV");
+    pass("the survey does not come back for the same CV after a reload and second download");
+    await page.close();
+
+    // The path through the Job Search Pass offer.
+    active = await session(browser, { cv: fixtureCv(), paid: true });
+    const second = active.page;
+    await second.locator("summary", { hasText: /^\s*Download\s*$/ }).waitFor({ timeout: 60_000 });
+    await downloadPdf(second);
+    await survey(second).getByRole("button", { name: "Changing career" }).click();
+    await survey(second).getByRole("button", { name: "3–10 jobs" }).click();
+    await survey(second).getByText("Applying for more than a few jobs?").waitFor();
+    await survey(second).getByRole("button", { name: "No thanks" }).click();
+    await survey(second).getByText(/Last one:/).waitFor();
+    await survey(second).getByRole("button", { name: "Nothing, it did what I needed" }).click();
+    await survey(second).getByText("Thank you. Good luck with your applications.").waitFor();
+    assert.ok(active.state.events.some((event) => event.eventName === "cv_missing_feature_selected" && event.metadata.feature === "nothing"));
+    pass("declining the Pass offer still reaches the question, and 'Nothing, it did what I needed' is recorded");
+    await second.close();
+
+    // Closing at the last question is not recorded as a dismissal.
+    active = await session(browser, { cv: fixtureCv(), paid: true, viewport: { width: 375, height: 812 } });
+    const third = active.page;
+    await third.locator("summary", { hasText: /^\s*Download\s*$/ }).waitFor({ timeout: 60_000 });
+    await downloadPdf(third);
+    await survey(third).getByRole("button", { name: "Looking for a new job" }).click();
+    await survey(third).getByRole("button", { name: "1–2 jobs" }).click();
+    await survey(third).getByText(/Last one:/).waitFor();
+    assert.equal(await third.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth), 0, "no horizontal scroll with the question at 375px");
+    await survey(third).screenshot({ path: `${outDir}/survey-wish-mobile.png` });
+    await survey(third).getByRole("button", { name: "Close question" }).click();
+    await survey(third).waitFor({ state: "detached" });
+    assert.ok(!active.state.events.some((event) => event.eventName === "cv_missing_feature_selected"));
+    assert.ok(!active.state.events.some((event) => event.eventName === "cv_purpose_dismissed"), "closing after answering two questions is not a dismissal");
+    pass("skipping the last question records nothing and the earlier answers stand");
+    await third.close();
   }
 
   console.log("No roles yet");

@@ -26,6 +26,7 @@ export const editorEventNames = [
   "cv_purpose_selected",
   "cv_application_volume_selected",
   "cv_purpose_dismissed",
+  "cv_missing_feature_selected",
   "checkout_plan_selected",
   "pass_offer_shown",
   "pass_offer_clicked",
@@ -60,6 +61,21 @@ export const cvPurposeOptions = [
   ["other", "Something else"],
 ] as const;
 
+// "What would have helped you most?" Fixed answers only, like the other survey questions, so no
+// free text or personal details can reach analytics. The list is the features competitors advertise
+// that we do not have; the answers show which of them our own users actually want before we build any.
+export const missingFeatureOptions = [
+  ["layout_controls", "Choose fonts, sizes and spacing"],
+  ["fit_one_page", "Fit my CV onto one page automatically"],
+  ["more_templates", "More template designs"],
+  ["linkedin_import", "Import my details from LinkedIn"],
+  ["job_matching", "Find jobs that match my CV"],
+  ["interview_practice", "Practise interview questions"],
+  ["auto_apply", "Fill in job applications for me"],
+  ["nothing", "Nothing, it did what I needed"],
+  ["other", "Something else"],
+] as const;
+
 export const applicationVolumeOptions = [
   ["one_or_two", "1–2 jobs"],
   ["three_to_ten", "3–10 jobs"],
@@ -69,6 +85,7 @@ export const applicationVolumeOptions = [
 const surveyAnswers: Partial<Record<string, { key: string; values: ReadonlySet<string> }>> = {
   cv_purpose_selected: { key: "purpose", values: new Set(cvPurposeOptions.map(([value]) => value)) },
   cv_application_volume_selected: { key: "volume", values: new Set(applicationVolumeOptions.map(([value]) => value)) },
+  cv_missing_feature_selected: { key: "feature", values: new Set(missingFeatureOptions.map(([value]) => value)) },
   cv_purpose_dismissed: { key: "", values: new Set() },
 };
 

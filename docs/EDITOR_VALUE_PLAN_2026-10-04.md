@@ -136,7 +136,7 @@ Fix F1 and F6 together:
 
 Done when: the same CV never shows two different 0–100 scores on one screen; a user who fixes keywords sees something change.
 
-### Phase 3: Only with evidence of demand (do not build yet)
+### Phase 3: Only with evidence of demand (do not build yet) [now: measuring demand, see "Phase 3 results" at the end]
 
 Layout controls / fit-to-one-page, LinkedIn import, more templates, share link, live gauge as a marketing feature, job search, mock interviews, auto-apply, mobile app. ResumAI shows them **[theirs]**, but I have no evidence our users want them **[unverified]**, and at 18 clicks per quarter on the checker we cannot measure demand with analytics. Cheapest honest test: add one optional free-text question to the existing post-download survey (`components/editor/purpose-survey.tsx`) asking "What was missing?", and read the answers after a month. Check first whether the survey store can hold free text (it is deliberately fixed-choice today **[code]**, `lib/editor-events.ts`), because adding free text would change the privacy posture.
 
@@ -224,3 +224,19 @@ Goal: one honest story about how good the CV is, and a visible feedback loop whi
 - Not done on purpose: no combined estimated score and no re-check button (the AI-judged parts of the checker's score cannot be recomputed live). The checker still lists action verbs such as "Resolve" under "Keywords to review"; that noise is unchanged.
 
 Checks: 2 more unit tests (17 in `tests/vacancy-fit.test.ts`); whole suite 362 pass, 0 fail, 1 skip that needs PostgreSQL; typecheck clean; browser flows 37/37 on three consecutive runs, now also asserting the banner text at each step, the counts, and no horizontal scroll at 375px with the counts row (screenshots written to `tmp/editor-fix-flows/`); real checker page re-run with live AI: single 53/100 score, no second 0–100 figure.
+
+## Phase 3 results (2026-10-04, working tree, not committed)
+
+Phase 3 as written is "do not build the extras until users show they want them". So the work done is the measurement, not the features.
+
+**What was built:** a third optional tap in the existing post-download survey (once per saved CV, after the first successful download): *"Last one: if we could add one thing, what would have helped you most?"* with nine fixed answers: fonts/sizes/spacing, fit onto one page automatically, more templates, import from LinkedIn, find jobs that match my CV, practise interview questions, fill in job applications for me, "Nothing, it did what I needed", "Something else". The seven feature answers appear in a random order each time, so position does not decide the result; the last two stay last.
+
+**Privacy posture kept:** no free-text box. The server accepts only the fixed values (`cv_missing_feature_selected` with a `feature` key), drops any other key, and rejects anything else, exactly like the purpose and volume questions. Tests refuse an email address, a wrong-case value, an empty value, a number, and another question's key. The on-screen promise "never added to your CV or shared" stays true.
+
+**Where the answers show up:** `npm run report:growth:production` already renders survey answers (event, answer, number of saved CVs); the new question appears in that table with no further change. I renamed the table heading to "What buyers say: purpose, volume and what would have helped most".
+
+**Checks:** 2 new boundary tests; whole suite 364 pass, 0 fail, 1 skip needing PostgreSQL; typecheck clean; browser flows 42/42 on three consecutive runs, including a mocked paid download: the question order (purpose, volume, then this), nine answers with the two non-features last, no input field, events sent as one fixed value each, the Pass-offer path (declining still reaches the question), once per saved CV across a reload, and closing at the last question records nothing and is not counted as a dismissal. Screenshots at 1440px and 375px were looked at; no horizontal scroll.
+
+**How to use the result (my suggestion, not a measured threshold).** Traffic is small, so answers will accumulate slowly and a handful of answers proves little. Do not decide on fewer than about 30 answers to this question. Then, ignoring "Nothing" and "Something else", a feature is only worth building if it is the clear leader (for example chosen by roughly a quarter or more of the answers and well ahead of the next). If "Nothing, it did what I needed" is the largest answer, the honest conclusion is that none of these extras is holding people back, and effort should go to getting more people to the checker instead. If "Something else" is large, the list is missing the real wish and needs another round.
+
+**Deliberately not built:** layout controls, fit-to-one-page, LinkedIn import, extra templates, job matching, interview practice, auto-apply, mobile app. Each is a real build (layout controls and fit-to-page touch the PDF renderer and the preview), and until the answers exist there is no evidence which, if any, is worth it.

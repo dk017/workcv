@@ -173,9 +173,9 @@ export async function collectSnapshot(client, environment = process.env) {
         FROM f WHERE event_name IN ('tool_started','tool_completed') GROUP BY 1,2,3,4 ORDER BY 1,2,3,4`);
       // Fixed-choice answers only; the ingest route rejects anything else.
       const answers = await query(`SELECT event_name question,
-        coalesce(metadata->>'purpose',metadata->>'volume','dismissed') answer,
+        coalesce(metadata->>'purpose',metadata->>'volume',metadata->>'feature','dismissed') answer,
         count(DISTINCT coalesce(document_id,user_id))::int cvs
-        FROM e WHERE event_name IN ('cv_purpose_selected','cv_application_volume_selected','cv_purpose_dismissed')
+        FROM e WHERE event_name IN ('cv_purpose_selected','cv_application_volume_selected','cv_missing_feature_selected','cv_purpose_dismissed')
         GROUP BY 1,2 ORDER BY 1,3 DESC`);
       const ctas = await query(`SELECT coalesce(metadata->>'placement','unlabelled') placement,
         count(*)::int clicks,count(DISTINCT session_hash)::int sessions
