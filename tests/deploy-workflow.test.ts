@@ -34,8 +34,8 @@ test("image cleanup stays scoped to WorkCV images", () => {
 });
 
 test("server maintenance never prints banned addresses and needs explicit confirmation", () => {
-  const maintenance = readFileSync(".github/workflows/server-maintenance.yml", "utf8");
-  assert.match(maintenance, /inputs\.confirm == 'HARDEN'/);
+  const maintenance = readFileSync(".github/workflows/diagnose-app.yml", "utf8");
+  assert.match(maintenance, /inputs\.mode == 'harden_ssh' && inputs\.confirm == 'HARDEN'/);
   assert.match(maintenance, /fail2ban-client status sshd \| grep -E 'Currently failed\|Total failed\|Currently banned\|Total banned'/);
   assert.match(maintenance, /sshd -t/);
 });
