@@ -1,3 +1,4 @@
+import { ApplicationVersionExample } from "@/components/application-version-example";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { BellRing, ClipboardList, Download, FileSpreadsheet, ShieldCheck, Wand2 } from "lucide-react";
@@ -219,6 +220,7 @@ export default function JobApplicationTrackerPage() {
       </section>
 
       <section className="bg-paper py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">From a saved job to a tailored application</h2><p className="mt-5 leading-8">Example: Sam saves a customer service vacancy, pastes the advert into the job record and sets the next action to “Choose two customer examples”. “Tailor my CV for this job” carries that advert, employer and role to the application-pack tool. Sam adds their own evidence, reviews the draft, then records the final filename and submission date back in the tracker.</p><p className="mt-4 leading-8"><Link href="/tailor-cv-to-job-description-uk" className="font-bold underline">Follow Sam's worked CV and letter example</Link>, or start with the <Link href="/cv-template-retail-uk" className="font-bold underline">retail pack</Link> or <Link href="/cv-template-warehouse-uk" className="font-bold underline">warehouse pack</Link>.</p><h3 className="mt-7 text-xl font-bold text-navy">Spreadsheet-style preview: fictional rows</h3><div className="mt-4 grid gap-4 md:grid-cols-3">{[["Customer Service Adviser", "Northbank Homeware", "Saved", "Choose two customer examples"],["Junior Administrator", "Eastmere Community Centre", "Applied", "Check follow-up instructions"],["Retail Assistant", "Westbridge Stores", "Interview", "Review the CV version sent"]].map(([role,employer,status,next])=><article key={role} className="rounded-lg border border-line bg-white p-5"><h4 className="font-bold">{role}</h4><p className="mt-2">{employer}</p><p className="mt-2 text-sm">Status: {status}</p><p className="mt-2 text-sm leading-6">Next: {next}</p></article>)}</div><p className="mt-4 text-sm leading-7 text-muted">These examples are not your saved applications. Download the Excel template to work offline, or export CSV from the online tracker for a backup. Browser storage does not sync between devices.</p></div></section>
+      <ApplicationVersionExample />
       <PassOffer audience="tailoring" trackingLabel="tracker_footer_pass" />
 
       <RelatedLinksSection

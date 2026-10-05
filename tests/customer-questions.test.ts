@@ -50,7 +50,9 @@ test("reviewed routes and scoped placements remain explicit", () => {
   for (const path of [...Array.from(ownerPaths), "/tools/blank-cv-template-uk", "/tools/first-job-cv-wizard-uk", "/privacy"]) {
     assert.match(customerContentReview[path as keyof typeof customerContentReview], /^\d{4}-\d{2}-\d{2}$/);
   }
-  assert.equal(Object.keys(customerContentReview).length, 18);
+  for (const path of ["/cv-after-long-service-uk", "/overqualified-cv-example-uk", "/livecareer-alternative", "/myperfectcv-alternative-uk"]) {
+    assert.match(customerContentReview[path as keyof typeof customerContentReview], /^\d{4}-\d{2}-\d{2}$/);
+  }
   const placements = Object.entries(analyticsPlacements).filter(([key]) => key.startsWith("customerQ"));
   assert.equal(placements.length, 8);
   assert.equal(new Set(placements.map(([, value]) => value)).size, placements.length);

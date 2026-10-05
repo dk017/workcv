@@ -12,6 +12,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { PassOfferView } from "@/components/pass-offer-view";
 import { site } from "@/lib/site";
 import { buildCoverLetterPatch, coverLetterEditorRoute } from "@/lib/cover-letter-handoff";
 import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
@@ -105,7 +106,6 @@ export function CoverLetterGenerator() {
         0,
       );
     } catch (requestError) {
-      setResult(null);
       setError(
         requestError instanceof DOMException && requestError.name === "AbortError"
           ? "The request took too long. Please try again."
@@ -130,7 +130,9 @@ export function CoverLetterGenerator() {
     }
   }
 
-  function continueToEditor() {
+  function continueToEditor(pass = false) {
+    const destination = coverLetterEditorRoute + (pass ? "&plan=pass" : "");
+    const placement = pass ? analyticsPlacements.coverLetterPass : analyticsPlacements.coverLetterHandoff;
     if (!result || !resultInput || isLoading) return;
     setHandoffError("");
     try {
@@ -142,12 +144,12 @@ export function CoverLetterGenerator() {
       setHandoffError("We could not carry this draft to the editor. Copy your letter first, or allow browser storage and try again.");
       return;
     }
-    try { rememberCtaHandoff(analyticsPlacements.coverLetterHandoff, coverLetterEditorRoute); } catch { /* Measurement must not block the saved transfer. */ }
+    try { rememberCtaHandoff(placement, destination); } catch { /* Measurement must not block the saved transfer. */ }
     trackFunnelEvent("marketing_cta_clicked", {
-      destination: coverLetterEditorRoute,
-      placement: analyticsPlacements.coverLetterHandoff,
+      destination,
+      placement,
     });
-    window.location.assign(coverLetterEditorRoute);
+    window.location.assign(destination);
   }
 
   return (
@@ -223,9 +225,10 @@ export function CoverLetterGenerator() {
             <div className="border-t border-line bg-paper p-6 md:p-8">
               <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
                 <div><p className="font-display text-2xl font-semibold text-navy">Make the CV match the letter.</p><p className="mt-2 text-sm text-muted">Build and preview free. Pay {site.price} once for one saved CV and its matching cover letter as PDF and Word. Edits and redownloads of the same CV and letter are included.</p></div>
-                <button type="button" onClick={continueToEditor} disabled={isLoading} data-analytics-placement={analyticsPlacements.coverLetterHandoff} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover disabled:opacity-60">Edit this letter and build my CV <ArrowRight className="h-4 w-4" /></button>
+                <button type="button" onClick={() => continueToEditor()} disabled={isLoading} data-analytics-placement={analyticsPlacements.coverLetterHandoff} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover disabled:opacity-60">Edit this letter and build my CV <ArrowRight className="h-4 w-4" /></button>
               </div>
               <p className="mt-3 text-sm leading-6 text-muted">Your letter, name and job details will be ready in a new saved CV after email-code sign-in. Continue in this tab within 30 minutes.</p>
+              <PassOfferView placement={analyticsPlacements.coverLetterPass}><div className="mt-5 border-t border-line pt-5"><p className="text-sm leading-7">Want separate CV and letter versions for several vacancies? Job Search Pass is {site.passPrice} once for {site.passDays} days of new documents, with no renewal. Existing documents and those created during the pass stay covered afterwards. New documents after expiry need a purchase. Reusing the same paid pair for other applications does not require Pass.</p><button type="button" disabled={isLoading} onClick={() => continueToEditor(true)} className="mt-3 min-h-12 rounded-md border border-line-strong px-5 text-sm font-bold text-navy">Keep this letter with Job Search Pass</button></div></PassOfferView>
               {handoffError ? <p role="alert" className="mt-3 text-sm font-bold text-[#8d3030]">{handoffError}</p> : null}
             </div>
           </section>

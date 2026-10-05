@@ -4,6 +4,8 @@ import { site } from "@/lib/site";
 import { customerReviewDate } from "@/lib/customer-content-review";
 
 const routes = [
+  { path: "/cv-after-long-service-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
+  { path: "/overqualified-cv-example-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
   { path: "/tailor-cv-to-job-description-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
   { path: "/cv-template-retail-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
   { path: "/cv-layout-tests-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-24" },

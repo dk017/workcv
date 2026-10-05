@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.error("workcv_job_application_pack_error", {
-      message: error instanceof Error ? error.message : String(error),
+      kind: "unexpected_generation_error",
     });
     return NextResponse.json(
       { error: "The job application pack is temporarily unavailable. Please try again." },

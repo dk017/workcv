@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import { ReturnerExample } from "@/components/content-worked-examples";
 import { CustomerAnswer } from "@/components/customer-answer";
@@ -372,6 +373,7 @@ export default function ReturnToWorkCvUkPage() {
         </CustomerAnswer>
       </div></section>
       <ReturnerExample />
+      <CareerHistoryLinks context="return" />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

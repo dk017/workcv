@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -473,6 +474,7 @@ export default function HowToWriteACvUkPage() {
         </div>
       </section>
 
+      <CareerHistoryLinks context="general" />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

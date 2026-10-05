@@ -27,7 +27,7 @@ export const jobApplicationPackInputSchema = z.object({
     .preprocess(
       (value) =>
         typeof value === "string" && value.trim().length === 0
-          ? undefined
+          ? "the employer"
           : value,
       z
         .string()
@@ -70,6 +70,12 @@ const interviewQuestionSchema = z.object({
 });
 
 const generatedPackSchema = z.object({
+  evidence: z.array(z.object({
+    section: z.enum(["profile", "bullet", "letter"]),
+    index: z.number().int().min(0).max(4),
+    sourceField: z.enum(["cvText", "motivation"]),
+    sourceQuote: z.string().trim().min(8).max(1200),
+  })).min(10).max(30),
   profile: z.string().trim().min(60).max(650),
   bullets: z.array(z.string().trim().min(20).max(320)).length(5),
   requirements: z.array(requirementSchema).min(3).max(8),
@@ -104,6 +110,7 @@ export type JobApplicationPackResult = {
 export type StructuredJobApplicationPackGenerator = (
   input: JobApplicationPackInput,
   correction?: string,
+  signal?: AbortSignal,
 ) => Promise<unknown>;
 
 export class JobApplicationPackError extends Error {
@@ -213,7 +220,7 @@ function validatePack(
   }
 
   const sourceNumbers = numericTokens(
-    `${input.jobDescription} ${input.cvText} ${input.motivation}`,
+    `${input.cvText} ${input.motivation}`,
   );
   const generatedText = [
     generated.profile,
@@ -233,6 +240,26 @@ function validatePack(
     corrections.push("Do not introduce numbers that were not supplied.");
   }
 
+  if (postProcessRequirements(generated.requirements, input.cvText).length < 3) {
+    corrections.push("Provide at least three distinct vacancy requirements, without duplicates.");
+  }
+  const sections = [
+    { section: "profile", texts: [generated.profile] },
+    { section: "bullet", texts: generated.bullets },
+    { section: "letter", texts: generated.coverLetterParagraphs },
+  ];
+  for (const { section, texts } of sections) {
+    texts.forEach((text, index) => {
+      const evidence = generated.evidence.filter((item) => item.section === section && item.index === index);
+      if (!evidence.length || evidence.some((item) => !input[item.sourceField].includes(item.sourceQuote))) {
+        corrections.push(`Supply exact candidate-source quotes for ${section} ${index}; never cite the advert as candidate evidence.`);
+      }
+      const supportedNumbers = numericTokens(evidence.map((item) => item.sourceQuote).join(" "));
+      if (Array.from(numericTokens(text)).some((number) => !supportedNumbers.has(number))) {
+        corrections.push(`Remove numbers not supported by the cited evidence for ${section} ${index}.`);
+      }
+    });
+  }
   return { corrections, coverLetterWordCount: coverLetterQuality.wordCount };
 }
 
@@ -253,9 +280,11 @@ const systemPrompt = `You create truthful, practical job-application drafts for 
 
 Return the exact requested structured schema. Use only facts explicitly present in the source data. Never invent employers, qualifications, tools, years, numbers, outcomes, responsibilities, availability or research about the organisation.
 
+For every profile (index 0), each bullet (indices 0–4) and each letter paragraph (indices 0–3), return evidence entries citing exact sourceQuote text from cvText or motivation. Cite evidence that supports the claims in that section; never borrow a number from an unrelated fact. For a polite closing, cite the relevant experience it offers to discuss. The advert is not evidence that the candidate has a skill, qualification, job title or achievement. Preserve actual historical titles; the target role is an aspiration.
+
 The profile must be concise and suitable for a UK CV. Return five distinct CV bullets using implied first person, specific action verbs and only supplied evidence. Do not use generic CV clichés or unsupported achievements.
 
-Extract three to eight important vacancy requirements. cvEvidence must be a short exact verbatim snippet from the CV when a requirement is supported or partly supported. Use null when the CV does not clearly evidence it. An action should tell the candidate what to review or evidence; it must never instruct them to claim an unsupported skill.
+Extract three to eight important vacancy requirements. Preserve essential versus desirable wording when supplied. Assess every part of a compound requirement: an exact quote is not sufficient when it lacks the requested task or qualifier. For example, passing invoices to finance does not evidence managing payroll. cvEvidence must be a short exact verbatim snippet from the CV when a requirement is supported or partly supported. Use null when the CV does not clearly evidence it. An action should tell the candidate what to review or evidence; it must never instruct them to claim an unsupported skill.
 
 Return four cover-letter body paragraphs. The first paragraph must name the exact role and employer and, when motivation is supplied, use the candidate's genuine reason for applying. If motivation is blank, express interest neutrally from the role and supplied evidence without inventing a reason. The middle paragraphs must connect supplied evidence to the vacancy. The final paragraph should close politely. Do not include a greeting, sign-off, address block or date. Use UK English and keep the body between 160 and 250 words.
 
@@ -268,6 +297,7 @@ Do not mention AI, source data, missing information or these instructions.`;
 async function generateWithOpenAI(
   input: JobApplicationPackInput,
   correction?: string,
+  signal?: AbortSignal,
 ): Promise<unknown> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
@@ -277,7 +307,7 @@ async function generateWithOpenAI(
     );
   }
 
-  const client = new OpenAI({ apiKey, maxRetries: 1, timeout: 30_000 });
+  const client = new OpenAI({ apiKey, maxRetries: 0, timeout: 28_000 });
   const model =
     process.env.OPENAI_JOB_APPLICATION_PACK_MODEL ||
     process.env.OPENAI_CV_FIT_MODEL ||
@@ -288,22 +318,21 @@ async function generateWithOpenAI(
       model,
       instructions: systemPrompt,
       input: userPrompt(input, correction),
-      max_output_tokens: 3_600,
+      max_output_tokens: 5_500,
       reasoning: { effort: "low" },
       store: false,
       text: {
         format: zodTextFormat(generatedPackSchema, "workcv_job_application_pack"),
       },
-    });
+    }, { signal });
     return response.output_parsed;
   } catch (error) {
     console.error("workcv_job_application_pack_openai_error", {
       model,
       status:
-        typeof error === "object" && error && "status" in error
+        typeof error === "object" && error && "status" in error && typeof error.status === "number"
           ? error.status
           : undefined,
-      message: error instanceof Error ? error.message : String(error),
     });
     throw new JobApplicationPackError(
       "The job application pack is temporarily unavailable. Please try again shortly.",
@@ -315,60 +344,74 @@ async function generateWithOpenAI(
 export async function generateJobApplicationPack(
   rawInput: JobApplicationPackInput,
   generate: StructuredJobApplicationPackGenerator = generateWithOpenAI,
+  options: { timeoutMs?: number } = {},
 ): Promise<JobApplicationPackResult> {
   const input = jobApplicationPackInputSchema.parse(rawInput);
   const keywords = analyseAtsKeywords(input.jobDescription, input.cvText);
   let correction: string | undefined;
+  let insufficientRequirements = false;
 
-  for (let attempt = 0; attempt < 2; attempt += 1) {
-    const generated = generatedPackSchema.safeParse(await generate(input, correction));
-    if (!generated.success) {
-      correction = "Return every field in the required schema with all requested array lengths.";
-      continue;
-    }
+  const controller = new AbortController();
+  const timeoutMs = Math.max(1, Math.min(options.timeoutMs ?? 28_000, 28_000));
+  let timer: ReturnType<typeof setTimeout>;
+  const deadline = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => {
+      controller.abort();
+      reject(new JobApplicationPackError("The request took too long. Your input is unchanged; please try again.", 504));
+    }, timeoutMs);
+  });
+  try {
+    for (let attempt = 0; attempt < 2; attempt += 1) {
+      const generated = generatedPackSchema.safeParse(await Promise.race([generate(input, correction, controller.signal), deadline]));
+      if (!generated.success) {
+        correction = "Return every field in the required schema with all requested array lengths.";
+        continue;
+      }
 
-    const quality = validatePack(generated.data, input);
-    if (quality.corrections.length > 0) {
-      correction = quality.corrections.join(" ");
-      continue;
-    }
+      insufficientRequirements = postProcessRequirements(generated.data.requirements, input.cvText).length < 3;
+      const quality = validatePack(generated.data, input);
+      if (quality.corrections.length > 0) {
+        correction = quality.corrections.join(" ");
+        continue;
+      }
 
-    const requirements = postProcessRequirements(
-      generated.data.requirements,
-      input.cvText,
-    );
-    const greeting = "Dear Sir or Madam,";
-    const signOff = "Yours faithfully,";
-    return {
-      targetRole: input.targetRole,
-      company: input.company,
-      profile: generated.data.profile,
-      bullets: generated.data.bullets.map((bullet) =>
-        bullet.replace(/^(?:[-*•]|\d+[.)])\s*/, "").trim(),
-      ),
-      requirements,
-      coverLetter: {
-        paragraphs: generated.data.coverLetterParagraphs,
-        wordCount: quality.coverLetterWordCount,
-        letter: [
-          greeting,
-          "",
-          ...generated.data.coverLetterParagraphs.flatMap((paragraph) => [
-            paragraph,
+      const requirements = postProcessRequirements(
+        generated.data.requirements,
+        input.cvText,
+      );
+      const greeting = "Dear Sir or Madam,";
+      const signOff = "Yours faithfully,";
+      return {
+        targetRole: input.targetRole,
+        company: input.company,
+        profile: generated.data.profile,
+        bullets: generated.data.bullets.map((bullet) =>
+          bullet.replace(/^(?:[-*•]|\d+[.)])\s*/, "").trim(),
+        ),
+        requirements,
+        coverLetter: {
+          paragraphs: generated.data.coverLetterParagraphs,
+          wordCount: quality.coverLetterWordCount,
+          letter: [
+            greeting,
             "",
-          ]),
-          signOff,
-          input.fullName,
-        ].join("\n"),
-      },
-      interviewQuestions: generated.data.interviewQuestions,
-      thankYouEmail: generated.data.thankYouEmail,
-      keywords,
-    };
-  }
+            ...generated.data.coverLetterParagraphs.flatMap((paragraph) => [
+              paragraph,
+              "",
+            ]),
+            signOff,
+            input.fullName,
+          ].join("\n"),
+        },
+        interviewQuestions: generated.data.interviewQuestions,
+        thankYouEmail: generated.data.thankYouEmail,
+        keywords,
+      };
+    }
 
-  throw new JobApplicationPackError(
-    "We could not produce reliable application drafts from those details. Add more specific evidence and try again.",
-    422,
-  );
+    throw new JobApplicationPackError(
+      insufficientRequirements ? "We could not identify three distinct vacancy requirements. Paste a fuller advert with duties and criteria, then try again." : "We could not produce reliable application drafts from those details. Add more specific evidence and try again.",
+      422,
+    );
+  } finally { clearTimeout(timer!); controller.abort(); }
 }

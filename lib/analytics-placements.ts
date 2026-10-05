@@ -1,4 +1,6 @@
 export const analyticsPlacements = {
+  jobApplicationPackPass: "job_application_pack_pass_result",
+  coverLetterPass: "cover_letter_pass_result",
   coverLetterHandoff: "cover_letter_generator_handoff",
   homeBundleMoney: "home_bundle_money",
   atsTemplateBundleMoney: "ats_template_bundle_money",

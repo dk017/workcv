@@ -35,17 +35,24 @@ export function writeCvToolHandoff(input: {
   sourceText?: string;
 }) {
   if (typeof window === "undefined") return;
+  if (input.sourceText && input.sourceText.length > 30_000) {
+    throw new Error("The source text is too long to carry across. Shorten it or copy your notes first.");
+  }
   const handoff: CvToolHandoff = {
     version: 1,
     createdAt: Date.now(),
     source: input.source.slice(0, 80),
     patch: input.patch,
-    sourceText: input.sourceText?.slice(0, 30_000),
+    sourceText: input.sourceText,
   };
   if (input.patch && !cvDataSchema.safeParse({ ...createBlankCv(), ...input.patch }).success) {
     throw new Error("The tool result is not a valid CV draft.");
   }
-  window.sessionStorage.setItem(cvToolHandoffKey, JSON.stringify(handoff));
+  const encoded = JSON.stringify(handoff);
+  if (encoded.length > 150_000 || new TextEncoder().encode(JSON.stringify(input.patch || {})).byteLength > 100 * 1024) {
+    throw new Error("The draft is too large to carry across. Copy it and shorten the selected wording.");
+  }
+  window.sessionStorage.setItem(cvToolHandoffKey, encoded);
 }
 
 export function readCvToolHandoff(): CvToolHandoff | null {

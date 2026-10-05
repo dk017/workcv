@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import { CareerChangeExample } from "@/components/content-worked-examples";
 import Link from "next/link";
@@ -357,6 +358,7 @@ export default function CareerChangeCvUkPage() {
       </section>
 
       <CareerChangeExample />
+      <CareerHistoryLinks context="change" />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,

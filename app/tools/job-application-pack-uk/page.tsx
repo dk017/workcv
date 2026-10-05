@@ -6,6 +6,7 @@ import { GuideTable } from "@/components/cv-guide";
 import { customerQuestionHref } from "@/lib/customer-questions";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 
+import { TailoringDemo } from "@/components/tailoring-demo";
 import { JobApplicationPack } from "@/components/job-application-pack";
 import {
   FaqSection,
@@ -18,12 +19,12 @@ import { site } from "@/lib/site";
 const path = "/tools/job-application-pack-uk";
 
 export const metadata: Metadata = {
-  title: "Free UK Job Application Pack Generator",
+  title: "Tailor Your CV to a Job Description: Free UK Tool",
   description:
-    "Turn a UK job advert and your real CV evidence into a reviewable application pack with requirements, bullets, cover letter and interview prompts.",
+    "Paste your CV and a job advert to draft a tailored profile, CV bullets and cover letter. Review the evidence and copy the results free. Fair-use limits apply.",
   alternates: { canonical: path },
   openGraph: {
-    title: "Free UK Job Application Pack Generator",
+    title: "Tailor Your CV to a Job Description: Free UK Tool",
     description:
       "Create a truthful, editable application plan from one vacancy and your own evidence.",
     url: path,
@@ -32,6 +33,14 @@ export const metadata: Metadata = {
 
 const faqs = [
   {
+    question: "Does Job Search Pass cover several tailored applications?",
+    answer: `Job Search Pass costs ${site.passPrice} once and covers existing documents and new documents created during ${site.passDays} days, with no renewal. Covered documents stay editable and downloadable afterwards. New documents after expiry need a purchase. One saved CV and matching letter costs ${site.price} once and can be edited and reused for other applications; Pass is useful for keeping separate saved versions. Neither option promises unlimited AI generation or an interview.`,
+  },
+  {
+    question: "Does this rewrite my entire CV automatically?",
+    answer: "No. It drafts a profile, five bullets and a letter alongside an evidence review. Your existing roles, dates, qualifications and omitted sections still need review. When you continue to the editor, check the import and assign each suggested bullet to the role where it actually happened.",
+  },
+  {
     question: "What does the Job Application Pack include?",
     answer:
       "It reviews vacancy terms against your pasted evidence, then drafts requirements to review, five CV bullets, a short profile, a cover letter, eight interview questions and a thank-you email.",
@@ -39,12 +48,12 @@ const faqs = [
   {
     question: "Is the job application pack free?",
     answer:
-      "Yes. You can try the first result without signing up or entering payment details. Fair-use limits apply to the generation service.",
+      "Yes. Generating, editing and copying the text is free without signup or payment details. Fair-use limits apply. Saving in the editor requires email-code login; personalised PDF and Word downloads are paid.",
   },
   {
     question: "Will it invent experience for my CV?",
     answer:
-      "It is instructed to use only the advert and evidence you provide, and the result labels requirements that are not evidenced. Still check every sentence: generated drafts can make mistakes and must not be used to claim experience you do not have.",
+      "It is instructed to use your CV and motivation as candidate evidence, with the advert used for relevance, and the result labels requirements that are not evidenced. Still check every sentence: generated drafts can make mistakes and must not be used to claim experience you do not have.",
   },
   {
     question: "What happens to the CV and job advert I paste?",
@@ -66,7 +75,7 @@ const appSchema = {
   operatingSystem: "Any",
   url: `${site.url}${path}`,
   description: metadata.description,
-  offers: { "@type": "Offer", price: "0", priceCurrency: "GBP" },
+  offers: { "@type": "Offer", name: "Free draft text generation, editing and copying; fair-use limits apply", price: "0", priceCurrency: "GBP" },
 };
 
 const faqSchema = {
@@ -89,8 +98,8 @@ export default function JobApplicationPackPage() {
         <div className="container-page">
           <div className="max-w-4xl">
             <SectionLabel>Free UK application tool</SectionLabel>
-            <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">Build a job application pack from the vacancy and your real evidence.</h1>
-            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">Get one structured starting point for the CV, cover letter, interview and follow-up email. It is a draft to review—not a promise of an interview.</p>
+            <h1 className="font-display text-4xl font-semibold leading-[1.06] text-navy md:text-6xl">Tailor your CV and cover letter to a job description.</h1>
+            <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">Paste your CV and one job advert. Review the evidence map, edit a tailored profile, five bullets and a matching cover letter, then copy the text free. No signup is needed; fair-use limits apply. This provides wording to review, not a complete rewritten CV.</p>
             <div className="mt-7 flex flex-wrap gap-x-6 gap-y-3 text-sm font-bold text-navy">
               <span className="flex items-center gap-2"><Sparkles className="h-5 w-5 text-gold" />Tailored to one advert</span>
               <span className="flex items-center gap-2"><FileCheck2 className="h-5 w-5 text-success" />Evidence-led</span>
@@ -101,6 +110,7 @@ export default function JobApplicationPackPage() {
         </div>
       </section>
 
+      <TailoringDemo />
       <CustomerQuestionNav ids={["Q10", "Q13"]} />
       <section className="bg-surface py-16"><div className="container-page max-w-5xl space-y-14">
         <CustomerAnswer questionId="Q10">
@@ -169,8 +179,8 @@ export default function JobApplicationPackPage() {
         ].map(([number, title, body]) => <li key={number} className="rounded-lg border border-line bg-white p-5"><span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-navy text-sm font-bold text-white">{number}</span><h3 className="mt-4 font-display text-xl font-semibold text-navy">{title}</h3><p className="mt-2 text-sm leading-7 text-muted">{body}</p></li>)}</ol></div>
       </section>
 
-      <MoneyPageCta heading="Turn the pack into a finished UK CV." body={`Build and preview the document behind your application, then pay ${site.price} once only if you download the PDF.`} trackingContext="job_application_pack_page" />
-      <RelatedLinksSection title="Continue with the application." links={[["Track your job applications", "/tools/job-application-tracker-uk"], ["Prepare for a job interview", "/how-to-prepare-for-a-job-interview-uk"], ["Common interview questions", "/common-job-interview-questions-uk"], ["Cover letter generator", "/tools/cover-letter-generator-uk"], ["ATS CV checker", "/tools/ats-score-checker"], ["No-subscription CV builder", "/cv-builder-no-subscription-uk"]]} />
+      <MoneyPageCta heading="Turn the pack into a finished UK CV." body={`Copy the draft text free. PDF and editable Word exports cost ${site.price} once for one saved CV and matching letter, or ${site.passPrice} once for Job Search Pass with ${site.passDays} days of new documents. Covered documents remain editable and downloadable afterwards. No renewal.`} trackingContext="job_application_pack_page" />
+      <RelatedLinksSection title="Continue with the application." links={[["How to tailor a CV with evidence", "/tailor-cv-to-job-description-uk"], ["Track your job applications", "/tools/job-application-tracker-uk"], ["Prepare for a job interview", "/how-to-prepare-for-a-job-interview-uk"], ["Common interview questions", "/common-job-interview-questions-uk"], ["Cover letter generator", "/tools/cover-letter-generator-uk"], ["ATS CV checker", "/tools/ats-score-checker"], ["No-subscription CV builder", "/cv-builder-no-subscription-uk"]]} />
       <FaqSection faqs={faqs} title="Job application pack questions." />
     </>
   );

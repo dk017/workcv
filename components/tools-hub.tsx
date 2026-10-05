@@ -45,7 +45,7 @@ const categories: Category[] = [
   ] },
   { title: "Application builders", description: "Turn an existing CV, early experience or a career break into wording you can review and use.", tools: [
     { title: "Supporting Statement Planner", href: "/tools/supporting-statement-planner-uk", description: "Map Civil Service criteria to your own evidence, check length and download a free text draft.", icon: ListChecks },
-    { title: "Job Application Pack", href: "/tools/job-application-pack-uk", description: "Turn one job advert and your real CV evidence into requirements, bullets, a cover letter and interview prompts.", icon: Sparkles },
+    { title: "CV & Cover Letter Tailoring", href: "/tools/job-application-pack-uk", description: "Turn one job advert and your real CV evidence into requirements, bullets, a cover letter and interview prompts.", icon: Sparkles },
     { title: "Job Application Tracker", href: "/tools/job-application-tracker-uk", description: "Track every application, follow-up and closing date. Free, no signup, export to Excel.", icon: ListChecks },
     { title: "CV Format Checker", href: "/tools/cv-format-checker-uk", description: "Check pasted CV text for clear headings, dates, evidence and common parsing warning signals.", icon: FileCheck2 },
     { title: "First-Job CV Wizard", href: "/tools/first-job-cv-wizard-uk", description: "Build a truthful first-job CV draft from education, projects, volunteering and strengths.", icon: Sparkles },

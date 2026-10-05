@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
@@ -286,6 +287,7 @@ export default function MadeRedundantPage() {
         </div>
       </section>
 
+      <CareerHistoryLinks context="redundancy" />
       <FaqSection faqs={faqs} title="Redundancy questions." />
       <FinalCta
         heading="Put the next application back under your control."

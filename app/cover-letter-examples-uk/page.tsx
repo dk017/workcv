@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import { PassOffer } from "@/components/pass-offer";
 import { RolePackLinks } from "@/components/role-application-pack";
 import type { Metadata } from "next";
@@ -218,6 +219,7 @@ export default function CoverLetterExamplesPage() {
       <PassOffer audience="tailoring" trackingLabel="cover_letter_hub_pass" />
       <RolePackLinks context="cover_letter_examples" />
 
+      <CareerHistoryLinks context="letters" />
       <FaqSection faqs={faqs} title="UK cover letter example questions." />
 
       <section className="border-t border-line bg-navy py-16 text-white">

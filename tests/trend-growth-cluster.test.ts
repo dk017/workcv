@@ -45,7 +45,8 @@ test("new content has a reusable money-page CTA path", () => {
   assert.match(moneyCta, /commercialRoutes\.moneyPage/);
   assert.match(moneyCta, /site\.price/);
   assert.match(guide, /<MoneyPageCta/);
-  assert.match(pack, /commercialRoutes\.moneyPage/);
+  assert.match(pack, /rememberCtaHandoff\(placement, destination\)/);
+  assert.match(pack, /jobApplicationPackPass/);
   assert.match(pack, /site\.price/);
 });
 
@@ -84,7 +85,7 @@ test("the application pack is bounded and evidence-led", () => {
 });
 
 test("the full tools hub and route taxonomy point to the cluster", () => {
-  assert.match(toolsHub, /Job Application Pack/);
+  assert.match(toolsHub, /CV & Cover Letter Tailoring/);
   assert.match(toolsHub, /\/career-tools/);
   for (const route of [
     "/career-tools",
