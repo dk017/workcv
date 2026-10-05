@@ -51,7 +51,14 @@ Help the user tailor their CV to the job advert open in the active tab: send tha
 
 ## Screenshot captions
 
-1. Tailor your saved CV to the job advert you are viewing
-2. Scan a UK job advert and highlight relevant wording
-3. Group skills, qualifications and ways of working
-4. Minimal browser permissions: only the tab you choose, only when you click
+Upload in this order (all 1280x800, in `store-assets/`):
+
+1. `screenshot-2-tailor-and-sponsor-1280x800.jpg`: Tailor your CV to the job you are viewing, and check the employer's sponsor licence
+2. `screenshot-4-tailor-page-1280x800.jpg`: The advert opens in WorkCV, ready to tailor a copy of your saved CV
+3. `screenshot-3-keyword-highlights-1280x800.jpg`: Highlight the skills, qualifications and ways of working the advert asks for
+
+The original `screenshot-1-job-keyword-highlighter-1280x800.jpg` shows the old popup; remove it from the listing.
+
+## Store item
+
+Published 27 July 2026 as "WorkCV Job Keyword Highlighter" 0.1.0. Ship new versions as an update to that item (Package > Upload new package), not as a new item.
