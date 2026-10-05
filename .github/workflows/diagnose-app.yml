@@ -138,8 +138,11 @@ jobs:
             echo "== Oldest SSH session process age (elapsed time):"
             ps -eo etimes,cmd --sort=-etimes | grep -E 'sshd(-session)?: [^ ]+@' | grep -v grep | head -1 | awk '{printf "%d days\n", $1/86400}'
             echo "== logind sessions: $(loginctl list-sessions --no-legend 2>/dev/null | wc -l)"
+            echo "== logind sessions by state (count, state)"
+            loginctl list-sessions --no-legend -o json 2>/dev/null | grep -o '"state":"[a-z]*"' | sort | uniq -c || echo "(state not available)"
+            echo "== logind sessions with no remaining processes: $(for s in $(loginctl list-sessions --no-legend 2>/dev/null | awk '{print $1}' | head -200); do loginctl show-session "$s" -p Leader --value 2>/dev/null; done | grep -c '^0$' || true) of first 200 checked"
             echo "== sshd limits"
-            (sshd -T 2>/dev/null || /usr/sbin/sshd -T 2>/dev/null) | grep -Ei '^(maxstartups|maxsessions|clientaliveinterval|clientalivecountmax|logingracetime) ' || echo "(sshd -T not available to this user)"
+            (sshd -T 2>/dev/null || /usr/sbin/sshd -T 2>/dev/null) | grep -Ei '^(maxstartups|maxsessions|clientaliveinterval|clientalivecountmax|logingracetime|passwordauthentication|kbdinteractiveauthentication|permitrootlogin) ' || echo "(sshd -T not available to this user)"
             echo "== SSH log, last 24 hours (counts)"
             log="$(journalctl -u ssh -u sshd --since '-24h' --no-pager 2>/dev/null || true)"
             echo "Accepted logins: $(printf '%s\n' "$log" | grep -c 'Accepted ' || true)"
