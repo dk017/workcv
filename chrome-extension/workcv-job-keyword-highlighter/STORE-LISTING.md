@@ -61,4 +61,4 @@ The original `screenshot-1-job-keyword-highlighter-1280x800.jpg` shows the old p
 
 ## Store item
 
-Published 27 July 2026 as "WorkCV Job Keyword Highlighter" 0.1.0. Ship new versions as an update to that item (Package > Upload new package), not as a new item.
+Item ID `bpledmncejopbidegmhdefkpdjgojlmg` (https://chromewebstore.google.com/detail/bpledmncejopbidegmhdefkpdjgojlmg). Published 27 July 2026 as "WorkCV Job Keyword Highlighter" 0.1.0. Ship new versions as an update to that item (Package > Upload new package), not as a new item.

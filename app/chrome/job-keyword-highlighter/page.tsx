@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SectionLabel } from "@/components/marketing";
+import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "WorkCV: Tailor Your CV to This Job – Chrome extension",
@@ -28,9 +29,14 @@ export default function ChromeExtensionPage() {
             itself; that part stays in your browser.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <span className="inline-flex min-h-12 items-center rounded-md bg-navy px-5 text-sm font-bold text-white">
-              Chrome Web Store listing in preparation
-            </span>
+            <a
+              href={site.chromeExtensionUrl}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex min-h-12 items-center rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover"
+            >
+              Add to Chrome, free
+            </a>
             <Link
               href="/chrome/job-keyword-highlighter/privacy"
               className="inline-flex min-h-12 items-center rounded-md border border-line-strong bg-white px-5 text-sm font-bold text-navy hover:border-navy"

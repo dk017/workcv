@@ -7,6 +7,8 @@ export const site = {
   name: "WorkCV",
   domain: "workcv.co.uk",
   url: "https://workcv.co.uk",
+  // Store listing by item ID, so the link survives renames of the listing.
+  chromeExtensionUrl: "https://chromewebstore.google.com/detail/bpledmncejopbidegmhdefkpdjgojlmg",
   locale: "en-GB",
   priceAmount,
   priceCurrency,
