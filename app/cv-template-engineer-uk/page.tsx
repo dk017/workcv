@@ -163,6 +163,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["UK visa sponsor checker", "/tools/uk-visa-sponsor-checker"],
   ["Engineering cover letter example", "/cover-letter-examples-uk#graduate-engineer"],
   ["Engineer personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],

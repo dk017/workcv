@@ -179,6 +179,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["UK visa sponsor checker", "/tools/uk-visa-sponsor-checker"],
   ["Nurse cover letter example", "/cover-letter-examples-uk#nurse"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["CV personal statement UK", "/cv-personal-statement-uk"],

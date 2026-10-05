@@ -196,8 +196,8 @@ export default function CvVsResumeUkPage() {
       <section className="bg-paper py-20">
         <div className="container-page">
           <SectionLabel>Next step</SectionLabel>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {[["UK CV and resume template", "/professional-cv-template-uk"], ["No-subscription CV builder", commercialRoutes.moneyPage], ["How to write a UK CV", "/how-to-write-a-cv-uk"]].map(([label, href]) => <Link key={href} href={href} className="group flex min-h-24 items-center justify-between gap-4 rounded-xl border border-line bg-white p-5 font-bold text-navy transition hover:-translate-y-1 hover:border-navy">{label}<ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" /></Link>)}
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {[["UK CV and resume template", "/professional-cv-template-uk"], ["No-subscription CV builder", commercialRoutes.moneyPage], ["How to write a UK CV", "/how-to-write-a-cv-uk"], ["UK visa sponsor checker", "/tools/uk-visa-sponsor-checker"]].map(([label, href]) => <Link key={href} href={href} className="group flex min-h-24 items-center justify-between gap-4 rounded-xl border border-line bg-white p-5 font-bold text-navy transition hover:-translate-y-1 hover:border-navy">{label}<ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" /></Link>)}
           </div>
         </div>
       </section>
