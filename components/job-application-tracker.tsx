@@ -17,6 +17,7 @@ import {
 
 import { trackFunnelEvent } from "@/components/attribution-capture";
 import { PassOfferView } from "@/components/pass-offer-view";
+import { SponsorCheckButton } from "@/components/sponsor-check";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { jobTailorEditorPath, jobTailorHandoffKey, minAdvertLength, parseTailorJob, serializeJobTailorHandoff } from "@/lib/job-tailor";
@@ -305,6 +306,7 @@ export function JobApplicationTracker() {
           {job.appliedDate ? `Applied ${formatDate(job.appliedDate)}` : job.closingDate ? `Closes ${formatDate(job.closingDate)}` : "Not applied yet"}
           {job.source ? ` · ${job.source}` : ""}
         </p>
+        {!job.isExample ? <SponsorCheckButton key={job.employer} employer={job.employer} /> : null}
         <div className="mt-3 flex flex-wrap items-center gap-2">
           <label className="sr-only" htmlFor={`status-${job.id}`}>Status for {job.role}</label>
           <select
@@ -416,7 +418,7 @@ export function JobApplicationTracker() {
       </div>
       {jobs.some(job => job.isExample) ? <p className="mt-3 text-sm font-bold text-muted">These are fictional practice jobs. Use “Add a job” to track your own application.</p> : null}
       <p className="mt-3 text-sm text-muted">
-        Saved only in this browser. Nothing is sent to WorkCV.{jobs.length >= 5 ? " Export a CSV now and then so you have a backup." : ""}
+        Saved only in this browser. Nothing is sent to WorkCV unless you check a sponsor licence, which sends only the employer name.{jobs.length >= 5 ? " Export a CSV now and then so you have a backup." : ""}
       </p>
 
       {realJobCount >= passOfferThreshold ? (

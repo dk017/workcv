@@ -25,5 +25,14 @@
     return origin + "/tailor?" + tracking + "#job=" + base64Url(payload);
   }
 
-  scope.WorkCVJobLink = { buildTailorUrl: buildTailorUrl };
+  // Sponsor register search. Only the employer name is sent.
+  function sponsorCheckUrl(employer) {
+    return origin + "/api/tools/sponsor-check?q=" + encodeURIComponent(String(employer || "").slice(0, 160));
+  }
+
+  function sponsorPageUrl(employer) {
+    return origin + "/tools/uk-visa-sponsor-checker?q=" + encodeURIComponent(String(employer || "").slice(0, 160)) + "&" + tracking.replace("tailor_cv", "sponsor_check");
+  }
+
+  scope.WorkCVJobLink = { buildTailorUrl: buildTailorUrl, sponsorCheckUrl: sponsorCheckUrl, sponsorPageUrl: sponsorPageUrl };
 })(globalThis);

@@ -12,6 +12,8 @@ Send the UK job advert you are viewing to WorkCV to tailor a copy of your CV, an
 
 Looking at a job on Indeed, Reed, NHS Jobs or a company careers page? Click "Tailor my CV for this job" and WorkCV opens with the advert ready. It makes a separate copy of your saved CV for that vacancy, so your original stays as it is, and walks you through the advert's keywords one at a time, adding only what you have really done.
 
+Applying from outside the UK? "Check sponsor licence" looks up the employer on the Home Office register of licensed sponsors, so you can see whether it can sponsor a work visa before you apply.
+
 The extension can also scan the job page itself, highlighting CV-relevant wording and grouping the strongest terms in a compact popup.
 
 Use it to spot:
@@ -26,6 +28,7 @@ The extension is intentionally narrow:
 - it works only after you click on the current tab
 - keyword highlighting runs locally in the browser
 - the advert is sent to WorkCV only when you click Tailor, and you check it before anything is saved
+- a sponsor check sends only the employer name
 - highlighting needs no account; tailoring uses your free WorkCV account
 - it stores no job-page history
 - it does not scrape tabs in the background

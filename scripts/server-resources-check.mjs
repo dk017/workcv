@@ -34,7 +34,8 @@ console.log(
       node: process.version,
       nodeHeapLimitMb: mb(v8.getHeapStatistics().heap_size_limit),
       availableToAppMb: mb(available),
-      containerMemoryLimitMb: constrained ? mb(constrained) : null,
+      // Without a container limit Node reports a huge placeholder value.
+      containerMemoryLimitMb: constrained && constrained < os.totalmem() ? mb(constrained) : null,
       hostTotalMb: mb(os.totalmem()),
       tmpdir: os.tmpdir(),
       tmpWritable,

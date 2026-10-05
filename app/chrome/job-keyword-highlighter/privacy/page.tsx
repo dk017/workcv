@@ -35,6 +35,12 @@ export default function ChromeExtensionPrivacyPage() {
             <Link href="/privacy" className="font-bold text-navy underline">website privacy policy</Link>.
           </p>
           <p>
+            “Check sponsor licence” reads the employer name from the page and
+            sends only that name to WorkCV, which searches the public Home Office
+            register of licensed sponsors and returns the matching entries. The
+            name is not linked to an account or stored with your details.
+          </p>
+          <p>
             The extension does not transmit browsing history, other tabs or
             personal information to WorkCV or a third party. It does not use
             analytics, advertising, remote code, background scraping or

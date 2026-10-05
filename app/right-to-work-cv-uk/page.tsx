@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import {
   ArrowRight,
+  Building2,
   Check,
   FileText,
+  PoundSterling,
   KeyRound,
   Lock,
   ShieldCheck,
@@ -43,6 +45,24 @@ const jsonLd = {
         "@type": "Answer",
         text:
           "No. Do not put a right to work share code on a public CV. A share code should be given only when an employer needs to carry out the official check.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "How do I check if a UK employer can sponsor my visa?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "Search the Home Office register of licensed sponsors for the employer's name, or use WorkCV's free sponsor checker, which searches the same register. A licence shows the employer can sponsor workers; the job itself must also be eligible and meet the salary rules. For advice on your own situation, use a regulated immigration adviser.",
+      },
+    },
+    {
+      "@type": "Question",
+      name: "What salary do I need for a Skilled Worker visa?",
+      acceptedAnswer: {
+        "@type": "Answer",
+        text:
+          "GOV.UK says you will usually need to be paid at least £41,700 a year or the going rate for your job, whichever is higher. Some people can be paid at least £33,400. Going rates are set for each occupation code in the Immigration Rules.",
       },
     },
     {
@@ -95,6 +115,11 @@ const wordingExamples = [
     "Avoid oversharing dates or document numbers on the CV. Be ready to explain accurately during hiring.",
   ],
   [
+    "Need sponsorship",
+    "Requires Skilled Worker visa sponsorship.",
+    "Being upfront saves wasted applications. Apply to employers that hold a sponsor licence, for roles that can be sponsored.",
+  ],
+  [
     "Applying from overseas",
     "Eligible to work in the UK from [month/year], subject to employer right to work checks.",
     "Use cautious wording if your right to work starts later or depends on a process.",
@@ -108,6 +133,24 @@ const dontShare = [
   "BRP, eVisa or Home Office reference numbers",
   "Full immigration history",
   "Scans or photos of identity documents",
+];
+
+const sponsorshipChecks = [
+  {
+    title: "Is the employer licensed?",
+    body: "Only employers on the Home Office register of licensed sponsors can sponsor a Skilled Worker visa. Search the register for the employer's name before you tailor an application.",
+    icon: Building2,
+  },
+  {
+    title: "Can the job be sponsored?",
+    body: "GOV.UK says the job must be on the list of eligible occupations, usually as a higher-skilled (degree-level) role. Medium-skilled roles qualify only in limited cases.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Does the salary meet the rules?",
+    body: "You will usually need at least £41,700 a year or the going rate for the occupation, whichever is higher. Some people can be paid at least £33,400. For example, software developers (code 2134) have a going rate of £54,700 and chartered accountants (code 2421) £49,200.",
+    icon: PoundSterling,
+  },
 ];
 
 const relatedLinks = [
@@ -223,7 +266,47 @@ export default function RightToWorkCvUkPage() {
         </div>
       </section>
 
-      <section className="bg-surface py-24">
+      <section id="sponsorship" className="bg-surface py-24">
+        <div className="container-page">
+          <SectionLabel>Need visa sponsorship?</SectionLabel>
+          <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
+            Check three things before you tailor an application.
+          </h2>
+          <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
+            A strong UK CV cannot fix a role that cannot be sponsored. Since the
+            Skilled Worker rules tightened in 2025, most sponsored jobs are
+            degree-level roles with a salary floor, so check these first.
+          </p>
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
+            {sponsorshipChecks.map((check) => {
+              const Icon = check.icon;
+              return (
+                <div key={check.title} className="rounded-xl border border-line bg-white p-6">
+                  <Icon className="h-7 w-7 text-gold" />
+                  <h3 className="mt-5 font-display text-2xl font-semibold text-navy">{check.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-muted">{check.body}</p>
+                </div>
+              );
+            })}
+          </div>
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <ButtonLink href="/tools/uk-visa-sponsor-checker" trackingLabel={analyticsPlacements.rightToWorkSponsorChecker}>
+              Check if an employer is a licensed sponsor
+            </ButtonLink>
+          </div>
+          <p className="mt-6 max-w-3xl text-sm leading-7 text-muted">
+            This is general information, not immigration advice. Whether you can
+            be sponsored depends on your own circumstances: for advice, use an
+            adviser regulated by the Immigration Advice Authority or a solicitor.{" "}
+            <a href="https://www.gov.uk/find-an-immigration-adviser" rel="noreferrer" target="_blank" className="font-bold text-navy underline underline-offset-4">
+              Find a regulated immigration adviser on GOV.UK
+            </a>
+            .
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-paper py-24">
         <div className="container-page grid gap-12 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <SectionLabel>Do not include</SectionLabel>
@@ -258,7 +341,7 @@ export default function RightToWorkCvUkPage() {
         </div>
       </section>
 
-      <section className="bg-paper py-24">
+      <section className="bg-surface py-24">
         <div className="container-page grid gap-12 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <SectionLabel>Research checked</SectionLabel>
@@ -266,11 +349,13 @@ export default function RightToWorkCvUkPage() {
               Based on official UK right to work guidance.
             </h2>
             <p className="mt-6 text-lg leading-8 text-muted">
-              Last checked 13 June 2026. This page uses GOV.UK guidance on
+              Last checked 5 October 2026. This page uses GOV.UK guidance on
               employer right to work checks, GOV.UK share code checking, GOV.UK
-              proof of right to work, and Citizens Advice guidance on proving
-              your right to work. It is CV-writing guidance, not immigration
-              legal advice.
+              proof of right to work, Citizens Advice guidance on proving your
+              right to work, the GOV.UK Skilled Worker visa pages, the Immigration
+              Rules on skilled occupations (updated 3 August 2026) and the Home
+              Office register of licensed sponsors. It is CV-writing guidance,
+              not immigration legal advice.
             </p>
           </div>
 
@@ -295,11 +380,20 @@ export default function RightToWorkCvUkPage() {
             >
               Citizens Advice proving right to work
             </a>
+            <a href="https://www.gov.uk/skilled-worker-visa/your-job" rel="noreferrer" target="_blank">
+              GOV.UK Skilled Worker visa: your job
+            </a>
+            <a href="https://www.gov.uk/guidance/immigration-rules/immigration-rules-appendix-skilled-occupations" rel="noreferrer" target="_blank">
+              Immigration Rules: eligible occupations and going rates
+            </a>
+            <a href="https://www.gov.uk/government/publications/register-of-licensed-sponsors-workers" rel="noreferrer" target="_blank">
+              Home Office register of licensed sponsors
+            </a>
           </div>
         </div>
       </section>
 
-      <section className="bg-surface py-20">
+      <section className="bg-paper py-20">
         <div className="container-page">
           <SectionLabel>Related guidance</SectionLabel>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">

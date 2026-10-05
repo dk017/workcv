@@ -14,6 +14,15 @@ h1 { margin: 5px 0 7px; color: #0f2942; font-family: Georgia, serif; font-size: 
 .page-title { margin: 7px 0 2px; color: #0f2942; font-size: 13px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .page-url { margin: 0; color: #718096; font-size: 11px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .wide { width: 100%; margin-top: 13px; min-height: 44px; font-size: 13px; }
+.wide + .wide { margin-top: 8px; }
+.sponsor { margin-top: 10px; border-radius: 7px; border: 1px solid #c9d1d8; padding: 10px; font-size: 12px; line-height: 1.45; }
+.sponsor.listed { border-color: #246b48; background: #f0fdf4; }
+.sponsor.possible { border-color: #d4a843; background: #fdf8ec; }
+.sponsor strong { display: block; color: #0f2942; font-size: 13px; }
+.sponsor ul { margin: 6px 0 0; padding-left: 16px; }
+.sponsor li { margin-top: 4px; color: #334e68; }
+.sponsor small { display: block; margin-top: 6px; color: #63788c; }
+.sponsor a { color: #0f2942; font-weight: 700; }
 .hint { margin: 7px 0 0; color: #718096; font-size: 11px; line-height: 1.4; }
 .section-label { margin-top: 16px; }
 .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 13px; }

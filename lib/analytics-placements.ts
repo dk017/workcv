@@ -82,6 +82,8 @@ export const analyticsPlacements = {
   rightToWorkHeroEditor: "right_to_work_hero_editor",
   rightToWorkHeroGuide: "right_to_work_hero_guide",
   rightToWorkFinal: "right_to_work_final",
+  rightToWorkSponsorChecker: "right_to_work_sponsor_checker",
+  passSponsorChecker: "pass_sponsor_checker",
   redundancyFinal: "redundancy_calculator_final",
   redundancyCalculatorSticky: "redundancy_calculator_sticky",
   coverLetterExamplesHero: "cover_letter_examples_hero",

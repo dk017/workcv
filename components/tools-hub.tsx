@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, Banknote, BarChart3, CalendarCheck, FileCheck2, FileDown, FileSearch, FileText, ListChecks, Scale, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Banknote, BarChart3, CalendarCheck, FileCheck2, FileDown, FileSearch, FileText, ListChecks, Scale, Sparkles } from "lucide-react";
 
 import { FaqSection, MoneyPageCta } from "@/components/marketing";
 import { site } from "@/lib/site";
@@ -36,6 +36,7 @@ const categories: Category[] = [
     { title: "UK Living Wage Checker 2026", href: "/tools/uk-living-wage-checker", description: "Compare hourly pay or salary with current statutory and voluntary UK Living Wage rates.", icon: Scale },
     { title: "Redundancy Pay Calculator", href: "/tools/redundancy-pay-calculator", description: "Calculate statutory redundancy pay with current GB and Northern Ireland limits.", icon: Scale },
     { title: "Notice Period Calculator", href: "/tools/notice-period-calculator", description: "Find your earliest new-job start date and the UK statutory notice minimum.", icon: CalendarCheck },
+    { title: "UK Visa Sponsor Checker", href: "/tools/uk-visa-sponsor-checker", description: "Search the Home Office register to see whether an employer holds a licence to sponsor work visas.", icon: BadgeCheck },
     { title: "UK Salary by Job Title", href: "/tools/uk-salary-by-job-title", description: "Compare lower-quartile, median and upper-quartile gross pay for 60 roles using ONS data.", icon: BarChart3 },
   ] },
   { title: "Templates and downloads", description: "Start from a clean document without an email gate, payment screen or subscription.", tools: [

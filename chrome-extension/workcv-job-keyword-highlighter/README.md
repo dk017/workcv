@@ -5,6 +5,7 @@ A small Manifest V3 Chrome extension for UK job pages. (The folder name is kept 
 ## What it does
 
 - **Tailor my CV for this job**: reads the job title, employer and advert from the current tab (JobPosting structured data first, then any text the user selected, then the main page text) and opens `https://workcv.co.uk/tailor#job=...`. The job travels in the URL fragment, which is never sent to the server; the page asks the user to confirm before the editor copies their saved CV for the job. The link format must match `decodeJobFromHash` in `lib/job-tailor.ts` (covered by `tests/job-tailor.test.ts`).
+- **Check sponsor licence**: reads the employer from the page and calls `https://workcv.co.uk/api/tools/sponsor-check?q=<employer>` (public, CORS-open) to search the Home Office sponsor register. Only the employer name is sent.
 - scans only the current tab after the user clicks the button
 - highlights CV-relevant skills, tools, qualifications and action verbs
 - groups repeated signals in the popup

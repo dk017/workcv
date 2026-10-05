@@ -34,7 +34,7 @@ const faqItems = [
   {
     question: "Where are my job applications stored?",
     answer:
-      "Only in the browser you use, on your own device. WorkCV does not receive the jobs you track. Clearing your browser data deletes them, so export a CSV now and then as a backup. Details are shared only if you choose “Tailor my CV for this job”, which passes that one job’s title, employer and advert to the tool you open.",
+      "Only in the browser you use, on your own device. WorkCV does not receive the jobs you track. Clearing your browser data deletes them, so export a CSV now and then as a backup. Details are shared only if you choose “Tailor my CV for this job”, which passes that one job’s title, employer and advert to the tool you open, or “Check sponsor licence”, which sends only the employer name to search the Home Office sponsor register.",
   },
   {
     question: "Can I use the tracker in Excel or Google Sheets?",

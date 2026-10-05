@@ -30,6 +30,7 @@ const toolLabels: Record<string, string> = {
   "uk-cv-converter": "UK CV converter",
   "uk-living-wage-checker": "UK Living Wage checker",
   "uk-salary-by-job-title": "UK salary checker",
+  "uk-visa-sponsor-checker": "UK visa sponsor checker",
 };
 
 function titleFromSlug(slug: string) {

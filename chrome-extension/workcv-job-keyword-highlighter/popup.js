@@ -1,5 +1,7 @@
 var elements = {
   tailor: document.getElementById("tailorButton"),
+  sponsor: document.getElementById("sponsorButton"),
+  sponsorPanel: document.getElementById("sponsorPanel"),
   scan: document.getElementById("scanButton"),
   clear: document.getElementById("clearButton"),
   status: document.getElementById("statusMessage"),
@@ -27,6 +29,7 @@ function status(message, tone) {
 
 function busy(value) {
   elements.tailor.disabled = value;
+  elements.sponsor.disabled = value;
   elements.scan.disabled = value;
   elements.clear.disabled = value;
 }
@@ -94,6 +97,15 @@ async function scan() {
   }
 }
 
+async function captureJob(tab) {
+  await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["job-capture.js"] });
+  var results = await chrome.scripting.executeScript({
+    target: { tabId: tab.id },
+    func: function () { return globalThis.WorkCVCaptureJob(document, window); }
+  });
+  return results && results[0] && results[0].result;
+}
+
 // Reads the job from the page and opens it on WorkCV in a new tab.
 async function tailor() {
   var tab = await activeTab();
@@ -104,12 +116,7 @@ async function tailor() {
   busy(true);
   status("Reading the job advert…");
   try {
-    await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ["job-capture.js"] });
-    var results = await chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      func: function () { return globalThis.WorkCVCaptureJob(document, window); }
-    });
-    var job = results && results[0] && results[0].result;
+    var job = await captureJob(tab);
     if (!job || (!job.role && (!job.advertText || job.advertText.length < 80))) {
       throw new Error("no job advert was found");
     }
@@ -117,6 +124,71 @@ async function tailor() {
     window.close();
   } catch (error) {
     status("Unable to read this job: " + error.message + ". Select the advert text on the page and try again.", "error");
+    busy(false);
+  }
+}
+
+var sponsorCopy = {
+  listed: "An employer with this name holds a sponsor licence.",
+  possible: "No exact match. Close names on the register:",
+  not_found: "No employer with this name is on the register. Try its legal name."
+};
+
+function renderSponsor(check, employer) {
+  var panel = elements.sponsorPanel;
+  panel.replaceChildren();
+  panel.className = "sponsor " + check.status;
+  var title = document.createElement("strong");
+  title.textContent = sponsorCopy[check.status] || "Sponsor check complete.";
+  panel.appendChild(title);
+  if (check.matches && check.matches.length) {
+    var list = document.createElement("ul");
+    check.matches.slice(0, 3).forEach(function (match) {
+      var item = document.createElement("li");
+      var routes = match.routes.map(function (route) { return route.route + " (" + (route.rating || route.licence) + ")"; }).join(", ");
+      item.textContent = match.name + (match.locations[0] ? ", " + match.locations[0] : "") + ": " + routes;
+      list.appendChild(item);
+    });
+    panel.appendChild(list);
+  }
+  var note = document.createElement("small");
+  note.textContent = "A licence means the employer can sponsor workers, not that this job can be sponsored. Register dated " + (check.registerDate || "recently") + ". ";
+  var more = document.createElement("a");
+  more.href = WorkCVJobLink.sponsorPageUrl(employer);
+  more.target = "_blank";
+  more.rel = "noreferrer";
+  more.textContent = "See all results";
+  note.appendChild(more);
+  panel.appendChild(note);
+  panel.hidden = false;
+}
+
+// Reads the employer from the page and searches the Home Office sponsor register.
+async function checkSponsor() {
+  var tab = await activeTab();
+  if (!tab || !supported(tab.url)) {
+    status("Open a job advert first.", "error");
+    return;
+  }
+  busy(true);
+  status("Finding the employer…");
+  try {
+    var job = await captureJob(tab);
+    var employer = job && job.employer ? job.employer.trim() : "";
+    if (employer.length < 2) {
+      elements.sponsorPanel.hidden = true;
+      status("Could not find the employer's name on this page. Search it on WorkCV instead.", "error");
+      return;
+    }
+    status("Checking " + employer + " on the sponsor register…");
+    var response = await fetch(WorkCVJobLink.sponsorCheckUrl(employer));
+    var check = await response.json();
+    if (!response.ok || check.error) throw new Error(check.error || "the check is unavailable");
+    renderSponsor(check, employer);
+    status("Checked " + employer + ".", "success");
+  } catch (error) {
+    status("Unable to check the sponsor register: " + error.message, "error");
+  } finally {
     busy(false);
   }
 }
@@ -138,6 +210,7 @@ async function clear() {
 }
 
 elements.tailor.addEventListener("click", tailor);
+elements.sponsor.addEventListener("click", checkSponsor);
 elements.scan.addEventListener("click", scan);
 elements.clear.addEventListener("click", clear);
 
@@ -147,6 +220,7 @@ activeTab().then(function (tab) {
   if (!tab || !supported(tab.url)) {
     status("Open a regular job page to use this extension.", "error");
     elements.tailor.disabled = true;
+    elements.sponsor.disabled = true;
     elements.scan.disabled = true;
     elements.clear.disabled = true;
   }
