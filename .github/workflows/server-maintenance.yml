@@ -1,0 +1,102 @@
+name: Server maintenance
+run-name: "Server maintenance: ${{ inputs.action }}"
+
+# Manual, one-off changes to the Hetzner host. The repository is public, so
+# every step prints counts and settings only: no IP addresses or user names.
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        description: "Maintenance action"
+        type: choice
+        options: [harden_ssh]
+        required: true
+      confirm:
+        description: "Type HARDEN to confirm changes to the production server"
+        required: true
+
+jobs:
+  harden-ssh:
+    if: ${{ inputs.action == 'harden_ssh' && inputs.confirm == 'HARDEN' }}
+    name: Harden SSH (passwords off, fail2ban, clear stale sessions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Apply hardening
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 12m
+          script: |
+            set -eu
+
+            echo "== 1. Password login off"
+            dropin=/etc/ssh/sshd_config.d/00-workcv-hardening.conf
+            if ! grep -qiE '^\s*Include\s+/etc/ssh/sshd_config\.d/' /etc/ssh/sshd_config; then
+              echo "sshd_config does not include sshd_config.d; leaving SSH unchanged"
+              exit 1
+            fi
+            # Files in sshd_config.d are read in name order and the first value
+            # wins, so 00- takes precedence over cloud-init's 50- file.
+            printf '%s\n' \
+              '# Added by WorkCV server maintenance: key-only SSH.' \
+              'PasswordAuthentication no' \
+              'KbdInteractiveAuthentication no' > "$dropin.new"
+            mv "$dropin.new" "$dropin"
+            if ! sshd -t; then
+              echo "New SSH config failed validation; removing it"
+              rm -f "$dropin"
+              exit 1
+            fi
+            effective="$(sshd -T | awk '/^passwordauthentication /{print $2}')"
+            if [ "$effective" != "no" ]; then
+              echo "Effective PasswordAuthentication is '$effective', not 'no'; removing the change"
+              rm -f "$dropin"
+              exit 1
+            fi
+            systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null \
+              || echo "SSH is socket-activated; each new connection reads the new config"
+            sshd -T | grep -Ei '^(passwordauthentication|kbdinteractiveauthentication|pubkeyauthentication) '
+
+            echo "== 2. fail2ban for SSH"
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get -o DPkg::Lock::Timeout=300 update -qq
+            apt-get -o DPkg::Lock::Timeout=300 install -y -qq fail2ban python3-systemd >/dev/null
+            printf '%s\n' \
+              '# Added by WorkCV server maintenance.' \
+              '[sshd]' \
+              'enabled = true' \
+              'backend = systemd' \
+              'maxretry = 5' \
+              'findtime = 10m' \
+              'bantime = 1h' > /etc/fail2ban/jail.d/workcv-sshd.local
+            systemctl enable fail2ban >/dev/null 2>&1
+            systemctl restart fail2ban
+            sleep 5
+            echo "fail2ban: $(systemctl is-active fail2ban)"
+            # Counts only; the status also lists banned addresses, which stay private.
+            fail2ban-client status sshd | grep -E 'Currently failed|Total failed|Currently banned|Total banned' || true
+
+            echo "== 3. Stale login sessions"
+            echo "Before: $(loginctl list-sessions --no-legend | wc -l)"
+            systemctl restart systemd-logind
+            sleep 3
+            echo "After: $(loginctl list-sessions --no-legend | wc -l)"
+            loginctl list-sessions --no-legend -o json 2>/dev/null | grep -o '"state":"[a-z]*"' | sort | uniq -c || true
+
+      # A fresh key login proves SSH still works after the change.
+      - name: Confirm key login still works
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            echo "Key login OK"
+            echo "Live SSH connections: $(ss -Htn state established '( sport = :22 )' | wc -l)"
+            echo "fail2ban: $(systemctl is-active fail2ban)"

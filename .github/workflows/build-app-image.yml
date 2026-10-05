@@ -76,7 +76,26 @@ jobs:
       - name: Checkout deploy files
         uses: actions/checkout@v4
 
+      # SSH handshakes are sometimes dropped while bots flood the server, so
+      # each SSH step is retried once after a pause. Both steps are safe to
+      # repeat. Keep each retry identical to its first attempt (tested).
       - name: Copy compose file
+        id: copy_compose
+        continue-on-error: true
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          source: "docker-compose.ghcr.yml"
+          target: "${{ github.event.inputs.deploy_dir }}"
+
+      - name: Wait before retrying
+        if: ${{ steps.copy_compose.outcome == 'failure' }}
+        run: sleep 30
+
+      - name: Copy compose file (retry)
+        if: ${{ steps.copy_compose.outcome == 'failure' }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.HETZNER_HOST }}
@@ -86,6 +105,87 @@ jobs:
           target: "${{ github.event.inputs.deploy_dir }}"
 
       - name: Pull and restart app
+        id: restart_app
+        continue-on-error: true
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          WORKCV_IMAGE: ${{ needs.build.outputs.image }}:${{ needs.build.outputs.tag }}
+          GHCR_USER: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GHCR_READ_TOKEN }}
+          ANALYTICS_ADMIN_EMAILS: ${{ secrets.ANALYTICS_ADMIN_EMAILS }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: WORKCV_IMAGE,GHCR_USER,GHCR_TOKEN,ANALYTICS_ADMIN_EMAILS
+          script: |
+            set -eu
+            cd "${{ github.event.inputs.deploy_dir }}"
+            if [ -n "${GHCR_TOKEN:-}" ]; then
+              echo "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USER" --password-stdin
+            fi
+            if [ -n "${ANALYTICS_ADMIN_EMAILS:-}" ]; then
+              umask 077
+              awk '!/^ANALYTICS_ADMIN_EMAILS=/' .env > .env.analytics-tmp
+              printf 'ANALYTICS_ADMIN_EMAILS=%s\n' "$ANALYTICS_ADMIN_EMAILS" >> .env.analytics-tmp
+              mv .env.analytics-tmp .env
+            fi
+            image_repository="${WORKCV_IMAGE%:*}"
+            # Record WorkCV image IDs before pulling, so only these can be
+            # removed later. Never prune server-wide: other services share
+            # this host.
+            previous_image_ids="$(docker image ls -q --no-trunc "$image_repository" | sort -u)"
+            docker compose -p workcv -f docker-compose.ghcr.yml pull app
+            docker run --rm --env-file .env --network werkcv_default --entrypoint node "$WORKCV_IMAGE" scripts/prepare-growth-schema.mjs
+            docker compose -p workcv -f docker-compose.ghcr.yml up -d app
+            docker compose -p workcv -f docker-compose.ghcr.yml ps
+            healthy=false
+            for attempt in $(seq 1 30); do
+              if curl --fail --silent http://127.0.0.1:3004/api/health >/dev/null; then
+                healthy=true
+                break
+              fi
+              sleep 2
+            done
+            [ "$healthy" = true ] || { echo "App health check failed; keeping old images"; exit 1; }
+            docker compose -p workcv -f docker-compose.ghcr.yml exec -T app node -e 'if (!process.env.ANALYTICS_ADMIN_EMAILS) process.exit(1); console.log("Analytics admin allowlist configured")'
+            container_ids="$(docker ps -aq)"
+            if [ -n "$container_ids" ]; then
+              used_image_ids="$(docker inspect --format '{{.Image}}' $container_ids)"
+            else
+              used_image_ids=""
+            fi
+            echo "WorkCV images before cleanup:"
+            docker image ls "$image_repository"
+            image_rows="$(docker image ls --no-trunc --format '{{.Repository}}:{{.Tag}}|{{.ID}}' "$image_repository")"
+            for image_row in $image_rows; do
+              image_ref="${image_row%%|*}"
+              image_id="${image_row#*|}"
+              if printf '%s\n' "$used_image_ids" | grep -Fqx -- "$image_id"; then
+                echo "Keeping WorkCV image still referenced by a container: $image_id"
+              else
+                echo "Removing unused WorkCV image reference: $image_ref"
+                docker image rm "$image_ref"
+              fi
+            done
+            for image_id in $previous_image_ids; do
+              if printf '%s\n' "$used_image_ids" | grep -Fqx -- "$image_id"; then
+                continue
+              fi
+              if docker image inspect "$image_id" >/dev/null 2>&1; then
+                echo "Removing superseded WorkCV image: $image_id"
+                docker image rm "$image_id" || echo "Could not remove $image_id; leaving it in place"
+              fi
+            done
+            echo "WorkCV images after cleanup:"
+            docker image ls "$image_repository"
+
+      - name: Wait before retrying
+        if: ${{ steps.restart_app.outcome == 'failure' }}
+        run: sleep 30
+
+      - name: Pull and restart app (retry)
+        if: ${{ steps.restart_app.outcome == 'failure' }}
         uses: appleboy/ssh-action@v1.2.0
         env:
           WORKCV_IMAGE: ${{ needs.build.outputs.image }}:${{ needs.build.outputs.tag }}
