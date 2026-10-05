@@ -7,7 +7,7 @@ on:
       mode:
         description: "Diagnostic operation"
         type: choice
-        options: [app_logs, growth_report, server_resources]
+        options: [app_logs, growth_report, server_resources, ssh_sessions]
         default: app_logs
       report_public_key:
         description: "Growth report recipient RSA public key (base64 PEM); NEVER a private key"
@@ -106,3 +106,44 @@ jobs:
             echo "== WorkCV app container"
             cd "${{ github.event.inputs.deploy_dir }}"
             printf '%s' "$CHECK_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T app node --input-type=module
+
+  ssh-sessions:
+    if: ${{ inputs.mode == 'ssh_sessions' }}
+    name: Count SSH sessions (read-only, counts only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Count sessions
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 3m
+          # The repository is public, so this prints counts only: no IP
+          # addresses, user names or host names.
+          script: |
+            set -u
+            echo "== uptime"
+            uptime
+            echo "== Login records (utmp, what uptime counts): $(who | wc -l)"
+            echo "== Login records by login time (date, count; oldest first, last 10 days shown)"
+            who | awk '{print $3}' | sort | uniq -c | tail -10
+            echo "== Live established SSH connections: $(ss -Htn state established '( sport = :22 )' | wc -l)"
+            echo "== Distinct remote addresses on live SSH connections: $(ss -Htn state established '( sport = :22 )' | awk '{print $4}' | sed 's/:[0-9]*$//' | sort -u | wc -l)"
+            echo "== sshd processes: $(pgrep -c sshd || true)"
+            echo "== Logged-in SSH session processes: $(ps -eo cmd | grep -cE '^sshd(-session)?: [^ ]+@' || true)"
+            echo "== Oldest SSH session process age (elapsed time):"
+            ps -eo etimes,cmd --sort=-etimes | grep -E 'sshd(-session)?: [^ ]+@' | grep -v grep | head -1 | awk '{printf "%d days\n", $1/86400}'
+            echo "== logind sessions: $(loginctl list-sessions --no-legend 2>/dev/null | wc -l)"
+            echo "== sshd limits"
+            (sshd -T 2>/dev/null || /usr/sbin/sshd -T 2>/dev/null) | grep -Ei '^(maxstartups|maxsessions|clientaliveinterval|clientalivecountmax|logingracetime) ' || echo "(sshd -T not available to this user)"
+            echo "== SSH log, last 24 hours (counts)"
+            log="$(journalctl -u ssh -u sshd --since '-24h' --no-pager 2>/dev/null || true)"
+            echo "Accepted logins: $(printf '%s\n' "$log" | grep -c 'Accepted ' || true)"
+            echo "Failed password or invalid user attempts: $(printf '%s\n' "$log" | grep -cE 'Failed password|Invalid user' || true)"
+            echo "Dropped by MaxStartups (start-up limit): $(printf '%s\n' "$log" | grep -ciE 'drop connection|MaxStartups|exceeded' || true)"
+            echo "Connections closed during handshake: $(printf '%s\n' "$log" | grep -ciE 'closed by .* \[preauth\]|reset by .* \[preauth\]|Connection closed by authenticating|Timeout before authentication' || true)"
+            echo "fail2ban active: $(systemctl is-active fail2ban 2>/dev/null || echo not installed)"
