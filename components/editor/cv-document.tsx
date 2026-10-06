@@ -177,7 +177,7 @@ function CvName({
 
   return (
     <h2
-      className={`cv-name font-display font-semibold leading-tight ${className}`}
+      className={`cv-name font-cvname font-semibold leading-tight ${className}`}
       data-emergency-break={typography.emergencyBreak ? "true" : "false"}
       style={style}
     >
@@ -307,7 +307,7 @@ function ContactLine({
 }) {
   return (
     <div
-      className={`cv-contact-line mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted ${
+      className={`cv-contact-line mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-cvmuted ${
         align === "center" ? "justify-center" : "justify-end text-right"
       } ${compact ? "max-w-[260px] text-xs leading-5" : ""}`}
     >
@@ -363,7 +363,7 @@ function Entry({
           <h4 className="font-bold text-navy">{title}</h4>
           <p className="text-sm font-bold text-ink">{subtitle}</p>
         </div>
-        <p className="cv-entry-dates shrink-0 whitespace-nowrap text-sm text-muted">{dates}</p>
+        <p className="cv-entry-dates shrink-0 whitespace-nowrap text-sm text-cvmuted">{dates}</p>
       </div>
       {bullets.length > 0 && (
         <ul className={compact ? "mt-2 space-y-1.5" : "mt-3 space-y-2"}>

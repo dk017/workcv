@@ -7,7 +7,12 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="font-display text-2xl font-semibold text-navy">
+        <Link href="/" className="flex items-center gap-2.5 font-display text-2xl font-bold text-navy">
+          <svg aria-hidden="true" viewBox="0 0 64 64" className="h-8 w-8 shrink-0">
+            <rect width="64" height="64" rx="12" fill="#0F2942" />
+            <path d="M12 16h9l6 28h-8L12 16Zm17 0h7l-5 28h-8l6-28Zm9 0h8l-3 28h-8l3-28Zm10 0h8l-7 28h-8l7-28Z" fill="#fff" />
+            <rect x="12" y="50" width="40" height="4" rx="2" fill="#D4A843" />
+          </svg>
           WorkCV
         </Link>
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">

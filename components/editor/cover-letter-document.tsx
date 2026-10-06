@@ -72,7 +72,7 @@ function LetterHeader({ cv, style, contact }: { cv: CvData; style: TemplateId; c
   if (style === "modern") {
     return (
       <header className="letter-header border-l-[10px] border-gold bg-navy px-16 py-9 text-white">
-        <h2 className="letter-name cv-name font-display font-semibold leading-tight" style={nameStyle}>{name}</h2>
+        <h2 className="letter-name cv-name font-cvname font-semibold leading-tight" style={nameStyle}>{name}</h2>
         <div className="letter-contact mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gold-tint">{contactItems}</div>
       </header>
     );
@@ -80,15 +80,15 @@ function LetterHeader({ cv, style, contact }: { cv: CvData; style: TemplateId; c
   if (style === "compact") {
     return (
       <header className="letter-header mx-16 grid grid-cols-[1fr_auto] gap-6 border-b-2 border-navy pb-5 pt-12">
-        <h2 className="letter-name cv-name font-display font-semibold leading-tight text-navy" style={nameStyle}>{name}</h2>
-        <div className="letter-contact flex max-w-[280px] flex-col items-end text-right text-xs leading-5 text-muted">{contactItems}</div>
+        <h2 className="letter-name cv-name font-cvname font-semibold leading-tight text-navy" style={nameStyle}>{name}</h2>
+        <div className="letter-contact flex max-w-[280px] flex-col items-end text-right text-xs leading-5 text-cvmuted">{contactItems}</div>
       </header>
     );
   }
   return (
     <header className="letter-header mx-16 border-b-2 border-navy pb-6 pt-12 text-center">
-      <h2 className="letter-name cv-name font-display font-semibold leading-tight text-navy" style={nameStyle}>{name}</h2>
-      <div className="letter-contact mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-muted">{contactItems}</div>
+      <h2 className="letter-name cv-name font-cvname font-semibold leading-tight text-navy" style={nameStyle}>{name}</h2>
+      <div className="letter-contact mt-3 flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-cvmuted">{contactItems}</div>
     </header>
   );
 }

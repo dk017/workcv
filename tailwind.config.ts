@@ -20,7 +20,9 @@ const config: Config = {
           tint: "#F5E6C0",
         },
         ink: "#1A1A1A",
-        muted: "#6B7280",
+        // Interface text. CV and cover-letter documents use cvmuted so redesigns never change them.
+        muted: "#4B5563",
+        cvmuted: "#6B7280",
         line: {
           DEFAULT: "#E5E2DB",
           strong: "#C9C5BC",
@@ -30,7 +32,10 @@ const config: Config = {
         greensoft: "#F0FDF4",
       },
       fontFamily: {
-        display: ["var(--font-fraunces)", "Georgia", "serif"],
+        // Interface headings.
+        display: ["var(--font-dm-sans)", "Arial", "sans-serif"],
+        // The name line on CVs and cover letters (and their PDFs); lib/cv-typography.ts measures it.
+        cvname: ["var(--font-fraunces)", "Georgia", "serif"],
         sans: ["var(--font-dm-sans)", "Arial", "sans-serif"],
       },
       boxShadow: {

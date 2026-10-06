@@ -44,11 +44,16 @@ body:has(.workcv-embed-root) {
   color: #0f2942;
 }
 
+/* Formerly a graph-paper grid; plain backgrounds read as calmer and more professional. */
 .quiet-grid {
-  background-image:
-    linear-gradient(rgba(15, 41, 66, 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(15, 41, 66, 0.045) 1px, transparent 1px);
-  background-size: 44px 44px;
+  background-image: none;
+}
+
+/* Interface headings in DM Sans sit slightly tighter. tracking-* utilities still win. */
+@layer utilities {
+  .font-display {
+    letter-spacing: -0.02em;
+  }
 }
 
 .container-page {
