@@ -1,11 +1,12 @@
 import Link from "next/link";
 
 import { HeaderAuth } from "@/components/header-auth";
+import { HeaderMenu } from "@/components/header-menu";
 import { routes } from "@/lib/site";
 
 export function Header() {
   return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-line bg-white/95 backdrop-blur">
       <div className="container-page flex h-16 items-center justify-between gap-6">
         <Link href="/" className="flex items-center gap-2.5 font-display text-2xl font-bold text-navy">
           <svg aria-hidden="true" viewBox="0 0 64 64" className="h-8 w-8 shrink-0">
@@ -15,8 +16,8 @@ export function Header() {
           </svg>
           WorkCV
         </Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
-          {routes.slice(1).map((route) => (
+        <nav aria-label="Main" className="hidden items-center gap-7 whitespace-nowrap text-[0.9375rem] font-medium text-muted lg:flex">
+          {routes.map((route) => (
             <Link key={route.href} href={route.href} className="hover:text-navy">
               {route.label}
             </Link>
@@ -26,10 +27,11 @@ export function Header() {
           <HeaderAuth />
           <Link
             href="/editor"
-            className="hidden rounded-md bg-navy px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-navy-hover sm:inline-flex"
+            className="hidden min-h-11 items-center whitespace-nowrap rounded-lg bg-navy px-[18px] text-[0.9375rem] font-bold text-white shadow-sm hover:bg-navy-hover md:inline-flex"
           >
-            Create my CV
+            Build my CV
           </Link>
+          <HeaderMenu />
         </div>
       </div>
     </header>

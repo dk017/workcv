@@ -10,6 +10,8 @@ const config: Config = {
     extend: {
       colors: {
         paper: "#F8F7F3",
+        // Backdrop behind product pictures and CV thumbnails.
+        sand: "#F1EFE9",
         surface: "#FFFFFF",
         navy: {
           DEFAULT: "#0F2942",

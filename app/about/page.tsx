@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { BookOpenCheck, Mail, ShieldCheck, Wallet } from "lucide-react";
 
+import { DirectoryBadges } from "@/components/directory-badges";
 import { ButtonLink, SectionLabel } from "@/components/marketing";
 import { founder, site } from "@/lib/site";
 
@@ -127,6 +128,15 @@ export default function AboutPage() {
             <Link href="/terms" className="underline">terms</Link> and{" "}
             <Link href="/refund-policy" className="underline">refund policy</Link>.
           </p>
+        </div>
+      </section>
+
+      <section aria-labelledby="listings-heading" className="border-t border-line bg-paper py-12">
+        <div className="container-page max-w-4xl">
+          <h2 id="listings-heading" className="text-sm font-bold uppercase tracking-[0.14em] text-navy">Listed on</h2>
+          <div className="mt-5">
+            <DirectoryBadges />
+          </div>
         </div>
       </section>
     </>

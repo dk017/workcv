@@ -40,17 +40,6 @@ export const evidenceRows: EvidenceRow[] = [
   },
 ];
 
-export const forgottenDetails = [
-  "You covered extra shifts when the team was short",
-  "You trained or buddied new starters",
-  "You were trusted with keys, the cash-up or the float",
-  "You calmed an angry customer and kept their business",
-  "You hold a licence or ticket: forklift, CSCS, SIA, food hygiene or a full UK driving licence",
-  "You kept records accurate: care notes, stock counts or delivery logs",
-  "You speak another language at work",
-  "You fixed something that kept going wrong",
-];
-
 export type GuidanceQuote = {
   quote: string;
   source: string;

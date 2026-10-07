@@ -33,9 +33,10 @@ export const commercialRoutes = {
   editor: "/editor?template=classic&new=1",
 } as const;
 
+// Main navigation in the site header.
 export const routes = [
-  { href: "/", label: "Home" },
   { href: "/templates", label: "Templates" },
+  { href: "/cv-examples-uk", label: "CV examples" },
+  { href: "/tools", label: "Free tools" },
   { href: "/pricing", label: "Pricing" },
-  { href: "/#faq", label: "FAQ" },
 ];
