@@ -1,5 +1,5 @@
 import { WORKCV_PASS, WORKCV_PASS_PRODUCT_ID, WORKCV_PRODUCT_ID } from "@/lib/commerce";
-import { ensurePaymentTables, getPool } from "@/lib/db";
+import { ensureAuthTables, ensurePaymentTables, getPool } from "@/lib/db";
 import { passStatusFrom, unlockedDocumentSql, type PassStatus } from "@/lib/pass-rules";
 import {
   PASS_UPGRADE_WINDOW_DAYS,
@@ -56,4 +56,48 @@ export async function getUpgradeOffer(
     passActive: pass.active,
     now,
   });
+}
+
+export type AccountOrder = {
+  id: string;
+  plan: "pass" | "cv";
+  amountMinor: number | null;
+  currency: string | null;
+  paidAt: string;
+  refunded: boolean;
+  cvTargetRole: string | null;
+  cvEmployer: string | null;
+};
+
+// The user's own orders, newest first, with the CV each single-CV order unlocked.
+export async function listAccountOrders(userId: string): Promise<AccountOrder[]> {
+  await Promise.all([ensureAuthTables(), ensurePaymentTables()]);
+  const result = await getPool().query<{
+    id: string;
+    product_id: string;
+    amount_cents: number | null;
+    currency: string | null;
+    paid_at: Date;
+    refunded_at: Date | null;
+    target_role: string | null;
+    employer: string | null;
+  }>(
+    `SELECT o.id, o.product_id, o.amount_cents, o.currency, o.paid_at, o.refunded_at,
+            d.data->>'targetRole' AS target_role, d.data->'coverLetter'->>'employer' AS employer
+     FROM workcv_orders o
+     LEFT JOIN workcv_cv_documents d ON d.id = o.draft_id AND d.user_id = o.user_id
+     WHERE o.user_id = $1
+     ORDER BY o.paid_at DESC`,
+    [userId],
+  );
+  return result.rows.map((row) => ({
+    id: row.id,
+    plan: row.product_id === WORKCV_PASS_PRODUCT_ID ? "pass" : "cv",
+    amountMinor: row.amount_cents,
+    currency: row.currency,
+    paidAt: row.paid_at.toISOString(),
+    refunded: row.refunded_at !== null,
+    cvTargetRole: row.target_role?.trim() || null,
+    cvEmployer: row.employer?.trim() || null,
+  }));
 }

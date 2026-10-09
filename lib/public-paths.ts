@@ -27,6 +27,8 @@ export function isPublicMeasurementPath(pathname: string) {
     path === "/login" ||
     path === "/editor" ||
     path === "/my-cvs" ||
+    path.startsWith("/my-cvs/") ||
+    path === "/account" ||
     path === "/cv-pdf-parity" ||
     path.startsWith("/cv-pdf/") ||
     path === "/agent-markdown" ||

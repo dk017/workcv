@@ -5,6 +5,7 @@ import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import {
   CvUpdateConflictError,
+  deleteCvDocument,
   getCvDocument,
   getOrCreateCurrentCv,
   parseTemplate,
@@ -96,4 +97,17 @@ export async function PUT(request: NextRequest) {
     });
     throw error;
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  const user = await getCurrentUserFromRequest(request);
+  if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const documentId = request.nextUrl.searchParams.get("documentId") || "";
+  if (!/^[a-zA-Z0-9_-]{12,80}$/.test(documentId)) {
+    return NextResponse.json({ error: "Invalid CV" }, { status: 400 });
+  }
+  const deleted = await deleteCvDocument(user.id, documentId);
+  if (!deleted) return NextResponse.json({ error: "CV not found" }, { status: 404 });
+  return NextResponse.json({ deleted: true });
 }

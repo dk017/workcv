@@ -28,7 +28,9 @@ export type CvDocumentSummary = {
   targetRole: string;
   template: TemplateId;
   updatedAt: string;
+  createdAt: string;
   paid: boolean;
+  data: CvData;
 };
 
 function isValidTemplate(value: unknown): value is TemplateId {
@@ -147,6 +149,7 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
     data: CvData;
     template_id: string;
     updated_at: Date;
+    created_at: Date;
     paid: boolean;
   }>(
     `
@@ -156,6 +159,7 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
         d.data,
         d.template_id,
         d.updated_at,
+        d.created_at,
         ${unlockedDocumentSql("$2", "$3")} AS paid
       FROM workcv_cv_documents d
       WHERE d.user_id = $1
@@ -172,7 +176,9 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
       targetRole: data.targetRole?.trim() || "No target role added",
       template: data.template,
       updatedAt: row.updated_at.toISOString(),
+      createdAt: row.created_at.toISOString(),
       paid: row.paid,
+      data,
     };
   });
 }
@@ -294,6 +300,13 @@ export async function updateCvDocument(
     return null;
   }
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
+}
+
+// Deletes one of the user's own CVs. Orders keep their record of what was bought.
+export async function deleteCvDocument(userId: string, documentId: string) {
+  await ensureAuthTables();
+  const result = await getPool().query("DELETE FROM workcv_cv_documents WHERE id = $1 AND user_id = $2", [documentId, userId]);
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function userOwnsCvDocument(userId: string, documentId: string) {

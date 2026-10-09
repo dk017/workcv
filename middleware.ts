@@ -24,7 +24,8 @@ export function middleware(request: NextRequest) {
   const privatePath =
     pathname === "/admin" || pathname.startsWith("/admin/") ||
     pathname === "/editor" ||
-    pathname === "/my-cvs" ||
+    pathname === "/my-cvs" || pathname.startsWith("/my-cvs/") ||
+    pathname === "/account" ||
     pathname.startsWith("/cv-pdf/");
 
   if (pathname === "/login") {
@@ -49,5 +50,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/editor", "/my-cvs", "/cv-pdf/:path*", "/admin/:path*"],
+  matcher: ["/", "/login", "/editor", "/my-cvs", "/my-cvs/:path*", "/account", "/cv-pdf/:path*", "/admin/:path*"],
 };

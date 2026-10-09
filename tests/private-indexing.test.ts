@@ -24,7 +24,7 @@ test("middleware adds response-level noindex to private routes only", () => {
   assert.match(loginRobots, /follow/);
   assert.doesNotMatch(loginRobots, /nofollow/);
 
-  for (const path of ["/editor", "/my-cvs", "/cv-pdf/cv_123"]) {
+  for (const path of ["/editor", "/my-cvs", "/my-cvs/tracker", "/account", "/cv-pdf/cv_123"]) {
     const response = middleware(new NextRequest(`https://workcv.co.uk${path}`));
     const robots = response.headers.get("x-robots-tag") || "";
     assert.match(robots, /noindex/);

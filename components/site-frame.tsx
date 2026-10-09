@@ -10,6 +10,8 @@ export function SiteFrame({ children, header, footer }: { children: React.ReactN
   const analytics = <Script defer data-site="hq2xtnu4" data-domain="workcv.co.uk" src="https://piqo.app/piqo.js" strategy="afterInteractive" />;
   // The CV editor is a focused app screen with its own top bar.
   if (pathname === "/editor") return <>{analytics}<main>{children}</main></>;
+  // Signed-in pages use the app shell, which has its own navigation and <main>.
+  if (pathname === "/account" || pathname === "/my-cvs" || pathname.startsWith("/my-cvs/")) return <>{analytics}{children}</>;
   return <>
     {analytics}
     {header}<SiteBreadcrumbs /><main>{children}</main>{footer}

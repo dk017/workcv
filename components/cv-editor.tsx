@@ -18,6 +18,7 @@ import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, step
 import { useCvEditor } from "@/components/editor/use-cv-editor";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { cvPapers, resolveCvDesign } from "@/lib/cv-design";
+import { cvDisplayTitle } from "@/lib/cv-label";
 import { emptyEducation, emptyExperience, lines } from "@/lib/editor-data";
 import { trackEditorEvent } from "@/lib/editor-events";
 import { vacancyTargeting } from "@/lib/job-tailor";
@@ -208,7 +209,7 @@ export function CvEditor() {
     goToStep(target, entryId);
   };
 
-  const cvTitle = [cv.targetRole.trim() || "Untitled CV", cv.coverLetter?.employer.trim()].filter(Boolean).join(" · ");
+  const cvTitle = cvDisplayTitle(cv);
   const saveTone = saveSnapshot.status === "error" ? "text-[#8d3030] font-bold" : "text-muted";
 
   const advertPanel = (

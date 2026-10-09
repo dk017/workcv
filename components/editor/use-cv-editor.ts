@@ -169,6 +169,9 @@ export function useCvEditor() {
             params.delete("new");
             params.delete("roleTemplate");
             params.delete("layoutPreset");
+            // "Upload an existing CV" on My CVs opens the import dialog on the new CV.
+            if (params.get("import") === "1") setImportOpen(true);
+            params.delete("import");
             params.set("draftId", data.document.id);
             const nextUrl = `${window.location.pathname}${
               params.toString() ? `?${params.toString()}` : ""
