@@ -72,6 +72,7 @@ import {
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { useAccessibleDialog } from "@/components/editor/use-accessible-dialog";
 import { createCvSaveManager } from "@/components/editor/create-cv-save-manager";
+import { tabForCvField } from "@/lib/cv-save-validation";
 import { readCheckoutAttribution } from "@/components/attribution-capture";
 import { MemoCvDocument } from "@/components/editor/cv-document";
 import { CvStructureForm, ApplicationPackReview } from "@/components/editor/cv-structure-form";
@@ -126,6 +127,7 @@ export function CvEditor() {
     status: "saving",
     error: null,
     errorKind: null,
+    errorDetail: null,
     version: 0,
   });
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
@@ -176,6 +178,8 @@ export function CvEditor() {
   const lastManagedCvRef = useRef<CvData | null>(null);
   const undoRef = useRef<(() => void) | null>(null);
   const previousSaveStatusRef = useRef<SaveSnapshot["status"]>("saving");
+  // Every edit to an invalid field fails its save again; report each field once.
+  const trackedInvalidFieldRef = useRef<string | null>(null);
   const trackedMilestonesRef = useRef(new Set<number>());
   const trackedSectionsRef = useRef(new Set<string>());
   const previewReadyDocumentRef = useRef<string | null>(null);
@@ -276,6 +280,7 @@ export function CvEditor() {
             status: "error",
             error: "Could not load your saved CV.",
             errorKind: "general",
+            errorDetail: null,
             version: 0,
           });
           setLoaded(true);
@@ -621,16 +626,22 @@ export function CvEditor() {
 
   useEffect(() => {
     const previous = previousSaveStatusRef.current;
-    if (saveSnapshot.status === "error" && previous !== "error") {
+    if (saveSnapshot.status === "saved") trackedInvalidFieldRef.current = null;
+    const repeatedInvalidField =
+      saveSnapshot.errorKind === "invalid" &&
+      saveSnapshot.errorDetail === trackedInvalidFieldRef.current;
+    if (saveSnapshot.status === "error" && previous !== "error" && !repeatedInvalidField) {
+      if (saveSnapshot.errorKind === "invalid") trackedInvalidFieldRef.current = saveSnapshot.errorDetail;
       trackEditorEvent("save_failed", draftId, {
         error_kind: saveSnapshot.errorKind || "unknown",
+        ...(saveSnapshot.errorDetail ? { detail: saveSnapshot.errorDetail } : {}),
       });
     }
     if (saveSnapshot.status === "saving" && previous === "error") {
       trackEditorEvent("save_retried", draftId);
     }
     previousSaveStatusRef.current = saveSnapshot.status;
-  }, [draftId, saveSnapshot.status]);
+  }, [draftId, saveSnapshot.status, saveSnapshot.errorKind, saveSnapshot.errorDetail]);
 
   useEffect(() => {
     const flushOnExit = () => {
@@ -914,6 +925,7 @@ export function CvEditor() {
         status: "error",
         error: error instanceof Error ? error.message : "Could not create a new CV",
         errorKind: "general",
+        errorDetail: null,
       }));
       return false;
     } finally {
@@ -943,7 +955,7 @@ export function CvEditor() {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       let response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
       if (response.status === 503) {
         trackEditorEvent("pdf_generation_retried", draftId);
@@ -971,7 +983,7 @@ export function CvEditor() {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       const response = await fetch(`/api/cv/docx?draftId=${encodeURIComponent(draftId)}`);
       if (!response.ok) {
         const data = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -997,7 +1009,7 @@ export function CvEditor() {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       const url = `/api/cv/cover-letter?draftId=${encodeURIComponent(draftId)}&format=${format}`;
       let response = await fetch(url);
       if (response.status === 503 && format === "pdf") {
@@ -1122,6 +1134,10 @@ export function CvEditor() {
         : saveSnapshot.status === "unsaved"
           ? "Unsaved changes"
           : saveSnapshot.error || "Save failed";
+  const invalidFieldTab =
+    saveSnapshot.errorKind === "invalid" && saveSnapshot.errorDetail
+      ? tabForCvField(saveSnapshot.errorDetail)
+      : null;
 
   useEffect(() => {
     if (paymentState !== "paid" || !upgradeOffer?.eligible || passStatus?.active || upgradeShownRef.current) return;
@@ -1265,7 +1281,22 @@ export function CvEditor() {
               aria-live="polite"
             >
               {saveLabel}
-              {saveSnapshot.status === "error" && (
+              {saveSnapshot.status === "error" && saveSnapshot.errorKind === "invalid" ? (
+                // Retrying unchanged data fails again; take the user to the field instead.
+                (invalidFieldTab || saveSnapshot.errorDetail?.startsWith("targeting")) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMobileView("edit");
+                      if (invalidFieldTab) setActiveTab(invalidFieldTab);
+                      else setTailoringOpen(true);
+                    }}
+                    className="ml-2 underline"
+                  >
+                    Show me
+                  </button>
+                )
+              ) : saveSnapshot.status === "error" && (
                 <button
                   type="button"
                   onClick={() => {

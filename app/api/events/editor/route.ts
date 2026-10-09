@@ -59,21 +59,19 @@ export async function POST(request: NextRequest) {
   );
 
   if (eventName === "save_failed") {
+    const errorKind = typeof metadata.error_kind === "string" ? metadata.error_kind : "unknown";
+    // The field for an invalid save, or network / http_<status> otherwise.
+    const detail = typeof metadata.detail === "string" ? metadata.detail : null;
     await reportConversionFailure({
       category: "repeated_cv_save_failure",
       title: "Repeated CV saves failed",
       userId: user.id,
       documentId,
-      error:
-        typeof metadata.error_kind === "string"
-          ? `Client save error: ${metadata.error_kind}`
-          : "The editor reported a failed save.",
+      error: `Client save error: ${errorKind}${detail ? ` (${detail})` : ""}`,
       context: {
         route: "/api/events/editor",
-        error_kind:
-          typeof metadata.error_kind === "string"
-            ? metadata.error_kind
-            : "unknown",
+        error_kind: errorKind,
+        detail: detail || "none",
       },
       threshold: 3,
       windowMinutes: 15,

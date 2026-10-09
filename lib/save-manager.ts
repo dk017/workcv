@@ -3,7 +3,9 @@ export type SaveStatus = "saved" | "saving" | "unsaved" | "error";
 export type SaveSnapshot = {
   status: SaveStatus;
   error: string | null;
-  errorKind: "conflict" | "general" | null;
+  errorKind: "conflict" | "invalid" | "general" | null;
+  /** Field for an invalid save, or "network" / "http_<status>"; safe for analytics. */
+  errorDetail: string | null;
   version: number;
 };
 
@@ -16,6 +18,40 @@ export class SaveConflictError extends Error {
   }
 }
 
+/** The data would be rejected, so retrying cannot help until the field is changed. */
+export class SaveValidationError extends Error {
+  readonly field: string;
+
+  constructor(message: string, field: string) {
+    super(message);
+    this.name = "SaveValidationError";
+    this.field = field;
+  }
+}
+
+/** The request failed: status 0 when the server could not be reached. */
+export class SaveRequestError extends Error {
+  readonly status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "SaveRequestError";
+    this.status = status;
+  }
+}
+
+function errorKindFor(error: unknown): SaveSnapshot["errorKind"] {
+  if (error instanceof SaveConflictError) return "conflict";
+  if (error instanceof SaveValidationError) return "invalid";
+  return "general";
+}
+
+function errorDetailFor(error: unknown) {
+  if (error instanceof SaveValidationError) return error.field;
+  if (error instanceof SaveRequestError) return error.status === 0 ? "network" : `http_${error.status}`;
+  return null;
+}
+
 export class DebouncedSaveManager<T> {
   private value: T;
   private revision: string;
@@ -24,6 +60,7 @@ export class DebouncedSaveManager<T> {
   private status: SaveStatus = "saved";
   private error: string | null = null;
   private errorKind: SaveSnapshot["errorKind"] = null;
+  private errorDetail: string | null = null;
   private timer: ReturnType<typeof setTimeout> | null = null;
   private activeSave: Promise<boolean> | null = null;
   private disposed = false;
@@ -62,6 +99,7 @@ export class DebouncedSaveManager<T> {
       status: this.status,
       error: this.error,
       errorKind: this.errorKind,
+      errorDetail: this.errorDetail,
       version: this.version,
     };
   }
@@ -73,6 +111,7 @@ export class DebouncedSaveManager<T> {
     this.status = "unsaved";
     this.error = null;
     this.errorKind = null;
+    this.errorDetail = null;
     this.emit();
     this.schedule();
   }
@@ -98,6 +137,7 @@ export class DebouncedSaveManager<T> {
     this.status = "saving";
     this.error = null;
     this.errorKind = null;
+    this.errorDetail = null;
     this.emit();
 
     const operation = this.save(savingValue, savingRevision, options)
@@ -108,6 +148,7 @@ export class DebouncedSaveManager<T> {
           this.status = "saved";
           this.error = null;
           this.errorKind = null;
+          this.errorDetail = null;
         } else {
           this.status = "unsaved";
           this.schedule();
@@ -119,7 +160,8 @@ export class DebouncedSaveManager<T> {
         this.status = "error";
         this.error =
           error instanceof Error ? error.message : "Your changes could not be saved.";
-        this.errorKind = error instanceof SaveConflictError ? "conflict" : "general";
+        this.errorKind = errorKindFor(error);
+        this.errorDetail = errorDetailFor(error);
         this.emit();
         return false;
       })

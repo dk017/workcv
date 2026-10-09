@@ -29,6 +29,7 @@ function lineList(maxLines: number, maxLineLength: number, maxLength: number) {
         context.addIssue({
           code: "custom",
           message: `Must contain no more than ${maxLines} lines`,
+          params: { limit: "lines", maximum: maxLines },
         });
         return z.NEVER;
       }
@@ -36,6 +37,7 @@ function lineList(maxLines: number, maxLineLength: number, maxLength: number) {
         context.addIssue({
           code: "custom",
           message: `Each line must contain no more than ${maxLineLength} characters`,
+          params: { limit: "line_length", maximum: maxLineLength },
         });
         return z.NEVER;
       }
@@ -304,11 +306,4 @@ export function repairCvData(
   }
 
   return parseCvData(repaired);
-}
-
-export function formatCvValidationError(error: CvValidationError) {
-  if (error.issues.length === 0) return error.message;
-  const issue = error.issues[0];
-  const field = issue.path.length > 0 ? issue.path.join(".") : "CV data";
-  return `${field}: ${issue.message}`;
 }
