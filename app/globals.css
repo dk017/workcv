@@ -693,7 +693,8 @@ main section.py-24 {
 }
 
 /* Finish step: each part of the CV page opens the step that edits it. Outlines don't move the layout. */
-.cv-click-to-edit :is(.cv-header, .cv-section, [data-cv-section], .cv-template-modern .cv-name) {
+.cv-click-to-edit :is(.cv-header, .cv-section, [data-cv-section], .cv-template-modern .cv-name),
+.cv-click-to-edit .letter-document {
   cursor: pointer;
 }
 

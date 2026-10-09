@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Copy, Download, FileText, LayoutTemplate, Mail, MoreHorizontal, Plus, SlidersHorizontal, Sparkles, Undo2, Upload } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Copy, Download, Eye, FileText, LayoutTemplate, Mail, Menu, Plus, SlidersHorizontal, Sparkles, Undo2, Upload, X } from "lucide-react";
 
+import { AppMenuDrawer, AppRail } from "@/components/app/app-rail";
 import { MemoCvDocument } from "@/components/editor/cv-document";
 import { CoverLetterDocument } from "@/components/editor/cover-letter-document";
 import { CoverLetterForm } from "@/components/editor/cover-letter-form";
@@ -11,7 +12,7 @@ import { ApplicationPackReview, CvStructureForm } from "@/components/editor/cv-s
 import { ContactStep, EducationStep, ProfileStep, RoleStep, SkillsStep, StepHeading } from "@/components/editor/editor-forms";
 import { DesignToolbar } from "@/components/editor/design-toolbar";
 import { AiReviewModal, CheckoutSheet, ImportCvModal, TemplatePickerModal } from "@/components/editor/editor-modals";
-import { AdvertWords, EditorNotices, EntryList, FinishStep, ImportCard, ReadinessCard, ReadinessRing, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
+import { AdvertWords, EditorNotices, EntryList, FinishStep, ImportCard, ReadinessCard, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
 import { PurposeSurvey } from "@/components/editor/purpose-survey";
 import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
@@ -27,7 +28,7 @@ import { addSkillLine, addSkippedKeyword } from "@/lib/keyword-triage";
 export { CvDocument } from "@/components/editor/cv-document";
 
 const menuItem = "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60";
-const closeMenu = (event: React.MouseEvent<HTMLElement>) => event.currentTarget.closest("details")?.removeAttribute("open");
+const closeMenuDetails = (event: React.MouseEvent<HTMLElement>) => event.currentTarget.closest("details")?.removeAttribute("open");
 
 export function CvEditor() {
   const editor = useCvEditor();
@@ -55,6 +56,8 @@ export function CvEditor() {
     creatingNew,
     previewRef,
     previewPageCount,
+    previewOpen,
+    setPreviewOpen,
     fitMessage,
     changeDesign,
     resetDesign,
@@ -110,8 +113,10 @@ export function CvEditor() {
 
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
   const [selectedEducationId, setSelectedEducationId] = useState<string | null>(null);
-  const [previewHidden, setPreviewHidden] = useState(false);
   const [designOpen, setDesignOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  // On Finish the page can show the CV or its cover letter.
+  const [finishDocument, setFinishDocument] = useState<"cv" | "letter">("cv");
 
   const role = cv.experience.find((item) => item.id === selectedRoleId) ?? cv.experience[0];
   const roleIndex = role ? cv.experience.indexOf(role) : 0;
@@ -121,7 +126,9 @@ export function CvEditor() {
   const previous = previousStep(step);
   // Finish puts the page in the middle with the design toolbar above it.
   const finishing = step === "finish";
-  const showPreview = finishing || !previewHidden;
+  // The page is only on screen at Finish, or when the user opens Preview.
+  const pageDocument = finishing ? finishDocument : step === "letter" ? "letter" : "cv";
+  const pageClickable = finishing || previewOpen;
 
   // The step lives in the URL so refresh and the browser Back button keep your place.
   useEffect(() => {
@@ -142,6 +149,14 @@ export function CvEditor() {
     window.history.replaceState(window.history.state, "", `${window.location.pathname}?${params.toString()}`);
   }, [loaded, step]);
 
+  // Keep the current step in view in the scrolling step bar on narrow screens.
+  useEffect(() => {
+    const current = document.querySelector<HTMLElement>('nav[aria-label="CV steps"] [aria-current="step"]');
+    const bar = current?.closest("nav");
+    if (!current || !bar || bar.scrollWidth <= bar.clientWidth) return;
+    bar.scrollTo({ left: current.offsetLeft - (bar.clientWidth - current.offsetWidth) / 2 });
+  }, [step, loaded]);
+
   const goToStep = (target: StepId, entryId?: string) => {
     if (target === "letter" && step !== "letter") trackEditorEvent("cover_letter_opened", draftId);
     if (entryId && target === "experience") setSelectedRoleId(entryId);
@@ -152,11 +167,21 @@ export function CvEditor() {
       window.history.pushState(null, "", `${window.location.pathname}?${params.toString()}`);
     }
     setStep(target);
+    setPreviewOpen(false);
     setMobileView("edit");
     window.scrollTo({ top: 0 });
   };
 
-  const leaveEditor = (event: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+  const closePreview = useCallback(() => setPreviewOpen(false), [setPreviewOpen]);
+  useEffect(() => {
+    if (!previewOpen) return;
+    const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") closePreview(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [previewOpen, closePreview]);
+
+  const leaveEditor = (event: React.MouseEvent<HTMLElement>, href: string) => {
     if (!saveManagerRef.current?.hasUnsavedChanges()) return;
     event.preventDefault();
     void saveManagerRef.current.flush().then((saved) => {
@@ -196,8 +221,12 @@ export function CvEditor() {
 
   // On Finish, clicking part of the page opens the step that edits it.
   const openSectionFromPage = (event: React.MouseEvent<HTMLDivElement>) => {
-    if (!finishing) return;
+    if (!pageClickable) return;
     const clicked = event.target as HTMLElement;
+    if (clicked.closest(".letter-document")) {
+      goToStep("letter");
+      return;
+    }
     const part = clicked.closest<HTMLElement>(".cv-header, .cv-section, [data-cv-section], .cv-template-modern .cv-name");
     if (!part) return;
     const section = part.dataset.cvSection
@@ -380,7 +409,7 @@ export function CvEditor() {
               intro="Check each page, change the design on the page if you like, then download both as PDF and Word."
             />
             <FinishStep editor={editor} onGoTo={goToStep} />
-            <button type="button" onClick={() => { setMobileView("preview"); setDesignOpen(true); window.scrollTo({ top: 0 }); }} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-line-strong font-bold text-navy lg:hidden">
+            <button type="button" onClick={() => { setMobileView("preview"); setDesignOpen(true); window.scrollTo({ top: 0 }); }} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
               <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />Change fonts, spacing and colour
             </button>
             {cv.targeting && <TailorCard editor={editor} onOpenAdvert={openAdvert} />}
@@ -434,19 +463,103 @@ export function CvEditor() {
     }
   };
 
+  const cvMenuItems = (close: (event: React.MouseEvent<HTMLElement>) => void) => (
+    <>
+      <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} className={menuItem}><FileText className="h-4 w-4" />All my CVs</Link>
+      <button type="button" onClick={(event) => { close(event); trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className={menuItem}>
+        <LayoutTemplate className="h-4 w-4" />
+        Template: {selectedTemplate?.name ?? "Choose"}
+      </button>
+      <button type="button" onClick={(event) => { close(event); openAdvert(); }} className={menuItem}><Sparkles className="h-4 w-4" />Tailor to job</button>
+      <button type="button" onClick={(event) => { close(event); setImportOpen(true); }} className={menuItem}><Upload className="h-4 w-4" />Import CV</button>
+      <button type="button" onClick={(event) => { close(event); void resetDraft(); }} disabled={creatingNew} className={menuItem}><Plus className="h-4 w-4" />{creatingNew ? "Creating..." : "New CV"}</button>
+      <button type="button" onClick={(event) => { close(event); if (draftId) void resetDraft(draftId); }} disabled={creatingNew || !draftId} className={menuItem}><Copy className="h-4 w-4" />Duplicate for another job</button>
+    </>
+  );
+
+  const paperLabel = cvPapers[resolveCvDesign(cv.design).paper].label;
+  const pageArea = (
+    <>
+      {finishing && loaded && (
+        <div className="editor-chrome px-4 pt-4 sm:px-6">
+          <button type="button" aria-expanded={designOpen} onClick={() => setDesignOpen((open) => !open)} className="mb-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
+            <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />{designOpen ? "Hide design settings" : "Design"}
+          </button>
+          <div className={`${designOpen ? "block" : "hidden"} lg:block`}>
+            <DesignToolbar
+              template={cv.template}
+              design={cv.design}
+              pages={previewPageCount}
+              fitMessage={fitMessage}
+              onDesign={changeDesign}
+              onTemplate={(template) => {
+                updateField("template", template);
+                trackEditorEvent("template_selected", draftId, { template });
+              }}
+              onFit={fitToPages}
+              onReset={resetDesign}
+            />
+          </div>
+        </div>
+      )}
+      <div className="editor-chrome flex flex-wrap items-center justify-between gap-3 px-4 pb-2 pt-4 text-[0.8125rem] font-bold sm:px-6">
+        <span className="text-muted">
+          {paperLabel} · {pageDocument === "letter" ? "Cover letter" : `${selectedTemplate?.name ?? "Classic"} · ${previewPageCount} ${previewPageCount === 1 ? "page" : "pages"}`}
+        </span>
+        {finishing && (
+          <div role="group" aria-label="Show on the page" className="flex rounded-lg bg-sand p-[3px]">
+            {(["cv", "letter"] as const).map((kind) => (
+              <button key={kind} type="button" aria-pressed={finishDocument === kind} onClick={() => setFinishDocument(kind)} className={`min-h-8 rounded-md px-3 text-[0.8125rem] ${finishDocument === kind ? "bg-white font-bold text-navy shadow-[0_1px_3px_rgba(15,41,66,0.15)]" : "font-semibold text-muted hover:text-navy"}`}>
+                {kind === "cv" ? "CV" : "Cover letter"}
+              </button>
+            ))}
+          </div>
+        )}
+        {pageClickable && <span className="hidden text-muted xl:inline">Click any part of the page to edit it</span>}
+      </div>
+      {pageDocument === "cv" && previewPageCount > 2 && (
+        <div className="editor-chrome mx-4 mb-3 flex flex-col gap-3 rounded-xl border border-gold bg-gold-tint p-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between" role="status">
+          <div>
+            <p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p>
+            <p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p>
+          </div>
+          {cv.template !== "compact" && (
+            <button type="button" onClick={() => updateField("template", "compact")} className="min-h-10 shrink-0 rounded-lg bg-navy px-4 text-sm font-bold text-white">Use Compact</button>
+          )}
+        </div>
+      )}
+      <div className="cv-preview-viewport px-4 pb-28 sm:px-6 lg:pb-8">
+        <div ref={previewRef} onClick={openSectionFromPage} className={`cv-preview-scale relative ${pageClickable ? "cv-click-to-edit" : ""}`}>
+          {pageDocument === "letter" ? <CoverLetterDocument cv={cv} /> : <MemoCvDocument cv={cv} />}
+        </div>
+      </div>
+    </>
+  );
+
   return (
-    <div className="print-page min-h-screen bg-white">
+    <div className="print-page min-h-screen bg-paper lg:pl-[76px]">
+      <AppRail onNavigate={leaveEditor} />
+      <AppMenuDrawer open={menuOpen} onClose={closeMenu} onLinkClick={leaveEditor} />
+
       <header className="editor-chrome sticky top-0 z-30 border-b border-line bg-white">
-        <div className="flex h-14 items-center justify-between gap-3 px-4 sm:h-16 sm:px-6">
+        <div className="flex h-14 items-center justify-between gap-3 px-4 sm:h-[60px] sm:px-6">
           <div className="flex min-w-0 items-center gap-3">
-            <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} aria-label="Back to My CVs" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-navy">
+            <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} aria-label="Back to My CVs" className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-navy lg:hidden">
               <svg aria-hidden="true" viewBox="0 0 64 64" className="h-5 w-5">
                 <path d="M12 16h9l6 28h-8L12 16Zm17 0h7l-5 28h-8l6-28Zm9 0h8l-3 28h-8l3-28Zm10 0h8l-7 28h-8l7-28Z" fill="#fff" />
                 <rect x="12" y="50" width="40" height="4" rx="2" fill="#D4A843" />
               </svg>
             </Link>
-            <span aria-hidden="true" className="hidden text-xl text-line-strong sm:inline">/</span>
-            <p className="min-w-0 truncate font-bold text-navy">{cvTitle}</p>
+            <details className="editor-menu relative min-w-0">
+              <summary className="flex min-h-10 min-w-0 cursor-pointer list-none items-center gap-1.5 rounded-lg px-2 font-extrabold text-navy hover:bg-paper [&::-webkit-details-marker]:hidden">
+                <span className="truncate">{cvTitle}</span>
+                <ChevronDown className="h-4 w-4 shrink-0" aria-hidden="true" />
+                <span className="sr-only">CV options</span>
+              </summary>
+              <div className="absolute left-0 z-40 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-white p-1 shadow-soft">
+                {cvMenuItems(closeMenuDetails)}
+              </div>
+            </details>
           </div>
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <span className={`flex items-center gap-1.5 text-sm ${saveTone}`} aria-live="polite">
@@ -469,198 +582,174 @@ export function CvEditor() {
               )}
             </span>
             {passStatus?.active && (
-              <span className="hidden min-h-9 items-center rounded-lg border border-gold bg-gold-tint px-3 text-xs font-bold text-navy md:inline-flex" title="Every CV you create before your Job Search Pass ends is unlocked.">
+              <span className="hidden min-h-9 items-center rounded-lg border border-gold bg-gold-tint px-3 text-xs font-bold text-navy xl:inline-flex" title="Every CV you create before your Job Search Pass ends is unlocked.">
                 Job Search Pass · {passStatus.daysLeft} {passStatus.daysLeft === 1 ? "day" : "days"} left
               </span>
             )}
-            <details className="editor-menu relative">
-              <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg border border-line-strong bg-white px-3 text-sm font-bold text-navy hover:bg-paper [&::-webkit-details-marker]:hidden">
-                <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
-                More
-              </summary>
-              <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-white p-1 shadow-soft">
-                <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} className={menuItem}><FileText className="h-4 w-4" />My CVs</Link>
-                <button type="button" onClick={(event) => { closeMenu(event); trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className={menuItem}>
-                  <LayoutTemplate className="h-4 w-4" />
-                  Template: {selectedTemplate?.name ?? "Choose"}
-                </button>
-                <button type="button" onClick={(event) => { closeMenu(event); openAdvert(); }} className={menuItem}><Sparkles className="h-4 w-4" />Tailor to job</button>
-                <button type="button" onClick={(event) => { closeMenu(event); setImportOpen(true); }} className={menuItem}><Upload className="h-4 w-4" />Import CV</button>
-                <button type="button" onClick={(event) => { closeMenu(event); void resetDraft(); }} disabled={creatingNew} className={menuItem}><Plus className="h-4 w-4" />{creatingNew ? "Creating..." : "New CV"}</button>
-                <button type="button" onClick={(event) => { closeMenu(event); if (draftId) void resetDraft(draftId); }} disabled={creatingNew || !draftId} className={menuItem}><Copy className="h-4 w-4" />Duplicate for another job</button>
-              </div>
-            </details>
-            {pdfUnlocked ? (
+            {!finishing && (
+              <button type="button" onClick={() => setPreviewOpen(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line-strong bg-white px-2.5 text-sm font-bold text-navy hover:bg-paper sm:px-3.5">
+                <Eye className="h-4 w-4" aria-hidden="true" />
+                <span className="sr-only sm:not-sr-only">Preview</span>
+              </button>
+            )}
+            {pdfUnlocked && (
               <details className="relative hidden sm:block">
                 <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover [&::-webkit-details-marker]:hidden">
                   <Download className="h-4 w-4" aria-hidden="true" />
                   {pdfDownloading || docxDownloading || letterDownloading ? "Preparing…" : "Download"}
                 </summary>
                 <div className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-xl border border-line bg-white p-1 shadow-soft">
-                  <button type="button" disabled={pdfDownloading} onClick={(event) => { closeMenu(event); startDownload(); }} className={menuItem}><Download className="h-4 w-4" />CV as PDF</button>
-                  <button type="button" disabled={docxDownloading} onClick={(event) => { closeMenu(event); void downloadDocx(); }} className={menuItem}><FileText className="h-4 w-4" />CV as Word</button>
+                  <button type="button" disabled={pdfDownloading} onClick={(event) => { closeMenuDetails(event); startDownload(); }} className={menuItem}><Download className="h-4 w-4" />CV as PDF</button>
+                  <button type="button" disabled={docxDownloading} onClick={(event) => { closeMenuDetails(event); void downloadDocx(); }} className={menuItem}><FileText className="h-4 w-4" />CV as Word</button>
                   {hasCoverLetterContent(cv) ? (
                     <>
-                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenu(event); void downloadCoverLetter("pdf"); }} className={menuItem}><Download className="h-4 w-4" />Cover letter as PDF</button>
-                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenu(event); void downloadCoverLetter("docx"); }} className={menuItem}><FileText className="h-4 w-4" />Cover letter as Word</button>
+                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenuDetails(event); void downloadCoverLetter("pdf"); }} className={menuItem}><Download className="h-4 w-4" />Cover letter as PDF</button>
+                      <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenuDetails(event); void downloadCoverLetter("docx"); }} className={menuItem}><FileText className="h-4 w-4" />Cover letter as Word</button>
                     </>
                   ) : (
-                    <button type="button" onClick={(event) => { closeMenu(event); goToStep("letter"); }} className={menuItem}><Mail className="h-4 w-4" />Write your cover letter</button>
+                    <button type="button" onClick={(event) => { closeMenuDetails(event); goToStep("letter"); }} className={menuItem}><Mail className="h-4 w-4" />Write your cover letter</button>
                   )}
                 </div>
               </details>
-            ) : (
-              step !== "finish" && (
-                <button type="button" onClick={() => goToStep("finish")} className="hidden min-h-10 items-center rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover sm:inline-flex">
-                  Finish and download
-                </button>
-              )
             )}
+            <button type="button" onClick={() => setMenuOpen(true)} aria-expanded={menuOpen} className="grid h-10 w-10 place-items-center rounded-lg border border-line-strong text-navy lg:hidden">
+              <Menu className="h-5 w-5" aria-hidden="true" />
+              <span className="sr-only">Menu</span>
+            </button>
           </div>
         </div>
-        <nav aria-label="CV steps" className="flex items-stretch gap-1 overflow-x-auto border-t border-line px-2 sm:px-4">
+      </header>
+
+      <div className="editor-chrome px-4 pt-4 sm:px-6 lg:pt-5">
+        {/* relative: the hidden "(complete)" labels are absolutely positioned and must stay inside the scrolling bar. */}
+        <nav aria-label="CV steps" className="relative mx-auto flex w-fit max-w-full items-center gap-0.5 overflow-x-auto rounded-xl border border-line bg-white p-1">
           {steps.map((item, index) => {
             const current = item.id === step;
             const done = !current && stepComplete(cv, item.id, pdfUnlocked);
             return (
-              <button
-                key={item.id}
-                type="button"
-                aria-current={current ? "step" : undefined}
-                onClick={() => goToStep(item.id)}
-                className={`flex min-h-12 shrink-0 items-center gap-2 border-b-2 px-3 text-sm ${current ? "border-navy font-extrabold text-navy" : done ? "border-transparent font-bold text-navy" : "border-transparent font-medium text-muted hover:text-navy"}`}
-              >
-                {done ? (
-                  <span className="grid h-5 w-5 place-items-center rounded-full bg-success"><Check className="h-3 w-3 text-white" aria-hidden="true" /></span>
-                ) : (
-                  <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] ${current ? "bg-navy text-white" : "border-[1.5px] border-line-strong"}`} aria-hidden="true">{index + 1}</span>
-                )}
-                {item.label}
-                {done && <span className="sr-only">(complete)</span>}
-              </button>
+              <span key={item.id} className="flex shrink-0 items-center">
+                {item.id === "letter" && <span aria-hidden="true" className="mx-1.5 h-5 w-px bg-line-strong" />}
+                <button
+                  type="button"
+                  aria-current={current ? "step" : undefined}
+                  onClick={() => goToStep(item.id)}
+                  className={`flex min-h-10 items-center gap-2 rounded-lg px-3 text-sm ${current ? "bg-sand font-extrabold text-navy" : done ? "font-bold text-navy hover:bg-paper" : "font-medium text-muted hover:bg-paper hover:text-navy"}`}
+                >
+                  {done ? (
+                    <span className="grid h-[18px] w-[18px] place-items-center rounded-full bg-success"><Check className="h-3 w-3 text-white" aria-hidden="true" /></span>
+                  ) : (
+                    <span className={`grid h-[18px] w-[18px] place-items-center rounded-full text-[10px] ${current ? "bg-navy text-white" : "border-[1.5px] border-line-strong"}`} aria-hidden="true">{index + 1}</span>
+                  )}
+                  {item.label}
+                  {done && <span className="sr-only">(complete)</span>}
+                </button>
+              </span>
             );
           })}
-          <span className="ml-auto flex shrink-0 items-center gap-2 pl-3 pr-2 text-sm font-bold text-navy lg:hidden">
-            <ReadinessRing score={readiness.score} size={22} />
-            {readiness.score}%
-          </span>
         </nav>
-      </header>
-
-      <div className={`grid lg:min-h-[calc(100vh-113px)] ${finishing ? "lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]" : previewHidden ? "lg:grid-cols-[272px_minmax(0,1fr)]" : "lg:grid-cols-[272px_minmax(0,1fr)_minmax(400px,500px)]"}`}>
-        <aside className={`editor-form hidden border-r border-line bg-paper ${finishing ? "" : "lg:block"}`}>
-          <div className="sticky top-[113px] flex max-h-[calc(100vh-113px)] flex-col gap-7 overflow-y-auto px-5 py-6">
-            {loaded && <ReadinessCard editor={editor} onGoTo={goToStep} />}
-            {railContent()}
+        {!finishing && loaded && (
+          <div className="mx-auto mt-3 flex max-w-[760px] items-center gap-3 rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm lg:hidden" aria-label="CV readiness">
+            <span className="font-extrabold text-navy">{readiness.score}%</span>
+            <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-sand" aria-hidden="true"><span className="block h-full rounded-full bg-success" style={{ width: `${Math.max(readiness.score, 2)}%` }} /></span>
+            <span className="text-muted">{readiness.issues.length === 0 ? "Ready" : `${readiness.issues.length} to improve`}</span>
           </div>
-        </aside>
+        )}
+      </div>
 
-        <div className={`editor-form min-w-0 px-4 pb-28 pt-6 sm:px-8 lg:pb-10 lg:pt-8 ${finishing ? "lg:order-last lg:border-l lg:border-line lg:px-6" : "xl:px-12"} ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
-          <div className="mx-auto flex max-w-[720px] flex-col gap-6">
-            <EditorNotices editor={editor} />
-            {tailoringOpen && advertPanel}
-            {loaded ? (
-              <fieldset className="min-w-0">
-                <legend className="sr-only">{stepLabel(step)}, step {stepIndex(step) + 1} of {steps.length}</legend>
-                {stepContent()}
-              </fieldset>
-            ) : (
-              <p className="flex items-center gap-3 py-10 font-bold text-navy" role="status">
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/20 border-t-navy" aria-hidden="true" />
-                Opening your CV…
-              </p>
-            )}
-            <div className="editor-chrome hidden items-center justify-between border-t border-line pt-5 lg:flex">
-              {previous ? (
-                <button type="button" onClick={() => goToStep(previous)} className="inline-flex min-h-11 items-center gap-2 font-bold text-navy hover:underline">
+      {finishing ? (
+        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+          <section aria-label="Preview" className={`print-area min-w-0 ${mobileView === "edit" ? "hidden lg:block" : "block"}`}>
+            {pageArea}
+          </section>
+          <div className={`editor-form min-w-0 px-4 pb-28 pt-6 sm:px-6 lg:pb-10 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
+            <div className="flex flex-col gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
+              <EditorNotices editor={editor} />
+              {tailoringOpen && advertPanel}
+              {loaded && stepContent()}
+              {previous && (
+                <button type="button" onClick={() => goToStep(previous)} className="editor-chrome hidden min-h-11 w-fit items-center gap-2 font-bold text-navy hover:underline lg:inline-flex">
                   <ArrowLeft className="h-4 w-4" aria-hidden="true" />{stepLabel(previous)}
-                </button>
-              ) : <span />}
-              {next && (
-                <button type="button" onClick={() => goToStep(next)} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-navy px-5 font-bold text-white hover:bg-navy-hover">
-                  Next: {stepLabel(next)}<ArrowRight className="h-4 w-4" aria-hidden="true" />
                 </button>
               )}
             </div>
           </div>
         </div>
-
-        {showPreview || mobileView === "preview" ? (
-          <section aria-label="Preview" className={`print-area min-w-0 bg-sand ${finishing ? "" : "border-l border-line"} ${mobileView === "edit" ? "hidden lg:block" : "block"} ${showPreview ? "" : "lg:hidden"}`}>
-            <div className="lg:sticky lg:top-[113px] lg:max-h-[calc(100vh-113px)] lg:overflow-y-auto">
-              {finishing && loaded && (
-                <div className="editor-chrome px-4 pt-4 sm:px-6">
-                  <button type="button" aria-expanded={designOpen} onClick={() => setDesignOpen((open) => !open)} className="mb-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
-                    <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />{designOpen ? "Hide design settings" : "Design"}
-                  </button>
-                  <div className={`${designOpen ? "block" : "hidden"} lg:block`}>
-                    <DesignToolbar
-                      template={cv.template}
-                      design={cv.design}
-                      pages={previewPageCount}
-                      fitMessage={fitMessage}
-                      onDesign={changeDesign}
-                      onTemplate={(template) => {
-                        updateField("template", template);
-                        trackEditorEvent("template_selected", draftId, { template });
-                      }}
-                      onFit={fitToPages}
-                      onReset={resetDesign}
-                    />
-                  </div>
-                </div>
+      ) : (
+        <div className="mx-auto grid max-w-[1120px] gap-6 px-4 pb-28 pt-5 sm:px-6 lg:grid-cols-[300px_minmax(0,1fr)] lg:pb-12">
+          <aside className="editor-form hidden lg:block">
+            <div className="sticky top-[80px] flex flex-col gap-4">
+              {loaded && <ReadinessCard editor={editor} onGoTo={goToStep} />}
+              {railContent()}
+            </div>
+          </aside>
+          <div className="editor-form flex min-w-0 flex-col gap-5">
+            <EditorNotices editor={editor} />
+            {tailoringOpen && advertPanel}
+            <div className="rounded-2xl border border-line bg-white p-5 sm:p-8">
+              {loaded ? (
+                <fieldset className="min-w-0">
+                  <legend className="sr-only">{stepLabel(step)}, step {stepIndex(step) + 1} of {steps.length}</legend>
+                  {stepContent()}
+                </fieldset>
+              ) : (
+                <p className="flex items-center gap-3 py-10 font-bold text-navy" role="status">
+                  <span className="h-5 w-5 animate-spin rounded-full border-2 border-navy/20 border-t-navy" aria-hidden="true" />
+                  Opening your CV…
+                </p>
               )}
-              <div className="editor-chrome flex items-center justify-between px-4 pb-2 pt-4 text-[0.8125rem] font-bold sm:px-6">
-                <span className="text-muted">
-                  {cvPapers[resolveCvDesign(cv.design).paper].label} · {step === "letter" ? "Cover letter" : selectedTemplate?.name ?? "Classic"} · {step === "letter" ? "1 page" : `${previewPageCount} ${previewPageCount === 1 ? "page" : "pages"}`}
-                </span>
-                {finishing ? (
-                  <span className="hidden text-muted sm:inline">Click any part of the page to edit it</span>
-                ) : (
-                  <span className="flex items-center gap-4 text-navy">
-                    <button type="button" onClick={() => { trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className="hover:underline">Template</button>
-                    <button type="button" onClick={() => setPreviewHidden(true)} className="hidden hover:underline lg:inline">Hide</button>
-                  </span>
+              <div className="editor-chrome mt-8 hidden items-center justify-between border-t border-line pt-5 lg:flex">
+                {previous ? (
+                  <button type="button" onClick={() => goToStep(previous)} className="inline-flex min-h-11 items-center gap-2 font-bold text-navy hover:underline">
+                    <ArrowLeft className="h-4 w-4" aria-hidden="true" />{stepLabel(previous)}
+                  </button>
+                ) : <span />}
+                {next && (
+                  <button type="button" onClick={() => goToStep(next)} className="inline-flex min-h-11 items-center gap-2 rounded-lg bg-navy px-5 font-bold text-white hover:bg-navy-hover">
+                    Next: {stepLabel(next)}<ArrowRight className="h-4 w-4" aria-hidden="true" />
+                  </button>
                 )}
               </div>
-              {step !== "letter" && previewPageCount > 2 && (
-                <div className="editor-chrome mx-4 mb-3 flex flex-col gap-3 rounded-xl border border-gold bg-gold-tint p-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between" role="status">
-                  <div>
-                    <p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p>
-                    <p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p>
-                  </div>
-                  {cv.template !== "compact" && (
-                    <button type="button" onClick={() => updateField("template", "compact")} className="min-h-10 shrink-0 rounded-lg bg-navy px-4 text-sm font-bold text-white">Use Compact</button>
-                  )}
-                </div>
-              )}
-              <div className="cv-preview-viewport px-4 pb-28 sm:px-6 lg:pb-6">
-                <div ref={previewRef} onClick={openSectionFromPage} className={`cv-preview-scale relative ${finishing ? "cv-click-to-edit" : ""}`}>
-                  {step === "letter" ? <CoverLetterDocument cv={cv} /> : <MemoCvDocument cv={cv} />}
-                </div>
-              </div>
             </div>
-          </section>
-        ) : null}
-      </div>
+          </div>
+        </div>
+      )}
 
-      {previewHidden && !finishing && (
-        <button type="button" onClick={() => setPreviewHidden(false)} className="editor-chrome fixed bottom-6 right-6 z-30 hidden min-h-11 items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white shadow-soft lg:inline-flex">
-          Show preview
-        </button>
+      {previewOpen && !finishing && (
+        <div role="dialog" aria-modal="true" aria-label={step === "letter" ? "Preview of your cover letter" : "Preview of your CV"} className="fixed inset-0 z-50 flex flex-col bg-sand">
+          <div className="editor-chrome flex items-center justify-between gap-3 border-b border-line bg-white px-4 py-3 sm:px-6">
+            <p className="font-extrabold text-navy">Preview</p>
+            <div className="flex items-center gap-2">
+              <button type="button" onClick={() => goToStep("finish")} className="hidden min-h-10 items-center rounded-lg border border-line-strong px-3.5 text-sm font-bold text-navy hover:bg-paper sm:inline-flex">Change the design</button>
+              <button type="button" onClick={closePreview} autoFocus className="inline-flex min-h-10 items-center gap-1.5 rounded-lg bg-navy px-3.5 text-sm font-bold text-white">
+                <X className="h-4 w-4" aria-hidden="true" />Back to editing
+              </button>
+            </div>
+          </div>
+          <div className="print-area min-h-0 flex-1 overflow-y-auto">{pageArea}</div>
+        </div>
       )}
 
       <div className="editor-chrome fixed inset-x-0 bottom-0 z-30 flex gap-2 border-t border-line bg-white px-4 pb-5 pt-3 lg:hidden">
-        <div className="flex rounded-lg border border-line-strong p-1" role="group" aria-label="Editor view">
-          <button type="button" aria-pressed={mobileView === "edit"} onClick={() => { setMobileView("edit"); trackEditorEvent("mobile_view_changed", draftId, { view: "edit" }); }} className={`min-h-10 rounded-md px-3 text-sm font-bold ${mobileView === "edit" ? "bg-navy text-white" : "text-muted"}`}>Edit CV</button>
-          <button type="button" aria-pressed={mobileView === "preview"} onClick={() => { setMobileView("preview"); trackEditorEvent("mobile_view_changed", draftId, { view: "preview" }); }} className={`min-h-10 rounded-md px-3 text-sm font-bold ${mobileView === "preview" ? "bg-navy text-white" : "text-muted"}`}>Preview</button>
-        </div>
-        {next ? (
-          <button type="button" onClick={() => goToStep(next)} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-navy px-3 text-sm font-bold text-white">
-            Next: {stepLabel(next)}<ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+        {finishing ? (
+          <div className="flex flex-1 rounded-lg border border-line-strong p-1" role="group" aria-label="Finish view">
+            <button type="button" aria-pressed={mobileView === "edit"} onClick={() => { setMobileView("edit"); trackEditorEvent("mobile_view_changed", draftId, { view: "edit" }); }} className={`min-h-10 flex-1 rounded-md px-3 text-sm font-bold ${mobileView === "edit" ? "bg-navy text-white" : "text-muted"}`}>Download</button>
+            <button type="button" aria-pressed={mobileView === "preview"} onClick={() => { setMobileView("preview"); trackEditorEvent("mobile_view_changed", draftId, { view: "preview" }); }} className={`min-h-10 flex-1 rounded-md px-3 text-sm font-bold ${mobileView === "preview" ? "bg-navy text-white" : "text-muted"}`}>Page and design</button>
+          </div>
         ) : (
-          <span className="flex flex-1 items-center justify-center text-sm font-bold text-navy">{readinessLabel(readiness.score, readiness.ready)}</span>
+          <>
+            {previous && (
+              <button type="button" onClick={() => goToStep(previous)} aria-label={`Back: ${stepLabel(previous)}`} className="grid min-h-12 w-12 place-items-center rounded-lg border border-line-strong text-navy">
+                <ArrowLeft className="h-5 w-5" aria-hidden="true" />
+              </button>
+            )}
+            {next ? (
+              <button type="button" onClick={() => goToStep(next)} className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-lg bg-navy px-3 text-sm font-bold text-white">
+                Next: {stepLabel(next)}<ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </button>
+            ) : (
+              <span className="flex flex-1 items-center justify-center text-sm font-bold text-navy">{readinessLabel(readiness.score, readiness.ready)}</span>
+            )}
+          </>
         )}
       </div>
 

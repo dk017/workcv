@@ -11,7 +11,7 @@ export const steps = [
   { id: "profile", label: "Profile" },
   { id: "more", label: "More sections" },
   { id: "letter", label: "Cover letter" },
-  { id: "finish", label: "Finish" },
+  { id: "finish", label: "Finish and preview" },
 ] as const;
 
 export type StepId = (typeof steps)[number]["id"];

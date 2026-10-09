@@ -8,7 +8,7 @@ import { Briefcase, FileText, LayoutGrid, LogOut, Mail, Menu, Plus, User, X } fr
 import type { PassStatus } from "@/lib/pass-rules";
 import { site } from "@/lib/site";
 
-const mainLinks = [
+export const mainLinks = [
   { href: "/my-cvs", label: "My CVs", icon: LayoutGrid },
   { href: "/my-cvs?view=letters", label: "Cover letters", icon: Mail },
   { href: "/my-cvs/tracker", label: "Job tracker", icon: Briefcase },
@@ -20,7 +20,7 @@ const helpLinks = [
   { href: "/cv-examples-uk", label: "CV examples" },
 ] as const;
 
-function Logo() {
+export function Logo() {
   return (
     <Link href="/" className="flex items-center gap-2.5 font-display text-[1.375rem] font-bold">
       <svg aria-hidden="true" viewBox="0 0 64 64" className="h-8 w-8 shrink-0">
@@ -57,7 +57,8 @@ function PassCard({ pass }: { pass: PassStatus }) {
   );
 }
 
-function NavContent({ email, pass, onNavigate }: { email: string; pass: PassStatus; onNavigate?: () => void }) {
+/** The app's links, used by the sidebar, the editor rail's phone menu and the dashboard's phone menu. */
+export function NavContent({ email, pass, onNavigate }: { email?: string; pass?: PassStatus | null; onNavigate?: () => void }) {
   const pathname = usePathname();
   const view = useSearchParams().get("view");
   const [loggingOut, setLoggingOut] = useState(false);
@@ -99,14 +100,14 @@ function NavContent({ email, pass, onNavigate }: { email: string; pass: PassStat
         ))}
       </nav>
       <div className="mt-auto flex flex-col gap-1 pt-5">
-        <PassCard pass={pass} />
+        {pass && <PassCard pass={pass} />}
         <Link href="/account" onClick={onNavigate} aria-current={pathname === "/account" ? "page" : undefined} className={`${item} mt-2 ${pathname === "/account" ? "bg-white/10 font-bold text-white" : "font-medium text-white/80 hover:bg-white/5 hover:text-white"}`}>
           <User className="h-[18px] w-[18px]" aria-hidden="true" />Account and orders
         </Link>
         <button type="button" onClick={logout} disabled={loggingOut} className={`${item} font-medium text-white/80 hover:bg-white/5 hover:text-white disabled:opacity-60`}>
           <LogOut className="h-[18px] w-[18px]" aria-hidden="true" />{loggingOut ? "Logging out…" : "Log out"}
         </button>
-        <p className="truncate px-3 pt-1 text-xs text-white/50" title={email}>{email}</p>
+        {email && <p className="truncate px-3 pt-1 text-xs text-white/50" title={email}>{email}</p>}
       </div>
     </div>
   );

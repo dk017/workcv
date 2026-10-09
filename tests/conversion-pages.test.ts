@@ -28,8 +28,9 @@ test("pricing keeps the evidence while removing repeated reassurance sections", 
 });
 
 test("editor keeps primary actions focused and groups secondary actions", () => {
-  assert.match(editorSource, /<details className="editor-menu relative">/);
-  assert.match(editorSource, />\s*More\s*<\/summary>/);
+  // Secondary actions sit in the menu under the CV's name, not beside the form.
+  assert.match(editorSource, /<details className="editor-menu relative min-w-0">/);
+  assert.match(editorSource, /<span className="sr-only">CV options<\/span>/);
   assert.match(editorSource, /Template: \{selectedTemplate\?\.name \?\? "Choose"\}/);
   assert.match(editorSource, /Tailor to job/);
   assert.match(editorSource, /Import CV/);

@@ -13,6 +13,7 @@ import { formatPence } from "@/lib/pass-upgrade";
 import { site } from "@/lib/site";
 
 const railHeading = "text-xs font-bold uppercase tracking-[0.08em] text-muted";
+export const sideCard = "rounded-2xl border border-line bg-white";
 
 export function ReadinessRing({ score, size = 56 }: { score: number; size?: number }) {
   const stroke = size >= 40 ? 6 : 3;
@@ -50,10 +51,10 @@ export function readinessLabel(score: number, ready: boolean) {
 
 export function ReadinessCard({ editor, onGoTo }: { editor: CvEditorState; onGoTo: (step: StepId, roleId?: string) => void }) {
   const { readiness, aiLoading, runReadinessAction } = editor;
-  const top = readiness.issues.slice(0, 3);
+  const top = readiness.issues.slice(0, 1);
   return (
-    <section aria-label="CV readiness" aria-live="polite" className="flex flex-col gap-3.5">
-      <div className="flex items-center gap-3.5">
+    <section aria-label="CV readiness" aria-live="polite" className={sideCard}>
+      <div className="flex items-center gap-3.5 p-4">
         <ReadinessRing score={readiness.score} />
         <div>
           <p className="font-extrabold text-navy">{readinessLabel(readiness.score, readiness.ready)}</p>
@@ -65,7 +66,7 @@ export function ReadinessCard({ editor, onGoTo }: { editor: CvEditorState; onGoT
         </div>
       </div>
       {top.length > 0 && (
-        <ul className="flex flex-col gap-1">
+        <ul className="flex flex-col border-t border-line p-2">
           {top.map((issue) => (
             <li key={issue.id}>
               <button
@@ -75,7 +76,7 @@ export function ReadinessCard({ editor, onGoTo }: { editor: CvEditorState; onGoT
                   onGoTo(stepForIssue(issue), issue.targetId);
                   if (issue.action) runReadinessAction(issue);
                 }}
-                className="flex w-full items-start gap-2 rounded-lg px-1.5 py-1.5 text-left text-sm leading-snug text-ink hover:bg-white disabled:cursor-wait"
+                className="flex w-full items-start gap-2 rounded-lg px-2 py-2 text-left text-sm leading-snug text-ink hover:bg-paper disabled:cursor-wait"
               >
                 <span aria-hidden="true" className={`mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full ${issue.severity === "fix" ? "bg-red-700" : "bg-gold"}`} />
                 <span className="min-w-0">
@@ -112,8 +113,8 @@ export function EntryList({
   addLabel: string;
 }) {
   return (
-    <section className="flex flex-col gap-1.5 border-t border-line pt-6">
-      <h2 className={`${railHeading} pb-1.5`}>{heading}</h2>
+    <section className={`flex flex-col gap-1 p-2 ${sideCard}`}>
+      <h2 className={`${railHeading} px-2 pb-1 pt-2`}>{heading}</h2>
       {items.map((item) => {
         const active = item.id === selectedId;
         return (
@@ -122,14 +123,14 @@ export function EntryList({
             type="button"
             aria-current={active ? "true" : undefined}
             onClick={() => onSelect(item.id)}
-            className={`flex flex-col gap-0.5 rounded-xl border px-3.5 py-3 text-left ${active ? "border-navy bg-white" : "border-transparent hover:bg-white"}`}
+            className={`flex flex-col gap-0.5 rounded-xl border px-3 py-2.5 text-left ${active ? "border-navy bg-paper" : "border-transparent hover:bg-paper"}`}
           >
             <span className={`font-bold ${active ? "text-navy" : "text-ink"}`}>{item.title}</span>
             {item.detail && <span className="text-[0.8125rem] text-muted">{item.detail}</span>}
           </button>
         );
       })}
-      <button type="button" onClick={onAdd} className="flex min-h-11 items-center gap-2 px-3.5 font-bold text-navy hover:underline">
+      <button type="button" onClick={onAdd} className="flex min-h-11 items-center gap-2 px-3 font-bold text-navy hover:underline">
         <Plus className="h-4 w-4" aria-hidden="true" />{addLabel}
       </button>
     </section>
@@ -140,17 +141,17 @@ export function TailorCard({ editor, onOpenAdvert }: { editor: CvEditorState; on
   const { cv, progress } = editor;
   if (!cv.targeting) {
     return (
-      <section className="flex flex-col gap-2 border-t border-line pt-6">
+      <section className={`flex flex-col gap-2 p-4 ${sideCard}`}>
         <h2 className={railHeading}>Applying for a specific job?</h2>
         <p className="text-sm leading-relaxed text-muted">Paste the advert and WorkCV points out what the employer asks for as you write.</p>
-        <button type="button" onClick={onOpenAdvert} className="mt-1 inline-flex min-h-10 w-fit items-center gap-1.5 rounded-lg border border-navy px-3 text-sm font-bold text-navy hover:bg-white">
+        <button type="button" onClick={onOpenAdvert} className="mt-1 inline-flex min-h-10 w-fit items-center gap-1.5 rounded-lg border border-navy px-3 text-sm font-bold text-navy hover:bg-paper">
           Add the job advert
         </button>
       </section>
     );
   }
   return (
-    <section className="flex flex-col gap-1.5 rounded-xl border border-green-200 bg-greensoft p-4">
+    <section className="flex flex-col gap-1.5 rounded-2xl border border-green-200 bg-greensoft p-4">
       <p className="text-xs font-bold uppercase tracking-[0.08em] text-green-800">Tailored to</p>
       <p className="font-extrabold text-navy">{cv.targeting.role || cv.targetRole || "This job"}</p>
       {progress && (
@@ -172,12 +173,12 @@ export function AdvertWords({ editor }: { editor: CvEditorState }) {
   const missing = keywordTriage.queue.slice(0, 6);
   if (!onCv.length && !missing.length) return null;
   return (
-    <section className="flex flex-col gap-3 border-t border-line pt-6">
-      <h2 className={railHeading}>Words from the advert</h2>
+    <section className="flex flex-col gap-3 rounded-2xl border border-green-200 bg-greensoft p-4">
+      <h2 className="text-xs font-bold uppercase tracking-[0.08em] text-green-800">Words from the advert</h2>
       <p className="text-sm leading-relaxed text-muted">Use the ones that are true for you. Ticked words are already on your CV.</p>
       <ul className="flex flex-wrap gap-1.5">
         {onCv.map((keyword) => (
-          <li key={keyword.term} className="inline-flex min-h-[30px] items-center gap-1 rounded-full border border-green-200 bg-greensoft px-2.5 text-[0.8125rem] font-bold text-green-800">
+          <li key={keyword.term} className="inline-flex min-h-[30px] items-center gap-1 rounded-full border border-green-200 bg-white px-2.5 text-[0.8125rem] font-bold text-green-800">
             <Check className="h-3 w-3" aria-hidden="true" />{displayKeyword(keyword.term)}
           </li>
         ))}
@@ -193,9 +194,8 @@ export function AdvertWords({ editor }: { editor: CvEditorState }) {
 
 export function ImportCard({ onImport }: { onImport: () => void }) {
   return (
-    <section className="flex flex-col gap-3 border-t border-line pt-6">
-      <h2 className={railHeading}>Start faster</h2>
-      <div className="flex flex-col gap-2.5 rounded-xl border border-line bg-white p-4">
+    <section className="flex flex-col gap-3">
+      <div className={`flex flex-col gap-2.5 p-4 ${sideCard}`}>
         <span className="grid h-9 w-9 place-items-center rounded-lg bg-gold-tint text-navy"><Upload className="h-4 w-4" aria-hidden="true" /></span>
         <p className="font-extrabold text-navy">Already have a CV?</p>
         <p className="text-sm leading-relaxed text-muted">Import a PDF or Word file and WorkCV fills in every step for you to check.</p>

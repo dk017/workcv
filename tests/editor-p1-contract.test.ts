@@ -23,9 +23,11 @@ test("AI assistance is limited to high-value CV content fields", () => {
 });
 
 test("mobile editing and page-count guidance remain available", () => {
-  assert.match(editorSource, /aria-label="Editor view"/);
-  assert.match(editorSource, /Edit CV/);
-  assert.match(editorSource, /Preview/);
+  // Filling steps show only the form; the page is on Finish or behind the Preview button.
+  assert.match(editorSource, /aria-label="Finish view"/);
+  assert.match(editorSource, /Page and design/);
+  assert.match(editorSource, /setPreviewOpen\(true\)/);
+  assert.match(editorSource, /Back to editing/);
   assert.match(editorSource, /Most UK applicants should aim for two pages/);
   assert.match(editorSource, /Use Compact/);
 });
@@ -36,7 +38,7 @@ test("bullet editing keeps focus and controls remain usable on narrow screens", 
   assert.match(formsSource, /aria-label=\{`Bullet point \$\{index \+ 1\}`\}/);
   assert.match(formsSource, /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(formsSource, /h-11 min-w-11/);
-  // Phones keep a fixed bar with the edit/preview switch and the next step.
+  // Phones keep a fixed bar with Back and Next (or, on Finish, the download/page switch).
   assert.match(editorSource, /fixed inset-x-0 bottom-0 z-30 flex gap-2/);
   assert.match(editorSource, /Next: \{stepLabel\(next\)\}/);
 });

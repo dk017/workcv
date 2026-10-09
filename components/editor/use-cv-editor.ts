@@ -63,6 +63,8 @@ export function useCvEditor() {
   const [jobDescriptionDraft, setJobDescriptionDraft] = useState("");
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
+  // The page is shown on Finish, or on any step when the user opens Preview.
+  const [previewOpen, setPreviewOpen] = useState(false);
   const [fitMessage, setFitMessage] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pendingTargeting, setPendingTargeting] = useState<CvTargeting | null>(null);
@@ -427,7 +429,7 @@ export function useCvEditor() {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [cv, step]);
+  }, [cv, step, previewOpen]);
 
   useEffect(() => {
     if (!draftId) return;
@@ -1251,6 +1253,8 @@ export function useCvEditor() {
     setCreatingNew,
     previewPageCount,
     setPreviewPageCount,
+    previewOpen,
+    setPreviewOpen,
     fitMessage,
     changeDesign,
     resetDesign,
