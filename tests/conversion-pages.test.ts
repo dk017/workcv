@@ -28,7 +28,7 @@ test("pricing keeps the evidence while removing repeated reassurance sections", 
 });
 
 test("editor keeps primary actions focused and groups secondary actions", () => {
-  assert.match(editorSource, /<details className="relative order-1 sm:order-none">/);
+  assert.match(editorSource, /<details className="editor-menu relative">/);
   assert.match(editorSource, />\s*More\s*<\/summary>/);
   assert.match(editorSource, /Template: \{selectedTemplate\?\.name \?\? "Choose"\}/);
   assert.match(editorSource, /Tailor to job/);

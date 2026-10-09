@@ -17,6 +17,7 @@ import {
   splitLetterText,
 } from "@/lib/cover-letter-document";
 import { COVER_LETTER_MAX_PARAGRAPHS, type CoverLetter, type CvData } from "@/lib/editor-data";
+import { StepHeading } from "@/components/editor/editor-forms";
 import { site } from "@/lib/site";
 
 const field = "mt-2 w-full rounded-md border border-line-strong bg-white px-3 py-2.5 text-[16px] text-ink outline-none focus:border-navy focus:ring-2 focus:ring-navy/15";
@@ -63,13 +64,11 @@ export function CoverLetterForm({
 
   return (
     <section className="space-y-6">
-      <div>
-        <h2 className="text-xl font-bold text-navy">Cover letter</h2>
-        <p className="mt-2 text-sm leading-6 text-muted">
-          Your letter uses the name, contact details and design from your CV. Writing and previewing are free. The
-          PDF and Word files are included in the same {site.price} download as your CV.
-        </p>
-      </div>
+      <StepHeading
+        eyebrow="Cover letter"
+        title="Your matching cover letter"
+        intro={`It uses the name, contact details and design from your CV. Writing and previewing are free; the PDF and Word files come with the same ${site.price} download as your CV.`}
+      />
 
       {canImportPack && (
         <div className="rounded-md border border-gold bg-gold-tint p-4 text-sm leading-6 text-navy">

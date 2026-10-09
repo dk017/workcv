@@ -381,7 +381,7 @@ export function JobApplicationPack() {
 
             <div className="border-t border-line bg-paper p-6 md:p-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-                <div><p className="font-display text-2xl font-semibold text-navy">Put the useful parts into your CV.</p><p className="mt-2 max-w-2xl text-sm leading-7 text-muted">Carry your original CV and complete pack into the editor. Review the import, then use the Experience tab to edit and apply truthful bullets to the correct role. The cover letter, evidence review and interview notes are saved separately from the CV PDF.</p></div>
+                <div><p className="font-display text-2xl font-semibold text-navy">Put the useful parts into your CV.</p><p className="mt-2 max-w-2xl text-sm leading-7 text-muted">Carry your original CV and complete pack into the editor. Review the import, then use the Experience step to edit and apply truthful bullets to the correct role. The cover letter, evidence review and interview notes are saved separately from the CV PDF.</p></div>
                 <button type="button" disabled={isLoading} onClick={() => continueToEditor()} className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">Use these details in my CV <ArrowRight className="h-4 w-4" /></button>
               </div>
             </div>

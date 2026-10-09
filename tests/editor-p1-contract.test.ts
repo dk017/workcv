@@ -36,7 +36,9 @@ test("bullet editing keeps focus and controls remain usable on narrow screens", 
   assert.match(formsSource, /aria-label=\{`Bullet point \$\{index \+ 1\}`\}/);
   assert.match(formsSource, /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(formsSource, /h-11 min-w-11/);
-  assert.match(editorSource, /grid w-full grid-cols-2 gap-2 sm:flex/);
+  // Phones keep a fixed bar with the edit/preview switch and the next step.
+  assert.match(editorSource, /fixed inset-x-0 bottom-0 z-30 flex gap-2/);
+  assert.match(editorSource, /Next: \{stepLabel\(next\)\}/);
 });
 
 test("preview uses the available column without redundant chrome", () => {

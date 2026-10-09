@@ -226,7 +226,7 @@ export default function CoverLetterExamplesPage() {
         <div className="container-page max-w-4xl">
           <h2 className="font-display text-3xl font-semibold md:text-4xl">Send a CV and cover letter that match.</h2>
           <p className="mt-4 leading-7 text-white/85">
-            Build your CV, then write your letter in the Cover letter tab with the same header and design. Preview both
+            Build your CV, then write your letter in the Cover letter step with the same header and design. Preview both
             free. Pay {site.price} once to download the CV and letter as PDF and Word, with no subscription.
           </p>
           <div className="mt-6 flex flex-wrap items-center gap-4">

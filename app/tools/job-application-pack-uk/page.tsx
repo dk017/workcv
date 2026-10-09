@@ -63,7 +63,7 @@ const faqs = [
   {
     question: "Can I move the result into my WorkCV CV?",
     answer:
-      "Yes. The handoff imports your original CV and carries the suggested profile, vacancy priorities and complete pack into a new saved CV. In the Experience tab, review and apply bullets to the correct role. Your original text, cover letter, evidence review, interview prompts and thank-you email remain available as notes, separate from the CV PDF.",
+      "Yes. The handoff imports your original CV and carries the suggested profile, vacancy priorities and complete pack into a new saved CV. In the Experience step, review and apply bullets to the correct role. Your original text, cover letter, evidence review, interview prompts and thank-you email remain available as notes, separate from the CV PDF.",
   },
 ];
 
@@ -115,7 +115,7 @@ export default function JobApplicationPackPage() {
       <section className="bg-surface py-16"><div className="container-page max-w-5xl space-y-14">
         <CustomerAnswer questionId="Q10">
           <ol className="list-decimal space-y-2 pl-6"><li>Keep a factual master CV that you can return to.</li><li>Highlight one vacancy’s essential requirements.</li><li>Match each requirement to a real bullet, project or qualification; mark gaps honestly.</li><li>Edit the target role, profile, skill order and a few relevant bullets without changing job titles or dates.</li><li>Review the final CV and requested file format before applying.</li></ol>
-          <p>The editor imports your original CV and keeps its source text for comparison. Your complete pack remains available in the Experience tab: review bullets before adding them to a selected role, edit the cover letter, and keep evidence and interview notes separately from the PDF. Original skills are not replaced by a keyword list. The <Link className="font-semibold underline" href={customerQuestionHref("Q13")}>advert-language example</Link> shows how to choose terms. For a longer application statement, use the free <Link className="font-semibold underline" href="/tools/supporting-statement-planner-uk">supporting-statement planner</Link>.</p>
+          <p>The editor imports your original CV and keeps its source text for comparison. Your complete pack remains available in the Experience step: review bullets before adding them to a selected role, edit the cover letter, and keep evidence and interview notes separately from the PDF. Original skills are not replaced by a keyword list. The <Link className="font-semibold underline" href={customerQuestionHref("Q13")}>advert-language example</Link> shows how to choose terms. For a longer application statement, use the free <Link className="font-semibold underline" href="/tools/supporting-statement-planner-uk">supporting-statement planner</Link>.</p>
         </CustomerAnswer>
         <CustomerAnswer questionId="Q13">
           <p>The following fictional Birch Office Services vacancy asks for Excel records, customer email replies, scheduling and Sage. Alex Morgan’s existing retail CV supports the first three; it does not supply Sage evidence.</p>

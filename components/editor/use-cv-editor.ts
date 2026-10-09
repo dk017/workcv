@@ -18,15 +18,15 @@ import { readCheckoutAttribution } from "@/components/attribution-capture";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { DebouncedSaveManager, type SaveSnapshot } from "@/lib/save-manager";
 import type { AiReview } from "@/components/editor/editor-modals";
+import { stepForIssue, type StepId } from "@/components/editor/steps";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
-export type TabId = "profile" | "experience" | "education" | "skills" | "template" | "cover-letter";
 
 // All editor state and actions. The editor screen renders from what this returns.
 export function useCvEditor() {
   const [cv, setCv] = useState<CvData>(() => createBlankCv());
-  const [activeTab, setActiveTab] = useState<TabId>("profile");
+  const [step, setStep] = useState<StepId>("contact");
   const [saveSnapshot, setSaveSnapshot] = useState<SaveSnapshot>({
     status: "saving",
     error: null,
@@ -259,7 +259,7 @@ export function useCvEditor() {
           ...data.cv,
           targeting,
         });
-        setActiveTab("profile");
+        setStep("contact");
         removeCvSourceFromHandoff();
         setFitImportState("complete");
         params.delete("from");
@@ -299,7 +299,7 @@ export function useCvEditor() {
       const nextCv = { ...cv, ...(imported || {}), ...(handoff.patch || {}) };
       pendingToolSaveRef.current = { handoff, cv: nextCv, draftId, version: null };
       setCv(nextCv);
-      setActiveTab(handoff.source === "cover-letter-generator" ? "cover-letter" : "profile");
+      setStep(handoff.source === "cover-letter-generator" ? "letter" : "contact");
       setMobileView("edit");
       setToolHandoffState("importing");
       // Keep the source and navigation marker until the account save succeeds.
@@ -417,7 +417,7 @@ export function useCvEditor() {
       window.cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [cv, activeTab]);
+  }, [cv, step]);
 
   useEffect(() => {
     if (!draftId) return;
@@ -650,8 +650,8 @@ export function useCvEditor() {
   const rewriteVaguePhrase = (item: VaguePhraseItem) => {
     setMobileView("edit");
     trackEditorEvent("keyword_triage_answered", draftId, { answer: "vague_phrase" });
-    if (item.where.kind === "profile") { setActiveTab("profile"); void improveProfile(); }
-    else { setActiveTab("experience"); void rewriteBullet(item.where.roleId, item.where.index); }
+    if (item.where.kind === "profile") { setStep("profile"); void improveProfile(); }
+    else { setStep("experience"); void rewriteBullet(item.where.roleId, item.where.index); }
   };
 
   const suggestSkills = () => {
@@ -668,7 +668,7 @@ export function useCvEditor() {
 
   const runReadinessAction = (issue: ReadinessIssue) => {
     setMobileView("edit");
-    setActiveTab(issue.section);
+    setStep(stepForIssue(issue));
     if (issue.action === "improve-profile") void improveProfile();
     else if (issue.action === "improve-bullets" && issue.targetId) void improveBullets(issue.targetId);
     else if (issue.action === "suggest-skills") suggestSkills();
@@ -805,7 +805,7 @@ export function useCvEditor() {
         setSaveSnapshot,
       );
       saveManagerRef.current = managerForNewDocument;
-      setActiveTab("profile");
+      setStep("contact");
       const params = new URLSearchParams(window.location.search);
       params.delete("new");
       params.delete("roleTemplate");
@@ -894,7 +894,7 @@ export function useCvEditor() {
   const downloadCoverLetter = async (format: "pdf" | "docx") => {
     if (!draftId || !pdfUnlocked || letterDownloading) return;
     if (!hasCoverLetterContent(cv)) {
-      setActiveTab("cover-letter");
+      setStep("letter");
       return;
     }
     trackEditorEvent("cover_letter_download_clicked", draftId, { format });
@@ -1014,7 +1014,7 @@ export function useCvEditor() {
 
   const applyImportedCv = (importedCv: CvData) => {
     setCv(importedCv);
-    setActiveTab("profile");
+    setStep("contact");
     setImportOpen(false);
     trackEditorEvent("import_succeeded", draftId);
   };
@@ -1138,8 +1138,8 @@ export function useCvEditor() {
   return {
     cv,
     setCv,
-    activeTab,
-    setActiveTab,
+    step,
+    setStep,
     saveSnapshot,
     setSaveSnapshot,
     pdfUnlocked,

@@ -121,10 +121,10 @@ export function coverLetterChecks(cv: CvData): CoverLetterCheck[] {
     checks.push({ severity: "fix", message: "Replace the remaining [bracketed] prompts with your own details." });
   }
   if (!cv.fullName.trim()) {
-    checks.push({ severity: "fix", message: "Add your name in the Profile tab so the letter can be signed." });
+    checks.push({ severity: "fix", message: "Add your name in the Contact step so the letter can be signed." });
   }
   if (![cv.email, cv.phone].some((value) => value.trim())) {
-    checks.push({ severity: "fix", message: "Add an email or phone number in the Profile tab so the employer can reply." });
+    checks.push({ severity: "fix", message: "Add an email or phone number in the Contact step so the employer can reply." });
   }
   const normalisedBody = normalise(body);
   if (letter.employer.trim() && !normalisedBody.includes(normalise(letter.employer))) {

@@ -6,6 +6,8 @@ export const editorSourceFiles = [
   "components/cv-editor.tsx",
   "components/editor/use-cv-editor.ts",
   "components/editor/editor-modals.tsx",
+  "components/editor/editor-panels.tsx",
+  "components/editor/steps.ts",
 ];
 
 export function readEditorSource() {
