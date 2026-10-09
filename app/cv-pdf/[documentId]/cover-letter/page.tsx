@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CoverLetterDocument } from "@/components/editor/cover-letter-document";
+import { PdfPageSize } from "@/components/editor/pdf-page-size";
 import { getCvDocument } from "@/lib/cv-documents";
 import { verifyPdfRenderToken } from "@/lib/pdf-render-token";
 
@@ -25,6 +26,7 @@ export default async function CoverLetterPdfRenderPage({
 
   return (
     <main className="pdf-render-shell" data-pdf-ready="true">
+      <PdfPageSize design={document.data.design} />
       <CoverLetterDocument cv={document.data} />
     </main>
   );

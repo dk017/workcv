@@ -46,6 +46,8 @@ export const editorEventNames = [
   "payment_pending",
   "payment_failed",
   "payment_cancelled",
+  "design_changed",
+  "design_fit_used",
 ] as const;
 
 // Optional post-download question. Answers are fixed choices only, so no

@@ -16,6 +16,7 @@ import {
   type EducationItem,
   type ExperienceItem,
 } from "./editor-data.ts";
+import { wordDesign, type WordDesign } from "./cv-design.ts";
 
 // A4 in twentieths of a point, with 1.5cm margins. The Word file is always a
 // single-column layout: sidebars and grids break ATS parsing and are awkward to
@@ -32,12 +33,13 @@ export function clean(value: string | undefined) {
   return (value || "").replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]/g, "").trim();
 }
 
-function sectionHeading(text: string) {
+function sectionHeading(text: string, w: WordDesign) {
+  const accent = w.accent ?? NAVY;
   return new Paragraph({
-    spacing: { before: 280, after: 120 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: NAVY, space: 2 } },
+    spacing: { before: w.gap(280), after: 120 },
+    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: accent, space: 2 } },
     keepNext: true,
-    children: [new TextRun({ text: text.toUpperCase(), bold: true, color: NAVY, size: 22, characterSpacing: 20 })],
+    children: [new TextRun({ text: text.toUpperCase(), bold: true, color: accent, size: w.size(22), characterSpacing: 20 })],
   });
 }
 
@@ -49,7 +51,7 @@ function bulletParagraph(text: string) {
   return new Paragraph({ bullet: { level: 0 }, spacing: { after: 60 }, children: [new TextRun({ text })] });
 }
 
-function entryParagraphs(input: {
+function entryParagraphs(w: WordDesign, input: {
   title: string;
   subtitle: string;
   dates: string;
@@ -58,11 +60,11 @@ function entryParagraphs(input: {
   first: boolean;
 }) {
   const heading = new Paragraph({
-    spacing: { before: input.first ? 0 : 200, after: 20 },
+    spacing: { before: input.first ? 0 : w.gap(200), after: 20 },
     keepNext: true,
-    tabStops: [{ type: TabStopType.RIGHT, position: CONTENT_WIDTH }],
+    tabStops: [{ type: TabStopType.RIGHT, position: w.page.width - w.margin(PAGE.margin) * 2 }],
     children: [
-      new TextRun({ text: input.title, bold: true, color: NAVY }),
+      new TextRun({ text: input.title, bold: true, color: w.accent ?? NAVY }),
       ...(input.dates ? [new TextRun({ text: `\t${input.dates}`, color: MUTED })] : []),
     ],
   });
@@ -91,12 +93,12 @@ function hasEducation(item: EducationItem) {
   return joinParts(item.qualification, item.institution, item.location, item.start, item.end, item.details).length > 0;
 }
 
-function experienceSection(cv: CvData) {
+function experienceSection(cv: CvData, w: WordDesign) {
   const items = cv.experience.filter(hasExperience);
   if (!items.length) return [];
   return [
-    sectionHeading(cvSectionLabels.experience),
-    ...items.flatMap((item, index) => entryParagraphs({
+    sectionHeading(cvSectionLabels.experience, w),
+    ...items.flatMap((item, index) => entryParagraphs(w, {
       title: clean(item.role) || clean(item.company),
       subtitle: joinParts(item.role ? item.company : "", item.location).join(" | "),
       dates: joinParts(item.start, item.end).join(" - "),
@@ -107,12 +109,12 @@ function experienceSection(cv: CvData) {
   ];
 }
 
-function educationSection(cv: CvData) {
+function educationSection(cv: CvData, w: WordDesign) {
   const items = cv.education.filter(hasEducation);
   if (!items.length) return [];
   return [
-    sectionHeading(cvSectionLabels.education),
-    ...items.flatMap((item, index) => entryParagraphs({
+    sectionHeading(cvSectionLabels.education, w),
+    ...items.flatMap((item, index) => entryParagraphs(w, {
       title: clean(item.qualification) || clean(item.institution),
       subtitle: joinParts(item.qualification ? item.institution : "", item.location).join(" | "),
       dates: joinParts(item.start, item.end).join(" - "),
@@ -124,6 +126,8 @@ function educationSection(cv: CvData) {
 }
 
 export function buildCvDocxDocument(cv: CvData) {
+  const w = wordDesign(cv.design);
+  const accent = w.accent ?? NAVY;
   const fullName = clean(cv.fullName);
   const contact = joinParts(cv.email, cv.phone, cv.location, cv.linkedin);
   const children: Paragraph[] = [];
@@ -132,14 +136,14 @@ export function buildCvDocxDocument(cv: CvData) {
     children.push(new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 60 },
-      children: [new TextRun({ text: fullName, bold: true, size: 40, color: NAVY })],
+      children: [new TextRun({ text: fullName, bold: true, size: w.size(40), color: accent })],
     }));
   }
   if (clean(cv.targetRole)) {
     children.push(new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 60 },
-      children: [new TextRun({ text: clean(cv.targetRole), bold: true, size: 24 })],
+      children: [new TextRun({ text: clean(cv.targetRole), bold: true, size: w.size(24) })],
     }));
   }
   if (contact.length) {
@@ -152,18 +156,18 @@ export function buildCvDocxDocument(cv: CvData) {
 
   for (const section of orderedCvSections(cv)) {
     if (section === "experience") {
-      children.push(...experienceSection(cv));
+      children.push(...experienceSection(cv, w));
     } else if (section === "education") {
-      children.push(...educationSection(cv));
+      children.push(...educationSection(cv, w));
     } else if (section === "profile") {
       const profile = lines(clean(cv.profile));
-      if (profile.length) children.push(sectionHeading(cvSectionLabels.profile), ...profile.map((line) => bodyParagraph(line)));
+      if (profile.length) children.push(sectionHeading(cvSectionLabels.profile, w), ...profile.map((line) => bodyParagraph(line)));
     } else if (section === "skills") {
       const skills = lines(clean(cv.skills));
-      if (skills.length) children.push(sectionHeading(cvSectionLabels.skills), ...skills.map(bulletParagraph));
+      if (skills.length) children.push(sectionHeading(cvSectionLabels.skills, w), ...skills.map(bulletParagraph));
     } else {
       const extra = lines(clean(cv.additionalSections?.[section]));
-      if (extra.length) children.push(sectionHeading(cvSectionLabels[section]), ...extra.map((line) => bodyParagraph(line, 40)));
+      if (extra.length) children.push(sectionHeading(cvSectionLabels[section], w), ...extra.map((line) => bodyParagraph(line, 40)));
     }
   }
 
@@ -172,15 +176,15 @@ export function buildCvDocxDocument(cv: CvData) {
     title: fullName ? `${fullName} CV` : "CV",
     styles: {
       default: {
-        document: { run: { font: FONT, size: 21, color: INK } },
+        document: { run: { font: w.font, size: w.size(21), color: INK }, ...(w.line ? { paragraph: { spacing: { line: w.line } } } : {}) },
       },
     },
     sections: [
       {
         properties: {
           page: {
-            size: { width: PAGE.width, height: PAGE.height },
-            margin: { top: PAGE.margin, right: PAGE.margin, bottom: PAGE.margin, left: PAGE.margin },
+            size: w.page,
+            margin: { top: w.margin(PAGE.margin), right: w.margin(PAGE.margin), bottom: w.margin(PAGE.margin), left: w.margin(PAGE.margin) },
           },
         },
         children,

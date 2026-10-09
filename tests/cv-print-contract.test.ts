@@ -32,7 +32,8 @@ test("fixed-format CV documents do not use viewport layout breakpoints", () => {
 test("preview does not render misleading page guide boundaries", () => {
   assert.doesNotMatch(editorSource, /cv-page-guide/);
   assert.doesNotMatch(editorSource, /Page count is an estimate/);
-  assert.match(editorSource, /Math\.ceil\(document\.scrollHeight \/ 1123\)/);
+  // Page counts replay the PDF pagination rather than dividing the screen height.
+  assert.match(editorSource, /predictPdfPages\(document, cv\.design\)/);
 });
 
 test("CV headings keep letter spacing low enough to extract as whole words", () => {

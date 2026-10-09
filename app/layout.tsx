@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
+import { Arimo, Caladea, Carlito, DM_Sans, EB_Garamond, Fraunces, Gelasio } from "next/font/google";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
@@ -20,6 +20,16 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   display: "swap",
 });
+
+// CV fonts chosen on the Finish step. Each has the same measurements as the Word font it
+// stands in for (Calibri, Cambria, Arial, Georgia; Garamond is a close match). Not preloaded:
+// a font downloads only when a CV uses it.
+const carlito = Carlito({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-carlito" });
+const caladea = Caladea({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-caladea" });
+const arimo = Arimo({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-arimo" });
+const gelasio = Gelasio({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-gelasio" });
+const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-eb-garamond" });
+const cvFontVariables = [carlito, caladea, arimo, gelasio, ebGaramond].map((font) => font.variable).join(" ");
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -88,7 +98,7 @@ const brandSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
+    <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable} ${cvFontVariables}`}>
       <head>
         <script
           type="application/ld+json"

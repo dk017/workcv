@@ -11,6 +11,7 @@ import {
   recipientBlock,
 } from "@/lib/cover-letter-document";
 import { getCvNameTypography } from "@/lib/cv-typography";
+import { cvDesignStyle } from "@/lib/cv-design";
 import type { CvData, TemplateId } from "@/lib/editor-data";
 
 export function CoverLetterDocument({ cv, date }: { cv: CvData; date?: Date }) {
@@ -25,6 +26,7 @@ export function CoverLetterDocument({ cv, date }: { cv: CvData; date?: Date }) {
     <article
       className={`letter-document mx-auto min-h-[1123px] w-full max-w-[794px] bg-white text-[15px] leading-7 text-ink shadow-soft ring-1 ring-line ${frameClass[style]}`}
       data-letter-template={style}
+      style={cvDesignStyle(cv.design) as CSSProperties}
     >
       <LetterHeader cv={cv} style={style} contact={contact} />
       <div className="letter-body px-16 pb-14 pt-10">

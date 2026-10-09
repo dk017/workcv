@@ -44,8 +44,8 @@ test("bullet editing keeps focus and controls remain usable on narrow screens", 
 test("preview uses the available column without redundant chrome", () => {
   assert.doesNotMatch(editorSource, />\s*Live preview\s*</);
   assert.doesNotMatch(editorSource, /Local draft/);
-  assert.match(editorSource, /availableWidth \/ 794/);
-  assert.match(editorSource, /Math\.min\(1, availableWidth \/ 794\)/);
+  // The preview scales the real page width (A4 or US Letter) to fit, never above actual size.
+  assert.match(editorSource, /Math\.min\(1, availableWidth \/ pageWidth\)/);
 });
 
 test("readiness checks stay out of creation and remain minimal at download", () => {

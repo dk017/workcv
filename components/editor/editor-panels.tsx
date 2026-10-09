@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { AlertTriangle, Check, Download, FileText, Mail, Plus, Sparkles, Upload, X } from "lucide-react";
 
-import { TemplateChoice } from "@/components/editor/editor-forms";
 import { type StepId, stepForIssue } from "@/components/editor/steps";
 import type { CvEditorState } from "@/components/editor/use-cv-editor";
 import { formatUkDate } from "@/components/editor/editor-modals";
@@ -411,7 +410,6 @@ export function FinishStep({ editor, onGoTo }: { editor: CvEditorState; onGoTo: 
     letterDownloading,
     passStatus,
     draftId,
-    updateField,
     startDownload,
     downloadDocx,
     downloadCoverLetter,
@@ -422,15 +420,16 @@ export function FinishStep({ editor, onGoTo }: { editor: CvEditorState; onGoTo: 
   const download = "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 font-bold disabled:cursor-wait disabled:opacity-60";
   return (
     <div className="space-y-7">
-      <div className="space-y-2.5">
-        <h2 className="text-[0.9375rem] font-bold text-navy">Template</h2>
-        <TemplateChoice
-          value={cv.template}
-          onChange={(template) => {
-            updateField("template", template);
-            trackEditorEvent("template_selected", draftId, { template });
-          }}
-        />
+      <div className="flex items-center gap-3.5">
+        <ReadinessRing score={readiness.score} />
+        <div>
+          <p className="font-extrabold text-navy">{readinessLabel(readiness.score, readiness.ready)}</p>
+          <p className="text-sm text-muted">
+            {readiness.issues.length === 0
+              ? "Check each page, then download"
+              : `${readiness.issues.length} ${readiness.issues.length === 1 ? "thing" : "things"} to ${readiness.fixCount ? "fix or improve" : "improve"} below`}
+          </p>
+        </div>
       </div>
 
       <section aria-labelledby="final-checks" className="space-y-2.5">
@@ -461,7 +460,7 @@ export function FinishStep({ editor, onGoTo }: { editor: CvEditorState; onGoTo: 
         {pdfUnlocked ? (
           <>
             <p className="text-sm text-muted">PDF and editable Word for both. Edit and redownload them any time.</p>
-            <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-2">
               <button type="button" disabled={pdfDownloading} onClick={startDownload} className={`${download} bg-navy text-white`}><Download className="h-4 w-4" aria-hidden="true" />{pdfDownloading ? "Preparing…" : "CV as PDF"}</button>
               <button type="button" disabled={docxDownloading} onClick={() => void downloadDocx()} className={`${download} border border-navy text-navy`}><FileText className="h-4 w-4" aria-hidden="true" />{docxDownloading ? "Preparing…" : "CV as Word"}</button>
               {hasCoverLetterContent(cv) ? (
@@ -470,7 +469,7 @@ export function FinishStep({ editor, onGoTo }: { editor: CvEditorState; onGoTo: 
                   <button type="button" disabled={letterDownloading !== null} onClick={() => void downloadCoverLetter("docx")} className={`${download} border border-navy text-navy`}><FileText className="h-4 w-4" aria-hidden="true" />{letterDownloading === "docx" ? "Preparing…" : "Cover letter as Word"}</button>
                 </>
               ) : (
-                <button type="button" onClick={() => onGoTo("letter")} className={`${download} border border-line-strong text-navy sm:col-span-2`}><Mail className="h-4 w-4" aria-hidden="true" />Write your cover letter</button>
+                <button type="button" onClick={() => onGoTo("letter")} className={`${download} border border-line-strong text-navy`}><Mail className="h-4 w-4" aria-hidden="true" />Write your cover letter</button>
               )}
             </div>
           </>

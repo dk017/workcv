@@ -12,6 +12,7 @@ import {
   cvSectionLabels,
 } from "@/lib/editor-data";
 import { getCvNameTypography } from "@/lib/cv-typography";
+import { cvDesignStyle } from "@/lib/cv-design";
 
 export function CvDocument({
   cv,
@@ -74,6 +75,7 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
   return (
     <article
       className={`${baseClass} cv-template-classic border-t-[10px] border-navy px-12 py-12`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="classic"
     >
       <header className="cv-header border-b-2 border-navy pb-7 text-center">
@@ -92,6 +94,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
   return (
     <article
       className={`${baseClass} cv-template-modern grid grid-cols-[230px_minmax(0,1fr)] overflow-hidden border-l-[10px] border-gold`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="modern"
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
@@ -135,6 +138,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
   return (
     <article
       className={`${baseClass} cv-template-compact border-t-[6px] border-line-strong px-10 py-9 text-[13px]`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="compact"
     >
       <header className="cv-header grid grid-cols-[1fr_auto] gap-4 border-b-2 border-navy pb-4">
@@ -332,7 +336,7 @@ function SidebarBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section>
+    <section data-cv-section={title.toLowerCase()}>
       <h3 className="mb-3 border-b border-white/25 pb-2 text-xs font-bold uppercase tracking-[0.04em] text-gold-tint">
         {title}
       </h3>

@@ -42,6 +42,14 @@ export function stepForIssue(issue: ReadinessIssue): StepId {
   return parseStep(issue.section) ?? "contact";
 }
 
+// The step that edits a part of the CV page, named by its section ("experience", "contact"…).
+export function stepForCvSection(section: string): StepId {
+  if (section === "header" || section === "contact") return "contact";
+  if (section.includes("experience")) return "experience";
+  if (section === "education" || section === "skills" || section === "profile") return section;
+  return "more";
+}
+
 const words = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
 
 // A tick in the step bar: the step has the essentials. Optional steps tick once they have content.

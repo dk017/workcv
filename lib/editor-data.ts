@@ -1,3 +1,5 @@
+import type { CvDesign } from "./cv-design.ts";
+
 export type TemplateId = "classic" | "modern" | "compact";
 export const cvSectionIds = ["profile", "experience", "education", "skills", "projects", "certifications", "volunteering", "languages"] as const;
 export type CvSectionId = typeof cvSectionIds[number];
@@ -91,6 +93,8 @@ export type CvData = {
   additionalSections?: Partial<Record<"projects" | "certifications" | "volunteering" | "languages", string>>;
   applicationPack?: { bullets: string[]; coverLetter: string; interviewPrompts: string[]; thankYouEmail: string; originalCvText?: string; evidenceReview?: string[] };
   coverLetter?: CoverLetter;
+  /** Font, size, spacing, margins, paper and colour chosen on the Finish step. Absent means the template's own look. */
+  design?: CvDesign;
 };
 
 export const COVER_LETTER_MAX_PARAGRAPHS = 6;

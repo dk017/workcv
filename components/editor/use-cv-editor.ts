@@ -19,6 +19,8 @@ import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { DebouncedSaveManager, type SaveSnapshot } from "@/lib/save-manager";
 import type { AiReview } from "@/components/editor/editor-modals";
 import { stepForIssue, type StepId } from "@/components/editor/steps";
+import { cvDesignStyle, cvDesignVariables, fitCandidates, minimalCvDesign, pageWidthPx, resolveCvDesign, type CvDesign } from "@/lib/cv-design";
+import { predictPdfPages } from "@/lib/cv-page-count";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
@@ -61,6 +63,7 @@ export function useCvEditor() {
   const [jobDescriptionDraft, setJobDescriptionDraft] = useState("");
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
+  const [fitMessage, setFitMessage] = useState<string | null>(null);
   const [mobileView, setMobileView] = useState<"edit" | "preview">("edit");
   const [pendingTargeting, setPendingTargeting] = useState<CvTargeting | null>(null);
   const [fitImportState, setFitImportState] = useState<
@@ -399,10 +402,12 @@ export function useCvEditor() {
             viewport.clientWidth -
             Number.parseFloat(styles.paddingLeft) -
             Number.parseFloat(styles.paddingRight);
-          preview.style.zoom = String(Math.min(1, availableWidth / 794));
+          const pageWidth = pageWidthPx(cv.design);
+          preview.style.width = `${pageWidth}px`;
+          preview.style.zoom = String(Math.min(1, availableWidth / pageWidth));
         }
         if (document.classList.contains("print-document")) {
-          setPreviewPageCount(Math.max(1, Math.ceil(document.scrollHeight / 1123)));
+          setPreviewPageCount(predictPdfPages(document, cv.design));
         }
       });
     };
@@ -412,6 +417,8 @@ export function useCvEditor() {
     if (document) observer.observe(document);
     if (preview.parentElement) observer.observe(preview.parentElement);
     updatePreview();
+    // A newly chosen font loads after the first layout; count pages again once it has.
+    void window.document.fonts?.ready.then(updatePreview);
 
     return () => {
       window.cancelAnimationFrame(frame);
@@ -557,6 +564,50 @@ export function useCvEditor() {
 
   const updateField = <K extends keyof CvData>(key: K, value: CvData[K]) => {
     setCv((current) => ({ ...current, [key]: value, ...(key === "template" ? { layoutPreset: "standard" as const } : {}) }));
+  };
+
+  const changeDesign = (change: Partial<CvDesign>) => {
+    setFitMessage(null);
+    setCv((current) => ({ ...current, design: minimalCvDesign({ ...resolveCvDesign(current.design), ...change }) }));
+    for (const [setting, value] of Object.entries(change)) trackEditorEvent("design_changed", draftId, { setting, value: String(value) });
+  };
+
+  const resetDesign = () => {
+    setFitMessage(null);
+    setCv((current) => ({ ...current, design: undefined }));
+    trackEditorEvent("design_changed", draftId, { setting: "reset", value: "default" });
+  };
+
+  // Tries smaller settings on the live preview, least noticeable first, and keeps the first that fits.
+  const fitToPages = (target: number) => {
+    const document = previewRef.current?.querySelector<HTMLElement>(".print-document");
+    if (!document) return;
+    const originalStyle = document.getAttribute("style");
+    const candidates = fitCandidates(cv.design);
+    let fitted: CvDesign | undefined;
+    let tried = 0;
+    try {
+      for (const candidate of candidates) {
+        tried += 1;
+        for (const name of cvDesignVariables) document.style.removeProperty(name);
+        for (const [name, value] of Object.entries(cvDesignStyle(candidate))) document.style.setProperty(name, value);
+        if (predictPdfPages(document, candidate) <= target) {
+          fitted = candidate;
+          break;
+        }
+      }
+    } finally {
+      if (originalStyle === null) document.removeAttribute("style");
+      else document.setAttribute("style", originalStyle);
+    }
+    const pages = `${target} ${target === 1 ? "page" : "pages"}`;
+    if (fitted) {
+      setCv((current) => ({ ...current, design: minimalCvDesign(fitted) }));
+      setFitMessage(`Fitted to ${pages}. Check the text is still easy to read, or press Reset to undo.`);
+    } else {
+      setFitMessage(`Your CV won’t fit on ${pages} even at the smallest settings. Shorten older roles, or try the Compact template.`);
+    }
+    trackEditorEvent("design_fit_used", draftId, { target, result: fitted ? "fitted" : "too_long", tried });
   };
 
   const updateExperience = (
@@ -1197,6 +1248,10 @@ export function useCvEditor() {
     setCreatingNew,
     previewPageCount,
     setPreviewPageCount,
+    fitMessage,
+    changeDesign,
+    resetDesign,
+    fitToPages,
     mobileView,
     setMobileView,
     pendingTargeting,

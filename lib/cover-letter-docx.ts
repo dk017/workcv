@@ -16,8 +16,9 @@ import {
   formatUkLetterDate,
   recipientBlock,
 } from "./cover-letter-document.ts";
-import { FONT, INK, MUTED, NAVY, PAGE, clean } from "./cv-docx.ts";
+import { INK, MUTED, NAVY, clean } from "./cv-docx.ts";
 import type { CvData } from "./editor-data.ts";
+import { wordDesign } from "./cv-design.ts";
 
 function line(text: string, options: { bold?: boolean; color?: string; after?: number } = {}) {
   return new Paragraph({
@@ -27,6 +28,8 @@ function line(text: string, options: { bold?: boolean; color?: string; after?: n
 }
 
 export function buildCoverLetterDocxDocument(cv: CvData, date = new Date()) {
+  const w = wordDesign(cv.design);
+  const accent = w.accent ?? NAVY;
   const letter = coverLetterFor(cv);
   const fullName = clean(cv.fullName);
   const contact = [cv.email, cv.phone, cv.location, cv.linkedin].map(clean).filter(Boolean);
@@ -37,14 +40,14 @@ export function buildCoverLetterDocxDocument(cv: CvData, date = new Date()) {
     children.push(new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 60 },
-      children: [new TextRun({ text: fullName, bold: true, size: 40, color: NAVY })],
+      children: [new TextRun({ text: fullName, bold: true, size: w.size(40), color: accent })],
     }));
   }
   if (contact.length) {
     children.push(new Paragraph({
       alignment: AlignmentType.CENTER,
       spacing: { after: 360 },
-      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: NAVY, space: 8 } },
+      border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: accent, space: 8 } },
       children: [new TextRun({ text: contact.join(" | "), color: MUTED })],
     }));
   }
@@ -55,11 +58,11 @@ export function buildCoverLetterDocxDocument(cv: CvData, date = new Date()) {
   recipient.forEach((text, index) => children.push(line(text, { after: index === recipient.length - 1 ? 240 : 0 })));
 
   const subject = clean(coverLetterSubject(letter));
-  if (subject) children.push(line(subject, { bold: true, color: NAVY, after: 240 }));
+  if (subject) children.push(line(subject, { bold: true, color: accent, after: 240 }));
 
   children.push(line(coverLetterGreeting(letter), { after: 200 }));
   coverLetterBody(letter).map(clean).filter(Boolean).forEach((paragraph) => {
-    children.push(new Paragraph({ spacing: { after: 200, line: 300 }, children: [new TextRun({ text: paragraph })] }));
+    children.push(new Paragraph({ spacing: { after: 200, line: w.line ? Math.round(300 * (w.line / 240)) : 300 }, children: [new TextRun({ text: paragraph })] }));
   });
   children.push(line(coverLetterSignOff(letter), { after: fullName ? 480 : 0 }));
   if (fullName) children.push(line(fullName, { bold: true }));
@@ -69,15 +72,15 @@ export function buildCoverLetterDocxDocument(cv: CvData, date = new Date()) {
     title: fullName ? `${fullName} cover letter` : "Cover letter",
     styles: {
       default: {
-        document: { run: { font: FONT, size: 22, color: INK } },
+        document: { run: { font: w.font, size: w.size(22), color: INK } },
       },
     },
     sections: [
       {
         properties: {
           page: {
-            size: { width: PAGE.width, height: PAGE.height },
-            margin: { top: 1000, right: 1134, bottom: 1000, left: 1134 },
+            size: w.page,
+            margin: { top: w.margin(1000), right: w.margin(1134), bottom: w.margin(1000), left: w.margin(1134) },
           },
         },
         children,

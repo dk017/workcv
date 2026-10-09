@@ -2,20 +2,22 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, Copy, Download, FileText, LayoutTemplate, Mail, MoreHorizontal, Plus, Sparkles, Undo2, Upload } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Download, FileText, LayoutTemplate, Mail, MoreHorizontal, Plus, SlidersHorizontal, Sparkles, Undo2, Upload } from "lucide-react";
 
 import { MemoCvDocument } from "@/components/editor/cv-document";
 import { CoverLetterDocument } from "@/components/editor/cover-letter-document";
 import { CoverLetterForm } from "@/components/editor/cover-letter-form";
 import { ApplicationPackReview, CvStructureForm } from "@/components/editor/cv-structure-form";
 import { ContactStep, EducationStep, ProfileStep, RoleStep, SkillsStep, StepHeading } from "@/components/editor/editor-forms";
+import { DesignToolbar } from "@/components/editor/design-toolbar";
 import { AiReviewModal, CheckoutSheet, ImportCvModal, TemplatePickerModal } from "@/components/editor/editor-modals";
 import { AdvertWords, EditorNotices, EntryList, FinishStep, ImportCard, ReadinessCard, ReadinessRing, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
 import { PurposeSurvey } from "@/components/editor/purpose-survey";
-import { nextStep, parseStep, previousStep, stepComplete, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
+import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
 import { useCvEditor } from "@/components/editor/use-cv-editor";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
+import { cvPapers, resolveCvDesign } from "@/lib/cv-design";
 import { emptyEducation, emptyExperience, lines } from "@/lib/editor-data";
 import { trackEditorEvent } from "@/lib/editor-events";
 import { vacancyTargeting } from "@/lib/job-tailor";
@@ -52,6 +54,10 @@ export function CvEditor() {
     creatingNew,
     previewRef,
     previewPageCount,
+    fitMessage,
+    changeDesign,
+    resetDesign,
+    fitToPages,
     mobileView,
     setMobileView,
     keywordTriage,
@@ -104,6 +110,7 @@ export function CvEditor() {
   const [selectedRoleId, setSelectedRoleId] = useState<string | null>(null);
   const [selectedEducationId, setSelectedEducationId] = useState<string | null>(null);
   const [previewHidden, setPreviewHidden] = useState(false);
+  const [designOpen, setDesignOpen] = useState(false);
 
   const role = cv.experience.find((item) => item.id === selectedRoleId) ?? cv.experience[0];
   const roleIndex = role ? cv.experience.indexOf(role) : 0;
@@ -111,6 +118,9 @@ export function CvEditor() {
   const educationIndex = education ? cv.education.indexOf(education) : 0;
   const next = nextStep(step);
   const previous = previousStep(step);
+  // Finish puts the page in the middle with the design toolbar above it.
+  const finishing = step === "finish";
+  const showPreview = finishing || !previewHidden;
 
   // The step lives in the URL so refresh and the browser Back button keep your place.
   useEffect(() => {
@@ -134,6 +144,7 @@ export function CvEditor() {
   const goToStep = (target: StepId, entryId?: string) => {
     if (target === "letter" && step !== "letter") trackEditorEvent("cover_letter_opened", draftId);
     if (entryId && target === "experience") setSelectedRoleId(entryId);
+    if (entryId && target === "education") setSelectedEducationId(entryId);
     if (target !== step) {
       const params = new URLSearchParams(window.location.search);
       params.set("step", target);
@@ -180,6 +191,21 @@ export function CvEditor() {
     setTailoringOpen(true);
     setMobileView("edit");
     window.scrollTo({ top: 0 });
+  };
+
+  // On Finish, clicking part of the page opens the step that edits it.
+  const openSectionFromPage = (event: React.MouseEvent<HTMLDivElement>) => {
+    if (!finishing) return;
+    const clicked = event.target as HTMLElement;
+    const part = clicked.closest<HTMLElement>(".cv-header, .cv-section, [data-cv-section], .cv-template-modern .cv-name");
+    if (!part) return;
+    const section = part.dataset.cvSection
+      ?? (part.matches(".cv-header, .cv-name") ? "header" : Array.from(part.classList).find((name) => name.startsWith("cv-section-"))?.slice("cv-section-".length) ?? "");
+    const target = stepForCvSection(section);
+    const entry = clicked.closest(".cv-entry");
+    const index = entry ? Array.from(part.querySelectorAll(".cv-entry")).indexOf(entry) : -1;
+    const entryId = target === "experience" ? cv.experience[index]?.id : target === "education" ? cv.education[index]?.id : undefined;
+    goToStep(target, entryId);
   };
 
   const cvTitle = [cv.targetRole.trim() || "Untitled CV", cv.coverLetter?.employer.trim()].filter(Boolean).join(" · ");
@@ -350,9 +376,13 @@ export function CvEditor() {
             <StepHeading
               eyebrow="Finish and download"
               title={readiness.ready ? "Your CV and letter are ready" : "Nearly there"}
-              intro="Pick a template, check each page in the preview, then download both as PDF and Word."
+              intro="Check each page, change the design on the page if you like, then download both as PDF and Word."
             />
             <FinishStep editor={editor} onGoTo={goToStep} />
+            <button type="button" onClick={() => { setMobileView("preview"); setDesignOpen(true); window.scrollTo({ top: 0 }); }} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-line-strong font-bold text-navy lg:hidden">
+              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />Change fonts, spacing and colour
+            </button>
+            {cv.targeting && <TailorCard editor={editor} onOpenAdvert={openAdvert} />}
           </div>
         );
     }
@@ -398,8 +428,6 @@ export function CvEditor() {
       case "skills":
       case "profile":
         return keywordTriage ? <AdvertWords editor={editor} /> : <TailorCard editor={editor} onOpenAdvert={openAdvert} />;
-      case "finish":
-        return cv.targeting ? <TailorCard editor={editor} onOpenAdvert={openAdvert} /> : null;
       default:
         return null;
     }
@@ -518,15 +546,15 @@ export function CvEditor() {
         </nav>
       </header>
 
-      <div className={`grid lg:min-h-[calc(100vh-113px)] ${previewHidden ? "lg:grid-cols-[272px_minmax(0,1fr)]" : "lg:grid-cols-[272px_minmax(0,1fr)_minmax(400px,500px)]"}`}>
-        <aside className="editor-form hidden border-r border-line bg-paper lg:block">
+      <div className={`grid lg:min-h-[calc(100vh-113px)] ${finishing ? "lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]" : previewHidden ? "lg:grid-cols-[272px_minmax(0,1fr)]" : "lg:grid-cols-[272px_minmax(0,1fr)_minmax(400px,500px)]"}`}>
+        <aside className={`editor-form hidden border-r border-line bg-paper ${finishing ? "" : "lg:block"}`}>
           <div className="sticky top-[113px] flex max-h-[calc(100vh-113px)] flex-col gap-7 overflow-y-auto px-5 py-6">
             {loaded && <ReadinessCard editor={editor} onGoTo={goToStep} />}
             {railContent()}
           </div>
         </aside>
 
-        <div className={`editor-form min-w-0 px-4 pb-28 pt-6 sm:px-8 lg:pb-10 lg:pt-8 xl:px-12 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
+        <div className={`editor-form min-w-0 px-4 pb-28 pt-6 sm:px-8 lg:pb-10 lg:pt-8 ${finishing ? "lg:order-last lg:border-l lg:border-line lg:px-6" : "xl:px-12"} ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
           <div className="mx-auto flex max-w-[720px] flex-col gap-6">
             <EditorNotices editor={editor} />
             {tailoringOpen && advertPanel}
@@ -556,17 +584,43 @@ export function CvEditor() {
           </div>
         </div>
 
-        {!previewHidden || mobileView === "preview" ? (
-          <section aria-label="Preview" className={`print-area min-w-0 border-l border-line bg-sand ${mobileView === "edit" ? "hidden lg:block" : "block"} ${previewHidden ? "lg:hidden" : ""}`}>
+        {showPreview || mobileView === "preview" ? (
+          <section aria-label="Preview" className={`print-area min-w-0 bg-sand ${finishing ? "" : "border-l border-line"} ${mobileView === "edit" ? "hidden lg:block" : "block"} ${showPreview ? "" : "lg:hidden"}`}>
             <div className="lg:sticky lg:top-[113px] lg:max-h-[calc(100vh-113px)] lg:overflow-y-auto">
+              {finishing && loaded && (
+                <div className="editor-chrome px-4 pt-4 sm:px-6">
+                  <button type="button" aria-expanded={designOpen} onClick={() => setDesignOpen((open) => !open)} className="mb-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
+                    <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />{designOpen ? "Hide design settings" : "Design"}
+                  </button>
+                  <div className={`${designOpen ? "block" : "hidden"} lg:block`}>
+                    <DesignToolbar
+                      template={cv.template}
+                      design={cv.design}
+                      pages={previewPageCount}
+                      fitMessage={fitMessage}
+                      onDesign={changeDesign}
+                      onTemplate={(template) => {
+                        updateField("template", template);
+                        trackEditorEvent("template_selected", draftId, { template });
+                      }}
+                      onFit={fitToPages}
+                      onReset={resetDesign}
+                    />
+                  </div>
+                </div>
+              )}
               <div className="editor-chrome flex items-center justify-between px-4 pb-2 pt-4 text-[0.8125rem] font-bold sm:px-6">
                 <span className="text-muted">
-                  A4 · {step === "letter" ? "Cover letter" : selectedTemplate?.name ?? "Classic"} · {step === "letter" ? "1 page" : `${previewPageCount} ${previewPageCount === 1 ? "page" : "pages"}`}
+                  {cvPapers[resolveCvDesign(cv.design).paper].label} · {step === "letter" ? "Cover letter" : selectedTemplate?.name ?? "Classic"} · {step === "letter" ? "1 page" : `${previewPageCount} ${previewPageCount === 1 ? "page" : "pages"}`}
                 </span>
-                <span className="flex items-center gap-4 text-navy">
-                  <button type="button" onClick={() => { trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className="hover:underline">Template</button>
-                  <button type="button" onClick={() => setPreviewHidden(true)} className="hidden hover:underline lg:inline">Hide</button>
-                </span>
+                {finishing ? (
+                  <span className="hidden text-muted sm:inline">Click any part of the page to edit it</span>
+                ) : (
+                  <span className="flex items-center gap-4 text-navy">
+                    <button type="button" onClick={() => { trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className="hover:underline">Template</button>
+                    <button type="button" onClick={() => setPreviewHidden(true)} className="hidden hover:underline lg:inline">Hide</button>
+                  </span>
+                )}
               </div>
               {step !== "letter" && previewPageCount > 2 && (
                 <div className="editor-chrome mx-4 mb-3 flex flex-col gap-3 rounded-xl border border-gold bg-gold-tint p-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between" role="status">
@@ -580,7 +634,7 @@ export function CvEditor() {
                 </div>
               )}
               <div className="cv-preview-viewport px-4 pb-28 sm:px-6 lg:pb-6">
-                <div ref={previewRef} className="cv-preview-scale relative">
+                <div ref={previewRef} onClick={openSectionFromPage} className={`cv-preview-scale relative ${finishing ? "cv-click-to-edit" : ""}`}>
                   {step === "letter" ? <CoverLetterDocument cv={cv} /> : <MemoCvDocument cv={cv} />}
                 </div>
               </div>
@@ -589,7 +643,7 @@ export function CvEditor() {
         ) : null}
       </div>
 
-      {previewHidden && (
+      {previewHidden && !finishing && (
         <button type="button" onClick={() => setPreviewHidden(false)} className="editor-chrome fixed bottom-6 right-6 z-30 hidden min-h-11 items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white shadow-soft lg:inline-flex">
           Show preview
         </button>
