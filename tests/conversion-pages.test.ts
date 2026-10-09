@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { readEditorSource } from "./editor-source.ts";
+
 const globalCss = readFileSync("app/globals.css", "utf8");
 const siteSource = readFileSync("lib/site.ts", "utf8");
 const pricingSource = readFileSync("app/pricing/page.tsx", "utf8");
-const editorSource = readFileSync("components/cv-editor.tsx", "utf8");
+const editorSource = readEditorSource();
 
 test("mobile page containers use valid calculated widths", () => {
   assert.match(globalCss, /min\(1120px, calc\(100% - 32px\)\)/);

@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const editorSource = readFileSync("components/cv-editor.tsx", "utf8");
+import { readEditorSource } from "./editor-source.ts";
+
+const editorSource = readEditorSource();
 const formsSource = readFileSync("components/editor/editor-forms.tsx", "utf8");
 const eventsSource = readFileSync("lib/editor-events.ts", "utf8");
 

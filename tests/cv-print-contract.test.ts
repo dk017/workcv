@@ -2,10 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const editorSource = readFileSync(
-  new URL("../components/cv-editor.tsx", import.meta.url),
-  "utf8",
-);
+import { readEditorSource } from "./editor-source.ts";
+
+const editorSource = readEditorSource();
 const documentSource = readFileSync(
   new URL("../components/editor/cv-document.tsx", import.meta.url),
   "utf8",
