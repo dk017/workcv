@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Briefcase, FileText, LayoutGrid, LogOut, Mail, Menu, Plus, User, X } from "lucide-react";
+import { Briefcase, FileText, LayoutGrid, Library, LogOut, Mail, Menu, Plus, User, X } from "lucide-react";
 
 import type { PassStatus } from "@/lib/pass-rules";
 import { site } from "@/lib/site";
@@ -11,13 +11,13 @@ import { site } from "@/lib/site";
 export const mainLinks = [
   { href: "/my-cvs", label: "My CVs", icon: LayoutGrid },
   { href: "/my-cvs?view=letters", label: "Cover letters", icon: Mail },
+  { href: "/my-cvs/samples", label: "Samples", icon: Library },
   { href: "/my-cvs/tracker", label: "Job tracker", icon: Briefcase },
 ] as const;
 
 const helpLinks = [
   { href: "/tailor", label: "Tailor a CV to a job" },
   { href: "/tools", label: "Free tools and checkers" },
-  { href: "/cv-examples-uk", label: "CV examples" },
 ] as const;
 
 export function Logo() {

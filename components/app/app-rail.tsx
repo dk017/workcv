@@ -2,13 +2,14 @@
 
 import Link from "next/link";
 import { Suspense, useEffect } from "react";
-import { Briefcase, FileText, Mail, Plus, User, Wrench, X } from "lucide-react";
+import { Briefcase, FileText, Library, Mail, Plus, User, Wrench, X } from "lucide-react";
 
 import { Logo, NavContent } from "@/components/app/app-shell";
 
 const railLinks = [
   { href: "/my-cvs", label: "My CVs", icon: FileText },
   { href: "/my-cvs?view=letters", label: "Letters", icon: Mail },
+  { href: "/my-cvs/samples", label: "Samples", icon: Library },
   { href: "/my-cvs/tracker", label: "Tracker", icon: Briefcase },
   { href: "/tools", label: "Tools", icon: Wrench },
 ] as const;

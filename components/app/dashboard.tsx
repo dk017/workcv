@@ -173,7 +173,7 @@ function FirstCv() {
   const options = [
     { href: "/editor?new=1", title: "Start from scratch", detail: "We guide you through each section, one step at a time.", icon: PenLine },
     { href: "/editor?new=1&import=1", title: "Upload your current CV", detail: "Bring in a Word (.docx) or PDF CV and check it section by section.", icon: Upload },
-    { href: "/cv-examples-uk", title: "Start from an example", detail: "Pick a UK example for your kind of job and make it yours.", icon: FileSearch },
+    { href: "/my-cvs/samples", title: "Start from a sample", detail: "Pick a UK sample CV for your kind of job and make it yours.", icon: FileSearch },
   ] as const;
   return (
     <section aria-labelledby="first-cv" className="rounded-2xl border border-line bg-white p-6 sm:p-8">
