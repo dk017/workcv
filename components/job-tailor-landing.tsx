@@ -19,10 +19,15 @@ const inputClass =
   "mt-1.5 min-h-11 w-full rounded-md border border-line-strong bg-white px-3 text-[16px] text-ink outline-none focus:border-navy focus:ring-2 focus:ring-navy/15";
 const labelClass = "block text-sm font-bold text-navy";
 
+export type TailorSourceCv = { id: string; title: string; detail: string };
+
 // Landing page for "Tailor my CV for this job": the Chrome extension sends the
 // job in the URL fragment; anyone else can paste an advert. Nothing is copied
 // until the visitor confirms, so a link alone cannot change their CVs.
-export function JobTailorLanding() {
+// Inside the app (`sourceCvs` given) the visitor also picks which saved CV to copy.
+export function JobTailorLanding({ sourceCvs }: { sourceCvs?: TailorSourceCv[] } = {}) {
+  const inApp = sourceCvs !== undefined;
+  const [sourceId, setSourceId] = useState(sourceCvs?.[0]?.id ?? "");
   const [role, setRole] = useState("");
   const [employer, setEmployer] = useState("");
   const [advertText, setAdvertText] = useState("");
@@ -60,20 +65,24 @@ export function JobTailorLanding() {
       return;
     }
     setSubmitting(true);
-    trackFunnelEvent("marketing_cta_clicked", { placement: fromExtension ? "tailor_page_extension" : "tailor_page_paste" });
-    window.location.href = jobTailorEditorPath;
+    if (!inApp) trackFunnelEvent("marketing_cta_clicked", { placement: fromExtension ? "tailor_page_extension" : "tailor_page_paste" });
+    // In the app the chosen CV is copied; otherwise the editor copies the most recent one.
+    window.location.href = inApp && sourceId ? `/editor?draftId=${encodeURIComponent(sourceId)}&from=job-tailor` : jobTailorEditorPath;
   };
 
   const advertLength = advertText.trim().length;
 
-  return (
-    <section className="bg-paper py-10 md:py-14">
-      <div className="container-page">
-        <div className="max-w-3xl">
-        <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">Tailor your CV</p>
-        <h1 className="mt-2 font-display text-4xl font-semibold text-navy md:text-5xl">
-          {fromExtension && role ? `Tailor your CV for ${role}` : "Tailor your CV for this job"}
-        </h1>
+  const heading = fromExtension && role ? `Tailor your CV for ${role}` : "Tailor your CV for this job";
+  const content = (
+        <>
+        {inApp ? (
+          <h1 className="text-3xl font-extrabold tracking-tight text-navy sm:text-4xl">{heading}</h1>
+        ) : (
+          <>
+            <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">Tailor your CV</p>
+            <h1 className="mt-2 font-display text-4xl font-semibold text-navy md:text-5xl">{heading}</h1>
+          </>
+        )}
         <p className="mt-3 text-muted">
           WorkCV makes a separate copy of your saved CV for this vacancy and shows which advert keywords it already covers. Your original CV stays
           as it is. Editing is free; you pay only to download, from {site.price} once.
@@ -85,6 +94,17 @@ export function JobTailorLanding() {
               Job details captured from the page you were viewing. Check them before you continue.
             </p>
           ) : null}
+          {inApp && sourceCvs.length > 0 && (
+            <label className={labelClass}>
+              Which CV should we copy?
+              <select value={sourceId} onChange={(event) => setSourceId(event.target.value)} className={inputClass}>
+                {sourceCvs.map((cv) => (
+                  <option key={cv.id} value={cv.id}>{cv.title}{cv.detail ? ` (${cv.detail})` : ""}</option>
+                ))}
+              </select>
+              <span className="mt-1 block text-xs font-normal text-muted">The copy is named after this job. The CV you pick isn’t changed.</span>
+            </label>
+          )}
           <div className="grid gap-5 sm:grid-cols-2">
             <label className={labelClass}>
               Job title
@@ -122,10 +142,17 @@ export function JobTailorLanding() {
               {submitting ? "Opening the editor..." : "Tailor my CV for this job"}
               <ArrowRight className="h-4 w-4" aria-hidden="true" />
             </button>
-            <p className="text-xs leading-5 text-muted">You will sign in with a one-time email code if you have not already.</p>
+            {!inApp && <p className="text-xs leading-5 text-muted">You will sign in with a one-time email code if you have not already.</p>}
           </div>
         </form>
-        </div>
+        </>
+  );
+
+  if (inApp) return <div className="max-w-3xl">{content}</div>;
+  return (
+    <section className="bg-paper py-10 md:py-14">
+      <div className="container-page">
+        <div className="max-w-3xl">{content}</div>
       </div>
     </section>
   );

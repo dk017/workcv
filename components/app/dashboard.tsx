@@ -72,7 +72,7 @@ function ContinueCard({ cv }: { cv: DashboardCv }) {
 }
 
 const quickActions = [
-  { href: "/tailor", title: "Tailor a CV to a job", detail: "Paste an advert and get a separate copy for it", icon: Wand2 },
+  { href: "/my-cvs/tailor", title: "Tailor a CV to a job", detail: "Paste an advert and get a separate copy for it", icon: Wand2 },
   { href: "/tools/ats-score-checker", title: "Check a CV against an advert", detail: "See which of the advert’s keywords it covers", icon: FileSearch },
   { href: "/tools/uk-visa-sponsor-checker", title: "Check a sponsor licence", detail: "Search the Home Office register of sponsors", icon: ShieldCheck },
 ] as const;

@@ -20,10 +20,12 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
-  if (request.method === "GET" && pathname === "/" && request.cookies.has("workcv_session")) {
+  // Signed-in visitors use the app's own pages. Browsers keep the #fragment across this
+  // redirect, so job details the Chrome extension puts there reach the in-app Tailor page.
+  if (request.method === "GET" && (pathname === "/" || pathname === "/tailor") && request.cookies.has("workcv_session")) {
     const url = request.nextUrl.clone();
-    url.pathname = "/my-cvs";
-    url.search = "";
+    url.pathname = pathname === "/tailor" ? "/my-cvs/tailor" : "/my-cvs";
+    if (pathname === "/") url.search = "";
     return NextResponse.redirect(url);
   }
 
@@ -57,5 +59,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/login", "/editor", "/my-cvs", "/my-cvs/:path*", "/account", "/cv-pdf/:path*", "/admin/:path*"],
+  matcher: ["/", "/tailor", "/login", "/editor", "/my-cvs", "/my-cvs/:path*", "/account", "/cv-pdf/:path*", "/admin/:path*"],
 };
