@@ -25,12 +25,6 @@ export function Header() {
         </nav>
         <div className="flex items-center gap-3">
           <HeaderAuth />
-          <Link
-            href="/editor"
-            className="hidden min-h-11 items-center whitespace-nowrap rounded-lg bg-navy px-[18px] text-[0.9375rem] font-bold text-white shadow-sm hover:bg-navy-hover md:inline-flex"
-          >
-            Build my CV
-          </Link>
           <HeaderMenu />
         </div>
       </div>

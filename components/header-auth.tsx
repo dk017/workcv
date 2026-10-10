@@ -35,48 +35,32 @@ export function useAuthMe() {
   return auth;
 }
 
+const primaryButton = "hidden min-h-11 items-center whitespace-nowrap rounded-lg bg-navy px-[18px] text-[0.9375rem] font-bold text-white shadow-sm hover:bg-navy-hover md:inline-flex";
+
+// Signed out: Sign in and Build my CV. Signed in: one way back to the app (email and
+// Log out live in the app's own menu), plus Analytics for admins.
 export function HeaderAuth() {
   const auth = useAuthMe();
-  const [loading, setLoading] = useState(false);
 
   if (!auth?.email) {
     return (
-      <Link href={buildLoginHref("/my-cvs")} className="hidden min-h-11 items-center whitespace-nowrap px-1 text-[0.9375rem] font-bold text-navy hover:underline lg:inline-flex">
-        Sign in
-      </Link>
+      <>
+        <Link href={buildLoginHref("/my-cvs")} className="hidden min-h-11 items-center whitespace-nowrap px-1 text-[0.9375rem] font-bold text-navy hover:underline lg:inline-flex">
+          Sign in
+        </Link>
+        <Link href="/editor" className={primaryButton}>
+          Build my CV
+        </Link>
+      </>
     );
   }
 
-  const logout = async () => {
-    setLoading(true);
-    try {
-      await fetch("/api/auth/logout", { method: "POST" });
-    } finally {
-      authMeRequest = null;
-      window.location.href = "/";
-    }
-  };
-
   return (
-    <div className="flex items-center gap-2">
-      {auth.analyticsAdmin && <a href="/admin/analytics" className="inline-flex min-h-10 items-center rounded-md bg-navy px-3 text-sm font-bold text-white">Analytics</a>}
-      <Link
-        href="/my-cvs"
-        className="inline-flex min-h-10 items-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper"
-      >
+    <>
+      {auth.analyticsAdmin && <a href="/admin/analytics" className="hidden min-h-11 items-center px-1 text-[0.9375rem] font-bold text-navy hover:underline lg:inline-flex">Analytics</a>}
+      <Link href="/my-cvs" className={primaryButton}>
         My CVs
       </Link>
-      <span className="hidden max-w-[210px] truncate rounded-md border border-line bg-white px-3 py-2 text-sm font-bold text-navy xl:inline-block">
-        {auth.email}
-      </span>
-      <button
-        type="button"
-        onClick={logout}
-        disabled={loading}
-        className="hidden min-h-10 items-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:opacity-60 lg:inline-flex"
-      >
-        {loading ? "Logging out..." : "Log out"}
-      </button>
-    </div>
+    </>
   );
 }

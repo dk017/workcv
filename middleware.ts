@@ -20,6 +20,13 @@ export function middleware(request: NextRequest) {
     return response;
   }
 
+  if (request.method === "GET" && pathname === "/" && request.cookies.has("workcv_session")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/my-cvs";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
+
   const response = NextResponse.next();
   const privatePath =
     pathname === "/admin" || pathname.startsWith("/admin/") ||
