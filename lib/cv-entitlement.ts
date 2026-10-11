@@ -7,12 +7,17 @@ import {
   upgradeOfferFrom,
   type UpgradeOffer,
 } from "@/lib/pass-upgrade";
+import { localUnlockEnabled } from "@/lib/local-unlock";
 import { isApprovedTestUser } from "@/lib/test-orders";
 
 // One paid order, or a Job Search Pass covering the CV's creation date,
 // unlocks every download format for that saved CV.
 export async function hasPaidCvOrder(userId: string, documentId: string) {
   await ensurePaymentTables();
+  if (localUnlockEnabled()) {
+    const owned = await getPool().query("SELECT 1 FROM workcv_cv_documents WHERE id = $1 AND user_id = $2", [documentId, userId]);
+    return (owned.rowCount ?? 0) > 0;
+  }
   const result = await getPool().query<{ unlocked: boolean }>(
     `SELECT ${unlockedDocumentSql("$3", "$4")} AS unlocked
      FROM workcv_cv_documents d

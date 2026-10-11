@@ -13,6 +13,7 @@ import { parseCvData, repairCvData } from "@/lib/cv-schema";
 import { duplicateTitle, prepareDuplicateCv } from "@/lib/cv-duplicate";
 import { tailorCvForJob, tailoredCvTitle, type TailorJob } from "@/lib/job-tailor";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
+import { localUnlockEnabled } from "@/lib/local-unlock";
 import { WORKCV_PASS, WORKCV_PASS_PRODUCT_ID } from "@/lib/commerce";
 import { unlockedDocumentSql } from "@/lib/pass-rules";
 
@@ -177,7 +178,7 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
       template: data.template,
       updatedAt: row.updated_at.toISOString(),
       createdAt: row.created_at.toISOString(),
-      paid: row.paid,
+      paid: row.paid || localUnlockEnabled(),
       data,
     };
   });
