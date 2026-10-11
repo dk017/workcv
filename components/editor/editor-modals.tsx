@@ -143,7 +143,7 @@ export function CheckoutSheet({
             }}
             className="mt-0.5 h-4 w-4 shrink-0 accent-navy"
           />
-          <span>I want immediate digital access after payment and understand that once access starts my cancellation rights may be affected. Statutory rights still apply. <a className="font-bold text-navy underline" href="/refund-policy">Refund policy</a>.</span>
+          <span>I want immediate digital access after payment and understand that once access starts my cancellation rights may be affected. Statutory rights still apply. <a className="font-bold text-navy underline" href="/refund-policy" target="_blank" rel="noreferrer">Refund policy</a>.</span>
         </label>
 
         {checkoutError && <p className="mt-4 rounded-md border border-red-200 bg-redsoft px-4 py-3 text-sm font-bold leading-6 text-navy">{checkoutError}</p>}

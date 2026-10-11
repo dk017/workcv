@@ -386,7 +386,7 @@ export function CvEditor() {
         return (
           <div className="space-y-6">
             <StepHeading eyebrow="More sections · optional" title="Anything else worth showing?" intro="Add only what’s real and relevant. Sections you leave empty don’t appear on your CV." />
-            <CvStructureForm cv={cv} onChange={setCv} />
+            <CvStructureForm cv={cv} onChange={setCv} onPreview={() => setPreviewOpen(true)} />
           </div>
         );
       case "letter":

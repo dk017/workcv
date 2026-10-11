@@ -1,12 +1,13 @@
 "use client";
 import { useState } from "react";
+import { Eye } from "lucide-react";
 import { CvData, CvLayoutPreset, cvSectionLabels, orderedCvSections } from "@/lib/editor-data";
 const field = "mt-2 w-full rounded border border-line bg-white p-3 text-sm text-ink";
 const button = "min-h-11 rounded-lg border border-line px-3 text-sm font-bold text-navy disabled:opacity-40";
 const optionalSections = ["projects", "certifications", "volunteering", "languages"] as const;
 const presets: Array<[CvLayoutPreset, string]> = [["standard", "Standard"], ["education-first", "Education first"], ["experienced", "Experienced professional"], ["compact-single", "Compact single column"]];
 
-export function CvStructureForm({ cv, onChange }: { cv: CvData; onChange: (value: CvData) => void }) {
+export function CvStructureForm({ cv, onChange, onPreview }: { cv: CvData; onChange: (value: CvData) => void; onPreview: () => void }) {
   const order = orderedCvSections(cv);
   const [open, setOpen] = useState<string[]>([]);
   // List only sections that will appear on the CV; moves swap them within the full saved order.
@@ -51,7 +52,10 @@ export function CvStructureForm({ cv, onChange }: { cv: CvData; onChange: (value
           <input type="radio" name="layout-preset" className="h-4 w-4 accent-navy" checked={active} onChange={() => onChange({ ...cv, layoutPreset: preset, sectionOrder: undefined })} />{label}
         </label>;
       })}</div>
-      <p className="text-sm"><a href="/cv-layout-tests-uk" target="_blank" rel="noreferrer" className="font-bold text-navy underline underline-offset-4">Compare sample PDFs for each layout</a></p>
+      {/* Shows the user's own CV in the chosen layout, inside the editor. */}
+      <button type="button" onClick={onPreview} className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-line-strong bg-white px-3.5 text-sm font-bold text-navy hover:bg-paper">
+        <Eye className="h-4 w-4" aria-hidden="true" />Preview my CV in this layout
+      </button>
     </fieldset>
   </div>;
 }
