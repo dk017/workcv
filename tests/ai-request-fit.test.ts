@@ -2,6 +2,8 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { aiLimits, fitAdvert, fitLines } from "../lib/ai-request-fit.ts";
+import { cvBulletPointInputSchema } from "../lib/cv-bullet-point-generator.ts";
+import { cvBulletRewriteInputSchema } from "../lib/cv-bullet-rewrite.ts";
 import { cvSummaryInputSchema } from "../lib/cv-summary-generator.ts";
 
 test("long CV evidence keeps whole lines, earliest first, within the limit", () => {
@@ -31,7 +33,15 @@ test("the profile tool accepts what the editor sends for a long CV, and explains
   const evidence = fitLines(Array.from({ length: 80 }, (_, i) => `Achievement ${i + 1} with a measurable result for the team`).join("\n"), aiLimits.summaryEvidence);
   const parsed = cvSummaryInputSchema.safeParse({ background: "Software Engineer at Example Ltd. BSc Computer Science at Example University", targetRole: "Software Engineer", evidence, jobDescription: fitAdvert("x ".repeat(6_000)) });
   assert.ok(parsed.success);
-  const tooLong = cvSummaryInputSchema.safeParse({ background: "Software Engineer at Example Ltd. BSc Computer Science at Example University", targetRole: "Software Engineer", evidence: "a".repeat(2_500) });
-  assert.equal(tooLong.success, false);
-  assert.match(tooLong.error!.issues[0].message, /under 2,000 characters/);
+});
+
+test("the tools trim over-long input from older pages instead of rejecting it", () => {
+  const evidence = Array.from({ length: 60 }, (_, i) => `Achievement ${i + 1}: cut response times and coached new starters`).join("\n");
+  const parsed = cvSummaryInputSchema.parse({ background: "Software Engineer at Example Ltd. BSc Computer Science at Example University", targetRole: "Software Engineer", evidence, jobDescription: "Duty line.\n".repeat(900) });
+  assert.ok(parsed.evidence.length <= 2_000 && parsed.evidence.startsWith("Achievement 1:"));
+  assert.ok(parsed.jobDescription.length <= 5_000);
+  const bullets = cvBulletPointInputSchema.parse({ jobTitle: "Team Leader", rawExperience: "Handled escalations and reported weekly figures.\n".repeat(120), jobDescription: "x ".repeat(4_000) });
+  assert.ok(bullets.rawExperience.length <= 3_000 && bullets.jobDescription.length <= 5_000);
+  const rewrite = cvBulletRewriteInputSchema.parse({ jobTitle: "Team Leader", bullet: "Responsible for weekly coaching sessions", jobDescription: "y ".repeat(4_000) });
+  assert.ok(rewrite.jobDescription.length <= 5_000);
 });

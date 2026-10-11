@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
+import { fitAdvert, trimToLimit } from "./ai-request-fit.ts";
+
 import {
   cleanBullet,
   countWords,
@@ -20,11 +22,14 @@ export const cvBulletPointInputSchema = z.object({
     .min(2, "Enter the job or experience title.")
     .max(120, "Keep the title under 120 characters."),
   employmentStatus: z.enum(["current", "previous"]).default("previous"),
-  rawExperience: z
-    .string()
-    .trim()
-    .min(50, "Add more detail about what you did and what changed as a result.")
-    .max(3_000, "Keep your experience notes under 3,000 characters."),
+  rawExperience: z.preprocess(
+    trimToLimit(3_000),
+    z
+      .string()
+      .trim()
+      .min(50, "Add more detail about what you did and what changed as a result.")
+      .max(3_000, "Keep your experience notes under 3,000 characters."),
+  ),
   targetRole: z
     .string()
     .trim()
@@ -32,9 +37,7 @@ export const cvBulletPointInputSchema = z.object({
     .optional()
     .default(""),
   jobDescription: z
-    .string()
-    .trim()
-    .max(5_000, "Keep the job description under 5,000 characters.")
+    .preprocess(trimToLimit(5_000, fitAdvert), z.string().trim().max(5_000, "Keep the job description under 5,000 characters."))
     .optional()
     .default(""),
 });

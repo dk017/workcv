@@ -49,3 +49,9 @@ export function fitAdvert(text: string, max: number = aiLimits.jobDescription) {
   if (sentence > max * 0.6) return cut.slice(0, sentence + 1);
   return cutAtWord(cut, max);
 }
+
+/** For the tools' input schemas: text over the limit is trimmed instead of rejected, so a page
+ * still running older code (or any other caller) gets suggestions rather than an error. */
+export function trimToLimit(max: number, fit: (text: string, max: number) => string = fitLines) {
+  return (value: unknown) => (typeof value === "string" && value.trim().length > max ? fit(value, max) : value);
+}

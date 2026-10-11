@@ -36,8 +36,9 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Over-long fields are trimmed by the input schema, so allow a long CV or advert through.
     const body = await request.text();
-    if (body.length > 12_000) {
+    if (body.length > 40_000) {
       return NextResponse.json(
         { error: "The submitted details are too large." },
         { status: 413, headers: { "Cache-Control": "no-store" } },
