@@ -626,7 +626,9 @@ main section.py-24 {
 }
 
 .print-document .border-navy,
-.letter-document .border-navy {
+.letter-document .border-navy,
+.letter-document.border-navy {
+  /* The letter's own top bar is on the document element itself, not inside it. */
   border-color: var(--cv-accent, #0f2942) !important;
 }
 
