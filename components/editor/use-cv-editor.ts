@@ -21,6 +21,7 @@ import type { AiReview } from "@/components/editor/editor-modals";
 import { stepForIssue, type StepId } from "@/components/editor/steps";
 import { cvDesignStyle, cvDesignVariables, fitCandidates, minimalCvDesign, pageWidthPx, resolveCvDesign, type CvDesign } from "@/lib/cv-design";
 import { predictPdfPages } from "@/lib/cv-page-count";
+import { aiLimits, fitAdvert, fitLines } from "@/lib/ai-request-fit";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
@@ -639,11 +640,12 @@ export function useCvEditor() {
     if (aiLoading) return;
     setAiLoading("profile"); setAiError(null);
     try {
-      const background = [...cv.experience.map((item) => `${item.role} at ${item.company}`), ...cv.education.map((item) => `${item.qualification} at ${item.institution}`)].filter((value) => value.replace(/\s+at\s*$/, "").trim()).join(". ");
-      const evidence = [cv.skills, ...cv.experience.map((item) => item.bullets), ...cv.education.map((item) => item.details)].filter(Boolean).join("\n");
+      // Long CVs are trimmed to what the tool accepts, keeping skills and the most recent roles first.
+      const background = fitLines([...cv.experience.map((item) => `${item.role} at ${item.company}`), ...cv.education.map((item) => `${item.qualification} at ${item.institution}`)].filter((value) => value.replace(/\s+at\s*$/, "").trim()).join("\n"), aiLimits.summaryBackground - 40).split("\n").join(". ");
+      const evidence = fitLines([cv.skills, ...cv.experience.map((item) => item.bullets), ...cv.education.map((item) => item.details)].filter(Boolean).join("\n"), aiLimits.summaryEvidence);
       if (!effectiveTargetRole(cv)) throw new Error("Add a target role first so the profile has a clear direction.");
       if (background.length < 40 || evidence.length < 40) throw new Error("Add more evidence first: complete a role or education entry and a few bullets or skills.");
-      const response = await fetch("/api/tools/cv-summary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ background, targetRole: effectiveTargetRole(cv), evidence, jobDescription: cv.targeting?.jobDescription || "", careerStage: cv.experience.some((item) => item.role.trim()) ? "experienced" : "early" }) });
+      const response = await fetch("/api/tools/cv-summary", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ background, targetRole: effectiveTargetRole(cv), evidence, jobDescription: fitAdvert(cv.targeting?.jobDescription || ""), careerStage: cv.experience.some((item) => item.role.trim()) ? "experienced" : "early" }) });
       const data = await response.json() as { variants?: Array<{ label: string; summary: string }>; followUpQuestions?: string[]; error?: string };
       if (!response.ok || !data.variants) throw new Error(data.error || "Profile suggestions are unavailable.");
       setAiReview({ kind: "profile", title: "Choose an improved profile", original: cv.profile, options: data.variants.map((item) => ({ label: item.label, value: item.summary })), questions: data.followUpQuestions });
@@ -657,9 +659,10 @@ export function useCvEditor() {
     const item = cv.experience.find((entry) => entry.id === id); if (!item) return;
     setAiLoading("bullets"); setAiError(null);
     try {
-      const rawExperience = [item.bullets, item.company && `Employer: ${item.company}`, item.location && `Location: ${item.location}`].filter(Boolean).join("\n");
+      const context = [item.company && `Employer: ${item.company}`, item.location && `Location: ${item.location}`].filter(Boolean).join("\n");
+      const rawExperience = [fitLines(item.bullets, aiLimits.bulletNotes - context.length - 1), context].filter(Boolean).join("\n");
       if (!item.role.trim() || rawExperience.length < 50) throw new Error("Add the role and at least 50 characters of truthful experience notes first.");
-      const response = await fetch("/api/tools/cv-bullet-points", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, employmentStatus: /present|current/i.test(item.end) ? "current" : "previous", rawExperience, targetRole: effectiveTargetRole(cv), jobDescription: cv.targeting?.jobDescription || "" }) });
+      const response = await fetch("/api/tools/cv-bullet-points", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, employmentStatus: /present|current/i.test(item.end) ? "current" : "previous", rawExperience, targetRole: effectiveTargetRole(cv), jobDescription: fitAdvert(cv.targeting?.jobDescription || "") }) });
       const data = await response.json() as { bullets?: string[]; followUpQuestions?: string[]; error?: string };
       if (!response.ok || !data.bullets) throw new Error(data.error || "Bullet suggestions are unavailable.");
       setAiReview({ kind: "bullets", targetId: id, title: `Review suggestions for ${item.role}`, original: item.bullets, options: data.bullets.map((value, index) => ({ label: `Suggestion ${index + 1}`, value })), questions: data.followUpQuestions });
@@ -677,7 +680,7 @@ export function useCvEditor() {
     setAiLoading("bullet"); setAiError(null);
     try {
       if (!item.role.trim()) throw new Error("Add the job title for this role first.");
-      const response = await fetch("/api/tools/cv-bullet-rewrite", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, bullet, targetRole: effectiveTargetRole(cv), jobDescription: cv.targeting?.jobDescription || "", avoid, keyword: draft?.keyword || "", requirement: draft?.requirement || "" }) });
+      const response = await fetch("/api/tools/cv-bullet-rewrite", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ jobTitle: item.role, bullet, targetRole: effectiveTargetRole(cv), jobDescription: fitAdvert(cv.targeting?.jobDescription || ""), avoid, keyword: draft?.keyword || "", requirement: draft?.requirement || "" }) });
       const data = await response.json() as { options?: string[]; followUpQuestion?: string; error?: string };
       if (!response.ok || !data.options) throw new Error(data.error || "Bullet rewrites are unavailable.");
       setAiReview({ kind: "bullet", targetId: id, bulletIndex: index, keyword: draft?.keyword, requirement: draft?.requirement, title: draft ? `Add ${draft.keyword || "evidence"} to ${item.role}` : `Rewrite this ${item.role} bullet`, original: bullet, options: data.options.map((value, optionIndex) => ({ label: `Option ${optionIndex + 1}`, value })), questions: data.followUpQuestion ? [data.followUpQuestion] : undefined });

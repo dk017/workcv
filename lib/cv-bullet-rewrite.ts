@@ -23,8 +23,8 @@ export const cvBulletRewriteInputSchema = z.object({
     .trim()
     .min(8, "Write a few words about what you did, then rewrite it.")
     .max(400, "Keep the bullet under 400 characters."),
-  targetRole: z.string().trim().max(120).optional().default(""),
-  jobDescription: z.string().trim().max(5_000).optional().default(""),
+  targetRole: z.string().trim().max(120, "Keep the target role under 120 characters.").optional().default(""),
+  jobDescription: z.string().trim().max(5_000, "Keep the job description under 5,000 characters.").optional().default(""),
   // Earlier suggestions the user rejected with "Try again", so the next ones differ.
   avoid: z.array(z.string().trim().max(400)).max(9).optional().default([]),
   // Advert keyword the user confirmed they have, to use where the bullet supports it.
