@@ -705,3 +705,19 @@ main section.py-24 {
   outline-offset: 3px;
   border-radius: 2px;
 }
+
+/* The part of the page being edited in the Finish side panel. Outlines don't move the layout. */
+.cv-click-to-edit .cv-editing {
+  outline: 2px solid #0f2942;
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* Step forms inside the narrow Finish edit panel: one column, smaller headings. */
+.edit-panel [class*="sm:grid-cols-2"] {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.edit-panel h1 {
+  font-size: 1.25rem;
+}

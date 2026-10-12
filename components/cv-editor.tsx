@@ -12,10 +12,10 @@ import { ApplicationPackReview, CvStructureForm } from "@/components/editor/cv-s
 import { ContactStep, EducationStep, ProfileStep, RoleStep, SkillsStep, StepHeading } from "@/components/editor/editor-forms";
 import { DesignToolbar } from "@/components/editor/design-toolbar";
 import { AiReviewModal, CheckoutSheet, ImportCvModal, TemplatePickerModal } from "@/components/editor/editor-modals";
-import { AdvertWords, EditorNotices, EntryList, FinishStep, ImportCard, ReadinessCard, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
+import { AdvertWords, DownloadMenu, EditorNotices, EntryList, FinishPanel, ImportCard, ReadinessCard, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
 import { PurposeSurvey } from "@/components/editor/purpose-survey";
-import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
+import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, stepForIssue, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
 import { useCvEditor } from "@/components/editor/use-cv-editor";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { cvPapers, resolveCvDesign } from "@/lib/cv-design";
@@ -56,6 +56,7 @@ export function CvEditor() {
     creatingNew,
     previewRef,
     previewPageCount,
+    previewPageBreaks,
     previewOpen,
     setPreviewOpen,
     fitMessage,
@@ -117,6 +118,9 @@ export function CvEditor() {
   const [menuOpen, setMenuOpen] = useState(false);
   // On Finish the page can show the CV or its cover letter.
   const [finishDocument, setFinishDocument] = useState<"cv" | "letter">("cv");
+  // On Finish, the section being edited in the side panel (null shows readiness instead).
+  const [editing, setEditing] = useState<StepId | null>(null);
+  const [editingFromPage, setEditingFromPage] = useState(false);
 
   const role = cv.experience.find((item) => item.id === selectedRoleId) ?? cv.experience[0];
   const roleIndex = role ? cv.experience.indexOf(role) : 0;
@@ -168,6 +172,7 @@ export function CvEditor() {
     }
     setStep(target);
     setPreviewOpen(false);
+    setEditing(null);
     setMobileView("edit");
     window.scrollTo({ top: 0 });
   };
@@ -220,11 +225,29 @@ export function CvEditor() {
   };
 
   // On Finish, clicking part of the page opens the step that edits it.
+  // On Finish, a section opens in the side panel next to the page, so the page stays in view.
+  const openEditor = (target: StepId, entryId?: string, fromPage = false) => {
+    if (entryId && target === "experience") setSelectedRoleId(entryId);
+    if (entryId && target === "education") setSelectedEducationId(entryId);
+    if (target === "letter") setFinishDocument("letter");
+    else if (target !== "finish") setFinishDocument("cv");
+    setEditing(target === "finish" ? null : target);
+    setEditingFromPage(fromPage);
+    setMobileView("edit");
+    if (window.matchMedia("(max-width: 1023px)").matches) window.scrollTo({ top: 0 });
+  };
+  const closeEditor = () => {
+    setEditing(null);
+    if (editingFromPage) setMobileView("preview");
+  };
+
+  // Clicking part of the page edits it: in place on Finish, or by opening its step from Preview.
   const openSectionFromPage = (event: React.MouseEvent<HTMLDivElement>) => {
     if (!pageClickable) return;
     const clicked = event.target as HTMLElement;
     if (clicked.closest(".letter-document")) {
-      goToStep("letter");
+      if (finishing) openEditor("letter", undefined, true);
+      else goToStep("letter");
       return;
     }
     const part = clicked.closest<HTMLElement>(".cv-header, .cv-section, [data-cv-section], .cv-template-modern .cv-name");
@@ -235,8 +258,29 @@ export function CvEditor() {
     const entry = clicked.closest(".cv-entry");
     const index = entry ? Array.from(part.querySelectorAll(".cv-entry")).indexOf(entry) : -1;
     const entryId = target === "experience" ? cv.experience[index]?.id : target === "education" ? cv.education[index]?.id : undefined;
-    goToStep(target, entryId);
+    if (finishing) openEditor(target, entryId, true);
+    else goToStep(target, entryId);
   };
+
+  // Outline the part of the page being edited.
+  useEffect(() => {
+    const preview = previewRef.current;
+    if (!preview) return;
+    preview.querySelectorAll(".cv-editing").forEach((element) => element.classList.remove("cv-editing"));
+    if (!finishing || !editing) return;
+    const entries = (section: string) => Array.from(preview.querySelectorAll<HTMLElement>(`.cv-section-${section} .cv-entry`));
+    const targets: Element[] =
+      editing === "experience" ? [entries("experience")[cv.experience.findIndex((item) => item.id === role?.id)]]
+      : editing === "education" ? [entries("education")[cv.education.findIndex((item) => item.id === education?.id)]]
+      : Array.from(preview.querySelectorAll({
+          contact: ".cv-header, [data-cv-section='contact']",
+          profile: ".cv-section-profile",
+          skills: ".cv-section-skills, [data-cv-section='skills']",
+          more: ".cv-section-projects, .cv-section-certifications, .cv-section-volunteering, .cv-section-languages",
+          letter: ".letter-document",
+        }[editing as string] ?? ".none"));
+    targets.filter(Boolean).forEach((element) => element.classList.add("cv-editing"));
+  });
 
   const cvTitle = cvDisplayTitle(cv);
   const saveTone = saveSnapshot.status === "error" ? "text-[#8d3030] font-bold" : "text-muted";
@@ -266,21 +310,21 @@ export function CvEditor() {
     </section>
   );
 
-  const stepContent = () => {
-    switch (step) {
+  const stepContent = (target: StepId = step, inPanel = false) => {
+    switch (target) {
       case "contact":
         return (
           <div className="space-y-6">
             <StepHeading eyebrow="Contact" title="How should employers reach you?" intro="UK CVs don’t need a photo, date of birth or full address. Your town is enough." />
             <ContactStep cv={cv} updateField={updateField} />
-            {!cv.targeting && !tailoringOpen && advertPanel}
-            {cv.targeting && !tailoringOpen && <TailorCard editor={editor} onOpenAdvert={openAdvert} />}
+            {!inPanel && !cv.targeting && !tailoringOpen && advertPanel}
+            {!inPanel && cv.targeting && !tailoringOpen && <TailorCard editor={editor} onOpenAdvert={openAdvert} />}
           </div>
         );
       case "experience":
         return (
           <div className="space-y-6">
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden" role="group" aria-label="Your roles">
+            <div className={`flex gap-2 overflow-x-auto pb-1 ${inPanel ? "" : "lg:hidden"}`} role="group" aria-label="Your roles">
               {cv.experience.map((item, index) => (
                 <button key={item.id} type="button" aria-pressed={item.id === role?.id} onClick={() => setSelectedRoleId(item.id)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${item.id === role?.id ? "bg-navy text-white" : "border border-line-strong text-navy"}`}>
                   {item.role.trim() || `Role ${index + 1}`}
@@ -304,7 +348,7 @@ export function CvEditor() {
                 assistanceBusy={Boolean(aiLoading)}
               />
             )}
-            {keywordTriage && progress && (
+            {!inPanel && keywordTriage && progress && (
               <section aria-labelledby="advert-keywords" className="rounded-2xl border border-green-200 bg-greensoft p-4 sm:p-5">
                 <h2 id="advert-keywords" className="text-xs font-bold uppercase tracking-[0.08em] text-green-800">From the {fitTargeting?.role || cv.targeting?.role || "job"} advert</h2>
                 <KeywordTriagePanel
@@ -326,7 +370,7 @@ export function CvEditor() {
                 />
               </section>
             )}
-            {fitTargeting && fitTargeting.priorities.length > 0 && (
+            {!inPanel && fitTargeting && fitTargeting.priorities.length > 0 && (
               <details className="rounded-2xl border border-line p-4 text-sm" open={!prioritiesAreActions}>
                 <summary className="cursor-pointer font-bold text-navy">The CV checker’s top fixes for {fitTargeting.role}</summary>
                 <ol className="mt-3 grid gap-3 sm:grid-cols-3">
@@ -339,13 +383,13 @@ export function CvEditor() {
                 </ol>
               </details>
             )}
-            <ApplicationPackReview cv={cv} onChange={setCv} />
+            {!inPanel && <ApplicationPackReview cv={cv} onChange={setCv} />}
           </div>
         );
       case "education":
         return (
           <div className="space-y-6">
-            <div className="flex gap-2 overflow-x-auto pb-1 lg:hidden" role="group" aria-label="Your qualifications">
+            <div className={`flex gap-2 overflow-x-auto pb-1 ${inPanel ? "" : "lg:hidden"}`} role="group" aria-label="Your qualifications">
               {cv.education.map((item, index) => (
                 <button key={item.id} type="button" aria-pressed={item.id === education?.id} onClick={() => setSelectedEducationId(item.id)} className={`min-h-10 shrink-0 rounded-full px-4 text-sm font-bold ${item.id === education?.id ? "bg-navy text-white" : "border border-line-strong text-navy"}`}>
                   {item.qualification.trim() || `Qualification ${index + 1}`}
@@ -386,7 +430,7 @@ export function CvEditor() {
         return (
           <div className="space-y-6">
             <StepHeading eyebrow="More sections · optional" title="Anything else worth showing?" intro="Add only what’s real and relevant. Sections you leave empty don’t appear on your CV." />
-            <CvStructureForm cv={cv} onChange={setCv} onPreview={() => setPreviewOpen(true)} />
+            <CvStructureForm cv={cv} onChange={setCv} onPreview={inPanel ? undefined : () => setPreviewOpen(true)} />
           </div>
         );
       case "letter":
@@ -402,13 +446,8 @@ export function CvEditor() {
         );
       case "finish":
         return (
-          <div className="space-y-6">
-            <StepHeading
-              eyebrow="Finish and download"
-              title={readiness.ready ? "Your CV and letter are ready" : "Nearly there"}
-              intro="Check each page, change the design on the page if you like, then download both as PDF and Word."
-            />
-            <FinishStep editor={editor} onGoTo={goToStep} />
+          <div className="flex flex-col gap-4">
+            <FinishPanel editor={editor} onFix={(issue) => openEditor(stepForIssue(issue), issue.targetId)} />
             <button type="button" onClick={() => { setMobileView("preview"); setDesignOpen(true); window.scrollTo({ top: 0 }); }} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
               <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />Change fonts, spacing and colour
             </button>
@@ -481,7 +520,7 @@ export function CvEditor() {
   const pageArea = (
     <>
       {finishing && loaded && (
-        <div className="editor-chrome px-4 pt-4 sm:px-6">
+        <div className="editor-chrome">
           <button type="button" aria-expanded={designOpen} onClick={() => setDesignOpen((open) => !open)} className="mb-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-line-strong bg-white font-bold text-navy lg:hidden">
             <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />{designOpen ? "Hide design settings" : "Design"}
           </button>
@@ -491,6 +530,16 @@ export function CvEditor() {
               design={cv.design}
               pages={previewPageCount}
               fitMessage={fitMessage}
+              documentSwitch={
+                <div role="group" aria-label="Show on the page" className="flex rounded-[10px] bg-sand p-[3px]">
+                  {(["cv", "letter"] as const).map((kind) => (
+                    <button key={kind} type="button" aria-pressed={finishDocument === kind} onClick={() => setFinishDocument(kind)} className={`min-h-8 rounded-lg px-3 text-[0.8125rem] ${finishDocument === kind ? "bg-white font-bold text-navy shadow-[0_1px_3px_rgba(15,41,66,0.15)]" : "font-semibold text-muted hover:text-navy"}`}>
+                      {kind === "cv" ? "CV" : "Cover letter"}
+                    </button>
+                  ))}
+                </div>
+              }
+              download={<DownloadMenu editor={editor} onWriteLetter={() => goToStep("letter")} />}
               onDesign={changeDesign}
               onTemplate={(template) => {
                 updateField("template", template);
@@ -502,23 +551,14 @@ export function CvEditor() {
           </div>
         </div>
       )}
-      <div className="editor-chrome flex flex-wrap items-center justify-between gap-3 px-4 pb-2 pt-4 text-[0.8125rem] font-bold sm:px-6">
+      <div className={`editor-chrome flex flex-wrap items-center justify-between gap-3 pb-2 pt-4 text-[0.8125rem] font-bold ${finishing ? "" : "px-4 sm:px-6"}`}>
         <span className="text-muted">
           {paperLabel} · {pageDocument === "letter" ? "Cover letter" : `${selectedTemplate?.name ?? "Classic"} · ${previewPageCount} ${previewPageCount === 1 ? "page" : "pages"}`}
         </span>
-        {finishing && (
-          <div role="group" aria-label="Show on the page" className="flex rounded-lg bg-sand p-[3px]">
-            {(["cv", "letter"] as const).map((kind) => (
-              <button key={kind} type="button" aria-pressed={finishDocument === kind} onClick={() => setFinishDocument(kind)} className={`min-h-8 rounded-md px-3 text-[0.8125rem] ${finishDocument === kind ? "bg-white font-bold text-navy shadow-[0_1px_3px_rgba(15,41,66,0.15)]" : "font-semibold text-muted hover:text-navy"}`}>
-                {kind === "cv" ? "CV" : "Cover letter"}
-              </button>
-            ))}
-          </div>
-        )}
-        {pageClickable && <span className="hidden text-muted xl:inline">Click any part of the page to edit it</span>}
+        {pageClickable && <span className="hidden text-muted sm:inline">Click any part of the page to edit it</span>}
       </div>
       {pageDocument === "cv" && previewPageCount > 2 && (
-        <div className="editor-chrome mx-4 mb-3 flex flex-col gap-3 rounded-xl border border-gold bg-gold-tint p-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between" role="status">
+        <div className={`editor-chrome mb-3 flex ${finishing ? "" : "mx-4 sm:mx-6"} flex-col gap-3 rounded-xl border border-gold bg-gold-tint p-4 sm:mx-6 sm:flex-row sm:items-center sm:justify-between`} role="status">
           <div>
             <p className="text-sm font-bold text-navy">Your CV is about {previewPageCount} pages.</p>
             <p className="mt-1 text-xs leading-5 text-muted">Most UK applicants should aim for two pages. Remove older detail or use the Compact template before downloading.</p>
@@ -528,9 +568,15 @@ export function CvEditor() {
           )}
         </div>
       )}
-      <div className="cv-preview-viewport px-4 pb-28 sm:px-6 lg:pb-8">
+      <div className={`cv-preview-viewport ${finishing ? "rounded-2xl bg-sand px-3 py-5 sm:px-6" : "px-4 pb-28 sm:px-6 lg:pb-8"}`}>
         <div ref={previewRef} onClick={openSectionFromPage} className={`cv-preview-scale relative ${pageClickable ? "cv-click-to-edit" : ""}`}>
           {pageDocument === "letter" ? <CoverLetterDocument cv={cv} /> : <MemoCvDocument cv={cv} />}
+          {/* Where each PDF page starts, from the same pagination replay as the page count. */}
+          {pageDocument === "cv" && previewPageBreaks.map((top, index) => (
+            <div key={index} aria-hidden="true" data-page-break className="editor-chrome pointer-events-none absolute inset-x-0 z-10 border-t-2 border-dashed border-[#9ca3af]" style={{ top: Math.max(0, top - 6) }}>
+              <span className="absolute -top-3 left-1 rounded-full border border-line-strong bg-white px-2 py-0.5 text-[11px] font-bold text-muted">Page {index + 2}</span>
+            </div>
+          ))}
         </div>
       </div>
     </>
@@ -592,7 +638,7 @@ export function CvEditor() {
                 <span className="sr-only sm:not-sr-only">Preview</span>
               </button>
             )}
-            {pdfUnlocked && (
+            {pdfUnlocked && !finishing && (
               <details className="relative hidden sm:block">
                 <summary className="inline-flex min-h-10 cursor-pointer list-none items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover [&::-webkit-details-marker]:hidden">
                   <Download className="h-4 w-4" aria-hidden="true" />
@@ -657,16 +703,30 @@ export function CvEditor() {
       </div>
 
       {finishing ? (
-        <div className="grid lg:grid-cols-[minmax(0,1fr)_minmax(360px,420px)]">
+        <div className="grid gap-6 px-4 pb-28 pt-4 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(340px,400px)] lg:pb-10">
           <section aria-label="Preview" className={`print-area min-w-0 ${mobileView === "edit" ? "hidden lg:block" : "block"}`}>
             {pageArea}
           </section>
-          <div className={`editor-form min-w-0 px-4 pb-28 pt-6 sm:px-6 lg:pb-10 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
-            <div className="flex flex-col gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6">
+          <div className={`editor-form min-w-0 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
+            <div className="flex flex-col gap-4 lg:sticky lg:top-[76px] lg:max-h-[calc(100vh-92px)] lg:overflow-y-auto lg:pb-2">
               <EditorNotices editor={editor} />
               {tailoringOpen && advertPanel}
-              {loaded && stepContent()}
-              {previous && (
+              {loaded && editing ? (
+                <section aria-label={`Editing ${stepLabel(editing)}`} className="edit-panel rounded-2xl border-2 border-navy bg-white p-4 sm:p-5">
+                  <div className="mb-4 flex items-center justify-between gap-3">
+                    <p className="text-xs font-bold uppercase tracking-[0.08em] text-muted">Editing · {stepLabel(editing)}</p>
+                    <button type="button" onClick={closeEditor} className="inline-flex min-h-9 items-center rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover">Done</button>
+                  </div>
+                  {stepContent(editing, true)}
+                  <div className="mt-5 flex items-center justify-between gap-3 border-t border-line pt-4">
+                    <span className="text-sm text-muted">Changes show on the page as you type.</span>
+                    <button type="button" onClick={closeEditor} className="inline-flex min-h-10 items-center rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover">Done</button>
+                  </div>
+                </section>
+              ) : (
+                loaded && stepContent()
+              )}
+              {previous && !editing && (
                 <button type="button" onClick={() => goToStep(previous)} className="editor-chrome hidden min-h-11 w-fit items-center gap-2 font-bold text-navy hover:underline lg:inline-flex">
                   <ArrowLeft className="h-4 w-4" aria-hidden="true" />{stepLabel(previous)}
                 </button>

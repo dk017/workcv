@@ -20,7 +20,7 @@ import { DebouncedSaveManager, type SaveSnapshot } from "@/lib/save-manager";
 import type { AiReview } from "@/components/editor/editor-modals";
 import { stepForIssue, type StepId } from "@/components/editor/steps";
 import { cvDesignStyle, cvDesignVariables, fitCandidates, minimalCvDesign, pageWidthPx, resolveCvDesign, type CvDesign } from "@/lib/cv-design";
-import { predictPdfPages } from "@/lib/cv-page-count";
+import { paginatePdf } from "@/lib/cv-page-count";
 import { aiLimits, fitAdvert, fitLines } from "@/lib/ai-request-fit";
 
 const storageKey = "workcv-editor-draft";
@@ -64,6 +64,8 @@ export function useCvEditor() {
   const [jobDescriptionDraft, setJobDescriptionDraft] = useState("");
   const [creatingNew, setCreatingNew] = useState(false);
   const [previewPageCount, setPreviewPageCount] = useState(1);
+  // Where pages 2, 3… start in the preview, for the page-break lines.
+  const [previewPageBreaks, setPreviewPageBreaks] = useState<number[]>([]);
   // The page is shown on Finish, or on any step when the user opens Preview.
   const [previewOpen, setPreviewOpen] = useState(false);
   const [fitMessage, setFitMessage] = useState<string | null>(null);
@@ -413,7 +415,9 @@ export function useCvEditor() {
           preview.style.zoom = String(Math.min(1, availableWidth / pageWidth));
         }
         if (document.classList.contains("print-document")) {
-          setPreviewPageCount(predictPdfPages(document, cv.design));
+          const pagination = paginatePdf(document, cv.design);
+          setPreviewPageCount(pagination.pages);
+          setPreviewPageBreaks((current) => (current.length === pagination.breaks.length && current.every((y, i) => Math.abs(y - pagination.breaks[i]) < 1) ? current : pagination.breaks));
         }
       });
     };
@@ -597,7 +601,7 @@ export function useCvEditor() {
         tried += 1;
         for (const name of cvDesignVariables) document.style.removeProperty(name);
         for (const [name, value] of Object.entries(cvDesignStyle(candidate))) document.style.setProperty(name, value);
-        if (predictPdfPages(document, candidate) <= target) {
+        if (paginatePdf(document, candidate).pages <= target) {
           fitted = candidate;
           break;
         }
@@ -1256,6 +1260,7 @@ export function useCvEditor() {
     setCreatingNew,
     previewPageCount,
     setPreviewPageCount,
+    previewPageBreaks,
     previewOpen,
     setPreviewOpen,
     fitMessage,

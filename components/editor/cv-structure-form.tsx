@@ -7,7 +7,7 @@ const button = "min-h-11 rounded-lg border border-line px-3 text-sm font-bold te
 const optionalSections = ["projects", "certifications", "volunteering", "languages"] as const;
 const presets: Array<[CvLayoutPreset, string]> = [["standard", "Standard"], ["education-first", "Education first"], ["experienced", "Experienced professional"], ["compact-single", "Compact single column"]];
 
-export function CvStructureForm({ cv, onChange, onPreview }: { cv: CvData; onChange: (value: CvData) => void; onPreview: () => void }) {
+export function CvStructureForm({ cv, onChange, onPreview }: { cv: CvData; onChange: (value: CvData) => void; onPreview?: () => void }) {
   const order = orderedCvSections(cv);
   const [open, setOpen] = useState<string[]>([]);
   // List only sections that will appear on the CV; moves swap them within the full saved order.
@@ -53,9 +53,9 @@ export function CvStructureForm({ cv, onChange, onPreview }: { cv: CvData; onCha
         </label>;
       })}</div>
       {/* Shows the user's own CV in the chosen layout, inside the editor. */}
-      <button type="button" onClick={onPreview} className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-line-strong bg-white px-3.5 text-sm font-bold text-navy hover:bg-paper">
+      {onPreview && <button type="button" onClick={onPreview} className="inline-flex min-h-10 w-fit items-center gap-2 rounded-lg border border-line-strong bg-white px-3.5 text-sm font-bold text-navy hover:bg-paper">
         <Eye className="h-4 w-4" aria-hidden="true" />Preview my CV in this layout
-      </button>
+      </button>}
     </fieldset>
   </div>;
 }

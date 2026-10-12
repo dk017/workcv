@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { AlertTriangle, Check, Download, FileText, Mail, Plus, Sparkles, Upload, X } from "lucide-react";
+import { AlertTriangle, Check, ChevronDown, Download, FileText, Mail, Plus, Sparkles, Upload, X } from "lucide-react";
 
 import { type StepId, stepForIssue } from "@/components/editor/steps";
+import type { ReadinessIssue } from "@/lib/cv-readiness";
 import type { CvEditorState } from "@/components/editor/use-cv-editor";
 import { formatUkDate } from "@/components/editor/editor-modals";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
@@ -398,100 +399,96 @@ export function EditorNotices({ editor }: { editor: CvEditorState }) {
   return <div className="flex flex-col gap-3">{notices}</div>;
 }
 
-export function FinishStep({ editor, onGoTo }: { editor: CvEditorState; onGoTo: (step: StepId, roleId?: string) => void }) {
-  const {
-    cv,
-    readiness,
-    pdfUnlocked,
-    paymentState,
-    checkoutLoading,
-    pdfDownloading,
-    docxDownloading,
-    letterDownloading,
-    passStatus,
-    draftId,
-    startDownload,
-    downloadDocx,
-    downloadCoverLetter,
-    setCheckoutPlan,
-    setReviewOpen,
-  } = editor;
-  const confirming = paymentState === "checking" || paymentState === "pending";
-  const download = "inline-flex min-h-12 items-center justify-center gap-2 rounded-lg px-4 font-bold disabled:cursor-wait disabled:opacity-60";
-  return (
-    <div className="space-y-7">
-      <div className="flex items-center gap-3.5">
-        <ReadinessRing score={readiness.score} />
-        <div>
-          <p className="font-extrabold text-navy">{readinessLabel(readiness.score, readiness.ready)}</p>
-          <p className="text-sm text-muted">
-            {readiness.issues.length === 0
-              ? "Check each page, then download"
-              : `${readiness.issues.length} ${readiness.issues.length === 1 ? "thing" : "things"} to ${readiness.fixCount ? "fix or improve" : "improve"} below`}
-          </p>
-        </div>
-      </div>
+const menuItem = "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60";
+const closeMenu = (event: React.MouseEvent<HTMLElement>) => event.currentTarget.closest("details")?.removeAttribute("open");
 
-      <section aria-labelledby="final-checks" className="space-y-2.5">
-        <h2 id="final-checks" className="text-[0.9375rem] font-bold text-navy">Final checks</h2>
-        {readiness.issues.length === 0 ? (
-          <p className="flex items-center gap-2 rounded-xl border border-green-200 bg-greensoft px-4 py-3 font-bold text-green-900">
-            <Check className="h-4 w-4" aria-hidden="true" />Nothing left to fix. Check each page in the preview, then download.
-          </p>
+/** The Finish page's download control: a menu of the four files once the CV is unlocked,
+ * otherwise one button that opens checkout. */
+export function DownloadMenu({ editor, onWriteLetter }: { editor: CvEditorState; onWriteLetter: () => void }) {
+  const { cv, pdfUnlocked, paymentState, checkoutLoading, pdfDownloading, docxDownloading, letterDownloading, startDownload, downloadDocx, downloadCoverLetter } = editor;
+  const confirming = paymentState === "checking" || paymentState === "pending";
+  if (!pdfUnlocked) {
+    return (
+      <button type="button" onClick={startDownload} disabled={checkoutLoading || confirming} className="inline-flex min-h-9 items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover disabled:cursor-wait disabled:opacity-60">
+        <Download className="h-4 w-4" aria-hidden="true" />
+        {confirming ? "Confirming payment…" : `Download · ${site.price}`}
+      </button>
+    );
+  }
+  const busy = pdfDownloading || docxDownloading || letterDownloading !== null;
+  return (
+    <details className="relative">
+      <summary className="inline-flex min-h-9 cursor-pointer list-none items-center gap-2 rounded-lg bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover [&::-webkit-details-marker]:hidden">
+        <Download className="h-4 w-4" aria-hidden="true" />
+        {busy ? "Preparing…" : "Download"}
+        <ChevronDown className="h-4 w-4" aria-hidden="true" />
+      </summary>
+      <div className="absolute right-0 z-40 mt-2 w-60 overflow-hidden rounded-xl border border-line bg-white p-1 shadow-soft">
+        <button type="button" disabled={pdfDownloading} onClick={(event) => { closeMenu(event); startDownload(); }} className={menuItem}><Download className="h-4 w-4" aria-hidden="true" />CV as PDF</button>
+        <button type="button" disabled={docxDownloading} onClick={(event) => { closeMenu(event); void downloadDocx(); }} className={menuItem}><FileText className="h-4 w-4" aria-hidden="true" />CV as Word</button>
+        {hasCoverLetterContent(cv) ? (
+          <>
+            <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenu(event); void downloadCoverLetter("pdf"); }} className={menuItem}><Download className="h-4 w-4" aria-hidden="true" />Cover letter as PDF</button>
+            <button type="button" disabled={letterDownloading !== null} onClick={(event) => { closeMenu(event); void downloadCoverLetter("docx"); }} className={menuItem}><FileText className="h-4 w-4" aria-hidden="true" />Cover letter as Word</button>
+          </>
         ) : (
-          <ul className="divide-y divide-line rounded-xl border border-line">
-            {readiness.issues.map((issue) => (
-              <li key={issue.id} className="flex flex-wrap items-center justify-between gap-2 px-4 py-2.5">
-                <span className="flex min-w-0 items-start gap-2 text-sm text-ink">
-                  <span className={`mt-0.5 shrink-0 rounded px-1.5 text-[11px] font-bold uppercase ${issue.severity === "fix" ? "bg-red-100 text-red-800" : "bg-gold-tint text-navy"}`}>{issue.severity === "fix" ? "Fix" : "Improve"}</span>
+          <button type="button" onClick={(event) => { closeMenu(event); onWriteLetter(); }} className={menuItem}><Mail className="h-4 w-4" aria-hidden="true" />Write your cover letter</button>
+        )}
+      </div>
+    </details>
+  );
+}
+
+/** The Finish page's side panel when nothing is being edited: readiness and what to fix next. */
+export function FinishPanel({ editor, onFix }: { editor: CvEditorState; onFix: (issue: ReadinessIssue) => void }) {
+  const { readiness, pdfUnlocked, passStatus, draftId, setCheckoutPlan, setReviewOpen } = editor;
+  const shown = readiness.issues.slice(0, 4);
+  return (
+    <>
+      <section aria-label="CV readiness" className={`${sideCard} p-4`}>
+        <div className="flex items-center gap-3.5">
+          <ReadinessRing score={readiness.score} />
+          <div>
+            <p className="font-extrabold text-navy">{readinessLabel(readiness.score, readiness.ready)}</p>
+            <p className="text-sm text-muted">
+              {readiness.issues.length === 0
+                ? "Nothing left to fix"
+                : `${readiness.issues.length} ${readiness.issues.length === 1 ? "thing" : "things"} to ${readiness.fixCount ? "fix or improve" : "improve"}`}
+            </p>
+          </div>
+        </div>
+        {shown.length > 0 ? (
+          <ul className="mt-3 divide-y divide-line border-t border-line">
+            {shown.map((issue) => (
+              <li key={issue.id} className="flex items-start justify-between gap-3 py-2.5">
+                <span className="min-w-0 text-sm leading-snug text-ink">
+                  <span className={`mr-1.5 rounded px-1.5 py-0.5 text-[11px] font-bold uppercase ${issue.severity === "fix" ? "bg-red-100 text-red-800" : "bg-gold-tint text-navy"}`}>{issue.severity === "fix" ? "Fix" : "Improve"}</span>
                   {issue.message}
                 </span>
-                <button type="button" onClick={() => onGoTo(stepForIssue(issue), issue.targetId)} className="inline-flex min-h-9 shrink-0 items-center rounded-lg border border-line-strong bg-white px-3 text-xs font-bold text-navy">
-                  Go to step
+                <button type="button" onClick={() => onFix(issue)} className="inline-flex min-h-8 shrink-0 items-center rounded-lg border border-line-strong bg-white px-2.5 text-xs font-bold text-navy hover:bg-paper">
+                  Fix
                 </button>
               </li>
             ))}
           </ul>
-        )}
-      </section>
-
-      <section aria-labelledby="download-heading" className="space-y-3 rounded-2xl border-2 border-navy p-5">
-        <h2 id="download-heading" className="font-extrabold text-navy">Download your CV and letter</h2>
-        {pdfUnlocked ? (
-          <>
-            <p className="text-sm text-muted">PDF and editable Word for both. Edit and redownload them any time.</p>
-            <div className="grid gap-2">
-              <button type="button" disabled={pdfDownloading} onClick={startDownload} className={`${download} bg-navy text-white`}><Download className="h-4 w-4" aria-hidden="true" />{pdfDownloading ? "Preparing…" : "CV as PDF"}</button>
-              <button type="button" disabled={docxDownloading} onClick={() => void downloadDocx()} className={`${download} border border-navy text-navy`}><FileText className="h-4 w-4" aria-hidden="true" />{docxDownloading ? "Preparing…" : "CV as Word"}</button>
-              {hasCoverLetterContent(cv) ? (
-                <>
-                  <button type="button" disabled={letterDownloading !== null} onClick={() => void downloadCoverLetter("pdf")} className={`${download} border border-navy text-navy`}><Download className="h-4 w-4" aria-hidden="true" />{letterDownloading === "pdf" ? "Preparing…" : "Cover letter as PDF"}</button>
-                  <button type="button" disabled={letterDownloading !== null} onClick={() => void downloadCoverLetter("docx")} className={`${download} border border-navy text-navy`}><FileText className="h-4 w-4" aria-hidden="true" />{letterDownloading === "docx" ? "Preparing…" : "Cover letter as Word"}</button>
-                </>
-              ) : (
-                <button type="button" onClick={() => onGoTo("letter")} className={`${download} border border-line-strong text-navy`}><Mail className="h-4 w-4" aria-hidden="true" />Write your cover letter</button>
-              )}
-            </div>
-          </>
         ) : (
-          <>
-            <p className="text-sm text-muted">PDF and editable Word for your CV and its matching letter. Pay once; nothing renews.</p>
-            <button type="button" onClick={startDownload} disabled={checkoutLoading || confirming} className={`${download} w-full bg-navy text-white`}>
-              <Download className="h-4 w-4" aria-hidden="true" />
-              {confirming ? "Confirming payment…" : `Download · ${site.price} once`}
-            </button>
-            {!passStatus?.active && (
-              <button
-                type="button"
-                onClick={() => { trackEditorEvent("pass_offer_clicked", draftId, { placement: "finish_step" }); setCheckoutPlan("pass"); setReviewOpen(true); }}
-                className="w-full text-center text-sm font-bold text-navy underline underline-offset-4"
-              >
-                Or get the {site.passDays}-day Job Search Pass · {site.passPrice}
-              </button>
-            )}
-          </>
+          <p className="mt-3 border-t border-line pt-3 text-sm text-muted">Check each page, then download. Click any part of the page to change it.</p>
         )}
+        {readiness.issues.length > shown.length && <p className="pt-1 text-xs text-muted">And {readiness.issues.length - shown.length} more after these.</p>}
       </section>
-    </div>
+      {!pdfUnlocked && !passStatus?.active && (
+        <section className={`${sideCard} p-4`}>
+          <p className="text-sm font-bold text-navy">Applying for lots of jobs?</p>
+          <p className="mt-1 text-sm leading-relaxed text-muted">The Job Search Pass unlocks every CV and cover letter you make for {site.passDays} days, for {site.passPrice} once. Nothing renews.</p>
+          <button
+            type="button"
+            onClick={() => { trackEditorEvent("pass_offer_clicked", draftId, { placement: "finish_step" }); setCheckoutPlan("pass"); setReviewOpen(true); }}
+            className="mt-2 text-sm font-bold text-navy underline underline-offset-4"
+          >
+            Get the Job Search Pass · {site.passPrice}
+          </button>
+        </section>
+      )}
+    </>
   );
 }
