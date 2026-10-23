@@ -48,6 +48,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
     status: "saving",
     error: null,
     errorKind: null,
+    errorDetail: null,
     version: 0,
   });
   const [pdfUnlocked, setPdfUnlocked] = useState(false);
@@ -109,6 +110,8 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
   const lastManagedCvRef = useRef<CvData | null>(null);
   const undoRef = useRef<(() => void) | null>(null);
   const previousSaveStatusRef = useRef<SaveSnapshot["status"]>("saving");
+  // Every edit to an invalid field fails its save again; report each field once.
+  const trackedInvalidFieldRef = useRef<string | null>(null);
   const trackedMilestonesRef = useRef(new Set<number>());
   const trackedSectionsRef = useRef(new Set<string>());
   const previewReadyDocumentRef = useRef<string | null>(null);
@@ -158,7 +161,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
         if (isCvLayoutPreset(preset)) initial = { ...initial, layoutPreset: preset };
       }
       setCv(initial);
-      setSaveSnapshot({ status: "saved", error: null, errorKind: null, version: 0 });
+      setSaveSnapshot({ status: "saved", error: null, errorKind: null, errorDetail: null, version: 0 });
       if (params.get("import") === "1") setAccountPrompt("import");
       for (const key of ["new", "roleTemplate", "template", "layoutPreset", "import"]) params.delete(key);
       window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
@@ -244,6 +247,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
             status: "error",
             error: "Could not load your saved CV.",
             errorKind: "general",
+            errorDetail: null,
             version: 0,
           });
           setLoaded(true);
@@ -617,16 +621,22 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
 
   useEffect(() => {
     const previous = previousSaveStatusRef.current;
-    if (saveSnapshot.status === "error" && previous !== "error") {
+    if (saveSnapshot.status === "saved") trackedInvalidFieldRef.current = null;
+    const repeatedInvalidField =
+      saveSnapshot.errorKind === "invalid" &&
+      saveSnapshot.errorDetail === trackedInvalidFieldRef.current;
+    if (saveSnapshot.status === "error" && previous !== "error" && !repeatedInvalidField) {
+      if (saveSnapshot.errorKind === "invalid") trackedInvalidFieldRef.current = saveSnapshot.errorDetail;
       trackEditorEvent("save_failed", draftId, {
         error_kind: saveSnapshot.errorKind || "unknown",
+        ...(saveSnapshot.errorDetail ? { detail: saveSnapshot.errorDetail } : {}),
       });
     }
     if (saveSnapshot.status === "saving" && previous === "error") {
       trackEditorEvent("save_retried", draftId);
     }
     previousSaveStatusRef.current = saveSnapshot.status;
-  }, [draftId, saveSnapshot.status]);
+  }, [draftId, saveSnapshot.status, saveSnapshot.errorKind, saveSnapshot.errorDetail]);
 
   useEffect(() => {
     const flushOnExit = () => {
@@ -956,6 +966,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
         status: "error",
         error: error instanceof Error ? error.message : "Could not create a new CV",
         errorKind: "general",
+        errorDetail: null,
       }));
       return false;
     } finally {
@@ -989,7 +1000,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       let response = await fetch(`/api/cv/pdf?draftId=${encodeURIComponent(draftId)}`);
       if (response.status === 503) {
         trackEditorEvent("pdf_generation_retried", draftId);
@@ -1017,7 +1028,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       const response = await fetch(`/api/cv/docx?draftId=${encodeURIComponent(draftId)}`);
       if (!response.ok) {
         const data = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -1043,7 +1054,7 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
     setCheckoutError(null);
     try {
       const saved = await saveManagerRef.current?.flush();
-      if (saved === false) throw new Error("Save your latest changes before downloading.");
+      if (saved === false) throw new Error(saveManagerRef.current?.snapshot().error || "Save your latest changes before downloading.");
       const url = `/api/cv/cover-letter?draftId=${encodeURIComponent(draftId)}&format=${format}`;
       let response = await fetch(url);
       if (response.status === 503 && format === "pdf") {

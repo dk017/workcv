@@ -2,7 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { createCvDocument, duplicateCvDocument, parseTemplate } from "@/lib/cv-documents";
-import { CvValidationError, formatCvValidationError, parseCvData } from "@/lib/cv-schema";
+import { describeCvValidationError } from "@/lib/cv-save-validation";
+import { CvValidationError, parseCvData } from "@/lib/cv-schema";
 import { parseTailorJob } from "@/lib/job-tailor";
 import { parseRoleTemplate } from "@/lib/role-cv-templates";
 
@@ -29,7 +30,10 @@ export async function POST(request: NextRequest) {
       const document = await createCvDocument(user.id, undefined, undefined, draft);
       return NextResponse.json({ document });
     } catch (error) {
-      if (error instanceof CvValidationError) return NextResponse.json({ error: formatCvValidationError(error) }, { status: 400 });
+      if (error instanceof CvValidationError) {
+        const issue = describeCvValidationError(error);
+        return NextResponse.json({ error: issue.message, code: "INVALID_CV_DATA", field: issue.field }, { status: 400 });
+      }
       throw error;
     }
   }

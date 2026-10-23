@@ -16,7 +16,7 @@ import { AiReviewModal, CheckoutSheet, ImportCvModal, TemplatePickerModal } from
 import { AdvertWords, DownloadMenu, EditorNotices, EntryList, FinishPanel, ImportCard, ReadinessCard, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
 import { PurposeSurvey } from "@/components/editor/purpose-survey";
-import { nextStep, parseStep, previousStep, stepComplete, stepForCvSection, stepForIssue, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
+import { nextStep, parseStep, previousStep, stepComplete, stepForCvField, stepForCvSection, stepForIssue, stepIndex, stepLabel, steps, type StepId } from "@/components/editor/steps";
 import { useCvEditor } from "@/components/editor/use-cv-editor";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { cvPapers, resolveCvDesign } from "@/lib/cv-design";
@@ -638,7 +638,22 @@ export function CvEditor({ guest = false }: { guest?: boolean } = {}) {
             <span className={`flex items-center gap-1.5 text-sm ${saveTone}`} aria-live="polite">
               {saveSnapshot.status === "saved" && <Check className="h-4 w-4 text-success" aria-hidden="true" />}
               <span className={saveSnapshot.status === "error" ? "" : "hidden sm:inline"}>{saveLabel}</span>
-              {saveSnapshot.status === "error" && (
+              {saveSnapshot.status === "error" && saveSnapshot.errorKind === "invalid" ? (
+                // Retrying unchanged data fails again; take the user to the field instead.
+                saveSnapshot.errorDetail && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const target = stepForCvField(saveSnapshot.errorDetail ?? "");
+                      if (target) goToStep(target);
+                      else openAdvert();
+                    }}
+                    className="underline"
+                  >
+                    Show me
+                  </button>
+                )
+              ) : saveSnapshot.status === "error" && (
                 <button
                   type="button"
                   onClick={() => {

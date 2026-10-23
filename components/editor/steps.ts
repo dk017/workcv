@@ -42,6 +42,19 @@ export function stepForIssue(issue: ReadinessIssue): StepId {
   return parseStep(issue.section) ?? "contact";
 }
 
+// The step that edits a saved field, from a save error's field path ("experience.0.role").
+// The job advert has no step: it is edited in the advert panel (null).
+export function stepForCvField(field: string): StepId | null {
+  const top = field.split(".")[0];
+  if (["fullName", "targetRole", "email", "phone", "location", "linkedin"].includes(top)) return "contact";
+  if (top === "experience" || top === "applicationPack") return "experience";
+  if (top === "education" || top === "skills" || top === "profile") return top;
+  if (top === "coverLetter") return "letter";
+  if (["layoutPreset", "sectionOrder", "additionalSections"].includes(top)) return "more";
+  if (top === "template" || top === "design") return "finish";
+  return null;
+}
+
 // The step that edits a part of the CV page, named by its section ("experience", "contact"…).
 export function stepForCvSection(section: string): StepId {
   if (section === "header" || section === "contact") return "contact";

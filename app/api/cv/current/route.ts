@@ -11,11 +11,8 @@ import {
   parseTemplate,
   updateCvDocument,
 } from "@/lib/cv-documents";
-import {
-  CvValidationError,
-  formatCvValidationError,
-  parseCvData,
-} from "@/lib/cv-schema";
+import { describeCvValidationError } from "@/lib/cv-save-validation";
+import { CvValidationError, parseCvData } from "@/lib/cv-schema";
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUserFromRequest(request);
@@ -82,8 +79,9 @@ export async function PUT(request: NextRequest) {
       );
     }
     if (error instanceof CvValidationError) {
+      const issue = describeCvValidationError(error);
       return NextResponse.json(
-        { error: formatCvValidationError(error), code: "INVALID_CV_DATA" },
+        { error: issue.message, code: "INVALID_CV_DATA", field: issue.field },
         { status: 400 },
       );
     }
