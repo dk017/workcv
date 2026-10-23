@@ -187,12 +187,16 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
 export async function createCvDocument(
   userId: string,
   template?: TemplateId,
-  roleTemplate?: RoleTemplateId
+  roleTemplate?: RoleTemplateId,
+  // A CV someone built before signing in, saved to their account as it is.
+  guestDraft?: CvData,
 ) {
   await ensureAuthTables();
 
   const id = crypto.randomUUID();
-  const seed = roleTemplate
+  const seed = guestDraft
+    ? guestDraft
+    : roleTemplate
     ? getRoleCvTemplate(roleTemplate, template)
     : createBlankCv(template);
   const data = parseCvData(seed);
@@ -206,7 +210,7 @@ export async function createCvDocument(
   );
 
   const row = result.rows[0];
-  const creationMethod = roleTemplate ? "role_template" : template ? "template" : "blank";
+  const creationMethod = guestDraft ? "guest_draft" : roleTemplate ? "role_template" : template ? "template" : "blank";
   await recordServerEditorEvent({
     userId,
     documentId: row.id,

@@ -9,10 +9,9 @@ import { passStartHref } from "@/components/pass-offer";
 import { PassOfferView } from "@/components/pass-offer-view";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
-import { buildLoginHref } from "@/lib/safe-redirect";
 import { founder, site } from "@/lib/site";
 
-const startHref = buildLoginHref("/editor");
+const startHref = "/editor";
 
 export const metadata: Metadata = {
   title: "Turn Your Experience into a Professional UK CV",
@@ -265,7 +264,7 @@ export default function HomePage() {
                 One CV and its matching cover letter, as PDF and Word. Edit and redownload them any time.
               </p>
               <TrackedLink
-                href={buildLoginHref("/editor?plan=cv")}
+                href="/editor?plan=cv"
                 placement={analyticsPlacements.homeBundleMoney}
                 className="mt-auto inline-flex min-h-12 items-center justify-center rounded-lg border border-navy font-bold text-navy transition hover:bg-paper"
               >

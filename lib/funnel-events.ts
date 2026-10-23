@@ -12,6 +12,9 @@ export const publicFunnelEventNames = [
   "login_started",
   "tool_started",
   "tool_completed",
+  // Building a CV before signing in: opened the editor as a guest, and saved it to an account.
+  "guest_editor_started",
+  "guest_cv_saved",
 ] as const;
 
 export type PublicFunnelEventName = (typeof publicFunnelEventNames)[number];

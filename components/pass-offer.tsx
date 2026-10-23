@@ -3,13 +3,12 @@ import { PassOfferView } from "@/components/pass-offer-view";
 import { Check } from "lucide-react";
 
 import { ButtonLink } from "@/components/marketing";
-import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 
 export type PassAudience = "switching" | "redundancy" | "sponsorship" | "tailoring";
 
 // The editor reads plan=pass and opens checkout with the Job Search Pass selected.
-export const passStartHref = buildLoginHref("/editor?plan=pass");
+export const passStartHref = "/editor?plan=pass";
 
 const copy: Record<PassAudience, { eyebrow: string; heading: string; body: string }> = {
   switching: {

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { createCvDocument, duplicateCvDocument, parseTemplate } from "@/lib/cv-documents";
+import { CvValidationError, formatCvValidationError, parseCvData } from "@/lib/cv-schema";
 import { parseTailorJob } from "@/lib/job-tailor";
 import { parseRoleTemplate } from "@/lib/role-cv-templates";
 
@@ -20,6 +21,17 @@ export async function POST(request: NextRequest) {
     const copy = await duplicateCvDocument(user.id, body.copyFrom, job);
     if (!copy) return NextResponse.json({ error: "CV not found" }, { status: 404 });
     return NextResponse.json({ document: copy });
+  }
+  // A guest draft: the CV a visitor built before signing in, validated like any saved CV.
+  if (body.guestDraft !== undefined) {
+    try {
+      const draft = parseCvData(body.guestDraft);
+      const document = await createCvDocument(user.id, undefined, undefined, draft);
+      return NextResponse.json({ document });
+    } catch (error) {
+      if (error instanceof CvValidationError) return NextResponse.json({ error: formatCvValidationError(error) }, { status: 400 });
+      throw error;
+    }
   }
   const template = parseTemplate(typeof body.template === "string" ? body.template : null);
   const roleTemplate = parseRoleTemplate(

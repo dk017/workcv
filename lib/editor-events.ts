@@ -114,12 +114,19 @@ export function isAllowedClientEditorEvent(value: unknown): value is EditorEvent
   return typeof value === "string" && editorEventSet.has(value);
 }
 
+// Editor events belong to a saved CV and need an account; a guest's editor does not send them
+// (guest milestones go through the public funnel events instead).
+let editorEventsEnabled = true;
+export function setEditorEventsEnabled(enabled: boolean) {
+  editorEventsEnabled = enabled;
+}
+
 export function trackEditorEvent(
   eventName: EditorEventName,
   documentId?: string | null,
   metadata: Record<string, string | number | boolean> = {},
 ) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined" || !editorEventsEnabled) return;
   void fetch("/api/events/editor", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

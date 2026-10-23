@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { Suspense, useEffect } from "react";
-import { Briefcase, FileText, Library, Mail, Plus, User, Wand2, Wrench, X } from "lucide-react";
+import { Briefcase, UploadCloud, FileText, Home, Library, Mail, Plus, User, Wand2, Wrench, X } from "lucide-react";
 
 import { Logo, NavContent } from "@/components/app/app-shell";
 
@@ -15,9 +15,36 @@ const railLinks = [
   { href: "/tools", label: "Tools", icon: Wrench },
 ] as const;
 
+// A guest has no account pages yet: the rail offers public pages and saving the CV.
+const guestLinks = [
+  { href: "/", label: "Home", icon: Home },
+  { href: "/cv-examples-uk", label: "Examples", icon: Library },
+  { href: "/tools", label: "Tools", icon: Wrench },
+] as const;
+
 /** The editor's slim navy rail: the same places as the dashboard sidebar, as icons. */
-export function AppRail({ onNavigate }: { onNavigate?: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void }) {
+export function AppRail({ onNavigate, guest = false, onSave }: { onNavigate?: (event: React.MouseEvent<HTMLAnchorElement>, href: string) => void; guest?: boolean; onSave?: () => void }) {
   const item = "flex w-16 flex-col items-center gap-1 rounded-xl py-2.5 text-[11px] font-bold";
+  if (guest) {
+    return (
+      <nav aria-label="WorkCV" className="editor-chrome fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center gap-1.5 bg-navy py-4 text-white lg:flex">
+        <Link href="/" aria-label="WorkCV home" className="mb-4 grid h-10 w-10 place-items-center rounded-[10px] bg-gold">
+          <svg aria-hidden="true" viewBox="0 0 64 64" className="h-6 w-6">
+            <path d="M12 16h9l6 28h-8L12 16Zm17 0h7l-5 28h-8l6-28Zm9 0h8l-3 28h-8l3-28Zm10 0h8l-7 28h-8l7-28Z" fill="#0F2942" />
+          </svg>
+        </Link>
+        {guestLinks.map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href} className={`${item} text-white/75 hover:bg-white/10 hover:text-white`}>
+            <Icon className="h-[22px] w-[22px]" aria-hidden="true" />{label}
+          </Link>
+        ))}
+        <span className="flex-1" />
+        <button type="button" onClick={onSave} className={`${item} bg-gold text-navy hover:bg-[#e0b754]`}>
+          <UploadCloud className="h-[22px] w-[22px]" aria-hidden="true" />Save CV
+        </button>
+      </nav>
+    );
+  }
   return (
     <nav aria-label="WorkCV" className="editor-chrome fixed inset-y-0 left-0 z-40 hidden w-[76px] flex-col items-center gap-1.5 bg-navy py-4 text-white lg:flex">
       <Link href="/my-cvs" onClick={(event) => onNavigate?.(event, "/my-cvs")} aria-label="WorkCV: My CVs" className="mb-4 grid h-10 w-10 place-items-center rounded-[10px] bg-gold">
@@ -42,7 +69,7 @@ export function AppRail({ onNavigate }: { onNavigate?: (event: React.MouseEvent<
 }
 
 /** Phone menu with the app's links, opened from the editor's top bar. */
-export function AppMenuDrawer({ open, onClose, onLinkClick, children }: { open: boolean; onClose: () => void; onLinkClick?: (event: React.MouseEvent<HTMLElement>, href: string) => void; children?: React.ReactNode }) {
+export function AppMenuDrawer({ open, onClose, onLinkClick, guest = false, onSave, children }: { open: boolean; onClose: () => void; onLinkClick?: (event: React.MouseEvent<HTMLElement>, href: string) => void; guest?: boolean; onSave?: () => void; children?: React.ReactNode }) {
   useEffect(() => {
     if (!open) return;
     const onKey = (event: KeyboardEvent) => { if (event.key === "Escape") onClose(); };
@@ -70,9 +97,22 @@ export function AppMenuDrawer({ open, onClose, onLinkClick, children }: { open: 
           </button>
         </div>
         {children}
-        <Suspense fallback={null}>
-          <NavContent onNavigate={onClose} />
-        </Suspense>
+        {guest ? (
+          <div className="flex flex-col gap-1">
+            <button type="button" onClick={() => { onClose(); onSave?.(); }} className="mb-3 flex min-h-12 items-center justify-center gap-2 rounded-lg bg-gold font-bold text-navy">
+              <UploadCloud className="h-[18px] w-[18px]" aria-hidden="true" />Save to your account
+            </button>
+            {guestLinks.map(({ href, label, icon: Icon }) => (
+              <Link key={href} href={href} onClick={onClose} className="flex min-h-11 items-center gap-3 rounded-lg px-3 font-medium text-white/80 hover:bg-white/5 hover:text-white">
+                <Icon className="h-[18px] w-[18px]" aria-hidden="true" />{label === "Examples" ? "CV examples" : label === "Tools" ? "Free tools" : label}
+              </Link>
+            ))}
+          </div>
+        ) : (
+          <Suspense fallback={null}>
+            <NavContent onNavigate={onClose} />
+          </Suspense>
+        )}
       </div>
     </div>
   );

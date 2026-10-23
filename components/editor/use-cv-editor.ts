@@ -11,10 +11,11 @@ import { analyseAtsKeywords } from "@/lib/ats-keyword-checker";
 import { addSkippedKeyword } from "@/lib/keyword-triage";
 import { buildVacancyTriage, effectiveTargetRole, matchProgress, targetingFromFitHandoff, vaguePhraseItems, type VaguePhraseItem } from "@/lib/vacancy-fit";
 import { cvHasContent, jobTailorHandoffKey, minAdvertLength, parseJobTailorHandoff, tailorCvForJob, type TailorJob } from "@/lib/job-tailor";
-import { trackEditorEvent, type EditorEventName } from "@/lib/editor-events";
+import { setEditorEventsEnabled, trackEditorEvent, type EditorEventName } from "@/lib/editor-events";
+import { getRoleCvTemplate, parseRoleTemplate } from "@/lib/role-cv-templates";
 import { buildLoginHref } from "@/lib/safe-redirect";
 import { createCvSaveManager } from "@/components/editor/create-cv-save-manager";
-import { readCheckoutAttribution } from "@/components/attribution-capture";
+import { readCheckoutAttribution, trackFunnelEvent } from "@/components/attribution-capture";
 import { hasCoverLetterContent } from "@/lib/cover-letter-document";
 import { DebouncedSaveManager, type SaveSnapshot } from "@/lib/save-manager";
 import type { AiReview } from "@/components/editor/editor-modals";
@@ -25,9 +26,22 @@ import { aiLimits, fitAdvert, fitLines } from "@/lib/ai-request-fit";
 
 const storageKey = "workcv-editor-draft";
 const draftIdKey = "workcv-draft-id";
+// A CV built before signing in lives here until it is saved to an account.
+export const guestDraftKey = "workcv-guest-cv";
+export type AccountReason = "download" | "import" | "save";
+
+function readGuestDraft(): CvData | null {
+  try {
+    const stored = window.localStorage.getItem(guestDraftKey);
+    return stored ? (JSON.parse(stored) as { cv: CvData }).cv ?? null : null;
+  } catch {
+    return null;
+  }
+}
 
 // All editor state and actions. The editor screen renders from what this returns.
-export function useCvEditor() {
+// As a guest (not signed in) the CV is kept in this browser until the visitor saves it.
+export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
   const [cv, setCv] = useState<CvData>(() => createBlankCv());
   const [step, setStep] = useState<StepId>("contact");
   const [saveSnapshot, setSaveSnapshot] = useState<SaveSnapshot>({
@@ -56,6 +70,12 @@ export function useCvEditor() {
   const [undoLabel, setUndoLabel] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(false);
   const [recoveryCv, setRecoveryCv] = useState<CvData | null>(null);
+  // A guest asked for something that needs an account; the save dialog explains why.
+  const [accountPrompt, setAccountPrompt] = useState<AccountReason | null>(null);
+  const [savedToAccount, setSavedToAccount] = useState(false);
+  const [guestKeptExisting, setGuestKeptExisting] = useState(false);
+  // The guest start reads (and then tidies) the address once; a second run would see a bare URL.
+  const guestStartedRef = useRef(false);
   const [otherTabUpdated, setOtherTabUpdated] = useState(false);
   const [aiLoading, setAiLoading] = useState<AiReview["kind"] | null>(null);
   const [aiError, setAiError] = useState<string | null>(null);
@@ -118,7 +138,39 @@ export function useCvEditor() {
   useEffect(() => {
     let cancelled = false;
 
+    const loadGuestDraft = () => {
+      if (guestStartedRef.current) return;
+      guestStartedRef.current = true;
+      setEditorEventsEnabled(false);
+      const params = new URLSearchParams(window.location.search);
+      const templateParam = params.get("template");
+      const template = templates.some((item) => item.id === templateParam) ? (templateParam as CvData["template"]) : undefined;
+      const roleTemplate = parseRoleTemplate(params.get("roleTemplate"));
+      const stored = readGuestDraft();
+      let initial: CvData;
+      if (stored && cvHasContent(stored)) {
+        // Never replace work the visitor hasn't saved; say so if they asked for something else.
+        initial = stored;
+        if (roleTemplate || params.get("new") === "1") setGuestKeptExisting(true);
+      } else {
+        initial = roleTemplate ? getRoleCvTemplate(roleTemplate, template) : createBlankCv(template);
+        const preset = params.get("layoutPreset");
+        if (isCvLayoutPreset(preset)) initial = { ...initial, layoutPreset: preset };
+      }
+      setCv(initial);
+      setSaveSnapshot({ status: "saved", error: null, errorKind: null, version: 0 });
+      if (params.get("import") === "1") setAccountPrompt("import");
+      for (const key of ["new", "roleTemplate", "template", "layoutPreset", "import"]) params.delete(key);
+      window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
+      setLoaded(true);
+      trackFunnelEvent("guest_editor_started", { placement: stored && cvHasContent(stored) ? "resumed" : roleTemplate ? "sample" : template ? "template" : "blank" });
+    };
+
     const loadDocument = async () => {
+      if (guest) {
+        loadGuestDraft();
+        return;
+      }
       const params = new URLSearchParams(window.location.search);
       const templateParam = params.get("template");
       const roleTemplateParam = params.get("roleTemplate");
@@ -210,6 +262,28 @@ export function useCvEditor() {
     const key = `${storageKey}:${draftId}`;
     window.localStorage.setItem(key, JSON.stringify({ cv, savedAt: Date.now() }));
   }, [cv, draftId, loaded]);
+
+  useEffect(() => {
+    if (!guest || !loaded) return;
+    try {
+      window.localStorage.setItem(guestDraftKey, JSON.stringify({ cv, savedAt: Date.now() }));
+    } catch {
+      // Storage full or blocked: the CV stays on screen; saving to an account still works.
+    }
+  }, [cv, guest, loaded]);
+
+  // After a guest saves, the editor reopens the saved CV and carries on with what they asked for.
+  useEffect(() => {
+    if (!loaded || !draftId) return;
+    const params = new URLSearchParams(window.location.search);
+    const then = params.get("then");
+    if (!then) return;
+    params.delete("then");
+    window.history.replaceState(null, "", `${window.location.pathname}?${params.toString()}`);
+    setSavedToAccount(true);
+    if (then === "download") setReviewOpen(true);
+    if (then === "import") setImportOpen(true);
+  }, [loaded, draftId]);
 
   useEffect(() => {
     if (!draftId) return;
@@ -890,6 +964,10 @@ export function useCvEditor() {
   };
 
   const startDownload = () => {
+    if (guest) {
+      setAccountPrompt("download");
+      return;
+    }
     trackEditorEvent("pdf_clicked", draftId, {
       ready: readiness.ready,
       access: pdfUnlocked ? "unlocked" : "checkout",
@@ -1075,6 +1153,36 @@ export function useCvEditor() {
     }
   };
 
+  // Importing reads the file with paid AI processing, so it is tied to an account.
+  const openImport = () => {
+    if (guest) setAccountPrompt("import");
+    else setImportOpen(true);
+  };
+
+  /** Saves the guest's CV to the account they just signed in to, then reopens it as a saved CV
+   * and continues with what they asked for. Resolves with an error message if it failed. */
+  const saveGuestToAccount = async (reason: AccountReason): Promise<string | null> => {
+    try {
+      const response = await fetch("/api/cv/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guestDraft: cv }),
+      });
+      const data = (await response.json().catch(() => null)) as { document?: { id: string }; error?: string } | null;
+      if (!response.ok || !data?.document) return data?.error || "Your CV couldn't be saved. Check your connection and try again.";
+      trackFunnelEvent("guest_cv_saved", { placement: reason });
+      try { window.localStorage.removeItem(guestDraftKey); } catch { /* Blocked storage. */ }
+      const params = new URLSearchParams({ draftId: data.document.id, step });
+      const plan = new URLSearchParams(window.location.search).get("plan");
+      if (plan === "pass" || plan === "cv") params.set("plan", plan);
+      params.set("then", reason);
+      window.location.href = `/editor?${params.toString()}`;
+      return null;
+    } catch {
+      return "Your CV couldn't be saved. Check your connection and try again.";
+    }
+  };
+
   const applyImportedCv = (importedCv: CvData) => {
     setCv(importedCv);
     setStep("contact");
@@ -1082,8 +1190,9 @@ export function useCvEditor() {
     trackEditorEvent("import_succeeded", draftId);
   };
 
-  const saveLabel =
-    saveSnapshot.status === "saved"
+  const saveLabel = guest
+    ? "Saved on this device"
+    : saveSnapshot.status === "saved"
       ? "Saved"
       : saveSnapshot.status === "saving"
         ? "Saving…"
@@ -1199,6 +1308,15 @@ export function useCvEditor() {
   }, [draftId, paymentState]);
 
   return {
+    guest,
+    accountPrompt,
+    setAccountPrompt,
+    savedToAccount,
+    setSavedToAccount,
+    guestKeptExisting,
+    setGuestKeptExisting,
+    openImport,
+    saveGuestToAccount,
     cv,
     setCv,
     step,

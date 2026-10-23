@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Check, ChevronDown, Copy, Download, Eye, FileText, LayoutTemplate, Mail, Menu, Plus, SlidersHorizontal, Sparkles, Undo2, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronDown, Copy, Download, Eye, UploadCloud, X as XIcon, FileText, LayoutTemplate, Mail, Menu, Plus, SlidersHorizontal, Sparkles, Undo2, Upload, X } from "lucide-react";
 
 import { AppMenuDrawer, AppRail } from "@/components/app/app-rail";
 import { MemoCvDocument } from "@/components/editor/cv-document";
@@ -11,6 +11,7 @@ import { CoverLetterForm } from "@/components/editor/cover-letter-form";
 import { ApplicationPackReview, CvStructureForm } from "@/components/editor/cv-structure-form";
 import { ContactStep, EducationStep, ProfileStep, RoleStep, SkillsStep, StepHeading } from "@/components/editor/editor-forms";
 import { DesignToolbar } from "@/components/editor/design-toolbar";
+import { SaveCvDialog } from "@/components/editor/save-cv-dialog";
 import { AiReviewModal, CheckoutSheet, ImportCvModal, TemplatePickerModal } from "@/components/editor/editor-modals";
 import { AdvertWords, DownloadMenu, EditorNotices, EntryList, FinishPanel, ImportCard, ReadinessCard, TailorCard, readinessLabel } from "@/components/editor/editor-panels";
 import { KeywordTriagePanel } from "@/components/editor/keyword-triage";
@@ -30,9 +31,17 @@ export { CvDocument } from "@/components/editor/cv-document";
 const menuItem = "flex min-h-11 w-full items-center gap-3 rounded-lg px-3 text-left text-sm font-bold text-navy hover:bg-paper disabled:cursor-wait disabled:opacity-60";
 const closeMenuDetails = (event: React.MouseEvent<HTMLElement>) => event.currentTarget.closest("details")?.removeAttribute("open");
 
-export function CvEditor() {
-  const editor = useCvEditor();
+export function CvEditor({ guest = false }: { guest?: boolean } = {}) {
+  const editor = useCvEditor({ guest });
   const {
+    accountPrompt,
+    setAccountPrompt,
+    savedToAccount,
+    setSavedToAccount,
+    guestKeptExisting,
+    setGuestKeptExisting,
+    openImport,
+    saveGuestToAccount,
     cv,
     setCv,
     step,
@@ -460,7 +469,17 @@ export function CvEditor() {
   const railContent = () => {
     switch (step) {
       case "contact":
-        return <ImportCard onImport={() => setImportOpen(true)} />;
+        return (
+          <>
+            {guest && (
+              <section className="rounded-2xl border border-[#ebd9a6] bg-[#fbf6e8] p-4">
+                <p className="font-extrabold text-navy">No account needed to start</p>
+                <p className="mt-1 text-sm leading-relaxed text-muted">Your CV is kept in this browser as you type. Add your email whenever you like, or when you download, to keep it safe and open it on any device.</p>
+              </section>
+            )}
+            <ImportCard onImport={openImport} />
+          </>
+        );
       case "experience":
         return (
           <>
@@ -504,15 +523,23 @@ export function CvEditor() {
 
   const cvMenuItems = (close: (event: React.MouseEvent<HTMLElement>) => void) => (
     <>
-      <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} className={menuItem}><FileText className="h-4 w-4" />All my CVs</Link>
+      {guest ? (
+        <button type="button" onClick={(event) => { close(event); setAccountPrompt("save"); }} className={menuItem}><UploadCloud className="h-4 w-4" />Save to your account</button>
+      ) : (
+        <Link href="/my-cvs" onClick={(event) => leaveEditor(event, "/my-cvs")} className={menuItem}><FileText className="h-4 w-4" />All my CVs</Link>
+      )}
       <button type="button" onClick={(event) => { close(event); trackEditorEvent("template_chooser_opened", draftId); setTemplatePickerOpen(true); }} className={menuItem}>
         <LayoutTemplate className="h-4 w-4" />
         Template: {selectedTemplate?.name ?? "Choose"}
       </button>
       <button type="button" onClick={(event) => { close(event); openAdvert(); }} className={menuItem}><Sparkles className="h-4 w-4" />Tailor to job</button>
-      <button type="button" onClick={(event) => { close(event); setImportOpen(true); }} className={menuItem}><Upload className="h-4 w-4" />Import CV</button>
-      <button type="button" onClick={(event) => { close(event); void resetDraft(); }} disabled={creatingNew} className={menuItem}><Plus className="h-4 w-4" />{creatingNew ? "Creating..." : "New CV"}</button>
-      <button type="button" onClick={(event) => { close(event); if (draftId) void resetDraft(draftId); }} disabled={creatingNew || !draftId} className={menuItem}><Copy className="h-4 w-4" />Duplicate for another job</button>
+      <button type="button" onClick={(event) => { close(event); openImport(); }} className={menuItem}><Upload className="h-4 w-4" />Import CV</button>
+      {!guest && (
+        <>
+          <button type="button" onClick={(event) => { close(event); void resetDraft(); }} disabled={creatingNew} className={menuItem}><Plus className="h-4 w-4" />{creatingNew ? "Creating..." : "New CV"}</button>
+          <button type="button" onClick={(event) => { close(event); if (draftId) void resetDraft(draftId); }} disabled={creatingNew || !draftId} className={menuItem}><Copy className="h-4 w-4" />Duplicate for another job</button>
+        </>
+      )}
     </>
   );
 
@@ -584,8 +611,8 @@ export function CvEditor() {
 
   return (
     <div className="print-page min-h-screen bg-paper lg:pl-[76px]">
-      <AppRail onNavigate={leaveEditor} />
-      <AppMenuDrawer open={menuOpen} onClose={closeMenu} onLinkClick={leaveEditor} />
+      <AppRail onNavigate={leaveEditor} guest={guest} onSave={() => setAccountPrompt("save")} />
+      <AppMenuDrawer open={menuOpen} onClose={closeMenu} onLinkClick={leaveEditor} guest={guest} onSave={() => setAccountPrompt("save")} />
 
       <header className="editor-chrome sticky top-0 z-30 border-b border-line bg-white">
         <div className="flex h-14 items-center justify-between gap-3 px-4 sm:h-[60px] sm:px-6">
@@ -631,6 +658,11 @@ export function CvEditor() {
               <span className="hidden min-h-9 items-center rounded-lg border border-gold bg-gold-tint px-3 text-xs font-bold text-navy xl:inline-flex" title="Every CV you create before your Job Search Pass ends is unlocked.">
                 Job Search Pass · {passStatus.daysLeft} {passStatus.daysLeft === 1 ? "day" : "days"} left
               </span>
+            )}
+            {guest && (
+              <button type="button" onClick={() => setAccountPrompt("save")} className="hidden min-h-10 items-center gap-2 rounded-lg bg-gold-tint px-3.5 text-sm font-bold text-navy hover:bg-gold/40 md:inline-flex">
+                <UploadCloud className="h-4 w-4" aria-hidden="true" />Save to your account
+              </button>
             )}
             {!finishing && (
               <button type="button" onClick={() => setPreviewOpen(true)} className="inline-flex min-h-10 items-center gap-2 rounded-lg border border-line-strong bg-white px-2.5 text-sm font-bold text-navy hover:bg-paper sm:px-3.5">
@@ -709,6 +741,18 @@ export function CvEditor() {
           </section>
           <div className={`editor-form min-w-0 ${mobileView === "preview" ? "hidden lg:block" : "block"}`}>
             <div className="flex flex-col gap-4 lg:sticky lg:top-[76px] lg:max-h-[calc(100vh-92px)] lg:overflow-y-auto lg:pb-2">
+              {savedToAccount && (
+                <p role="status" className="flex items-start justify-between gap-3 rounded-xl border border-green-200 bg-greensoft px-4 py-3 text-sm font-bold text-green-900">
+                  <span><Check className="mr-1.5 inline h-4 w-4" aria-hidden="true" />Your CV is saved to your account. Find it any time in My CVs.</span>
+                  <button type="button" onClick={() => setSavedToAccount(false)} aria-label="Dismiss"><XIcon className="h-4 w-4" aria-hidden="true" /></button>
+                </p>
+              )}
+              {guestKeptExisting && (
+                <p role="status" className="flex items-start justify-between gap-3 rounded-xl border border-gold bg-gold-tint px-4 py-3 text-sm text-navy">
+                  <span><strong>You have a CV on this device that isn’t saved yet,</strong> so we’ve opened it rather than replace it. <button type="button" onClick={() => setAccountPrompt("save")} className="font-bold underline underline-offset-4">Save it to your account</button> to start another.</span>
+                  <button type="button" onClick={() => setGuestKeptExisting(false)} aria-label="Dismiss"><XIcon className="h-4 w-4" aria-hidden="true" /></button>
+                </p>
+              )}
               <EditorNotices editor={editor} />
               {tailoringOpen && advertPanel}
               {loaded && editing ? (
@@ -743,6 +787,18 @@ export function CvEditor() {
             </div>
           </aside>
           <div className="editor-form flex min-w-0 flex-col gap-5">
+            {savedToAccount && (
+              <p role="status" className="flex items-start justify-between gap-3 rounded-xl border border-green-200 bg-greensoft px-4 py-3 text-sm font-bold text-green-900">
+                <span><Check className="mr-1.5 inline h-4 w-4" aria-hidden="true" />Your CV is saved to your account. Find it any time in My CVs.</span>
+                <button type="button" onClick={() => setSavedToAccount(false)} aria-label="Dismiss"><XIcon className="h-4 w-4" aria-hidden="true" /></button>
+              </p>
+            )}
+            {guestKeptExisting && (
+              <p role="status" className="flex items-start justify-between gap-3 rounded-xl border border-gold bg-gold-tint px-4 py-3 text-sm text-navy">
+                <span><strong>You have a CV on this device that isn’t saved yet,</strong> so we’ve opened it rather than replace it. <button type="button" onClick={() => setAccountPrompt("save")} className="font-bold underline underline-offset-4">Save it to your account</button> to start another.</span>
+                <button type="button" onClick={() => setGuestKeptExisting(false)} aria-label="Dismiss"><XIcon className="h-4 w-4" aria-hidden="true" /></button>
+              </p>
+            )}
             <EditorNotices editor={editor} />
             {tailoringOpen && advertPanel}
             <div className="rounded-2xl border border-line bg-white p-5 sm:p-8">
@@ -813,6 +869,14 @@ export function CvEditor() {
         )}
       </div>
 
+      {accountPrompt && (
+        <SaveCvDialog
+          reason={accountPrompt}
+          defaultEmail={cv.email}
+          onClose={() => setAccountPrompt(null)}
+          onSignedIn={() => saveGuestToAccount(accountPrompt)}
+        />
+      )}
       {purposeSurveyOpen && (
         <PurposeSurvey
           onPurpose={(purpose) => trackEditorEvent("cv_purpose_selected", draftId, { purpose })}

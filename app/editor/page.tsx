@@ -28,7 +28,9 @@ export default async function EditorPage({
   };
 }) {
   const user = await getCurrentUser();
-  if (!user) {
+  // Starting a new CV needs no account: the draft stays in the browser until the visitor saves it.
+  const needsAccount = Boolean(searchParams.draftId || searchParams.payment || searchParams.from);
+  if (!user && needsAccount) {
     const editorParams = new URLSearchParams();
     if (searchParams.template) editorParams.set("template", searchParams.template);
     if (searchParams.layoutPreset) editorParams.set("layoutPreset", searchParams.layoutPreset);
@@ -45,5 +47,5 @@ export default async function EditorPage({
     );
   }
 
-  return <CvEditor />;
+  return <CvEditor guest={!user} />;
 }

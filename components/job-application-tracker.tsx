@@ -45,11 +45,10 @@ import {
   type JobStatus,
   type TrackedJob,
 } from "@/lib/job-tracker";
-import { buildLoginHref } from "@/lib/safe-redirect";
 import { site } from "@/lib/site";
 
 const tool = "job_application_tracker";
-const passHref = buildLoginHref("/editor?plan=pass");
+const passHref = "/editor?plan=pass";
 const packHref = "/tools/job-application-pack-uk?from=job-tracker";
 const boardStatuses: JobStatus[] = ["saved", "applied", "interview", "offer"];
 const closedStatuses: JobStatus[] = ["unsuccessful", "withdrawn"];

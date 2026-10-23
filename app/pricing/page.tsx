@@ -8,7 +8,6 @@ import { customerContentReview, displayReviewDate } from "@/lib/customer-content
 import { ButtonLink, FaqSection } from "@/components/marketing";
 import { PassOfferView } from "@/components/pass-offer-view";
 import { passStartHref } from "@/components/pass-offer";
-import { buildLoginHref } from "@/lib/safe-redirect";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
@@ -37,7 +36,7 @@ export default function PricingPage() {
      <p className="mt-4 font-display text-5xl font-semibold text-navy">{site.priceGbp} <span className="font-sans text-base">once</span></p>
      <p className="mt-4 leading-7">For keeping and editing the same CV and matching letter.</p>
      <ul className="my-5 list-disc space-y-2 pl-5 leading-7"><li>PDF and Word for this saved pair</li><li>Edit and redownload it without paying again</li><li>You can revise this same CV for another application</li></ul>
-     <ButtonLink href={buildLoginHref("/editor?plan=cv")} trackingLabel={analyticsPlacements.pricingCardEditor}>Start with one CV</ButtonLink>
+     <ButtonLink href="/editor?plan=cv" trackingLabel={analyticsPlacements.pricingCardEditor}>Start with one CV</ButtonLink>
      <p className="mt-4 text-sm leading-6 text-muted">A separate saved CV needs its own payment, unless covered by a Pass.</p>
     </article>
     <article id="job-search-pass" className="scroll-mt-24 rounded-xl border-2 border-gold bg-white p-6 md:p-8">

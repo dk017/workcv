@@ -105,6 +105,8 @@ export async function collectSnapshot(client, environment = process.env) {
         (SELECT count(DISTINCT visitor_hash)::int FROM f WHERE event_name='landing_view' AND ${publicPath}) public_visitors,
         (SELECT count(DISTINCT session_hash)::int FROM f WHERE event_name='marketing_cta_clicked') cta_sessions,
         (SELECT count(DISTINCT session_hash)::int FROM f WHERE event_name='login_started') login_start_sessions,
+        (SELECT count(DISTINCT visitor_hash)::int FROM f WHERE event_name='guest_editor_started') guest_editor_visitors,
+        (SELECT count(DISTINCT visitor_hash)::int FROM f WHERE event_name='guest_cv_saved') guest_saved_visitors,
         (SELECT count(DISTINCT user_id)::int FROM s) new_users,
         (SELECT count(DISTINCT user_id)::int FROM d) cv_creators,
         (SELECT count(DISTINCT user_id)::int FROM e WHERE event_name='preview_ready') preview_users,

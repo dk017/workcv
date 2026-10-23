@@ -124,7 +124,9 @@ export function trackFunnelEvent(
     | "marketing_cta_clicked"
     | "login_started"
     | "tool_started"
-    | "tool_completed",
+    | "tool_completed"
+    | "guest_editor_started"
+    | "guest_cv_saved",
   metadata: FunnelMetadata = {},
 ) {
   try {
