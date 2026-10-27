@@ -27,7 +27,7 @@ import { withAgentMetadata } from "@/lib/agent-metadata";
 export const metadata: Metadata = withAgentMetadata("/resume-builder-uk-no-subscription", {
   title: `Resume Builder UK No Subscription - ${site.price} PDF`,
   description:
-    `Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`,
+    `Build a UK resume or CV without a monthly subscription. Start without an account, build and preview free, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`,
   alternates: {
     canonical: "/resume-builder-uk-no-subscription",
   },
@@ -41,9 +41,9 @@ export const metadata: Metadata = withAgentMetadata("/resume-builder-uk-no-subsc
 
 const steps = [
   {
-    title: "Log in by email code",
+    title: "Start without an account",
     body:
-      "WorkCV requires an email-code login before the editor opens. This connects the CV to your account so it can be saved and reopened.",
+      "The editor opens straight away and keeps your draft in this browser. When you save or download, a one-time email code connects the CV to your account so it can be reopened.",
     icon: LogIn,
   },
   {
@@ -86,7 +86,7 @@ const terminologyRows = [
 ];
 
 const included = [
-  "Email-code login and saved CV access",
+  "No account needed to start; email-code saving and saved CV access",
   "Profile, experience, education and skills sections",
   "Classic, modern and compact CV layouts",
   "Live document preview before checkout",
@@ -165,7 +165,7 @@ const faqItems = [
   {
     question: "Do I need an account?",
     answer:
-      "Yes. You log in using a code sent to your email address. Login lets WorkCV save the CV and reconnect it to its payment status.",
+      "Not to start. You can build and preview a CV without one, and the draft is kept in your browser. To download, upload an existing CV or save it to reopen later, you confirm a code sent to your email address. That account lets WorkCV save the CV and reconnect it to its payment status.",
   },
   {
     question: "What does one payment unlock?",
@@ -237,8 +237,8 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Searched for a UK resume builder? WorkCV helps you create the
-              document usually called a CV in UK applications. Log in by email
-              code, build and preview first, then pay {site.price} once for the
+              document usually called a CV in UK applications. Start without an
+              account, build and preview first, then pay {site.price} once for the
               saved CV and its matching cover letter, as PDF and Word.
             </p>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
@@ -268,7 +268,7 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
       <section className="border-y border-line bg-surface">
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            "Email-code login",
+            "No account to start",
             "Saved CV editor",
             `${site.price} one-time unlock`,
             "Nothing renews",
@@ -450,7 +450,7 @@ export default function ResumeBuilderUkNoSubscriptionPage() {
       <FaqSection faqs={faqItems} title="Questions about UK resume builders without subscriptions." />
       <FinalCta
         heading="Build the CV first. Pay only when this saved CV is ready."
-        body={`Log in by email code, create and preview your CV, then pay ${site.price} to unlock its PDF. No monthly subscription and no automatic renewal.`}
+        body={`Create and preview your CV without an account, then pay ${site.price} to unlock its PDF. No monthly subscription and no automatic renewal.`}
         primaryHref="/editor"
         primary="Build my UK CV"
         secondaryHref="/pricing"

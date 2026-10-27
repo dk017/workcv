@@ -369,7 +369,7 @@ export default function CareerChangeCvUkPage() {
       />
       <FinalCta
         heading="Build a CV that makes the career change make sense."
-        body={`Log in with an email code, save your CV, and pay ${site.price} only when you download the final PDF.`}
+        body={`Build and preview your CV without an account, save it with an email code, and pay ${site.price} only when you download the final PDF.`}
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="How pricing works"
       />

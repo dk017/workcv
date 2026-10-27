@@ -162,8 +162,10 @@ export default function PrivacyPage() {
           body: (
             <>
               <p>
-                CV draft content is saved to your WorkCV account after email-code
-                login. Payment records are kept for accounting, fraud prevention,
+                If you build a CV without signing in, the draft is stored only in
+                your browser's local storage on that device and is not saved to
+                WorkCV's servers. It is saved to your WorkCV account once you
+                verify your email with a one-time code. Payment records are kept for accounting, fraud prevention,
                 support, dispute handling, and the sales-attribution purpose
                 described above.
               </p>

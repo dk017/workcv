@@ -236,7 +236,7 @@ export default function EnhancvAlternativeUkPage() {
               ))}
             </ul>
             <p className="mt-7 text-sm leading-6 text-muted">
-              Email-code login is required. WorkCV currently does not include
+              Saving or downloading needs an email code. WorkCV currently does not include
               cover letters, AI writing, ATS scoring or application tracking.
             </p>
           </div>

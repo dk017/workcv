@@ -33,7 +33,7 @@ const homepageFaqs = [
   {
     question: "Do I need to log in before using the editor?",
     answer:
-      "Yes. WorkCV asks for a one-time email code first so your CV can be saved, reopened, and connected to the PDF you unlock. There is no password and no payment until download.",
+      "No. You can build and preview your CV straight away, and the draft is kept in your browser. WorkCV asks for your email and a one-time code only when you download, upload an existing CV or save it to your account, so the CV can be reopened later and connected to the PDF you unlock. There is no password and no payment until download.",
   },
   {
     question: "Is the format right for UK jobs?",

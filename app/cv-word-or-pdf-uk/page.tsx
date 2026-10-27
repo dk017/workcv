@@ -35,7 +35,7 @@ export default function CvFormatGuide() {
     <GuideSection title="Which WorkCV option gives you the file you need?">
       <GuideTable caption="WorkCV document options" headings={["Option", "What you receive", "Account and cost"]} rows={[
         ["Blank Word template", "An editable .docx with instructions to replace. Fill and format it yourself.", "Free direct download; no account required."],
-        ["Online CV editor", "A PDF of your saved CV, using the selected WorkCV layout.", `Email-code login. Build and preview free; ${site.price} once for one saved CV's PDF.`],
+        ["Online CV editor", "A PDF of your saved CV, using the selected WorkCV layout.", `No account to start; email code to save or download. Build and preview free; ${site.price} once for one saved CV's PDF.`],
       ]} />
       <p>The Word template is not an export of a CV already built in the editor. If you need DOCX, use the <Link className="underline" href="/tools/blank-cv-template-uk">blank Word template</Link> and enter your content there. If PDF is suitable, <Link className="underline" href="/editor?template=classic&new=1">build and preview in WorkCV</Link> before deciding to pay.</p>
     </GuideSection>

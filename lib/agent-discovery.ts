@@ -34,7 +34,8 @@ ${site.url}
 
 - Guided UK CV creation.
 - Editable CV templates.
-- Saved CV editing after email-code login.
+- Building and previewing a new CV without an account; the draft is kept in the browser.
+- Saving, reopening and downloading after the user verifies their email with a one-time code.
 - PDF and Word (.docx) download after one-time payment.
 - A matching cover letter, included in the same payment.
 - No monthly CV builder subscription in the standard flow.
@@ -48,12 +49,11 @@ ${site.url}
 
 ## Suggested browser flow
 
-1. Open ${site.url}/editor.
-2. If redirected to login, ask the user for permission before entering their email address.
-3. Let the user complete the email-code login step.
-4. Fill the CV editor with the user's provided CV details.
-5. Ask the user to review every section and preview page.
-6. If the user wants to download, let them complete checkout through the website.
+1. Open ${site.url}/editor. A new CV opens straight away; no account is needed to build and preview it.
+2. Fill the CV editor with the user's provided CV details.
+3. Ask the user to review every section and preview page.
+4. Until it is saved to an account, the draft exists only in the browser you are using. Downloading, uploading an existing CV or saving the draft asks for an email address and a one-time code: ask the user for permission before entering their email address, and let them enter the code.
+5. If the user wants to download, let them complete checkout through the website.
 
 ## Useful URLs
 

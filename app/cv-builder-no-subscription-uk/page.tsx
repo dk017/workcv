@@ -129,9 +129,9 @@ const truthChecks = [
       "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV purchase.",
   },
   {
-    title: "Email-code login, not no-account editing",
+    title: "Start without an account",
     body:
-      "WorkCV asks you to log in with a one-time email code before editing so your CV can be saved and reopened later.",
+      "Build and preview your CV straight away; the draft is kept in your browser. A one-time email code is asked for only when you download, upload an existing CV or save it to reopen later.",
   },
   {
     title: "No hidden monthly fees",
@@ -236,7 +236,7 @@ export default function NoSubscriptionUkPage() {
                 {site.priceGbp} covers one saved CV and its matching cover letter,
                 each as PDF and Word. Edit and redownload that same CV and letter
                 without paying again. A separate new CV needs its own payment.
-                Email-code login is required before editing.
+                No account is needed to start; an email code is asked for when you save or download.
               </p>
             </div>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
@@ -284,7 +284,7 @@ export default function NoSubscriptionUkPage() {
       <section className="border-y border-line bg-paper py-16"><div className="container-page max-w-5xl space-y-8">
       <CustomerAnswer questionId="Q01">
         <GuideTable caption="The WorkCV offer" headings={["Stage", "Included"]} rows={[
-          ["Start", "Email-code login so the CV can be saved and reopened."],
+          ["Start", "No account needed. Your draft is kept in this browser until you save it with an email code."],
           ["Before payment", "Build in the editor and preview the layout for free. This is not a trial that renews."],
           ["Payment", `${site.price} once to unlock one saved CV and its matching cover letter as PDF and Word. No monthly renewal.`],
           ["Download", "A PDF and an editable Word (DOCX) file for each document. The CV Word export uses a single-column layout. Edits and redownloads of the same saved CV and its letter are included; a separate new CV needs its own payment."],
@@ -293,14 +293,14 @@ export default function NoSubscriptionUkPage() {
         <p>Inspect the <Link className="font-semibold underline" href="/samples/workcv-customer-service-cv-example.pdf">sample PDF</Link> before starting. Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link>. For costs and future downloads, read <Link className="underline" href={customerQuestionHref("Q05")}>how to reopen a paid CV</Link> and <Link className="underline" href={customerQuestionHref("Q06")}>what one payment covers</Link>.</p>
       </CustomerAnswer>
       <CustomerAnswer questionId="Q07">
-        <ol className="list-decimal space-y-2 pl-6"><li>Use an email code to sign in and save your document.</li><li>Edit and preview your CV without entering payment details.</li><li>Choose PDF download only when ready for checkout.</li></ol>
+        <ol className="list-decimal space-y-2 pl-6"><li>Open the editor and start your CV; no account is needed.</li><li>Edit and preview your CV without entering payment details.</li><li>When you download, upload an existing CV or save, enter your email and the one-time code so the CV is kept in your account.</li><li>Choose PDF download only when ready for checkout.</li></ol>
         <p>Need no account at all? <Link className="font-semibold underline" href="/tools/blank-cv-template-uk">Download the free blank DOCX</Link>. It is a separate file you edit yourself.</p>
       </CustomerAnswer>
       <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/cv-builder-no-subscription-uk"]}>{displayReviewDate(customerContentReview["/cv-builder-no-subscription-uk"])}</time>.</p>
       </div></section>
       <section className="bg-surface py-16"><div className="container-page max-w-5xl">
         <CustomerAnswer questionId="Q03">
-          <ol className="list-decimal space-y-3 pl-6"><li>Open WorkCV in your phone or tablet browser and sign in with your email code.</li><li>Enter your details, or select <strong>More → Import CV</strong> to upload a PDF or DOCX file. The import dialog does not take pasted text.</li><li>Check every imported field; correct names, dates and experience.</li><li>Switch between <strong>Edit CV</strong> and <strong>Preview</strong> to review every page.</li><li>Choose the PDF download and complete checkout when you are ready.</li><li>Open the downloaded PDF and confirm its contents before applying.</li></ol>
+          <ol className="list-decimal space-y-3 pl-6"><li>Open WorkCV in your phone or tablet browser and start a CV; no account is needed to build and preview it.</li><li>Enter your details, or select <strong>More → Import CV</strong> to upload a PDF or DOCX file (uploading asks for your email and a one-time code first). The import dialog does not take pasted text.</li><li>Check every imported field; correct names, dates and experience.</li><li>Switch between <strong>Edit CV</strong> and <strong>Preview</strong> to review every page.</li><li>Choose the PDF download and complete checkout when you are ready.</li><li>Open the downloaded PDF and confirm its contents before applying.</li></ol>
           <p>On iPhone and iPad, check Safari’s downloads list or the Files app; the location depends on browser and device settings. See <a className="font-semibold underline" href="https://support.apple.com/en-gb/102440" target="_blank" rel="noopener noreferrer">Apple’s download guide</a>. For other browsers, check their downloads list.</p>
           <p>If checkout succeeded but you cannot find the file, <TrackedLink className="font-semibold underline" placement={analyticsPlacements.customerQ03Support} href={customerQuestionHref("Q24")}>follow the paid download checks</TrackedLink>.</p>
         </CustomerAnswer>
@@ -439,8 +439,9 @@ export default function NoSubscriptionUkPage() {
               <p className="mt-6 text-lg leading-8 text-muted">
                 People search for no-subscription CV builders because they do
                 not want a cheap trial that turns into a monthly fee. WorkCV is
-                direct about the tradeoff: you need an email-code login so the
-                CV can be saved, and you pay once only if you download the PDF.
+                direct about the tradeoff: you can build without an account, you
+                add an email code to save the CV, and you pay once only if you
+                download the PDF.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">

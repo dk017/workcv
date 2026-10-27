@@ -248,7 +248,7 @@ export default function ProfessionalCvTemplateUkPage() {
               A UK CV template that is professional, clear and easy to tailor.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              Log in by email code, start with an editable UK CV example,
+              Start with an editable UK CV example, no account needed,
               replace the sample wording with your own evidence and tailor the
               final version to one job. Clean presentation supports the
               content; it does not replace it.
@@ -525,7 +525,7 @@ export default function ProfessionalCvTemplateUkPage() {
       />
       <FinalCta
         heading="Build a professional CV from evidence you can stand behind."
-        body={`Log in by email code, replace the editable example with your own details, then pay ${site.price} once to download that CV and a matching cover letter as PDF and Word.`}
+        body={`Replace the editable example with your own details, no account needed to start, then pay ${site.price} once to download that CV and a matching cover letter as PDF and Word.`}
         primaryHref={editorHref}
         primary="Use this CV template"
         secondaryHref="/how-to-write-a-cv-uk"

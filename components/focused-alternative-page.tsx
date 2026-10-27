@@ -112,7 +112,8 @@ export function FocusedAlternativePage({
               unlock for the selected saved CV
             </p>
             <p className="mt-7 text-sm leading-7 text-muted">
-              Email-code login is required. Each CV includes a matching cover
+              No account is needed to start; saving or downloading asks for an
+              email code. Each CV includes a matching cover
               letter. The ATS CV checker and job application tracker are free, and
               AI suggestions are only applied when you approve them.
             </p>

@@ -13,7 +13,7 @@ export const metadata = guideMetadata(path, "Turn a ChatGPT CV into a UK PDF | W
 
 export default function ChatGptCvGuide() {
   return <Guide path={path} title={title} reviewed={customerContentReview[path]} placement={analyticsPlacements.chatgptGuideEditor} action={["Format my CV", "/editor?template=classic&new=1"]}
-    intro={`Check the facts in your ChatGPT draft, then copy each section into a CV editor or save the text in a Word document for import. WorkCV accepts PDF and DOCX imports; its import dialog does not accept pasted text. Sign in with an email code, review the fields and preview the PDF. The finished download costs ${site.price} once for one saved CV, with no subscription.`}
+    intro={`Check the facts in your ChatGPT draft, then copy each section into a CV editor or save the text in a Word document for import. WorkCV accepts PDF and DOCX imports; its import dialog does not accept pasted text. Review the fields and preview the PDF; importing a file or downloading asks for your email and a one-time code. The finished download costs ${site.price} once for one saved CV, with no subscription.`}
     links={[["CV builder without a subscription", "/cv-builder-no-subscription-uk"], ["Free blank Word template", "/tools/blank-cv-template-uk"], ["Choose Word or PDF", "/cv-word-or-pdf-uk"], ["Match your CV to a vacancy", "/tools/ats-score-checker"]]}>
     <CustomerQuestionNav ids={["Q08", "Q09"]} />
     <CustomerAnswer questionId="Q08">
@@ -39,7 +39,7 @@ export default function ChatGptCvGuide() {
     </GuideSection>
     <GuideSection title="Build the PDF in six steps">
       <ol className="list-decimal space-y-4 pl-6">
-        <li><strong>Sign in and start a CV.</strong> Use your email code to enter the editor. Start a new saved CV if this is a separate application document.</li>
+        <li><strong>Start a CV.</strong> The editor opens without an account. Importing a file, saving or downloading asks for your email and a one-time code. Start a new saved CV if this is a separate application document.</li>
         <li><strong>Enter or import your content.</strong> For plain text, work through Profile, Experience, Education and Skills. For a file, open More, choose Import CV, select PDF or DOCX and review the summary before applying it. Read any replacement warning if the current CV is already populated.</li>
         <li><strong>Check each field.</strong> Keep your actual job title in Experience and your intended next job in Target role. Check the employer, start/end dates and the bullet points for every job.</li>
         <li><strong>Choose a template.</strong> Open Template and compare the current layouts. Keep the content consistent while deciding which presentation suits it.</li>

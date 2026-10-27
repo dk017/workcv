@@ -40,7 +40,7 @@ export function Guide({ path, title, intro, children, links, action, placement, 
     <article className="container-page max-w-5xl space-y-12 py-12 md:py-16">{children}</article>
     <section className="border-y border-line bg-paper py-12"><div className="container-page max-w-5xl">
       <h2 className="font-display text-3xl font-semibold text-navy">Put the guidance into practice</h2>
-      <p className="mb-6 mt-4 leading-7 text-muted">The blank Word template is free without an account. The WorkCV editor requires email-code login: build and preview free, then choose {site.price} once for one saved CV and matching letter as PDF and editable Word, or the {site.passPrice} Job Search Pass for separate versions during {site.passDays} days. Covered documents remain editable and downloadable afterwards. Neither plan renews automatically.</p>
+      <p className="mb-6 mt-4 leading-7 text-muted">The blank Word template is free without an account. The WorkCV editor needs no account to start, and an email code to save or download: build and preview free, then choose {site.price} once for one saved CV and matching letter as PDF and editable Word, or the {site.passPrice} Job Search Pass for separate versions during {site.passDays} days. Covered documents remain editable and downloadable afterwards. Neither plan renews automatically.</p>
       <ButtonLink href={action[1]} trackingLabel={placement}>{action[0]}</ButtonLink>
     </div></section>
     <MoneyPageCta trackingContext={`${placement}_money_cta`} />

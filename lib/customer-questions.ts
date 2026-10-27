@@ -28,7 +28,7 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q03: {
     id: "Q03", ownerPath: "/cv-builder-no-subscription-uk", anchor: "cv-on-phone-or-ipad",
     question: "How can I make and download a CV on my phone or iPad without a laptop?",
-    answer: `Open WorkCV in your browser, sign in with your email code, and enter your CV details or import a supported PDF or DOCX. On the narrow layout, switch between Edit CV and Preview to check the pages. PDF download costs ${site.price} for that saved CV. Your browser and device control where the downloaded file is saved.`,
+    answer: `Open WorkCV in your browser and enter your CV details; no account is needed to build and preview. Importing a supported PDF or DOCX, saving or downloading asks for your email and a one-time code. On the narrow layout, switch between Edit CV and Preview to check the pages. PDF download costs ${site.price} for that saved CV. Your browser and device control where the downloaded file is saved.`,
   },
   Q04: {
     id: "Q04", ownerPath: "/tools/cv-template-word-uk", anchor: "edit-cv-without-word",
@@ -48,7 +48,7 @@ export const customerQuestions: Record<CustomerQuestionId, CustomerQuestion> = {
   Q07: {
     id: "Q07", ownerPath: "/cv-builder-no-subscription-uk", anchor: "account-and-payment",
     question: "Do I need an account or credit card before I start?",
-    answer: "You need an email-code sign-in to use and save a CV in the WorkCV editor. You do not need to enter payment details just to build and preview it. Checkout comes when you choose the paid PDF download. If you only want the free blank Word template, you can download that separate file without a WorkCV account.",
+    answer: "No. You can build and preview a CV in the WorkCV editor without an account or payment details; the draft is kept in your browser. An email-code sign-in is needed to download, upload an existing CV or save the CV to reopen later. Checkout comes when you choose the paid PDF download. If you only want the free blank Word template, you can download that separate file without a WorkCV account.",
   },
   Q08: {
     id: "Q08", ownerPath: "/chatgpt-cv-to-pdf-uk", anchor: "turn-draft-into-pdf",

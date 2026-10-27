@@ -59,7 +59,7 @@ export function GenericMarketingPage({ config }: { config: GenericPageConfig }) 
     {
       question: "Do I need to log in?",
       answer:
-        "Yes. Login is required when you enter the editor so your CV can be saved and reopened later.",
+        "Not to start. You can build and preview a CV without an account. WorkCV asks for an email code when you download, upload an existing CV or save it to reopen later.",
     },
   ];
 
