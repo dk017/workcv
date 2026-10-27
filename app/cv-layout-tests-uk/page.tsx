@@ -5,7 +5,8 @@ import { join } from "node:path";
 import { site } from "@/lib/site";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
-export const metadata: Metadata = { title: "UK CV Layout Tests — Sample PDFs and Reading Order", description: "Compare six WorkCV layouts with the same fictional CV. Download sample PDFs, inspect extracted text and understand the limits of parsing tests.", alternates: { canonical: "/cv-layout-tests-uk" } };
+import { withAgentMetadata } from "@/lib/agent-metadata";
+export const metadata: Metadata = withAgentMetadata("/cv-layout-tests-uk", { title: "UK CV Layout Tests — Sample PDFs and Reading Order", description: "Compare six WorkCV layouts with the same fictional CV. Download sample PDFs, inspect extracted text and understand the limits of parsing tests.", alternates: { canonical: "/cv-layout-tests-uk" } });
 type Report = { generatedAt: string; parser: string; renderer: string; reports: Array<{ id: string; name: string; template: string; preset: string; pages: number; words: number; headings: string[] }> };
 export default function Page() {
   const file = join(process.cwd(), "public/samples/layouts/report.json");

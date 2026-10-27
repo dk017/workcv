@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/refund-policy", {
   title: "Refund Policy",
   description:
     "WorkCV refund policy for one-time UK CV and cover letter download purchases.",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
       "WorkCV refund policy for one-time UK CV and cover letter download purchases.",
     url: "/refund-policy",
   },
-};
+});
 
 export default function RefundPolicyPage() {
   return (

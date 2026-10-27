@@ -7,10 +7,11 @@ import { PassOffer } from "@/components/pass-offer";
 import { SponsorChecker } from "@/components/sponsor-check";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/uk-visa-sponsor-checker";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "UK Visa Sponsor Checker - Is an Employer Licensed?",
   description: "Check whether a UK employer holds a licence to sponsor Skilled Worker and other work visas. Searches the Home Office register of licensed sponsors, refreshed daily.",
   alternates: { canonical: path },
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     description: "Search the Home Office register of licensed sponsors by employer name.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

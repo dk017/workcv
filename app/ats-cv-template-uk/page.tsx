@@ -18,8 +18,9 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/ats-cv-template-uk", {
   title: "ATS CV Template UK - Applicant Tracking Format",
   description:
     "Edit an ATS-friendly UK CV template with standard headings, a clean single-column structure and honest job-specific wording. Preview before paying.",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
       "Use a clean, editable UK CV starting point and learn what ATS-friendly can—and cannot—promise.",
     url: "/ats-cv-template-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const atsCv = getRoleCvTemplate("general");

@@ -13,10 +13,11 @@ import { CustomerAnswer } from "@/components/customer-answer";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-template-word-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: { absolute: "Edit a UK CV With or Without Microsoft Word | WorkCV" },
   description:
     "Edit a UK CV in Word or a compatible editor, check formatting and export the right file. Includes a free DOCX template and a guided PDF option.",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
       "A practical guide to editing, checking and exporting a UK CV template in Microsoft Word.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

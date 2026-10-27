@@ -4,8 +4,9 @@ import { CalendarCheck, FileSearch, Scale, ShieldCheck } from "lucide-react";
 import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/notice-period-calculator", {
   title: "UK Notice Period Calculator - Earliest Start Date",
   description:
     "Calculate your contractual end date, earliest new-job start date, latest resignation date and UK statutory notice from your job start date.",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
       "Check whether a target start date works and see the notice date, contract end date and statutory UK minimums.",
     url: "/tools/notice-period-calculator",
   },
-};
+});
 
 const faqItems = [
   {

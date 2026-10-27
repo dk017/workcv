@@ -10,14 +10,15 @@ import { PassOfferView } from "@/components/pass-offer-view";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { founder, site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const startHref = "/editor";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/", {
   title: "Turn Your Experience into a Professional UK CV",
   description:
     `Build and preview a professional UK CV and matching cover letter. Pay ${site.price} once for PDF and Word downloads. No subscription.`,
-};
+}, `WorkCV's homepage. WorkCV is a UK CV builder: build and preview a CV and matching cover letter free, then pay ${site.price} once (or ${site.passPrice} for a ${site.passDays}-day Job Search Pass) to download both as PDF and Word.`);
 
 const homepageFaqs = [
   {

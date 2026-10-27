@@ -7,8 +7,9 @@ import { ButtonLink, FaqSection, MoneyPageCta, SectionLabel } from "@/components
 import { onsSalarySource, salaryRoles } from "@/lib/uk-salary-data";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/uk-salary-by-job-title", {
   title: "UK Salary by Job Title - ONS 2025 Pay Checker",
   description:
     "Search 60 common UK job titles and compare lower-quartile, median and upper-quartile annual pay from ONS ASHE 2025 data.",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "Search common UK roles and see transparent 25th percentile, median and 75th percentile annual salary benchmarks.",
     url: "/tools/uk-salary-by-job-title",
   },
-};
+});
 
 const faqItems = [
   {

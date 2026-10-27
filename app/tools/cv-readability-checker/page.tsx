@@ -4,14 +4,15 @@ import { BookOpen, Gauge, ShieldCheck } from "lucide-react";
 import { CvReadabilityChecker } from "@/components/cv-readability-checker";
 import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-readability-checker";
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Readability Checker UK - Flesch Score",
   description: "Check your CV's Flesch Reading Ease, sentence length and possible passive voice. Free, private and no signup required.",
   alternates: { canonical: path },
   openGraph: { title: "Free UK CV Readability Checker", description: "Find dense sentences and readability issues in your CV without uploading it.", url: path },
-};
+});
 const faqs = [
   { question: "What is a good readability score for a CV?", answer: "There is no official recruiter pass score. A higher Flesch Reading Ease score generally indicates shorter sentences and simpler words, but necessary job titles, qualifications and technical terms can lower a CV's result." },
   { question: "How is CV readability calculated?", answer: "This checker uses Flesch Reading Ease, which considers average sentence length and average syllables per word. It also separately flags sentences over 25 words and likely passive constructions." },

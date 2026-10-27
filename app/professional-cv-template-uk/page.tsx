@@ -16,8 +16,9 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/professional-cv-template-uk", {
   title: "CV Template UK: Professional, Editable Example",
   description:
     "A professional UK CV template with an editable example, the sections UK employers expect and role-specific versions. Download as PDF or Word; no subscription.",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
       "Use an editable UK CV example with clear sections, evidence-led wording and current UK careers guidance.",
     url: "/professional-cv-template-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const professionalCv = getRoleCvTemplate("general");

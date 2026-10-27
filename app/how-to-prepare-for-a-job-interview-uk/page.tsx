@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
 import { AdviceCard, BulletList, EditorialGuideShell, GuideSection } from "@/components/editorial-guide-shell";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/how-to-prepare-for-a-job-interview-uk";
-export const metadata: Metadata = { title: "How to Prepare for a Job Interview UK: Checklist", description: "A practical UK interview preparation plan for the week before, day before and interview day, with an evidence matrix, STAR prompts and questions to ask.", alternates: { canonical: path }, openGraph: { title: "How to Prepare for a Job Interview in the UK", description: "A timed checklist, evidence worksheet and practical interview-day plan.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "How to Prepare for a Job Interview UK: Checklist", description: "A practical UK interview preparation plan for the week before, day before and interview day, with an evidence matrix, STAR prompts and questions to ask.", alternates: { canonical: path }, openGraph: { title: "How to Prepare for a Job Interview in the UK", description: "A timed checklist, evidence worksheet and practical interview-day plan.", url: path } });
 
 const faqs = [
   { question: "How long should I spend preparing for an interview?", answer: "There is no fixed number, but cover four jobs: understand the role, research the employer, prepare several relevant examples and confirm the practical arrangements. Start when invited; if time is short, prioritise the essential criteria and two strong examples." },

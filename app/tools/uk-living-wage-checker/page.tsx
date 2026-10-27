@@ -4,10 +4,11 @@ import { Banknote, MapPin, Scale } from "lucide-react";
 import { LivingWageChecker2026 } from "@/components/living-wage-checker-2026";
 import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 // Annual refresh: update statutory rates each April and label the Real Living Wage vintage separately.
 const path = "/tools/uk-living-wage-checker";
-export const metadata: Metadata = { title: "UK Living Wage Checker 2026 - Hourly Pay", description: "Check hourly pay or salary against the 2026 UK minimum wage and voluntary Real Living Wage. Includes age, apprentice and London rates.", alternates: { canonical: path }, openGraph: { title: "UK Living Wage Checker 2026", description: "Compare pay with current legal and voluntary UK hourly wage benchmarks.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "UK Living Wage Checker 2026 - Hourly Pay", description: "Check hourly pay or salary against the 2026 UK minimum wage and voluntary Real Living Wage. Includes age, apprentice and London rates.", alternates: { canonical: path }, openGraph: { title: "UK Living Wage Checker 2026", description: "Compare pay with current legal and voluntary UK hourly wage benchmarks.", url: path } });
 const faqs = [
   { question: "What is the UK National Living Wage in 2026?", answer: "From 1 April 2026, the statutory National Living Wage for workers aged 21 and over is £12.71 per hour. Lower National Minimum Wage rates apply to younger workers and eligible apprentices." },
   { question: "What is the Real Living Wage in 2026?", answer: "The voluntary Living Wage Foundation rates for 2025–26 are £13.45 across the UK and £14.80 in London. They are separate from the legal National Living Wage and apply to accredited employers on a voluntary basis." },

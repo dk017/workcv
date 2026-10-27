@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/chrome/job-keyword-highlighter/privacy", {
   title: "Chrome Extension Privacy Policy",
   description: "Privacy policy for the WorkCV Tailor Your CV to This Job Chrome extension.",
   alternates: { canonical: "/chrome/job-keyword-highlighter/privacy" },
-};
+});
 
 export default function ChromeExtensionPrivacyPage() {
   return (

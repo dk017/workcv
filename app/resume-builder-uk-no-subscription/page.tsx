@@ -22,8 +22,9 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/resume-builder-uk-no-subscription", {
   title: `Resume Builder UK No Subscription - ${site.price} PDF`,
   description:
     `Build a UK resume or CV without a monthly subscription. Log in by email code, build and preview free, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`,
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
       `Create the document UK employers usually call a CV. Build and preview first, then pay ${site.price} to unlock the saved CV with no automatic renewal.`,
     url: "/resume-builder-uk-no-subscription",
   },
-};
+});
 
 const steps = [
   {

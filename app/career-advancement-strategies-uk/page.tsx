@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
 import { AdviceCard, BulletList, CopyTemplate, EditorialGuideShell, GuideSection } from "@/components/editorial-guide-shell";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/career-advancement-strategies-uk";
-export const metadata: Metadata = { title: "Career Progression Plan UK: 30-60-90 Day Guide", description: "Build a practical career progression plan with a target-role gap analysis, evidence log, manager conversation script and 30-60-90 day actions.", alternates: { canonical: path }, openGraph: { title: "Career Progression Plan: A Practical UK Guide", description: "Move from a vague promotion goal to evidence, conversations and measurable next steps.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "Career Progression Plan UK: 30-60-90 Day Guide", description: "Build a practical career progression plan with a target-role gap analysis, evidence log, manager conversation script and 30-60-90 day actions.", alternates: { canonical: path }, openGraph: { title: "Career Progression Plan: A Practical UK Guide", description: "Move from a vague promotion goal to evidence, conversations and measurable next steps.", url: path } });
 
 const faqs = [
   { question: "How do I make a career progression plan?", answer: "Define a specific target role or responsibility, compare its expectations with your current evidence, choose one or two gaps to close and set dated actions. Review the plan regularly instead of treating it as a one-off document." },

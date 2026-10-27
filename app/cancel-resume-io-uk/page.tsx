@@ -24,10 +24,11 @@ import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-resume-io-uk", {
   title: "How to Cancel Resume.io UK - Stop Subscription",
   description:
     "Step-by-step guide to cancelling Resume.io in the UK. Use the cancellation form, confirm by email, and stop automatic renewal.",
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
       "Current UK cancellation steps for Resume.io, including the cancellation form, account settings route, confirmation email, and support fallback.",
     url: "/cancel-resume-io-uk",
   },
-};
+});
 
 const cancellationSteps = [
   {

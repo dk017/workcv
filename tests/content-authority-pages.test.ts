@@ -6,7 +6,7 @@ import { customerContentReview } from "../lib/customer-content-review.ts";
 const page = readFileSync("app/cv-personal-statement-uk/page.tsx", "utf8");
 const examples = page.split("const examples: Example[] = [")[1]?.split("const beforeAfter")[0] ?? "";
 const proof = readFileSync("components/sample-cv-proof.tsx", "utf8");
-const sitemap = readFileSync("app/sitemap.ts", "utf8");
+const sitemap = readFileSync("lib/md/public-routes.ts", "utf8");
 
 test("personal statement page has exactly twelve required examples", () => {
   assert.equal((examples.match(/\n    title:/g) || []).length, 20);

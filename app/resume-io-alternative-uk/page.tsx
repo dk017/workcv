@@ -19,11 +19,12 @@ import {
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { PassOffer } from "@/components/pass-offer";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/resume-io-alternative-uk", {
   title: "Resume.io Alternative UK - No Subscription",
   description:
     `Looking for a Resume.io alternative in the UK? Compare Resume.io's 7-day trial and renewal pricing with WorkCV's ${site.priceGbp} PDF download model.`,
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
       "A focused UK CV and cover letter builder for people who want to pay once, without a monthly CV builder subscription.",
     url: "/resume-io-alternative-uk",
   },
-};
+});
 
 const comparisonRows = [
   ["Entry model", competitorPricing.resumeIo.entry, "Free to build"],

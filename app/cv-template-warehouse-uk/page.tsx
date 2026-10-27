@@ -16,9 +16,10 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-warehouse-uk", {
   title: "Warehouse CV Examples UK: With and Without Experience",
   description:
     "Complete UK warehouse CV and cover letter examples with and without experience. Show genuine picking, packing or transferable skills, with a free application checklist.",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       "An editable UK warehouse CV with picking, dispatch, scanner and safe-working examples.",
     url: "/cv-template-warehouse-uk",
   },
-};
+});
 
 const editorHref = "#application-pack";
 const warehouseCv = getRoleCvTemplate("warehouse");

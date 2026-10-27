@@ -23,12 +23,13 @@ import {
 } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-zety-uk", {
   title: "How to Cancel Zety UK - Stop Subscription",
   description:
     "Step-by-step guide to cancelling your Zety subscription in the UK. Use account settings, support, and confirmation checks to stop renewal.",
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
       "Current UK cancellation steps for Zety, including account dashboard, support routes, billing descriptors, and renewal checks.",
     url: "/cancel-zety-uk",
   },
-};
+});
 
 const officialLinks = [
   ["Zety UK pricing", "https://zety.com/uk/pricing"],

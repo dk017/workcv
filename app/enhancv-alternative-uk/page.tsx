@@ -21,10 +21,11 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = "21 June 2026";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/enhancv-alternative-uk", {
   title: "Enhancv Alternative UK - No Subscription CV Builder",
   description:
     `Compare Enhancv with WorkCV for UK applications. See verified differences in subscriptions, AI tools, cover letters, templates and the ${site.price} one-time CV and cover letter bundle.`,
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
       "An evidence-based comparison between Enhancv's broader subscription platform and WorkCV's focused no-subscription UK CV builder.",
     url: "/enhancv-alternative-uk",
   },
-};
+});
 
 const comparisonRows = [
   ["Primary focus", "Global resume and career-tool platform", "Focused UK CV builder"],

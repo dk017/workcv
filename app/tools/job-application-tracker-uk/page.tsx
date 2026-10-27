@@ -9,8 +9,9 @@ import { PassOffer } from "@/components/pass-offer";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/job-application-tracker-uk", {
   title: "Free Job Application Tracker UK: Online Tool & Excel Template",
   description:
     "Track every job you apply for: status, follow-ups and closing dates. Free, no signup, saved in your browser. Export to Excel and tailor your CV for each role.",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
       "Keep every application, follow-up and closing date in one place. No signup, export to Excel, and a free spreadsheet template.",
     url: "/tools/job-application-tracker-uk",
   },
-};
+});
 
 const templateHref = "/downloads/job-application-tracker-uk.xlsx";
 

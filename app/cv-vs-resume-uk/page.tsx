@@ -4,8 +4,9 @@ import { ArrowRight, Check, FileText, Globe2, GraduationCap, SearchCheck } from 
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { commercialRoutes } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-vs-resume-uk", {
   title: "CV vs Resume UK - Difference and Which to Use",
   description:
     "Understand CV vs resume terminology in the UK, when the documents differ, and which format to send for UK, international and academic applications.",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
       "A practical UK guide to CV, resume and academic CV terminology, with clear application scenarios.",
     url: "/cv-vs-resume-uk",
   },
-};
+});
 
 const faqs = [
   {

@@ -15,15 +15,16 @@ import {
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { TrackedLink } from "@/components/tracked-link";
 import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/right-to-work-cv-uk", {
   title: "Right to Work CV UK - What to Include",
   description:
     "Should you mention right to work on a UK CV? Learn when to include it, what not to share, and how to keep your CV clear and safe.",
   alternates: { canonical: "/right-to-work-cv-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",

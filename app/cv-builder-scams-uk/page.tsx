@@ -14,9 +14,10 @@ import {
 } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-builder-scams-uk", {
   title: "CV Builder Scams UK? Avoid Trial Renewal Charges",
   description:
     "Learn how low-cost CV builder trials can become recurring charges, what to check before paying, and how WorkCV's one-time price differs.",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       "A factual UK guide to CV builder introductory prices, automatic renewals, cancellation evidence, and one-time alternatives.",
     url: "/cv-builder-scams-uk",
   },
-};
+});
 
 const checkedDate = competitorPricingCheckedDate;
 

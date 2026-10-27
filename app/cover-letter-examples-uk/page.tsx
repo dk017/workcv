@@ -11,11 +11,12 @@ import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { coverLetterExamples, exampleWordCount } from "@/lib/cover-letter-examples";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/cover-letter-examples-uk";
 const reviewed = "2 October 2026";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Cover Letter Examples UK: 13 Samples by Role (2026)",
   description:
     "13 UK cover letter examples for customer service, retail, teaching, care, nursing, driving, warehouse, internships, engineering, law, finance, apprenticeships and student jobs, with notes on why each works.",
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
     description: "Realistic UK cover letter examples by role, with the correct greeting, sign-off and structure.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

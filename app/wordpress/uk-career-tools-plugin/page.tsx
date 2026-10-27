@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { SectionLabel } from "@/components/marketing";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/wordpress/uk-career-tools-plugin", {
   title: "Free UK Career Tools WordPress Plugin",
   description:
     "Add WorkCV take-home pay, Living Wage and redundancy calculators to WordPress with blocks or shortcodes.",
   alternates: { canonical: "/wordpress/uk-career-tools-plugin" },
-};
+});
 
 const tools = [
   ["UK take-home pay calculator", "[workcv_take_home_pay]"],

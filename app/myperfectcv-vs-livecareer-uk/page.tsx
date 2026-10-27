@@ -3,12 +3,13 @@ import type { Metadata } from "next";
 import { CompetitorVsPage, type CompetitorVsConfig } from "@/components/competitor-vs-page";
 import { competitorPlans, costOverDays, formatMinor } from "@/lib/competitor-plans";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const a = competitorPlans.myPerfectCv;
 const b = competitorPlans.liveCareer;
 const gbp = (minor: number) => formatMinor(minor, "GBP");
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/myperfectcv-vs-livecareer-uk", {
   title: "MyPerfectCV vs LiveCareer UK: Same Company, Different Prices",
   description: `MyPerfectCV vs LiveCareer compared on UK prices, renewals and free plans. Both are run by BOLD LLC; see what each costs after the trial and a one-off alternative at ${site.price}.`,
   alternates: { canonical: "/myperfectcv-vs-livecareer-uk" },
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     description: "Same company, same trial-then-renewal model, different prices. A sourced UK comparison.",
     url: "/myperfectcv-vs-livecareer-uk",
   },
-};
+});
 
 const config: CompetitorVsConfig = {
   slug: "/myperfectcv-vs-livecareer-uk",

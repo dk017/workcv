@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/terms", {
   title: "Terms of Use",
   description: "Terms for using WorkCV and buying one-time CV and cover letter downloads.",
   alternates: { canonical: "/terms" },
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
     description: "Terms for using WorkCV and buying one-time CV and cover letter downloads.",
     url: "/terms",
   },
-};
+});
 
 export default function TermsPage() {
   return (

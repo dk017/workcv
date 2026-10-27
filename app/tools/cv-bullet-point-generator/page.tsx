@@ -8,10 +8,11 @@ import { noMetricsExamples } from "@/lib/customer-answer-examples";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { FaqSection, MoneyPageCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-bullet-point-generator";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Bullet Point Generator UK - No Signup",
   description:
     "Generate five concise UK CV bullet points from your real responsibilities and achievements. Tailor them to a job advert, free with no signup.",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
       "Turn rough experience notes into five concise, evidence-led and editable UK CV bullet points.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

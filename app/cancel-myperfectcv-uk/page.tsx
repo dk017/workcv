@@ -25,10 +25,11 @@ import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-myperfectcv-uk", {
   title: "How to Cancel MyPerfectCV UK - Step by Step",
   description:
     "Step-by-step guide to cancelling your MyPerfectCV subscription in the UK. Stop automatic renewals, keep proof, and compare a no-subscription CV builder.",
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
       "Current UK cancellation steps for MyPerfectCV, including official support routes, confirmation checks, and what to do if payments continue.",
     url: "/cancel-myperfectcv-uk",
   },
-};
+});
 
 const officialLinks = [
   {

@@ -8,7 +8,7 @@ const blank = read("app/tools/blank-cv-template-uk/page.tsx");
 const word = read("app/tools/cv-template-word-uk/page.tsx");
 const noSubscription = read("app/cv-builder-no-subscription-uk/page.tsx");
 const pricing = read("app/pricing/page.tsx");
-const sitemap = read("app/sitemap.ts");
+const sitemap = read("lib/md/public-routes.ts");
 const toolsLayout = read("app/tools/layout.tsx");
 const toolBreadcrumbs = read("components/tool-breadcrumbs.tsx");
 

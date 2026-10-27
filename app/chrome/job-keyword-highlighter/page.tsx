@@ -3,13 +3,14 @@ import Link from "next/link";
 
 import { SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/chrome/job-keyword-highlighter", {
   title: "WorkCV: Tailor Your CV to This Job – Chrome extension",
   description:
     "Send the UK job advert you are viewing to WorkCV to tailor a copy of your CV, and highlight the skills it asks for.",
   alternates: { canonical: "/chrome/job-keyword-highlighter" },
-};
+});
 
 export default function ChromeExtensionPage() {
   return (

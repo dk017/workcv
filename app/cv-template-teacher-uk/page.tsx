@@ -15,8 +15,9 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-teacher-uk", {
   title: "Teacher CV Template UK - QTS and Classroom Example",
   description:
     "Use a UK teacher CV template with QTS, classroom impact, safeguarding, assessment, behaviour and curriculum examples you can edit.",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
       "An editable UK teacher CV with QTS, safeguarding, assessment and classroom-impact examples.",
     url: "/cv-template-teacher-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=teacher&new=1";
 const teacherCv = getRoleCvTemplate("teacher");

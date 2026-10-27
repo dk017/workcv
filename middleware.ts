@@ -1,23 +1,33 @@
 import { NextRequest, NextResponse } from "next/server.js";
 
-import { agentDiscoveryLinkHeader } from "./lib/agent-discovery.ts";
+import { agentDiscoveryLinkHeader, pageLinkHeader } from "./lib/agent-discovery.ts";
+import { prefersMarkdown } from "./lib/md/accept.ts";
+import { isPublicRoute } from "./lib/md/public-routes.ts";
+
+// Routes that really end in .md are served as they are.
+function isRealMarkdownRoute(pathname: string) {
+  return pathname === "/auth.md" || pathname.startsWith("/agent-skills/") || pathname.startsWith("/.well-known/");
+}
+
+function rewriteToMarkdown(request: NextRequest, pagePath: string) {
+  const url = request.nextUrl.clone();
+  url.pathname = pagePath === "/" ? "/api/md/index" : `/api/md${pagePath}`;
+  url.search = "";
+  return NextResponse.rewrite(url);
+}
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const acceptsMarkdown = request.headers
-    .get("accept")
-    ?.toLowerCase()
-    .includes("text/markdown");
 
-  if (request.method === "GET" && pathname === "/" && acceptsMarkdown) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/agent-markdown";
-    url.searchParams.set("path", "/");
+  // /pricing.md and /index.md: the markdown version of that page, or a markdown 404 from the handler.
+  if (pathname.endsWith(".md") && !isRealMarkdownRoute(pathname)) {
+    return rewriteToMarkdown(request, pathname === "/index.md" ? "/" : pathname.slice(0, -3));
+  }
 
-    const response = NextResponse.rewrite(url);
-    response.headers.set("Link", agentDiscoveryLinkHeader);
-    response.headers.set("Vary", "Accept");
-    return response;
+  // Content negotiation is limited to public pages, so app and API routes never change shape.
+  const readsPage = request.method === "GET" || request.method === "HEAD";
+  if (readsPage && isPublicRoute(pathname) && prefersMarkdown(request.headers.get("accept"))) {
+    return rewriteToMarkdown(request, pathname);
   }
 
   // Signed-in visitors use the app's own pages. Browsers keep the #fragment across this
@@ -50,8 +60,8 @@ export function middleware(request: NextRequest) {
     response.headers.set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
   }
 
-  if (pathname === "/") {
-    response.headers.set("Link", agentDiscoveryLinkHeader);
+  if (isPublicRoute(pathname)) {
+    response.headers.set("Link", pathname === "/" ? agentDiscoveryLinkHeader : pageLinkHeader(pathname));
     response.headers.append("Vary", "Accept");
   }
 
@@ -59,5 +69,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/", "/tailor", "/login", "/editor", "/my-cvs", "/my-cvs/:path*", "/account", "/cv-pdf/:path*", "/admin/:path*"],
+  // Everything except Next internals, API routes and static files; the checks above pick what to act on.
+  matcher: ["/((?!_next/|api/|.*\\.(?:txt|xml|json|ico|png|jpe?g|gif|svg|webp|avif|css|js|map|woff2?|ttf|pdf|docx)$).*)"],
 };

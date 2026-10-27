@@ -97,7 +97,7 @@ test("the extension sends only the employer name to the sponsor check", () => {
 
 test("sponsor checker is registered and privacy notes say what is sent", () => {
   const read = (path: string) => readFileSync(path, "utf8");
-  assert.match(read("app/sitemap.ts"), /path: "\/tools\/uk-visa-sponsor-checker"/);
+  assert.match(read("lib/md/public-routes.ts"), /path: "\/tools\/uk-visa-sponsor-checker"/);
   assert.match(read("components/tools-hub.tsx"), /\/tools\/uk-visa-sponsor-checker/);
   assert.match(read("components/tool-breadcrumbs.tsx"), /"uk-visa-sponsor-checker"/);
   assert.match(read("app/right-to-work-cv-uk/page.tsx"), /\/tools\/uk-visa-sponsor-checker/);

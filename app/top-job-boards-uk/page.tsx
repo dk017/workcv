@@ -6,15 +6,16 @@ import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answe
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/top-job-boards-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Best UK Job Sites and Job Boards: 2026 Guide",
   description: "Compare leading UK job sites by purpose, including Indeed, LinkedIn, Reed, GOV.UK, NHS Jobs and specialist boards, then use a safer search workflow.",
   alternates: { canonical: path },
   openGraph: { title: "Best UK Job Sites and Job Boards: 2026 Guide", description: "A practical comparison of general, official and specialist UK job sites.", url: path },
-};
+});
 
 const generalBoards = [
   { name: "Indeed UK", href: "https://uk.indeed.com/", best: "Broad discovery", useful: "A wide mix of direct-employer and aggregated listings, useful filters, company information and alerts.", watch: "The same role can appear more than once. Check who posted it and follow the stated application route." },

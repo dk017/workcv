@@ -76,12 +76,13 @@ const brandSchema = {
       "@id": `${site.url}/#organization`,
       name: site.name,
       url: site.url,
+      description: site.description,
       logo: {
         "@type": "ImageObject",
         url: `${site.url}/opengraph-image`,
       },
       founder: { "@type": "Person", name: founder.name },
-      email: "contact@workcv.co.uk",
+      email: site.email,
     },
     {
       "@type": "WebSite",

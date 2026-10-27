@@ -25,10 +25,11 @@ import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-livecareer-uk", {
   title: "How to Cancel LiveCareer UK - Step by Step",
   description:
     "How to cancel LiveCareer in the UK. Stop automatic renewal charges with account settings, support routes, and a confirmation checklist.",
@@ -41,7 +42,7 @@ export const metadata: Metadata = {
       "Current LiveCareer UK cancellation steps, including Settings, Subscription, support contact, cancellation reference, and statement checks.",
     url: "/cancel-livecareer-uk",
   },
-};
+});
 
 const cancellationSteps = [
   {

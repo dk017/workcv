@@ -7,10 +7,11 @@ import { FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { RedundancyPayCalculator } from "@/components/redundancy-pay-calculator";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { PassOffer } from "@/components/pass-offer";
 
 // Annual refresh: recheck the GB and Northern Ireland weekly caps and maximum awards each April.
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/redundancy-pay-calculator", {
   title: "Redundancy Pay Calculator UK 2026",
   description:
     "Estimate statutory redundancy pay using current 2026 weekly caps, age bands and the 20-year service limit for Great Britain and Northern Ireland.",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
       "Calculate statutory redundancy weeks and pay with a year-by-year breakdown using current UK limits.",
     url: "/tools/redundancy-pay-calculator",
   },
-};
+});
 
 const examples = redundancyExamples();
 const gbp = (value: number) => {

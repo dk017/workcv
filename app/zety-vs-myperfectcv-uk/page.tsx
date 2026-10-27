@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CompetitorVsPage, type CompetitorVsConfig } from "@/components/competitor-vs-page";
 import { competitorPlans, formatMinor } from "@/lib/competitor-plans";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 // Zety first in the title to match how people search; MyPerfectCV is the
 // UK-priced site, so it carries the pound figures.
@@ -11,7 +12,7 @@ const b = competitorPlans.myPerfectCv;
 const usd = (minor: number) => formatMinor(minor, "USD");
 const gbp = (minor: number) => formatMinor(minor, "GBP");
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/zety-vs-myperfectcv-uk", {
   title: "Zety vs MyPerfectCV UK: Same Company, Compared",
   description: `Zety vs MyPerfectCV for UK job seekers: both are run by BOLD LLC. Compare free plans, trial renewals and templates, plus a no-renewal alternative at ${site.price}.`,
   alternates: { canonical: "/zety-vs-myperfectcv-uk" },
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     description: "Both are run by BOLD LLC and use a renewing 14-day trial. A sourced UK comparison.",
     url: "/zety-vs-myperfectcv-uk",
   },
-};
+});
 
 const config: CompetitorVsConfig = {
   slug: "/zety-vs-myperfectcv-uk",

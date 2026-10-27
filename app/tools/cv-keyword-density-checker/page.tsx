@@ -4,14 +4,15 @@ import { Hash, ShieldCheck, Tags } from "lucide-react";
 import { CvKeywordDensityChecker } from "@/components/cv-keyword-density-checker";
 import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-keyword-density-checker";
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Keyword Density Checker UK",
   description: "Find repeated words, phrases and vague wording in your CV. Free browser-based keyword density analysis with no signup or upload.",
   alternates: { canonical: path },
   openGraph: { title: "Free CV Keyword Density Checker", description: "See the most repeated words and phrases in your CV without uploading it.", url: path },
-};
+});
 const faqs = [
   { question: "What is CV keyword density?", answer: "Keyword density is the percentage of analysed words represented by a term. This tool also counts repeated two- and three-word phrases after excluding common words." },
   { question: "What keyword density should a CV have?", answer: "There is no universal target percentage. Relevant job titles, tools and qualifications may repeat naturally. Use the result to spot monotonous or vague wording, not to chase a score." },

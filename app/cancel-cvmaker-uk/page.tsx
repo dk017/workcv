@@ -24,10 +24,11 @@ import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-cvmaker-uk", {
   title: "How to Cancel CVMaker UK Subscription",
   description:
     "Step-by-step guide to cancelling CVMaker UK. Stop automatic monthly renewal, keep proof, and compare a no-subscription CV builder.",
@@ -40,7 +41,7 @@ export const metadata: Metadata = {
       "Current CVMaker UK cancellation steps, including Account Settings, Subscription, help desk fallback, confirmation email, and statement checks.",
     url: "/cancel-cvmaker-uk",
   },
-};
+});
 
 const cancellationSteps = [
   {

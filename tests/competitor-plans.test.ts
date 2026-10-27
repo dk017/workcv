@@ -41,7 +41,7 @@ test("Bold-run brands are labelled with the operator named in their terms", () =
 });
 
 test("comparison pages are registered and linked", () => {
-  const sitemap = read("app/sitemap.ts");
+  const sitemap = read("lib/md/public-routes.ts");
   const breadcrumbs = read("components/site-breadcrumbs.tsx");
   const bestBuilder = read("app/best-cv-builder-uk/page.tsx");
   for (const path of comparisonPages) {

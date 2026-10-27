@@ -15,10 +15,11 @@ import {
   SectionLabel,
 } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/job-application-pack-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Tailor Your CV to a Job Description: Free UK Tool",
   description:
     "Paste your CV and a job advert to draft a tailored profile, CV bullets and cover letter. Review the evidence and copy the results free. Fair-use limits apply.",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       "Create a truthful, editable application plan from one vacancy and your own evidence.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

@@ -5,10 +5,11 @@ import {
   type EarlyCareerPageConfig,
 } from "@/components/early-career-cv-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const slug = "/student-cv-template";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/student-cv-template", {
   title: "Student CV Template UK + First-Job Cover Letter",
   description:
     "See a student CV and matching first-job cover letter, get a free checklist and build your own application using study, projects and volunteering.",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "An education-first student CV with truthful examples for part-time work, projects, societies and volunteering.",
     url: slug,
   },
-};
+});
 
 const config: EarlyCareerPageConfig = {
   slug,

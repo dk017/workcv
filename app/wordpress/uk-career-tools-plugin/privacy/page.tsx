@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/wordpress/uk-career-tools-plugin/privacy", {
   title: "WordPress Plugin Privacy",
   description: "Privacy information for the WorkCV UK Career Tools WordPress plugin.",
   alternates: { canonical: "/wordpress/uk-career-tools-plugin/privacy" },
-};
+});
 
 export default function WordPressPluginPrivacyPage() {
   return (

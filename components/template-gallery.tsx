@@ -152,7 +152,7 @@ export function TemplateGallery() {
                   key={template.id}
                   className="rounded-xl border border-line bg-paper p-4 shadow-sm"
                 >
-                  <div className="template-page-preview mb-5 overflow-hidden rounded-lg border border-line bg-white p-4">
+                  <div data-md-skip className="template-page-preview mb-5 overflow-hidden rounded-lg border border-line bg-white p-4">
                     <div
                       className="gallery-preview-document pointer-events-none mx-auto"
                       style={{

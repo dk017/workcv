@@ -4,10 +4,11 @@ import { FileCheck2, ShieldCheck, Sparkles } from "lucide-react";
 import { CoverLetterGenerator } from "@/components/cover-letter-generator";
 import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cover-letter-generator-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free UK Cover Letter Generator - No Signup",
   description:
     "Generate a tailored UK cover letter from the job advert and your real experience. Free to use with no signup or subscription.",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
       "Turn a job advert and your real evidence into a tailored four-paragraph UK cover letter.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

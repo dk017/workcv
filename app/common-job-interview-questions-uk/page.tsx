@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
 import { AdviceCard, BulletList, EditorialGuideShell, GuideSection } from "@/components/editorial-guide-shell";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/common-job-interview-questions-uk";
-export const metadata: Metadata = { title: "21 Common Job Interview Questions and Answers UK", description: "Prepare for 21 common UK interview questions with what the employer is testing, answer structures, evidence prompts and mistakes to avoid.", alternates: { canonical: path }, openGraph: { title: "21 Common Job Interview Questions and Answer Plans", description: "Question-by-question guidance for relevant, truthful interview answers.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "21 Common Job Interview Questions and Answers UK", description: "Prepare for 21 common UK interview questions with what the employer is testing, answer structures, evidence prompts and mistakes to avoid.", alternates: { canonical: path }, openGraph: { title: "21 Common Job Interview Questions and Answer Plans", description: "Question-by-question guidance for relevant, truthful interview answers.", url: path } });
 
 const questions = [
   ["1. Tell me about yourself", "Can you summarise the relevant thread in your experience?", "Present role or recent experience → two relevant strengths with evidence → why this role is the logical next step.", "Do not retell your life story or read your CV line by line."],

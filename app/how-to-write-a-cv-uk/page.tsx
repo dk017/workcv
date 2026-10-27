@@ -14,13 +14,14 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/how-to-write-a-cv-uk", {
   title: "How to Write a CV UK: 10-Step Guide + Example",
   description:
     "Learn how to write a UK CV in 10 practical steps. Includes section examples, ATS guidance, an evidence worksheet and a complete editable CV template.",
   alternates: { canonical: "/how-to-write-a-cv-uk" },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const exampleCv = getRoleCvTemplate("general");

@@ -16,13 +16,14 @@ import {
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/return-to-work-cv-uk", {
   title: "Return to Work CV UK: Career Break Example",
   description:
     "Use a return-to-work CV example for the UK to explain a career break briefly, show current skills and target your next role with confidence.",
   alternates: { canonical: "/return-to-work-cv-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",

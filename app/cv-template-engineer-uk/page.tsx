@@ -15,8 +15,9 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-engineer-uk", {
   title: "Engineer CV Template UK + Example",
   description:
     "Use an engineer CV template for UK jobs with discipline fit, technical tools, projects, safety and measurable engineering evidence.",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       "Start with an editable UK engineer CV example and tailor it to mechanical, civil, electrical or manufacturing roles.",
     url: "/cv-template-engineer-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=engineer&new=1";
 const engineerCv = getRoleCvTemplate("engineer");

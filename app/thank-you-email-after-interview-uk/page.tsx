@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 
 import { AdviceCard, BulletList, CopyTemplate, EditorialGuideShell, GuideSection } from "@/components/editorial-guide-shell";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/thank-you-email-after-interview-uk";
-export const metadata: Metadata = { title: "Thank-You Email After Interview UK: 5 Examples", description: "Copy and adapt five UK interview thank-you and follow-up email examples, with subject lines, timing and wording for panels, second interviews and missing updates.", alternates: { canonical: path }, openGraph: { title: "Thank-You Email After an Interview: UK Examples", description: "Five concise templates for the situations job seekers actually face.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "Thank-You Email After Interview UK: 5 Examples", description: "Copy and adapt five UK interview thank-you and follow-up email examples, with subject lines, timing and wording for panels, second interviews and missing updates.", alternates: { canonical: path }, openGraph: { title: "Thank-You Email After an Interview: UK Examples", description: "Five concise templates for the situations job seekers actually face.", url: path } });
 
 const faqs = [
   { question: "Should I send a thank-you email after an interview in the UK?", answer: "It is optional, but a short and specific message can acknowledge the interviewer’s time, confirm interest and provide something they requested. Follow the employer’s instructions and do not treat it as a guaranteed advantage." },

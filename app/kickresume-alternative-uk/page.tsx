@@ -6,11 +6,12 @@ import {
 } from "@/components/focused-alternative-page";
 import { competitorPlans } from "@/lib/competitor-plans";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const slug = "/kickresume-alternative-uk";
 const kickresume = competitorPlans.kickresume;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/kickresume-alternative-uk", {
   title: "Kickresume Alternative UK - Is Kickresume Free?",
   description: `Is Kickresume free, and does it renew? An honest UK comparison of Kickresume's free and paid plans with WorkCV's ${site.price} one-time CV and cover letter.`,
   alternates: { canonical: slug },
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
     description: "Kickresume's free plan, its auto-renewing paid plans, and when a one-time UK CV builder fits better.",
     url: slug,
   },
-};
+});
 
 const config: FocusedAlternativeConfig = {
   brand: "Kickresume",

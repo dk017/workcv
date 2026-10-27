@@ -4,10 +4,11 @@ import Link from "next/link";
 import { ButtonLink, MoneyPageCta, RelatedLinksSection } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 export const guideReviewed = "2026-09-06";
 export function guideMetadata(path: string, title: string, description: string): Metadata {
-  return { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { title, description, url: path } };
+  return withAgentMetadata(path, { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { title, description, url: path } });
 }
 
 export function Guide({ path, title, intro, children, links, action, placement, reviewed = guideReviewed, published = guideReviewed }: {

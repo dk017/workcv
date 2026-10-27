@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { TemplateGallery } from "@/components/template-gallery";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/templates", {
   title: "CV Designs: Classic, Modern and Compact Layouts",
   description:
     "Compare the Classic, Modern and Compact CV designs, open any layout in the editor and preview every page before you pay.",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
       "Choose a UK CV layout, replace the example with your details and preview the finished pages before paying.",
     url: "/templates",
   },
-};
+}, `WorkCV's three CV designs, Classic, Modern and Compact, shown with the same fictional sample CV. Each opens in the editor; downloading the finished CV costs ${site.price} once.`);
 
 export default function Page() {
   const itemListSchema = {

@@ -19,13 +19,14 @@ import { firstCvExample } from "@/lib/customer-answer-examples";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-no-experience-uk", {
   title: "CV No Experience UK - First Job CV Template",
   description:
     "Write a UK CV with no work experience. Learn what to include, how to show transferable skills, and build a first-job CV without a subscription.",
   alternates: { canonical: "/cv-no-experience-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",

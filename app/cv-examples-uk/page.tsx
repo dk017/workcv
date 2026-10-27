@@ -16,8 +16,9 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import type { EvidenceRow } from "@/lib/cv-evidence";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-examples-uk", {
   title: "UK CV Examples: 11 Samples by Job and Career Stage",
   description:
     "11 UK CV examples for customer service, nursing, teaching, care, engineering, driving, warehouse, graduate, student and school leaver roles, with notes on why each works. Edit any example free.",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
       "Use UK CV examples as starting points, then edit the wording to match your own evidence before downloading.",
     url: "/cv-examples-uk",
   },
-};
+});
 
 type GalleryItem = {
   role: "general" | "customer-service" | "nurse" | "teacher" | "care-worker" | "engineer" | "driver" | "warehouse" | "graduate" | "student" | "school-leaver";
@@ -174,7 +175,7 @@ export default function CvExamplesUkPage() {
             </p>
           </div>
 
-          <figure className="relative mx-auto hidden w-full max-w-[440px] sm:block">
+          <figure data-md-skip className="relative mx-auto hidden w-full max-w-[440px] sm:block">
             <div className="absolute -inset-4 rounded-2xl bg-gold-tint/60" aria-hidden="true" />
             <div className="relative h-[480px] overflow-hidden rounded-xl border border-line-strong bg-white shadow-soft">
               <div className="pointer-events-none mx-auto" style={{ width: 794, zoom: 0.55 }}>

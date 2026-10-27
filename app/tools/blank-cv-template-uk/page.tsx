@@ -9,10 +9,11 @@ import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/mark
 import { site } from "@/lib/site";
 import { customerQuestionHref } from "@/lib/customer-questions";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/blank-cv-template-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Template UK Download - Editable Word",
   description:
     "Download a free editable CV template for UK jobs as a Word document. No signup, payment or subscription; tailor it before you apply.",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
       "Download a clean, single-column UK CV template in Word format and tailor it to the job advert.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {

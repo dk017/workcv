@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 import { CareerToolsHub } from "@/components/career-tools-hub";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/career-tools", {
   title: "Career and Work Tools for UK Job Seekers",
   description:
     "Practical UK job-search guides and application tools for interviews, CVs, career progression and employment changes.",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
       "Move from a job-search question to a clearer application and UK CV.",
     url: "/career-tools",
   },
-};
+});
 
 export default function CareerToolsPage() {
   return <CareerToolsHub />;

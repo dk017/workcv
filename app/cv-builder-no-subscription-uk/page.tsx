@@ -29,9 +29,10 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { underTenCvBuilderAnswer } from "@/lib/price-copy";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-builder-no-subscription-uk", {
   title: `CV Builder No Subscription UK - ${site.price} CV + Letter`,
   description:
     `Build and preview free. Pay ${site.priceGbp} once for your UK CV and matching cover letter as PDF and Word. No subscription. Edit and redownload the same saved CV.`,
@@ -44,7 +45,7 @@ export const metadata: Metadata = {
       `Build and preview free. One ${site.priceGbp} payment unlocks your saved CV and matching cover letter as PDF and Word, with no monthly renewal.`,
     url: "/cv-builder-no-subscription-uk",
   },
-};
+});
 
 const checkedDate = competitorPricingCheckedDate;
 

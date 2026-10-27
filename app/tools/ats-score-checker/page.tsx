@@ -19,9 +19,10 @@ import { AtsScoreChecker } from "@/components/ats-score-checker";
 import { FaqSection, FinalCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/ats-score-checker", {
   title: "Free ATS CV Checker UK – Upload Your CV for an Instant Check",
   description:
     "Upload your CV as a PDF or Word file for a free ATS readability check in your browser, or add a job advert to see which keywords and requirements it evidences. No signup.",
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
       "Upload a PDF or Word CV for an instant readability check, then add a job advert for a keyword and requirement match.",
     url: "/tools/ats-score-checker",
   },
-};
+});
 
 const faqItems = [
   {

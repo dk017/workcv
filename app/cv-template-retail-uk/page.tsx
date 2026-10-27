@@ -6,11 +6,12 @@ import { ButtonLink, FinalCta } from "@/components/marketing";
 import { RoleApplicationPack } from "@/components/role-application-pack";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
-export const metadata: Metadata = {
+import { withAgentMetadata } from "@/lib/agent-metadata";
+export const metadata: Metadata = withAgentMetadata("/cv-template-retail-uk", {
   title: "Retail CV Examples UK: First Job, Experienced & Cover Letter",
   description: "Read complete UK retail CV and cover letter examples with and without experience. Get a free checklist and prepare a shop assistant application from your own facts.",
   alternates: { canonical: "/cv-template-retail-uk" },
-};
+});
 export default function RetailCvPage() {
   return <>
     <section className="quiet-grid bg-paper py-20 md:py-28">

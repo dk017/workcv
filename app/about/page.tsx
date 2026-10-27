@@ -5,8 +5,9 @@ import { BookOpenCheck, Mail, ShieldCheck, Wallet } from "lucide-react";
 import { DirectoryBadges } from "@/components/directory-badges";
 import { ButtonLink, SectionLabel } from "@/components/marketing";
 import { founder, site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/about", {
   title: "About WorkCV - Who Builds It and How",
   description:
     "WorkCV is an independent UK CV builder run by Dhineshkumar R. How it is built, how guides are checked against UK sources, and how it makes money.",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
     description: "Who builds WorkCV, how guides are checked and how the site makes money.",
     url: "/about",
   },
-};
+});
 
 const principles = [
   {

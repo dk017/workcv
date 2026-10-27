@@ -1,56 +1,26 @@
+import { markdownPath } from "./md/format.ts";
 import { site } from "./site.ts";
 
+// The site-level files that describe WorkCV to agents. Keep in sync with robots.txt, llms.txt and ai.txt.
+export const agentDescribedByLinks = [
+  `</llms.txt>; rel="describedby"; type="text/plain"`,
+  `</llms-full.txt>; rel="describedby"; type="text/plain"`,
+  `</ai.txt>; rel="describedby"; type="text/plain"`,
+];
+
+export function pageLinkHeader(path: string) {
+  return [`<${markdownPath(path)}>; rel="alternate"; type="text/markdown"`, ...agentDescribedByLinks].join(", ");
+}
+
 export const agentDiscoveryLinks = [
-  `</llms.txt>; rel="alternate"; type="text/plain"`,
-  `</agent-markdown>; rel="alternate"; type="text/markdown"`,
+  `</index.md>; rel="alternate"; type="text/markdown"`,
+  ...agentDescribedByLinks,
   `</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"`,
   `</auth.md>; rel="service-doc"; type="text/markdown"`,
   `</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"`,
 ];
 
 export const agentDiscoveryLinkHeader = agentDiscoveryLinks.join(", ");
-
-export const homepageMarkdown = `# WorkCV
-
-WorkCV is a UK CV builder for job seekers who want a clear, professional CV without a subscription.
-
-## What users can do
-
-- Create a UK-ready CV in a guided editor.
-- Choose a clean CV template.
-- Preview the CV before paying.
-- Download the finished CV as a PDF and as an editable Word (.docx) file after payment.
-- Write a matching cover letter in the same editor; it uses the CV's header and design and downloads as PDF and Word with the same payment.
-- Pay ${site.price} once per saved CV; both formats are included.
-- Or buy a ${site.passDays}-day Job Search Pass for ${site.passPrice} once: unlimited CVs and matching cover letters during the pass, never renews.
-- Avoid monthly subscriptions and automatic renewal.
-
-## Main actions
-
-- Start a CV: ${site.url}/editor
-- Compare templates: ${site.url}/templates
-- View pricing: ${site.url}/pricing
-- Read the no-subscription CV builder page: ${site.url}/cv-builder-no-subscription-uk
-- Browse UK CV examples: ${site.url}/cv-examples-uk
-- Compare UK CV builders: ${site.url}/best-cv-builder-uk
-
-## Important product facts
-
-- WorkCV is built for UK CV expectations.
-- The paid flow exports both PDF and an editable single-column Word (.docx) file.
-- Users log in with a one-time email code so their CV can be saved.
-- There is no monthly CV builder subscription in the standard download flow.
-- The current one-time price is ${site.price} per saved CV, covering the CV and one matching cover letter, each as PDF and Word.
-- The Job Search Pass is ${site.passPrice} once for unlimited CVs and cover letters created within ${site.passDays} days. CVs made during the pass stay downloadable afterwards. It never renews.
-
-## Agent discovery
-
-- API catalog: ${site.url}/.well-known/api-catalog
-- Agent skills index: ${site.url}/.well-known/agent-skills/index.json
-- Auth notes: ${site.url}/auth.md
-- LLM orientation file: ${site.url}/llms.txt
-- Sitemap: ${site.url}/sitemap.xml
-`;
 
 export const createCvSkillMarkdown = `# Create a UK CV with WorkCV
 

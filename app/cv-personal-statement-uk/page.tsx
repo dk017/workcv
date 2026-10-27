@@ -21,6 +21,7 @@ import { customerContentReview, displayReviewDate } from "@/lib/customer-content
 import { SampleCvProof } from "@/components/sample-cv-proof";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const pagePath = "/cv-personal-statement-uk";
 const reviewDateIso = customerContentReview["/cv-personal-statement-uk"];
@@ -28,7 +29,7 @@ const reviewDate = displayReviewDate(reviewDateIso);
 const publishedDateIso = "2026-06-13";
 const advertUrl = "https://www.jobs.nhs.uk/candidate/jobadvert/C9301-26-0052";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-personal-statement-uk", {
   title: "CV Personal Statement UK: 20 Examples + Walkthrough",
   description:
     "Write a stronger UK CV personal statement with 20 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
@@ -39,7 +40,7 @@ export const metadata: Metadata = {
       "See how to turn a real UK job advert and your evidence into a focused CV personal statement.",
     url: pagePath,
   },
-};
+});
 
 const faqItems = [
   {

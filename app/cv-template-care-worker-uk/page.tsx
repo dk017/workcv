@@ -15,9 +15,10 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-care-worker-uk", {
   title: "Care Worker CV Template UK + Cover Letter",
   description:
     "See a UK care worker CV and matching cover letter, get a free checklist and build your own application using accurate care experience and training.",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
       "An editable UK care worker CV with person-centred care, safeguarding and training examples.",
     url: "/cv-template-care-worker-uk",
   },
-};
+});
 
 const editorHref = "#application-pack";
 const careWorkerCv = getRoleCvTemplate("care-worker");

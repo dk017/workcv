@@ -4,13 +4,14 @@ import Link from "next/link";
 import { ButtonLink, FaqSection } from "@/components/marketing";
 import { PassOffer } from "@/components/pass-offer";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tailor-cv-to-job-description-uk";
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "How to Tailor Your CV to a Job Description: UK Examples",
   description: "See one applicant adapt a CV and matching letter for two UK vacancies. Worked profiles, evidence mapping, bullet edits and a checklist using truthful experience.",
   alternates: { canonical: path },
-};
+});
 const examples = [
   {
     id: "customer-service", role: "Customer Service Adviser", employer: "Northbank Homeware",

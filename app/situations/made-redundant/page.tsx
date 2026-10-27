@@ -9,6 +9,7 @@ import { RedundancyChecklist, type ChecklistPhase } from "@/components/redundanc
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { redundancyRules } from "@/lib/redundancy-pay-calculator";
 import { commercialRoutes, site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = "1 October 2026";
 const weeklyCap = redundancyRules.greatBritainWeeklyCap;
@@ -16,7 +17,7 @@ const weeklyCap = redundancyRules.greatBritainWeeklyCap;
 const maxStatutoryPay = weeklyCap * 30;
 const gbp = (value: number) => `£${value.toLocaleString("en-GB")}`;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/situations/made-redundant", {
   title: "Made Redundant? What to Do Next (UK Checklist)",
   description:
     `What to do when you're made redundant in the UK: a step-by-step checklist for redundancy pay, notice, tax, benefits and getting back into work, with free calculators.`,
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
       "Work through redundancy pay, notice, tax, benefits and your job search in order, from today to day 90.",
     url: "/situations/made-redundant",
   },
-};
+});
 
 const phases: ChecklistPhase[] = [
   {

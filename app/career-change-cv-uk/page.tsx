@@ -6,13 +6,14 @@ import { ArrowRight, Check, FileText, Search, Shuffle, Target } from "lucide-rea
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/career-change-cv-uk", {
   title: "Career Change CV Example UK + Template",
   description:
     "See career change CV examples for the UK: position transferable skills, explain your move and build a focused CV for the target role.",
   alternates: { canonical: "/career-change-cv-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",

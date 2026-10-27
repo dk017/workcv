@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal-page";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/privacy", {
   title: "Privacy Policy",
   description:
     "How WorkCV handles personal data when you build and download a UK CV.",
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
       "How WorkCV handles personal data when you build and download a UK CV.",
     url: "/privacy",
   },
-};
+});
 
 export default function PrivacyPage() {
   return (

@@ -331,7 +331,7 @@ export function FaqSection({ faqs, title }: { faqs: Faq[]; title: string }) {
               <summary className="cursor-pointer list-none font-bold text-navy">
                 <span className="flex items-center justify-between gap-4">
                   {faq.question}
-                  <span className="text-xl text-gold">+</span>
+                  <span aria-hidden="true" className="text-xl text-gold">+</span>
                 </span>
               </summary>
               <p className="mt-4 max-w-3xl leading-7 text-muted">{faq.answer}</p>

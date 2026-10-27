@@ -7,11 +7,12 @@ import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { cvLengthMeasurement } from "@/lib/cv-length-measurements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/how-long-should-a-cv-be-uk";
 const reviewed = "29 September 2026";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "How Long Should a CV Be? UK Pages and Word Count",
   description:
     "Two A4 pages for most UK CVs, one for school leavers and many graduates. Measured word counts per page, a free length check and how to cut to two pages.",
@@ -21,7 +22,7 @@ export const metadata: Metadata = {
     description: "Pages and word counts by career stage, measured in real CV layouts, with a free length check.",
     url: path,
   },
-};
+});
 
 const byStage = [
   ["School leaver or student", "1 page", "about 250–350", "Education, part-time work, volunteering and skills with an example for each."],

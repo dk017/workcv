@@ -15,9 +15,10 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-customer-service-uk", {
   title: "Customer Service CV Template UK + Cover Letter",
   description:
     "See a UK customer service CV and matching cover letter, get a free checklist and build your own application using real enquiries, complaints and teamwork evidence.",
@@ -30,7 +31,7 @@ export const metadata: Metadata = {
       "Start with an editable UK customer service CV example and tailor it to the job advert before downloading.",
     url: "/cv-template-customer-service-uk",
   },
-};
+});
 
 const editorHref = "#application-pack";
 const customerServiceCv = getRoleCvTemplate("customer-service");

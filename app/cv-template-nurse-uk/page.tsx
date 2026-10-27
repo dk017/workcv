@@ -15,8 +15,9 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-nurse-uk", {
   title: "Nurse CV Template UK + Example",
   description:
     "Use a nurse CV template for UK jobs with clinical evidence, NHS and private-care guidance, registration details and editable examples.",
@@ -27,7 +28,7 @@ export const metadata: Metadata = {
       "An editable UK nurse CV with NMC-focused sections and clinical evidence examples.",
     url: "/cv-template-nurse-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=nurse&new=1";
 const nurseCv = getRoleCvTemplate("nurse");

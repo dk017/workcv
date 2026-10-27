@@ -20,10 +20,11 @@ import { site } from "@/lib/site";
 import { CancelGuideLinks } from "@/components/cancel-guide-links";
 import { PassOffer } from "@/components/pass-offer";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = "13 June 2026";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cancel-enhancv-uk", {
   title: "How to Cancel Enhancv UK - Stop Monthly Charges",
   description:
     "Step-by-step guide to cancelling your Enhancv Pro subscription from the UK. Use the Billing page, confirm cancellation, and keep proof.",
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
       "Current Enhancv cancellation steps, including Billing page, Cancel Subscription, confirmation, Pro access expiry, and support fallback.",
     url: "/cancel-enhancv-uk",
   },
-};
+});
 
 const cancellationSteps = [
   {

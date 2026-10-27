@@ -7,11 +7,12 @@ import { ComparisonTable } from "@/components/comparison-table";
 import { competitorPricing, competitorPricingCheckedDate } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 import { ComparisonLinks } from "@/components/competitor-vs-page";
 
 const slug = "/best-cv-builder-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/best-cv-builder-uk", {
   title: "Best CV Builder UK: How to Choose the Right One",
   description:
     "Compare the main UK CV builder choices by price, renewal terms, document needs and editing workflow. Use the checklist before you pay.",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
       "A practical UK buyer guide for comparing CV builders, templates, subscriptions and one-time PDF tools.",
     url: slug,
   },
-};
+});
 
 const options = [
   {

@@ -7,8 +7,9 @@ import { CustomerAnswer } from "@/components/customer-answer";
 import { TrackedLink } from "@/components/tracked-link";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/contact", {
   title: "Contact",
   description: "Contact WorkCV for support, billing, payment, and CV download help.",
   alternates: { canonical: "/contact" },
@@ -17,7 +18,7 @@ export const metadata: Metadata = {
     description: "Contact WorkCV for support, billing, payment, and CV download help.",
     url: "/contact",
   },
-};
+});
 
 export default function ContactPage() {
   return (

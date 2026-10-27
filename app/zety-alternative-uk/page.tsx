@@ -22,10 +22,11 @@ import { site } from "@/lib/site";
 import { PassOffer } from "@/components/pass-offer";
 import { ComparisonLinks } from "@/components/competitor-vs-page";
 import { competitorPlans, formatMinor } from "@/lib/competitor-plans";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = competitorPricingCheckedDate;
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/zety-alternative-uk", {
   title: "Zety Alternative UK - No Subscription CV Builder",
   description:
     `Looking for a Zety alternative in the UK? Compare Zety's trial and renewal pricing with WorkCV's ${site.price} PDF download model.`,
@@ -38,7 +39,7 @@ export const metadata: Metadata = {
       "A focused UK CV and cover letter builder for people who want to pay once, without automatic renewal.",
     url: "/zety-alternative-uk",
   },
-};
+});
 
 const comparisonRows = [
   ["Entry model", competitorPricing.zety.entry, "Free to build"],

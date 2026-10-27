@@ -1,121 +1,19 @@
 import type { MetadataRoute } from "next";
 
 import { site } from "@/lib/site";
-import { customerReviewDate } from "@/lib/customer-content-review";
+import { publicRoutes, routeLastModified } from "@/lib/md/public-routes";
 
-const routes = [
-  { path: "/cv-after-long-service-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
-  { path: "/overqualified-cv-example-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
-  { path: "/tailor-cv-to-job-description-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/cv-template-retail-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/cv-layout-tests-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-24" },
-  { path: "/tools/supporting-statement-planner-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-24" },
-  { path: "/chatgpt-cv-to-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/convert-resume-to-uk-cv", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/shorten-cv-to-two-pages", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/cv-word-or-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/", priority: 1.0, changeFrequency: "weekly" },
-  { path: "/career-tools", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-09-13" },
-  { path: "/top-job-boards-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/how-to-prepare-for-a-job-interview-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/common-job-interview-questions-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/thank-you-email-after-interview-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/career-advancement-strategies-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-02" },
-  { path: "/best-cv-builder-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-10" },
-  { path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-29" },
-  { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-02" },
-  { path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },
-  { path: "/cv-vs-resume-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/cv-examples-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/templates", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-24" },
-  { path: "/student-cv-template", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/school-leaver-cv-example", priority: 0.75, changeFrequency: "monthly" },
-  { path: "/cv-no-experience-uk", priority: 0.85, changeFrequency: "monthly" },
-  { path: "/career-change-cv-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/return-to-work-cv-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/cv-employment-gap-uk", priority: 0.85, changeFrequency: "monthly" },
-  { path: "/situations/made-redundant", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/cv-personal-statement-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-08-25" },
-  { path: "/ats-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
-  { path: "/tools", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-07-10" },
-  { path: "/tools/take-home-pay-calculator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/uk-visa-sponsor-checker", priority: 0.9, changeFrequency: "weekly", lastModified: "2026-10-05" },
-  { path: "/tools/uk-living-wage-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-23" },
-  { path: "/tools/cover-letter-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/job-application-pack-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { path: "/tools/job-application-tracker-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/tools/cv-bullet-point-generator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/cv-summary-generator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/cv-word-count-checker", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/tools/cv-readability-checker", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/cv-keyword-density-checker", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/cv-gap-detector-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/blank-cv-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/tools/cv-template-word-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/about", priority: 0.6, changeFrequency: "monthly", lastModified: "2026-09-29" },
-  { path: "/how-long-should-a-cv-be-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-29" },
-  { path: "/cover-letter-examples-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/tools/cover-letter-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-07-10" },
-  { path: "/tools/redundancy-pay-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-30" },
-  { path: "/tools/ats-score-checker", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/tools/uk-salary-by-job-title", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
-  { path: "/tools/notice-period-calculator", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-28" },
-  { path: "/tools/cv-format-checker-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-24" },
-  { path: "/tools/first-job-cv-wizard-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
-  { path: "/tools/transferable-skills-translator-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
-  { path: "/tools/cv-shortener-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
-  { path: "/tools/uk-cv-converter", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
-  { path: "/tools/career-gap-explainer-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-08" },
-  { path: "/wordpress/uk-career-tools-plugin", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-07-27" },
-  { path: "/wordpress/uk-career-tools-plugin/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-07-27" },
-  { path: "/chrome/job-keyword-highlighter", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-07-27" },
-  { path: "/chrome/job-keyword-highlighter/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-07-27" },
-  { path: "/right-to-work-cv-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
-  { path: "/how-to-write-a-cv-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/professional-cv-template-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-29" },
-  { path: "/cv-template-customer-service-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/cv-template-engineer-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
-  { path: "/cv-template-driver-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-23" },
-  { path: "/cv-template-nurse-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
-  { path: "/cv-template-teacher-uk", priority: 0.9, changeFrequency: "monthly" },
-  { path: "/cv-template-warehouse-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/cv-template-graduate-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
-  { path: "/cv-template-care-worker-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly", lastModified: "2026-10-04" },
-  { path: "/myperfectcv-vs-livecareer-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { path: "/zety-vs-myperfectcv-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { path: "/kickresume-alternative-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/zety-alternative-uk", priority: 0.85, changeFrequency: "weekly", lastModified: "2026-10-04" },
-  { path: "/canva-cv-alternative-uk", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/enhancv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
-  { path: "/livecareer-alternative", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { path: "/cancel-myperfectcv-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/cancel-resume-io-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/cancel-cvmaker-uk", priority: 0.8, changeFrequency: "weekly" },
-  { path: "/cancel-livecareer-uk", priority: 0.8, changeFrequency: "weekly" },
-  { path: "/cancel-enhancv-uk", priority: 0.75, changeFrequency: "weekly" },
-  { path: "/cancel-zety-uk", priority: 0.8, changeFrequency: "weekly" },
-  { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-09-23" },
-  { path: "/terms", priority: 0.35, changeFrequency: "yearly" },
-  { path: "/refund-policy", priority: 0.45, changeFrequency: "yearly" },
-] satisfies Array<{
-  path: string;
-  priority: number;
-  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
-  lastModified?: string;
-}>;
-
+// Markdown versions (/<path>.md) stay out of the sitemap: they are noindex alternates of these pages.
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date("2026-06-13");
 
-  return routes.map((route) => ({
-    url: `${site.url}${route.path}`,
-    lastModified: customerReviewDate(route.path) ? new Date(customerReviewDate(route.path)!) : route.lastModified ? new Date(route.lastModified) : lastModified,
-    changeFrequency: route.changeFrequency,
-    priority: route.priority,
-  }));
+  return publicRoutes.map((route) => {
+    const modified = routeLastModified(route);
+    return {
+      url: `${site.url}${route.path}`,
+      lastModified: modified ? new Date(modified) : lastModified,
+      changeFrequency: route.changeFrequency,
+      priority: route.priority,
+    };
+  });
 }

@@ -5,10 +5,11 @@ import {
   type FocusedAlternativeConfig,
 } from "@/components/focused-alternative-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const slug = "/cvmaker-alternative";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cvmaker-alternative", {
   title: "CVMaker Alternative UK - No Subscription CV Builder",
   description:
     `Compare CVMaker with WorkCV's ${site.price} one-time CV and cover letter bundle, including billing model, document scope and cancellation links.`,
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "An independent comparison between CVMaker's broader service and WorkCV's focused one-CV model.",
     url: slug,
   },
-};
+});
 
 const config: FocusedAlternativeConfig = {
   brand: "CVMaker",

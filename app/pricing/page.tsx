@@ -11,10 +11,11 @@ import { passStartHref } from "@/components/pass-offer";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { commercialRoutes, site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const title = `WorkCV Pricing: ${site.priceGbp} CV or ${site.passPrice} Job Search Pass`;
 const description = `Compare one saved CV and letter for ${site.priceGbp} with the ${site.passPrice}, ${site.passDays}-day Job Search Pass. PDF and Word included. No automatic renewal.`;
-export const metadata: Metadata = { title, description, alternates: { canonical: "/pricing" }, openGraph: { title, description, url: "/pricing" } };
+export const metadata: Metadata = withAgentMetadata("/pricing", { title, description, alternates: { canonical: "/pricing" }, openGraph: { title, description, url: "/pricing" } }, `WorkCV's prices: ${site.priceGbp} once for one saved CV and its matching cover letter, or ${site.passPrice} once for a ${site.passDays}-day Job Search Pass covering unlimited new CVs. Both include PDF and Word downloads and neither renews.`);
 const faqs = [
   { question: "How much does WorkCV cost?", answer: `One saved CV and matching letter costs ${site.priceGbp} once. The ${site.passPrice} Job Search Pass covers existing CVs and unlimited new CVs created during its ${site.passDays}-day window. Both include PDF and Word. Build and preview free first.` },
   { question: "Does either plan renew automatically?", answer: "No. Both are one-time payments, with no automatic renewal and nothing to cancel." },

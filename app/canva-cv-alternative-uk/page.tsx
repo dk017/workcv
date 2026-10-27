@@ -21,10 +21,11 @@ import {
 } from "@/components/marketing";
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const checkedDate = "13 June 2026";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/canva-cv-alternative-uk", {
   title: "Canva CV Alternative UK for Job Applications",
   description:
     `Looking for a Canva CV alternative in the UK? Compare Canva's design-led CV templates with WorkCV's UK CV builder and ${site.price} PDF download.`,
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
       "A focused UK CV builder for people who want recruiter-readable structure instead of starting from a graphic design canvas.",
     url: "/canva-cv-alternative-uk",
   },
-};
+});
 
 const comparisonRows = [
   ["Main purpose", "General design platform with CV/resume templates", "Focused UK CV builder"],

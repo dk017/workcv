@@ -25,7 +25,7 @@ for(const id of ids) {
  });
  test(id+": indexable route exposes the pack and has a sitemap entry",()=>{
   const page=readFileSync(`app${p.path}/page.tsx`,"utf8");assert.ok(page.includes(p.path));assert.ok(page.includes("RoleApplicationPack")||(id==="student"&&page.includes("EarlyCareerCvPage")));
-  assert.ok(readFileSync("app/sitemap.ts","utf8").includes(p.path));
+  assert.ok(readFileSync("lib/md/public-routes.ts","utf8").includes(p.path));
  });
  test(id+": user facts survive without importing fictional work or education",()=>{
   const cv=parseCvData(JSON.parse(JSON.stringify({...createBlankCv(),...buildRolePackDraft({...fields,targetRole:p.targetRole},id==="student")})));

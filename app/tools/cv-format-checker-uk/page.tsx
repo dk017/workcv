@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { CareerToolPage } from "@/components/career-tool-page";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 const path = "/tools/cv-format-checker-uk";
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Format Checker UK - PDF and DOCX",
   description: "Inspect a PDF or DOCX privately in your browser. Compare extracted reading order, check headings and see what still needs a human review.",
   alternates: { canonical: path },
   openGraph: { title: "Free UK CV File and Format Checker", description: "Inspect extracted CV text and PDF pages without uploading your file.", url: path },
-};
+});
 export default function CvFormatCheckerPage() {
   return <CareerToolPage path={path} tool="format" eyebrow="Free CV format checker UK"
     title="See what can be read from your CV file."
