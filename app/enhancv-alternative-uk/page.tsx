@@ -46,8 +46,8 @@ const comparisonRows = [
   ["Paid model", "Pro subscription", `${site.price} unlock for the selected saved CV`],
   ["Renewal", "Monthly, quarterly or semiannual plans renew automatically unless cancelled", "No monthly plan or automatic renewal"],
   ["Documents", "Multiple resumes and cover letters on Pro", `One saved CV and matching cover letter per payment, or unlimited for ${site.passDays} days with the Pass`],
-  ["AI tools", "Content suggestions, ATS check, tailoring, feedback and generators", "No AI scoring or interview guarantee"],
-  ["Job-search tools", "Application tracking and additional career features", "CV editor, saved document and PDF access"],
+  ["AI tools", "Content suggestions, ATS check, tailoring, feedback and generators", "AI bullet and profile suggestions, applied only when you approve them; a free ATS checker that explains its own score. No interview guarantee"],
+  ["Job-search tools", "Application tracking and additional career features", "A tailored copy of your CV for each advert, a free job application tracker, and saved CVs with PDF access"],
   ["Templates", "Broad resume template and design catalogue", "Classic, modern and compact UK CV layouts"],
   ["PDF access", "PDF download; edit access changes when Pro expires", "PDF access linked to the paid saved CV"],
   ["Best fit", "Ongoing resume optimisation and broader job-search tools", "A straightforward UK CV without recurring billing"],
@@ -97,12 +97,12 @@ const faqItems = [
   {
     question: "What is a good Enhancv alternative in the UK?",
     answer:
-      `WorkCV may suit someone who needs a focused UK CV and does not want a recurring resume-platform subscription. It costs ${site.price} to unlock PDF access for the selected saved CV. Enhancv may suit users who want multiple resumes, cover letters, AI feedback and broader job-search tools.`,
+      `WorkCV may suit someone who needs a focused UK CV and does not want a recurring resume-platform subscription. It costs ${site.price} to unlock PDF access for the selected saved CV. Enhancv may suit users who want a wider design catalogue, translation and interview-preparation features in one subscription.`,
   },
   {
     question: "How is WorkCV different from Enhancv?",
     answer:
-      "Enhancv is a broader resume platform with AI tools, cover letters, ATS checking, application tracking and renewable Pro plans. WorkCV is narrower: it provides a saved UK CV editor with a matching cover letter, three layouts and one-time payments with no subscription.",
+      "Enhancv is a broader resume platform with AI tools, cover letters, ATS checking, application tracking and renewable Pro plans. WorkCV is narrower and UK-focused: a saved UK CV editor with a matching cover letter, three layouts, AI suggestions you approve, a free ATS checker and job tracker, and one-time payments with no subscription.",
   },
   {
     question: "How much does Enhancv cost in the UK?",
@@ -122,12 +122,12 @@ const faqItems = [
   {
     question: "Does WorkCV include AI feedback or ATS scoring?",
     answer:
-      "No. WorkCV currently provides clear layouts, guided CV fields and a live preview. It does not claim to score, optimise or guarantee ATS performance.",
+      "Partly. The editor can suggest CV bullets and a profile summary with AI, and a suggestion is only applied when you approve it. The free ATS checker reads your CV and, with a job advert, gives a five-part score with its method explained. That score is WorkCV's own assessment, not an employer's applicant-tracking system, and it does not guarantee an interview.",
   },
   {
     question: "Does WorkCV include cover letters?",
     answer:
-      "Not in the current version. Enhancv Pro includes resumes and cover letters, while WorkCV is currently focused on creating and downloading one saved UK CV.",
+      `Yes. Every saved CV comes with a matching cover letter in the same design, and one ${site.price} payment downloads both as PDF and Word. The ${site.passDays}-day Job Search Pass covers unlimited CVs and letters.`,
   },
   {
     question: "How do I cancel Enhancv if I already subscribe?",
@@ -236,8 +236,9 @@ export default function EnhancvAlternativeUkPage() {
               ))}
             </ul>
             <p className="mt-7 text-sm leading-6 text-muted">
-              Saving or downloading needs an email code. WorkCV currently does not include
-              cover letters, AI writing, ATS scoring or application tracking.
+              Saving or downloading needs an email code. Each CV includes a matching
+              cover letter. The ATS CV checker and job application tracker are free,
+              and AI suggestions are only applied when you approve them.
             </p>
           </div>
         </div>
