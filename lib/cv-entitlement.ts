@@ -70,6 +70,9 @@ export type AccountOrder = {
   currency: string | null;
   paidAt: string;
   refunded: boolean;
+  // The saved CV a single-CV order unlocked, or null if that CV no longer exists.
+  cvId: string | null;
+  cvTitle: string | null;
   cvTargetRole: string | null;
   cvEmployer: string | null;
 };
@@ -84,10 +87,12 @@ export async function listAccountOrders(userId: string): Promise<AccountOrder[]>
     currency: string | null;
     paid_at: Date;
     refunded_at: Date | null;
+    cv_id: string | null;
+    cv_title: string | null;
     target_role: string | null;
     employer: string | null;
   }>(
-    `SELECT o.id, o.product_id, o.amount_cents, o.currency, o.paid_at, o.refunded_at,
+    `SELECT o.id, o.product_id, o.amount_cents, o.currency, o.paid_at, o.refunded_at, d.id AS cv_id, d.title AS cv_title,
             d.data->>'targetRole' AS target_role, d.data->'coverLetter'->>'employer' AS employer
      FROM workcv_orders o
      LEFT JOIN workcv_cv_documents d ON d.id = o.draft_id AND d.user_id = o.user_id
@@ -102,6 +107,8 @@ export async function listAccountOrders(userId: string): Promise<AccountOrder[]>
     currency: row.currency,
     paidAt: row.paid_at.toISOString(),
     refunded: row.refunded_at !== null,
+    cvId: row.cv_id,
+    cvTitle: row.cv_title?.trim() || null,
     cvTargetRole: row.target_role?.trim() || null,
     cvEmployer: row.employer?.trim() || null,
   }));

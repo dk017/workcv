@@ -28,8 +28,9 @@ function orderTitle(order: AccountOrder) {
 
 function orderFor(order: AccountOrder) {
   if (order.plan === "pass") return "Every CV you create while it lasts";
-  if (!order.cvTargetRole) return "A CV that has since been deleted";
-  return [order.cvTargetRole, order.cvEmployer].filter(Boolean).join(" · ");
+  if (!order.cvId) return "A CV that has since been deleted";
+  // Many CVs (especially ones started as a guest) have no target role yet; name them by title instead.
+  return [order.cvTargetRole || order.cvTitle || "Your saved CV", order.cvEmployer].filter(Boolean).join(" · ");
 }
 
 const card = "rounded-2xl border border-line bg-white p-5 sm:p-6";
@@ -74,6 +75,9 @@ export default async function AccountPage() {
                   <div className="min-w-0">
                     <p className="font-bold text-navy">{orderTitle(order)}</p>
                     <p className="text-sm text-muted">{orderFor(order)}</p>
+                    {order.plan === "cv" && order.cvId && !order.refunded && (
+                      <Link href={`/editor?draftId=${encodeURIComponent(order.cvId)}`} className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-navy underline">Open this CV to download it</Link>
+                    )}
                   </div>
                   <div className="text-right">
                     <p className="font-bold text-ink">{formatAmount(order)}</p>
