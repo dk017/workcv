@@ -14,9 +14,9 @@ import { withAgentMetadata } from "@/lib/agent-metadata";
 const path = "/tools/blank-cv-template-uk";
 
 export const metadata: Metadata = withAgentMetadata(path, {
-  title: "Free CV Template UK Download - Editable Word",
+  title: "Blank CV Template UK - Free Word Download (.docx), No Sign-up",
   description:
-    "Download a free editable CV template for UK jobs as a Word document. No signup, payment or subscription; tailor it before you apply.",
+    "Free blank UK CV template in Word (.docx). One click to download, no email, sign-up or subscription. Single column, no tables or text boxes, with fill-in prompts.",
   alternates: { canonical: path },
   openGraph: {
     title: "Free Editable CV Template UK - Word Download",
