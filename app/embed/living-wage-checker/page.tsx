@@ -27,7 +27,7 @@ export default function LivingWageEmbedPage({
       showFooter={resolveEmbedOption(searchParams.footer, "off")}
       theme={resolveEmbedTheme(searchParams.theme)}
     >
-      <LivingWageChecker2026 />
+      <LivingWageChecker2026 cvPrompt={false} />
     </ToolEmbedShell>
   );
 }
