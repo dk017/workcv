@@ -5,9 +5,16 @@ import { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.
 export { isPublicMeasurementPath, sanitizeSameOriginPath } from "./public-paths.ts";
 
 export const publicFunnelEventNames = [
+  "public_pass_offer_viewed",
   "landing_view",
+  "page_view",
   "marketing_cta_clicked",
   "login_started",
+  "tool_started",
+  "tool_completed",
+  // Building a CV before signing in: opened the editor as a guest, and saved it to an account.
+  "guest_editor_started",
+  "guest_cv_saved",
 ] as const;
 
 export type PublicFunnelEventName = (typeof publicFunnelEventNames)[number];
@@ -56,6 +63,7 @@ export function normalizeTrafficSource(sourceInput?: string, referrerHostInput?:
   if (/gemini|bard\.google/.test(value)) return "gemini";
   if (/perplexity/.test(value)) return "perplexity";
   if (/copilot/.test(value)) return "copilot";
+  if (host === "search.brave.com" || host.endsWith(".search.brave.com") || source === "brave" || source === "brave_search") return "brave";
   if (/bing\.com|(^|\s)bing(\s|$)/.test(value)) return "bing";
   if (/google/.test(value)) return "google";
   if (source) return source.replace(/[^a-z0-9._-]/g, "_").slice(0, 80);
@@ -106,7 +114,13 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
     return null;
   }
 
-  if (eventName === "landing_view" && !isPublicMeasurementPath(path)) {
+  if ((eventName === "landing_view" || eventName === "page_view") && !isPublicMeasurementPath(path)) {
+    return null;
+  }
+  if (
+    (eventName === "tool_started" || eventName === "tool_completed") &&
+    !isPublicMeasurementPath(path)
+  ) {
     return null;
   }
 
@@ -114,10 +128,21 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
     input.metadata && typeof input.metadata === "object" && !Array.isArray(input.metadata)
       ? (input.metadata as Record<string, unknown>)
       : {};
-  const allowedMetadata = new Set(["destination", "placement"]);
+  const allowedMetadata = new Set([
+    "offer_version",
+    "destination",
+    "placement",
+    "tool",
+    "lifecycle",
+    "result",
+  ]);
   const metadataEntries: Array<[string, string | number | boolean]> = [];
   for (const [key, item] of Object.entries(metadataInput)) {
     if (!allowedMetadata.has(key)) continue;
+    if (key === "offer_version" && item === "saved_versions_v2") {
+      metadataEntries.push([key, item]);
+      continue;
+    }
     if (key === "destination") {
       const destination = sanitizeSameOriginPath(item);
       if (destination) metadataEntries.push([key, destination]);
@@ -129,9 +154,46 @@ export function sanitizeFunnelEvent(value: unknown): SanitizedFunnelEvent | null
       /^[a-z0-9_]{3,80}$/.test(item)
     ) {
       metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "tool" &&
+      typeof item === "string" &&
+      /^[a-z0-9_-]{3,40}$/.test(item)
+    ) {
+      metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "lifecycle" &&
+      typeof item === "string" &&
+      ["started", "completed"].includes(item)
+    ) {
+      metadataEntries.push([key, item]);
+      continue;
+    }
+    if (
+      key === "result" &&
+      typeof item === "string" &&
+      ["success", "error"].includes(item)
+    ) {
+      metadataEntries.push([key, item]);
     }
   }
   const metadata = Object.fromEntries(metadataEntries);
+  if (eventName === "public_pass_offer_viewed" && (!isPublicMeasurementPath(path) || !metadata.placement || metadata.offer_version !== "saved_versions_v2")) return null;
+
+  if (
+    (eventName === "tool_started" || eventName === "tool_completed") &&
+    (typeof metadata.tool !== "string" ||
+      typeof metadata.lifecycle !== "string" ||
+      (eventName === "tool_started" && metadata.lifecycle !== "started") ||
+      (eventName === "tool_completed" &&
+        (metadata.lifecycle !== "completed" ||
+          (metadata.result !== "success" && metadata.result !== "error"))))
+  ) {
+    return null;
+  }
 
   return {
     eventId,

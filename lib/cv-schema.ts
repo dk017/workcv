@@ -1,10 +1,13 @@
 import { z } from "zod";
 
 import {
+  COVER_LETTER_MAX_PARAGRAPHS,
   createBlankCv,
   type CvData,
   type TemplateId,
+  cvSectionIds,
 } from "./editor-data.ts";
+import { cvAccents, cvFonts, cvLeading, cvMargins, cvPapers, cvSizeRange, cvSpacing } from "./cv-design.ts";
 
 export const CV_MAX_PAYLOAD_BYTES = 100 * 1024;
 export const CV_MAX_EXPERIENCE_ITEMS = 30;
@@ -27,6 +30,7 @@ function lineList(maxLines: number, maxLineLength: number, maxLength: number) {
         context.addIssue({
           code: "custom",
           message: `Must contain no more than ${maxLines} lines`,
+          params: { limit: "lines", maximum: maxLines },
         });
         return z.NEVER;
       }
@@ -34,6 +38,7 @@ function lineList(maxLines: number, maxLineLength: number, maxLength: number) {
         context.addIssue({
           code: "custom",
           message: `Each line must contain no more than ${maxLineLength} characters`,
+          params: { limit: "line_length", maximum: maxLineLength },
         });
         return z.NEVER;
       }
@@ -86,6 +91,54 @@ const targetingSchema = z
           .strict(),
       )
       .max(10),
+    // Advert keywords and requirements the user said are not part of their experience.
+    skippedKeywords: z.array(z.string().max(180)).max(100).optional(),
+    requirements: z
+      .array(
+        z
+          .object({
+            requirement: z.string().max(180),
+            status: z.enum(["partly-supported", "not-evidenced"]),
+            explanation: z.string().max(260),
+            watch: z.array(z.string().max(80)).max(6).optional(),
+          })
+          .strict(),
+      )
+      .max(8)
+      .optional(),
+    evidencedRequirements: z.array(z.string().max(180)).max(8).optional(),
+    answeredRequirements: z.array(z.string().max(180)).max(8).optional(),
+    vaguePhrases: z
+      .array(z.object({ phrase: z.string().max(160), reason: z.string().max(220) }).strict())
+      .max(5)
+      .optional(),
+  })
+  .strict();
+
+export const coverLetterSchema = z
+  .object({
+    jobTitle: shortText,
+    employer: shortText,
+    reference: z.string().max(80),
+    recipientName: z.string().max(120),
+    greeting: z.enum(["hiring-manager", "sir-madam"]),
+    employerAddress: lineList(6, 160, 600),
+    includeDate: z.boolean(),
+    paragraphs: z.array(z.string().max(2_500)).max(COVER_LETTER_MAX_PARAGRAPHS),
+  })
+  .strict();
+
+const keysOf = <T extends Record<string, unknown>>(record: T) => Object.keys(record) as [keyof T & string, ...Array<keyof T & string>];
+
+export const cvDesignSchema = z
+  .object({
+    font: z.enum(keysOf(cvFonts)).optional(),
+    size: z.number().int().min(cvSizeRange.min).max(cvSizeRange.max).optional(),
+    leading: z.enum(keysOf(cvLeading)).optional(),
+    spacing: z.enum(keysOf(cvSpacing)).optional(),
+    margins: z.enum(keysOf(cvMargins)).optional(),
+    paper: z.enum(keysOf(cvPapers)).optional(),
+    accent: z.enum(keysOf(cvAccents)).optional(),
   })
   .strict();
 
@@ -103,6 +156,12 @@ export const cvDataSchema = z
     experience: z.array(experienceItemSchema).max(CV_MAX_EXPERIENCE_ITEMS),
     education: z.array(educationItemSchema).max(CV_MAX_EDUCATION_ITEMS),
     targeting: targetingSchema.optional(),
+    layoutPreset: z.enum(["standard", "education-first", "compact-single", "experienced"]).optional(),
+    sectionOrder: z.array(z.enum(cvSectionIds)).max(8).refine((items) => new Set(items).size === items.length, "Sections must not repeat").optional(),
+    additionalSections: z.object({ projects: z.string().max(5000).optional(), certifications: z.string().max(5000).optional(), volunteering: z.string().max(5000).optional(), languages: z.string().max(5000).optional() }).strict().optional(),
+    applicationPack: z.object({ bullets: z.array(z.string().max(1000)).max(20), coverLetter: z.string().max(10000), interviewPrompts: z.array(z.string().max(1000)).max(20), thankYouEmail: z.string().max(5000), originalCvText: z.string().max(24000).optional(), evidenceReview: z.array(z.string().max(1000)).max(10).optional() }).strict().optional(),
+    coverLetter: coverLetterSchema.optional(),
+    design: cvDesignSchema.optional(),
   })
   .strict()
   .superRefine((value, context) => {
@@ -256,13 +315,11 @@ export function repairCvData(
 
   const targetingResult = targetingSchema.safeParse(source.targeting);
   if (targetingResult.success) repaired.targeting = targetingResult.data;
+  for (const key of ["layoutPreset", "sectionOrder", "additionalSections", "applicationPack", "coverLetter", "design"] as const) {
+    if (source[key] === undefined) continue;
+    const candidate = cvDataSchema.safeParse({ ...repaired, [key]: source[key] });
+    if (candidate.success) Object.assign(repaired, { [key]: candidate.data[key] });
+  }
 
   return parseCvData(repaired);
-}
-
-export function formatCvValidationError(error: CvValidationError) {
-  if (error.issues.length === 0) return error.message;
-  const issue = error.issues[0];
-  const field = issue.path.length > 0 ? issue.path.join(".") : "CV data";
-  return `${field}: ${issue.message}`;
 }

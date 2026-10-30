@@ -2,6 +2,19 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
+import { fitAdvert, trimToLimit } from "./ai-request-fit.ts";
+
+import {
+  cleanBullet,
+  countWords,
+  emptyCliches,
+  hasOutcome,
+  normalise,
+  numericTokens,
+  personalPronouns,
+  weakOpening,
+} from "./cv-bullet-rules.ts";
+
 export const cvBulletPointInputSchema = z.object({
   jobTitle: z
     .string()
@@ -9,11 +22,14 @@ export const cvBulletPointInputSchema = z.object({
     .min(2, "Enter the job or experience title.")
     .max(120, "Keep the title under 120 characters."),
   employmentStatus: z.enum(["current", "previous"]).default("previous"),
-  rawExperience: z
-    .string()
-    .trim()
-    .min(50, "Add more detail about what you did and what changed as a result.")
-    .max(3_000, "Keep your experience notes under 3,000 characters."),
+  rawExperience: z.preprocess(
+    trimToLimit(3_000),
+    z
+      .string()
+      .trim()
+      .min(50, "Add more detail about what you did and what changed as a result.")
+      .max(3_000, "Keep your experience notes under 3,000 characters."),
+  ),
   targetRole: z
     .string()
     .trim()
@@ -21,9 +37,7 @@ export const cvBulletPointInputSchema = z.object({
     .optional()
     .default(""),
   jobDescription: z
-    .string()
-    .trim()
-    .max(5_000, "Keep the job description under 5,000 characters.")
+    .preprocess(trimToLimit(5_000, fitAdvert), z.string().trim().max(5_000, "Keep the job description under 5,000 characters."))
     .optional()
     .default(""),
 });
@@ -57,39 +71,8 @@ export class CvBulletPointError extends Error {
   }
 }
 
-const personalPronouns =
-  /\b(i|i'm|i’ve|i'd|me|my|mine|we|we're|we’ve|our|ours|he|she|him|her|his|hers|they|them|their|theirs)\b/i;
-const weakOpening = /^(responsible for|duties included|worked on|helped with|tasked with)\b/i;
-const emptyCliches =
-  /\b(passionate|hard[- ]working|results[- ]driven|dynamic professional|go[- ]getter|excellent communication skills|team player)\b/i;
-
-function countWords(value: string) {
-  return value.trim().match(/\b[A-Za-z0-9][A-Za-z0-9'’-]*\b/g)?.length ?? 0;
-}
-
-function numericTokens(value: string) {
-  return new Set(value.match(/(?:£\s*)?\b\d+(?:[.,]\d+)?%?\b/g) ?? []);
-}
-
-function normalise(value: string) {
-  return value.toLocaleLowerCase("en-GB").replace(/[^a-z0-9]+/g, " ").trim();
-}
-
 function firstWord(value: string) {
   return normalise(value).split(" ")[0] || "";
-}
-
-function cleanBullet(value: string) {
-  return value
-    .trim()
-    .replace(/^(?:[-*•]|\d+[.)])\s*/, "")
-    .replace(/[.;]\s*$/, "");
-}
-
-function hasOutcome(value: string) {
-  return /(?:£\s*)?\b\d+(?:[.,]\d+)?%?\b|\b(?:increased|reduced|improved|saved|grew|delivered|resolved|achieved|exceeded|cut|raised|enabled|resulting|leading to)\b/i.test(
-    value,
-  );
 }
 
 export function assessBulletPointQuality(

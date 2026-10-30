@@ -1,21 +1,24 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { ButtonLink, RelatedLinksSection } from "@/components/marketing";
+import { ButtonLink, MoneyPageCta, RelatedLinksSection } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 export const guideReviewed = "2026-09-06";
 export function guideMetadata(path: string, title: string, description: string): Metadata {
-  return { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { title, description, url: path } };
+  return withAgentMetadata(path, { title: { absolute: title }, description, alternates: { canonical: path }, openGraph: { title, description, url: path } });
 }
 
-export function Guide({ path, title, intro, children, links, action, placement }: {
+export function Guide({ path, title, intro, children, links, action, placement, reviewed = guideReviewed, published = guideReviewed }: {
   path: string; title: string; intro: string; children: ReactNode;
   links: Array<[string, string]>; action: [string, string]; placement: string;
+  reviewed?: string; published?: string;
 }) {
   const schemas = [
     { "@context": "https://schema.org", "@type": "Article", headline: title, description: intro,
-      mainEntityOfPage: `${site.url}${path}`, datePublished: guideReviewed, dateModified: guideReviewed,
+      mainEntityOfPage: `${site.url}${path}`, datePublished: published, dateModified: reviewed,
       author: { "@type": "Organization", name: "WorkCV", url: site.url }, publisher: { "@type": "Organization", name: "WorkCV", url: site.url } },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: site.url },
@@ -31,15 +34,16 @@ export function Guide({ path, title, intro, children, links, action, placement }
         <p className="mb-4 text-sm font-bold uppercase tracking-widest text-navy">Practical UK CV guide</p>
         <h1 className="font-display text-4xl font-semibold leading-tight text-navy md:text-6xl">{title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">{intro}</p>
-        <p className="mt-5 text-sm text-muted">By WorkCV · Reviewed <time dateTime={guideReviewed}>6 September 2026</time></p>
+        <p className="mt-5 text-sm text-muted">By WorkCV · Reviewed <time dateTime={reviewed}>{displayReviewDate(reviewed)}</time></p>
       </div>
     </section>
     <article className="container-page max-w-5xl space-y-12 py-12 md:py-16">{children}</article>
     <section className="border-y border-line bg-paper py-12"><div className="container-page max-w-5xl">
       <h2 className="font-display text-3xl font-semibold text-navy">Put the guidance into practice</h2>
-      <p className="mb-6 mt-4 leading-7 text-muted">The blank Word template is free without an account. The WorkCV editor requires email-code login: build and preview free, then pay {site.price} once for the PDF of one saved CV. No subscription.</p>
+      <p className="mb-6 mt-4 leading-7 text-muted">The blank Word template is free without an account. The WorkCV editor needs no account to start, and an email code to save or download: build and preview free, then choose {site.price} once for one saved CV and matching letter as PDF and editable Word, or the {site.passPrice} Job Search Pass for separate versions during {site.passDays} days. Covered documents remain editable and downloadable afterwards. Neither plan renews automatically.</p>
       <ButtonLink href={action[1]} trackingLabel={placement}>{action[0]}</ButtonLink>
     </div></section>
+    <MoneyPageCta trackingContext={`${placement}_money_cta`} />
     <RelatedLinksSection title="Continue with your CV" links={links} />
   </>;
 }
@@ -72,9 +76,9 @@ export function GuideSource({ href, children }: { href: string; children: ReactN
   return <p className="text-sm leading-7 text-muted">Guidance: <a href={href} className="font-semibold text-navy underline underline-offset-4" rel="noopener noreferrer" target="_blank">{children}</a>.</p>;
 }
 
-export function WorkedSection({ title, children }: { title: string; children: ReactNode }) {
+export function WorkedSection({ title, children, reviewed = guideReviewed }: { title: string; children: ReactNode; reviewed?: string }) {
   return <section className="border-y border-line bg-paper py-16"><div className="container-page max-w-5xl space-y-6 text-base leading-8 text-ink">
-    <p className="text-xs font-bold uppercase tracking-widest text-muted">WorkCV worked example · Reviewed 6 September 2026</p>
+    <p className="text-xs font-bold uppercase tracking-widest text-muted">WorkCV worked example · Reviewed <time dateTime={reviewed}>{displayReviewDate(reviewed)}</time></p>
     <h2 className="font-display text-3xl font-semibold leading-tight text-navy md:text-4xl">{title}</h2>{children}
   </div></section>;
 }

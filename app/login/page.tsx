@@ -18,7 +18,8 @@ export default async function LoginPage({
   searchParams: { next?: string };
 }) {
   const user = await getCurrentUser();
-  const next = safeInternalRedirect(searchParams.next);
+  // Without a destination, signing in opens the dashboard.
+  const next = safeInternalRedirect(searchParams.next, "/my-cvs");
 
   if (user) redirect(next);
 

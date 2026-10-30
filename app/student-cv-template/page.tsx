@@ -5,13 +5,14 @@ import {
   type EarlyCareerPageConfig,
 } from "@/components/early-career-cv-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const slug = "/student-cv-template";
 
-export const metadata: Metadata = {
-  title: "Student CV Template UK - Part-Time Job Example",
+export const metadata: Metadata = withAgentMetadata("/student-cv-template", {
+  title: "Student CV Template UK + First-Job Cover Letter",
   description:
-    "Use an editable UK student CV template for part-time jobs, placements and internships, with education, volunteering, society and project examples.",
+    "See a student CV and matching first-job cover letter, get a free checklist and build your own application using study, projects and volunteering.",
   alternates: { canonical: slug },
   openGraph: {
     title: "Student CV Template UK - WorkCV",
@@ -19,11 +20,12 @@ export const metadata: Metadata = {
       "An education-first student CV with truthful examples for part-time work, projects, societies and volunteering.",
     url: slug,
   },
-};
+});
 
 const config: EarlyCareerPageConfig = {
   slug,
   roleTemplate: "student",
+  applicationPackId: "student",
   kicker: "Student CV template UK",
   heading: "Build a student CV from education, projects and real responsibilities.",
   intro:
@@ -80,14 +82,15 @@ const config: EarlyCareerPageConfig = {
     { question: "How long should a student CV be?", answer: "One complete page often works, but two readable pages are acceptable when you have relevant placements, projects or employment. Do not add filler to reach a target length." },
   ],
   relatedLinks: [
+    ["Student cover letter example", "/cover-letter-examples-uk#part-time-student"],
     ["Graduate CV template", "/cv-template-graduate-uk"],
     ["CV with no experience", "/cv-no-experience-uk"],
     ["School leaver CV example", "/school-leaver-cv-example"],
     ["ATS CV template", "/ats-cv-template-uk"],
   ],
   finalHeading: "Start with a student CV that gives education useful context.",
-  finalBody: `Edit the student draft with your real course, projects and responsibilities, then pay ${site.price} only when you download the final PDF.`,
-  primaryLabel: "Use student CV template",
+  finalBody: `Build and preview your own CV and letter free. Pay ${site.price} once for one saved pair in PDF and Word. Edits and redownloads of the same pair are included.`,
+  primaryLabel: "Build my CV and letter",
 };
 
 export default function StudentCvTemplatePage() {

@@ -5,10 +5,11 @@ import {
   type EarlyCareerPageConfig,
 } from "@/components/early-career-cv-page";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const slug = "/school-leaver-cv-example";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/school-leaver-cv-example", {
   title: "School Leaver CV Example UK - First Job Template",
   description:
     "Use an editable UK school leaver CV example for first jobs and apprenticeships, with GCSE, project, volunteering and DofE evidence.",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "An education-first school leaver CV for first jobs and apprenticeships, without fabricated employment.",
     url: slug,
   },
-};
+});
 
 const config: EarlyCareerPageConfig = {
   slug,
@@ -80,6 +81,7 @@ const config: EarlyCareerPageConfig = {
     { question: "How long should a school leaver CV be?", answer: "A clear one-page CV is often enough. Use a second page only when you have relevant work experience, qualifications, projects or responsibilities that genuinely help the application." },
   ],
   relatedLinks: [
+    ["Apprenticeship cover letter example", "/cover-letter-examples-uk#apprenticeship"],
     ["Student CV template", "/student-cv-template"],
     ["CV with no experience", "/cv-no-experience-uk"],
     ["Warehouse CV template", "/cv-template-warehouse-uk"],

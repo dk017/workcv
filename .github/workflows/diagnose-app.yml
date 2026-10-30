@@ -1,8 +1,20 @@
 name: Diagnose app
+run-name: "${{ inputs.mode == 'growth_report' && format('Private growth report {0}', inputs.report_id) || 'Diagnose app logs' }}"
 
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: "Diagnostic operation"
+        type: choice
+        options: [app_logs, growth_report, server_resources, ssh_sessions, harden_ssh]
+        default: app_logs
+      report_public_key:
+        description: "Growth report recipient RSA public key (base64 PEM); NEVER a private key"
+        required: false
+      report_id:
+        description: "Growth report request UUID"
+        required: false
       deploy_dir:
         description: "Remote deploy directory"
         required: true
@@ -11,9 +23,13 @@ on:
         description: "Number of recent app log lines to inspect"
         required: true
         default: "400"
+      confirm:
+        description: "harden_ssh only: type HARDEN to confirm changes to the production server"
+        required: false
 
 jobs:
   app-logs:
+    if: ${{ inputs.mode == 'app_logs' }}
     name: Read filtered app logs
     runs-on: ubuntu-latest
     permissions:
@@ -32,3 +48,197 @@ jobs:
             docker compose -p workcv -f docker-compose.ghcr.yml logs --tail "${{ github.event.inputs.tail }}" app \
               | grep -Ei 'workcv_import|cv/import|openai|pdf|error' \
               | tail -200 || true
+
+  growth-report:
+    if: ${{ inputs.mode == 'growth_report' }}
+    name: Read encrypted production growth snapshot
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare read-only reporter
+        run: echo "REPORT_CODE=$(base64 -w0 scripts/production-growth-snapshot.mjs)" >> "$GITHUB_ENV"
+      - name: Read encrypted snapshot
+        uses: appleboy/ssh-action@v1.2.0
+        env:
+          REPORT_PUBLIC_KEY: ${{ inputs.report_public_key }}
+          REPORT_ID: ${{ inputs.report_id }}
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: REPORT_CODE,REPORT_PUBLIC_KEY,REPORT_ID
+          command_timeout: 3m
+          script: |
+            set -eu
+            cd /opt/workcv
+            printf '%s' "$REPORT_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T \
+              -e WORKCV_REPORT_EXECUTE=1 -e WORKCV_REPORT_PUBLIC_KEY="$REPORT_PUBLIC_KEY" \
+              -e WORKCV_REPORT_ID="$REPORT_ID" app node --input-type=module
+
+  server-resources:
+    if: ${{ inputs.mode == 'server_resources' }}
+    name: Read server and app memory (read-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare read-only check
+        run: echo "CHECK_CODE=$(base64 -w0 scripts/server-resources-check.mjs)" >> "$GITHUB_ENV"
+      - name: Read resources
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          envs: CHECK_CODE
+          command_timeout: 3m
+          script: |
+            set -eu
+            echo "== Host"
+            echo "CPUs: $(nproc)"
+            free -m
+            uptime
+            df -h / /tmp | sed -n '1,3p'
+            echo "== Container memory (all containers, read-only)"
+            docker stats --no-stream --format '{{.Name}}\t{{.MemUsage}}\t{{.CPUPerc}}'
+            echo "== WorkCV app container"
+            cd "${{ github.event.inputs.deploy_dir }}"
+            printf '%s' "$CHECK_CODE" | base64 -d | docker compose -p workcv -f docker-compose.ghcr.yml exec -T app node --input-type=module
+
+  ssh-sessions:
+    if: ${{ inputs.mode == 'ssh_sessions' }}
+    name: Count SSH sessions (read-only, counts only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Count sessions
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 3m
+          # The repository is public, so this prints counts only: no IP
+          # addresses, user names or host names.
+          script: |
+            set -u
+            echo "== uptime"
+            uptime
+            echo "== Login records (utmp, what uptime counts): $(who | wc -l)"
+            echo "== Login records by login time (date, count; oldest first, last 10 days shown)"
+            who | awk '{print $3}' | sort | uniq -c | tail -10
+            echo "== Live established SSH connections: $(ss -Htn state established '( sport = :22 )' | wc -l)"
+            echo "== Distinct remote addresses on live SSH connections: $(ss -Htn state established '( sport = :22 )' | awk '{print $4}' | sed 's/:[0-9]*$//' | sort -u | wc -l)"
+            echo "== sshd processes: $(pgrep -c sshd || true)"
+            echo "== Logged-in SSH session processes: $(ps -eo cmd | grep -cE '^sshd(-session)?: [^ ]+@' || true)"
+            echo "== Oldest SSH session process age (elapsed time):"
+            ps -eo etimes,cmd --sort=-etimes | grep -E 'sshd(-session)?: [^ ]+@' | grep -v grep | head -1 | awk '{printf "%d days\n", $1/86400}'
+            echo "== logind sessions: $(loginctl list-sessions --no-legend 2>/dev/null | wc -l)"
+            echo "== logind sessions by state (count, state)"
+            loginctl list-sessions --no-legend -o json 2>/dev/null | grep -o '"state":"[a-z]*"' | sort | uniq -c || echo "(state not available)"
+            echo "== logind sessions with no remaining processes: $(for s in $(loginctl list-sessions --no-legend 2>/dev/null | awk '{print $1}' | head -200); do loginctl show-session "$s" -p Leader --value 2>/dev/null; done | grep -c '^0$' || true) of first 200 checked"
+            echo "== sshd limits"
+            (sshd -T 2>/dev/null || /usr/sbin/sshd -T 2>/dev/null) | grep -Ei '^(maxstartups|maxsessions|clientaliveinterval|clientalivecountmax|logingracetime|passwordauthentication|kbdinteractiveauthentication|permitrootlogin) ' || echo "(sshd -T not available to this user)"
+            echo "== SSH log, last 24 hours (counts)"
+            log="$(journalctl -u ssh -u sshd --since '-24h' --no-pager 2>/dev/null || true)"
+            echo "Accepted logins: $(printf '%s\n' "$log" | grep -c 'Accepted ' || true)"
+            echo "  with a key: $(printf '%s\n' "$log" | grep -c 'Accepted publickey' || true)"
+            echo "  with a password: $(printf '%s\n' "$log" | grep -c 'Accepted password' || true)"
+            echo "Password logins accepted in the last 30 days: $(journalctl -u ssh -u sshd --since '-30d' --no-pager 2>/dev/null | grep -c 'Accepted password' || true)"
+            echo "Accounts with a login shell: $(grep -cvE '(nologin|false|sync|halt|shutdown)$' /etc/passwd)"
+            echo "Failed password or invalid user attempts: $(printf '%s\n' "$log" | grep -cE 'Failed password|Invalid user' || true)"
+            echo "Dropped by MaxStartups (start-up limit): $(printf '%s\n' "$log" | grep -ciE 'drop connection|MaxStartups|exceeded' || true)"
+            echo "Connections closed during handshake: $(printf '%s\n' "$log" | grep -ciE 'closed by .* \[preauth\]|reset by .* \[preauth\]|Connection closed by authenticating|Timeout before authentication' || true)"
+            echo "fail2ban active: $(systemctl is-active fail2ban 2>/dev/null || echo not installed)"
+
+  # Changes the server (unlike the other modes): runs only with confirm=HARDEN.
+  harden-ssh:
+    if: ${{ inputs.mode == 'harden_ssh' && inputs.confirm == 'HARDEN' }}
+    name: Harden SSH (passwords off, fail2ban, clear stale sessions)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read
+    steps:
+      - name: Apply hardening
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          command_timeout: 12m
+          script: |
+            set -eu
+
+            echo "== 1. Password login off"
+            dropin=/etc/ssh/sshd_config.d/00-workcv-hardening.conf
+            if ! grep -qiE '^\s*Include\s+/etc/ssh/sshd_config\.d/' /etc/ssh/sshd_config; then
+              echo "sshd_config does not include sshd_config.d; leaving SSH unchanged"
+              exit 1
+            fi
+            # Files in sshd_config.d are read in name order and the first value
+            # wins, so 00- takes precedence over cloud-init's 50- file.
+            printf '%s\n' \
+              '# Added by WorkCV server maintenance: key-only SSH.' \
+              'PasswordAuthentication no' \
+              'KbdInteractiveAuthentication no' > "$dropin.new"
+            mv "$dropin.new" "$dropin"
+            if ! sshd -t; then
+              echo "New SSH config failed validation; removing it"
+              rm -f "$dropin"
+              exit 1
+            fi
+            effective="$(sshd -T | awk '/^passwordauthentication /{print $2}')"
+            if [ "$effective" != "no" ]; then
+              echo "Effective PasswordAuthentication is '$effective', not 'no'; removing the change"
+              rm -f "$dropin"
+              exit 1
+            fi
+            systemctl reload ssh 2>/dev/null || systemctl reload sshd 2>/dev/null \
+              || echo "SSH is socket-activated; each new connection reads the new config"
+            sshd -T | grep -Ei '^(passwordauthentication|kbdinteractiveauthentication|pubkeyauthentication) '
+
+            echo "== 2. fail2ban for SSH"
+            export DEBIAN_FRONTEND=noninteractive
+            apt-get -o DPkg::Lock::Timeout=300 update -qq
+            apt-get -o DPkg::Lock::Timeout=300 install -y -qq fail2ban python3-systemd >/dev/null
+            printf '%s\n' \
+              '# Added by WorkCV server maintenance.' \
+              '[sshd]' \
+              'enabled = true' \
+              'backend = systemd' \
+              'maxretry = 5' \
+              'findtime = 10m' \
+              'bantime = 1h' > /etc/fail2ban/jail.d/workcv-sshd.local
+            systemctl enable fail2ban >/dev/null 2>&1
+            systemctl restart fail2ban
+            sleep 5
+            echo "fail2ban: $(systemctl is-active fail2ban)"
+            # Counts only; the status also lists banned addresses, which stay private.
+            fail2ban-client status sshd | grep -E 'Currently failed|Total failed|Currently banned|Total banned' || true
+
+            echo "== 3. Stale login sessions"
+            echo "Before: $(loginctl list-sessions --no-legend | wc -l)"
+            systemctl restart systemd-logind
+            sleep 3
+            echo "After: $(loginctl list-sessions --no-legend | wc -l)"
+            loginctl list-sessions --no-legend -o json 2>/dev/null | grep -o '"state":"[a-z]*"' | sort | uniq -c || true
+
+      # A fresh key login proves SSH still works after the change.
+      - name: Confirm key login still works
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.HETZNER_HOST }}
+          username: ${{ secrets.HETZNER_USER }}
+          key: ${{ secrets.HETZNER_SSH_KEY }}
+          script: |
+            echo "Key login OK"
+            echo "Live SSH connections: $(ss -Htn state established '( sport = :22 )' | wc -l)"
+            echo "fail2ban: $(systemctl is-active fail2ban)"

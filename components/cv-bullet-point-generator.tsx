@@ -246,7 +246,7 @@ export function CvBulletPointGenerator() {
         <div className="mt-6 flex flex-col gap-5 border-t border-line pt-5 lg:flex-row lg:items-end lg:justify-between">
           <p className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            Your entries are sent to OpenAI for this generation and are not saved by WorkCV. Verify every bullet before using it.
+            <span>Your entries are sent through WorkCV to OpenAI for this generation. Remove unnecessary personal details and verify every bullet before using it. Read our <a href="/privacy" className="font-semibold underline">privacy policy</a>.</span>
           </p>
           <div className="flex flex-wrap gap-2">
             <button

@@ -1,4 +1,24 @@
+import type { CvDesign } from "./cv-design.ts";
+
 export type TemplateId = "classic" | "modern" | "compact";
+export const cvSectionIds = ["profile", "experience", "education", "skills", "projects", "certifications", "volunteering", "languages"] as const;
+export type CvSectionId = typeof cvSectionIds[number];
+export type CvLayoutPreset = "standard" | "education-first" | "compact-single" | "experienced";
+export function isCvLayoutPreset(value: unknown): value is CvLayoutPreset {
+  return typeof value === "string" && ["standard", "education-first", "compact-single", "experienced"].includes(value);
+}
+export const cvSectionLabels: Record<CvSectionId, string> = {
+  profile: "Profile", experience: "Experience", education: "Education", skills: "Skills",
+  projects: "Projects", certifications: "Certifications", volunteering: "Volunteering", languages: "Languages",
+};
+export function orderedCvSections(cv: CvData): CvSectionId[] {
+  const defaults: CvSectionId[] = cv.layoutPreset === "education-first"
+    ? ["profile", "education", "projects", "experience", "skills", "certifications", "volunteering", "languages"]
+    : cv.layoutPreset === "experienced"
+      ? ["profile", "experience", "projects", "certifications", "skills", "education", "volunteering", "languages"]
+      : [...cvSectionIds];
+  return Array.from(new Set([...(cv.sectionOrder || defaults), ...defaults]));
+}
 
 export type ExperienceItem = {
   id: string;
@@ -33,6 +53,26 @@ export type CvTargeting = {
     title: string;
     action: string;
   }>;
+  /** Advert keywords and requirements the user said are not part of their experience. */
+  skippedKeywords?: string[];
+  /** Advert requirements the checker could not find clear evidence for (partly or not evidenced). */
+  requirements?: Array<{
+    requirement: string;
+    status: "partly-supported" | "not-evidenced";
+    explanation: string;
+    /**
+     * Skill keywords in this requirement that were missing from the CV when the checker ran.
+     * The requirement counts as answered once the CV has all of them. Empty means it can only
+     * be answered by the user, because the checker saw the words and still judged it unmet.
+     */
+    watch?: string[];
+  }>;
+  /** Advert requirements the checker judged clearly evidenced, so their keywords are not asked about again. */
+  evidencedRequirements?: string[];
+  /** Advert requirements the user has answered by adding a bullet. */
+  answeredRequirements?: string[];
+  /** Phrases in the CV the checker called vague, with why. */
+  vaguePhrases?: Array<{ phrase: string; reason: string }>;
 };
 
 export type CvData = {
@@ -48,6 +88,28 @@ export type CvData = {
   experience: ExperienceItem[];
   education: EducationItem[];
   targeting?: CvTargeting;
+  layoutPreset?: CvLayoutPreset;
+  sectionOrder?: CvSectionId[];
+  additionalSections?: Partial<Record<"projects" | "certifications" | "volunteering" | "languages", string>>;
+  applicationPack?: { bullets: string[]; coverLetter: string; interviewPrompts: string[]; thankYouEmail: string; originalCvText?: string; evidenceReview?: string[] };
+  coverLetter?: CoverLetter;
+  /** Font, size, spacing, margins, paper and colour chosen on the Finish step. Absent means the template's own look. */
+  design?: CvDesign;
+};
+
+export const COVER_LETTER_MAX_PARAGRAPHS = 6;
+
+export type CoverLetterGreeting = "hiring-manager" | "sir-madam";
+
+export type CoverLetter = {
+  jobTitle: string;
+  employer: string;
+  reference: string;
+  recipientName: string;
+  greeting: CoverLetterGreeting;
+  employerAddress: string;
+  includeDate: boolean;
+  paragraphs: string[];
 };
 
 export const templates: Array<{

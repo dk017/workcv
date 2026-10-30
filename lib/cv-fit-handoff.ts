@@ -10,6 +10,14 @@ export type CvFitHandoff = {
   jobDescription: string;
   targetRole: string;
   priorities: CvFitPriority[];
+  /** What the assessment found for each advert requirement. Optional: older hand-offs do not have it. */
+  requirements?: Array<{
+    requirement: string;
+    status: "supported" | "partly-supported" | "not-evidenced";
+    explanation: string;
+  }>;
+  /** Phrases in the CV the assessment called vague. */
+  vaguePhrases?: Array<{ phrase: string; reason: string }>;
   source: "cv-fit-assessment";
 };
 

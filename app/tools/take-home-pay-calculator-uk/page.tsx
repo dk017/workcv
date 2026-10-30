@@ -6,9 +6,10 @@ import { FaqSection, SectionLabel } from "@/components/marketing";
 import { SalaryCalculator } from "@/components/salary-calculator";
 import { site } from "@/lib/site";
 import { takeHomePayRules } from "@/lib/uk-take-home-pay";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 // Annual refresh: replace Income Tax, NI and student-loan thresholds for each new tax year.
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/take-home-pay-calculator-uk", {
   title: "UK Take-Home Pay Calculator 2026/27",
   description:
     "Calculate salary after Income Tax, National Insurance, student loans and salary-sacrifice pension using current UK 2026/27 rates.",
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "Estimate annual, monthly and weekly take-home pay with current UK and Scottish tax bands.",
     url: "/tools/take-home-pay-calculator-uk",
   },
-};
+});
 
 const faqItems = [
   {

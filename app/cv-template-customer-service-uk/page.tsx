@@ -15,11 +15,13 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
+import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
-  title: "Customer Service CV Template UK + Example",
+export const metadata: Metadata = withAgentMetadata("/cv-template-customer-service-uk", {
+  title: "Customer Service CV Template UK + Cover Letter",
   description:
-    "Use a customer service CV template for UK jobs with adviser, assistant and support examples for complaints, CRM, communication and outcomes.",
+    "See a UK customer service CV and matching cover letter, get a free checklist and build your own application using real enquiries, complaints and teamwork evidence.",
   alternates: {
     canonical: "/cv-template-customer-service-uk",
   },
@@ -29,9 +31,9 @@ export const metadata: Metadata = {
       "Start with an editable UK customer service CV example and tailor it to the job advert before downloading.",
     url: "/cv-template-customer-service-uk",
   },
-};
+});
 
-const editorHref = "/editor?template=classic&roleTemplate=customer-service&new=1";
+const editorHref = "#application-pack";
 const customerServiceCv = getRoleCvTemplate("customer-service");
 
 const faqItems = [
@@ -197,6 +199,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Customer service cover letter example", "/cover-letter-examples-uk#customer-service"],
   ["Customer service personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
@@ -204,7 +207,7 @@ const relatedLinks = [
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Editable UK CV templates", "/templates"],
   ["Professional CV template", "/professional-cv-template-uk"],
-  ["Resume template UK", "/resume-template-uk"],
+  ["UK CV template", "/professional-cv-template-uk"],
 ];
 
 export default function CustomerServiceCvTemplateUkPage() {
@@ -228,10 +231,10 @@ export default function CustomerServiceCvTemplateUkPage() {
               Start with an editable UK customer service CV example for adviser,
               assistant, contact-centre and support roles. Replace the sample
               wording with your own customer evidence, then preview every page
-              before paying for the PDF.
+              before paying for your CV and matching letter as PDF and Word.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={editorHref}>Use customer service CV template</ButtonLink>
+              <ButtonLink href={editorHref} trackingLabel="role_pack_customer_service_hero">Build my CV and letter</ButtonLink>
               <ButtonLink href="#example" variant="secondary">
                 See example
               </ButtonLink>
@@ -242,7 +245,7 @@ export default function CustomerServiceCvTemplateUkPage() {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-                  Editable draft
+                  Fictional CV example
                 </p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-navy">
                   Customer Service Adviser CV
@@ -252,7 +255,7 @@ export default function CustomerServiceCvTemplateUkPage() {
                 href={editorHref}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
               >
-                Edit
+                Personalise
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -267,6 +270,8 @@ export default function CustomerServiceCvTemplateUkPage() {
           </div>
         </div>
       </section>
+
+      <RoleApplicationPack id="customer-service" />
 
       <section className="bg-surface py-24">
         <div className="container-page">
@@ -495,9 +500,10 @@ export default function CustomerServiceCvTemplateUkPage() {
       />
       <FinalCta
         heading="Start with a customer service CV that sounds specific, not generic."
-        body={`Use the editable customer service template, tailor it to the advert, then pay ${site.price} only when you download the final PDF.`}
+        body={`Start with your own details, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`}
         primaryHref={editorHref}
-        primary="Use customer service CV template"
+        primary="Build my CV and letter"
+        trackingContext="role_pack_customer_service_final"
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="Open the CV builder"
       />

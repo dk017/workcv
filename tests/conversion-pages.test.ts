@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
+import { readEditorSource } from "./editor-source.ts";
+
 const globalCss = readFileSync("app/globals.css", "utf8");
 const siteSource = readFileSync("lib/site.ts", "utf8");
 const pricingSource = readFileSync("app/pricing/page.tsx", "utf8");
-const editorSource = readFileSync("components/cv-editor.tsx", "utf8");
+const editorSource = readEditorSource();
 
 test("mobile page containers use valid calculated widths", () => {
   assert.match(globalCss, /min\(1120px, calc\(100% - 32px\)\)/);
@@ -19,15 +21,16 @@ test("customer-facing WorkCV prices use the UK pound symbol", () => {
 
 test("pricing keeps the evidence while removing repeated reassurance sections", () => {
   assert.match(pricingSource, /id="compare"/);
-  assert.match(pricingSource, /Competitor prices checked/);
-  assert.match(pricingSource, /source:\s*"https:\/\/www\.myperfectcv\.co\.uk\/pricing"/);
+  assert.match(pricingSource, /checked on 2 October 2026/);
+  assert.match(pricingSource, /href="https:\/\/www\.myperfectcv\.co\.uk\/pricing"/);
   assert.doesNotMatch(pricingSource, /No hidden fees guarantee/);
   assert.doesNotMatch(pricingSource, /When a subscription might make sense/);
 });
 
 test("editor keeps primary actions focused and groups secondary actions", () => {
-  assert.match(editorSource, /<details className="relative order-1 sm:order-none">/);
-  assert.match(editorSource, />\s*More\s*<\/summary>/);
+  // Secondary actions sit in the menu under the CV's name, not beside the form.
+  assert.match(editorSource, /<details className="editor-menu relative min-w-0">/);
+  assert.match(editorSource, /<span className="sr-only">CV options<\/span>/);
   assert.match(editorSource, /Template: \{selectedTemplate\?\.name \?\? "Choose"\}/);
   assert.match(editorSource, /Tailor to job/);
   assert.match(editorSource, /Import CV/);

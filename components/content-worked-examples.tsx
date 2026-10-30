@@ -7,7 +7,7 @@ import { scoreCvFit } from "@/lib/cv-fit-assessment";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
 
-function EditorTerms() { return <p className="text-sm text-muted">Email-code login required. Build and preview free; pay {site.price} once for this saved CV&apos;s PDF. No subscription. Copy only details that are true for you.</p>; }
+function EditorTerms() { return <p className="text-sm text-muted">No account needed to start; saving or downloading asks for an email code. Build and preview free; pay {site.price} once for this saved CV&apos;s PDF. No subscription. Copy only details that are true for you.</p>; }
 
 export function CareEntryExample() {
   return <WorkedSection title="A complete care-worker CV with no care experience">

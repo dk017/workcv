@@ -1,3 +1,5 @@
+import marketingClusterConfig from "../lib/marketing-clusters-data.json" with { type: "json" };
+
 export const growthStages = [
   ["qualified_sessions", "marketing_cta_clickers"],
   ["marketing_cta_clickers", "login_starters"],
@@ -40,3 +42,25 @@ export function normalizeNumericRows(rows) {
 }
 
 export const normalizeSourceRows = normalizeNumericRows;
+
+const marketingClusterExactRoutes = new Map(
+  Object.entries(marketingClusterConfig.exactRoutes),
+);
+
+const marketingClusterPrefixes = marketingClusterConfig.prefixRoutes;
+
+export function marketingClusterForPath(pathname = "") {
+  const path = pathname.split("?", 1)[0] || "/";
+  if (marketingClusterExactRoutes.has(path)) return marketingClusterExactRoutes.get(path);
+  const prefix = marketingClusterPrefixes.find(([value]) => path.startsWith(value));
+  if (prefix) return prefix[1];
+  if (path === "/" || path === "/tools" || path === "/templates") return "core-commercial";
+  return "other";
+}
+
+export function addMarketingCluster(rows, pathKey = "landing_path") {
+  return rows.map((row) => ({
+    ...row,
+    marketing_cluster: marketingClusterForPath(row[pathKey]),
+  }));
+}

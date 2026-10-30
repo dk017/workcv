@@ -42,7 +42,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: "/cv-template-uk", destination: "/templates", permanent: true },
+      { source: "/cv-template-uk", destination: "/professional-cv-template-uk", permanent: true },
+      { source: "/resume-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       {
         source: "/cv-builder-uk",
         destination: "/cv-builder-no-subscription-uk",
@@ -113,17 +114,6 @@ const nextConfig = {
         destination: "/resume-builder-uk-no-subscription",
         permanent: true,
       },
-      // Cancellation guides were replaced by comparison pages on 30 October 2026.
-      ...[
-        ["/cancel-myperfectcv-uk", "/myperfectcv-alternative-uk"],
-        ["/cancel-livecareer-uk", "/livecareer-alternative"],
-        ["/cancel-zety-uk", "/zety-alternative-uk"],
-        ["/cancel-resume-io-uk", "/resume-io-alternative-uk"],
-        ["/cancel-cvmaker-uk", "/cvmaker-alternative"],
-        ["/cancel-enhancv-uk", "/enhancv-alternative-uk"],
-        ["/myperfectcv-vs-livecareer-uk", "/compare"],
-        ["/compare-cv-builders", "/compare"],
-      ].map(([source, destination]) => ({ source, destination, permanent: true })),
     ];
   },
 };

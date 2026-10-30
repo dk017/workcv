@@ -16,8 +16,9 @@ function clientAddress(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    // Over-long fields are trimmed by the input schema, so allow a long CV or advert through.
     const body = await request.text();
-    if (body.length > 12_000) return NextResponse.json({ error: "The submitted details are too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
+    if (body.length > 40_000) return NextResponse.json({ error: "The submitted details are too large." }, { status: 413, headers: { "Cache-Control": "no-store" } });
     const input = cvSummaryInputSchema.parse(JSON.parse(body));
     const identifier = createHash("sha256").update(`${process.env.RATE_LIMIT_SALT || "workcv"}:${clientAddress(request)}`).digest("hex");
     const rate = consumeToolRateLimit(identifier, { limit, windowMs });

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { BarChart3, Database, Search, ShieldCheck } from "lucide-react";
 
 import { UkSalaryChecker } from "@/components/uk-salary-checker";
-import { ButtonLink, FaqSection, SectionLabel } from "@/components/marketing";
+import { ButtonLink, FaqSection, MoneyPageCta, SectionLabel } from "@/components/marketing";
 import { onsSalarySource, salaryRoles } from "@/lib/uk-salary-data";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
-  title: "Salary Comparison by Job Title UK - ONS 2025 Pay Data",
+export const metadata: Metadata = withAgentMetadata("/tools/uk-salary-by-job-title", {
+  title: "UK Salary by Job Title - ONS 2025 Pay Checker",
   description:
     "Search 60 common UK job titles and compare lower-quartile, median and upper-quartile annual pay from ONS ASHE 2025 data.",
   alternates: { canonical: "/tools/uk-salary-by-job-title" },
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
       "Search common UK roles and see transparent 25th percentile, median and 75th percentile annual salary benchmarks.",
     url: "/tools/uk-salary-by-job-title",
   },
-};
+});
 
 const faqItems = [
   {
@@ -250,6 +251,11 @@ export default function UkSalaryByJobTitlePage() {
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Turn the target salary into a stronger application."
+        body={`Tailor your UK CV to the role behind the benchmark. Build and preview first, then pay ${site.price} once only if you download the PDF.`}
+        trackingContext="salary_checker_money"
+      />
       <FaqSection faqs={faqItems} title="UK salary benchmark questions." />
     </>
   );

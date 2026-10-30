@@ -3,6 +3,8 @@ export type PaymentState = "checking" | "paid" | "pending" | "cancelled" | "fail
 export type PaymentStatusResult = {
   paid: boolean;
   status?: "pending" | "cancelled" | "failed";
+  pass?: { active: boolean; expiresAt: string | null; daysLeft: number };
+  upgrade?: { eligible: true; creditMinor: number; priceMinor: number; endsAt: string } | { eligible: false };
 };
 
 export async function pollPaymentStatus(

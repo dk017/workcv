@@ -2,13 +2,16 @@
 
 ## What is recorded
 
-WorkCV records three privacy-limited public events before authentication:
+WorkCV records six privacy-limited public events before authentication:
 
 - `landing_view`
+- `page_view`
 - `marketing_cta_clicked`
 - `login_started`
+- `tool_started`
+- `tool_completed`
 
-Random first-party visitor and session identifiers are hashed on the server. Public events may contain a same-origin path, a labelled CTA placement, a same-origin destination, a normalised referral source, campaign fields, a referrer hostname, and a broad device class. The endpoint rejects unknown events and arbitrary metadata.
+Random first-party visitor and session identifiers are hashed on the server. Public events may contain a same-origin path, a labelled CTA placement, a same-origin destination, a bounded tool identifier and lifecycle/result state, a normalised referral source, campaign fields, a referrer hostname, and a broad device class. The endpoint rejects unknown events and arbitrary metadata.
 
 The browser posts these events only to `POST /api/events/funnel`. The authenticated `/api/events/editor` route does not accept anonymous public-funnel traffic. The public endpoint validates an allowlist, rate-limits by both hashed address and hashed session, and never stores an IP address.
 
@@ -45,6 +48,28 @@ Optional smoke traffic is classified as test data only when `X-WorkCV-Smoke-Toke
 
 ## Reports
 
+### Private production dashboard (recommended)
+
+From an authorised local checkout with Node 22.13+ and Git Credential Manager signed in to an account with repository Actions access:
+
+```text
+npm run report:growth:production
+```
+
+Open `.private-reports/latest.html` locally. `latest.json` is machine-readable; each request also keeps its own snapshot directory. The selected pushed branch must contain the reviewed reporting code and match local HEAD. `--ref=branch` selects another matching branch. If interrupted, use the printed `--resume=request-uuid` command.
+
+The existing **Diagnose app** manual workflow now has a separate `growth_report` mode. It streams a standalone reporter into the running app container without deploying or writing server files. Reporting uses a single read-only, repeatable-read transaction with timeouts. It makes no schema/customer changes, sends no emails and performs no Docker cleanup.
+
+**Privacy:** this repository is public. A fresh RSA-3072 key pair is generated locally; only the public key reaches GitHub. The server encrypts aggregate JSON using RSA-OAEP SHA-256 and AES-256-GCM before output. GitHub logs contain ciphertext, not business numbers. Only the local key decrypts it. Private keys, request metadata and reports stay under `.private-reports/`, excluded from Git and Docker build context. Never upload that folder, put it under `public/`, or attach it to public issues. Local access relies on the operating-system account; this is not a hosted admin dashboard. There is no plaintext fallback. Missing, reordered, duplicated or tampered output is rejected, as is a mismatched request ID or reporter commit.
+
+**Definitions:** rolling 7/30-day windows share one UTC snapshot; the final day is partial. Activity totals mix sessions, users and orders, so do not divide adjacent totals. Visitor milestones start at each visitor's first observed public landing *inside that window*, not necessarily their first-ever visit. Existing hashed associations link later authenticated milestones. Ambiguous multi-user identities are unlinked; one user is assigned to at most one visitor per window. Milestones are independent, not a mandatory sequence. Missing tracking is unknown, not a confirmed abandonment; a saved CV is not necessarily completed. The linked visitor-to-buyer figure is not the site's true overall conversion rate.
+
+Paid totals exclude zero-value orders, trusted test flags and configured operator IDs. Gross amounts are separated by currency and are not net of refunds, fees or tax. Attribution uses checkout snapshots or explicitly labelled mutable legacy profile fallback. Source-less checkout snapshots remain unknown. Tagged paid/affiliate traffic is separated, but untagged paid traffic and bots cannot reliably be removed. Do not assume direct/unknown is organic. No customer IDs, hashes, emails, CV content or job text leave production.
+
+Use the first successful snapshot as the baseline and refresh weekly. Compare equally matured periods, document tracking/deployment changes, and avoid declaring uplift from a few visits/orders. Keep private business numbers out of public documentation and CI. The legacy plaintext CLI below must not be run through public CI logs.
+
+### Legacy local operational report
+
 With `DATABASE_URL` configured, run:
 
 ```text
@@ -54,7 +79,9 @@ npm run report:growth -- --days=30
 npm run report:growth -- --days=90
 ```
 
-The report captures one half-open UTC window (`window_start <= occurred_at < report_end`) and reuses it for every query. It contains no email addresses or CV content, shows first-touch source/landing acquisition and last-touch production revenue separately, and separates positive production orders from test or zero-value orders.
+The report captures one half-open UTC window (`window_start <= occurred_at < report_end`) and reuses it for every query. It contains no email addresses or CV content, shows route-level public page views alongside first-touch source/landing acquisition and last-touch production revenue, and separates positive production orders from test or zero-value orders.
+
+The headline metrics also include `job_application_pack_starts` and successful `job_application_pack_completions`, identified only by the bounded tool identifier and lifecycle/result metadata. This makes tool usage measurable without storing the application text.
 
 ## Retention
 

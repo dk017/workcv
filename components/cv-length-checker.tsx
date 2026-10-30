@@ -313,8 +313,8 @@ export function CvLengthChecker() {
                     Put the right content into a clean UK CV.
                   </p>
                   <p className="mt-2 text-sm leading-6 text-muted">
-                    Build and preview first, then unlock the selected CV PDF once for{" "}
-                    {site.price}.
+                    Build and preview first, then pay {site.price} once to download your
+                    CV and a matching cover letter.
                   </p>
                 </div>
                 <Link

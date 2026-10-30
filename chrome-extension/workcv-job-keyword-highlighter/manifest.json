@@ -1,15 +1,15 @@
 {
   "manifest_version": 3,
-  "name": "WorkCV Job Keyword Highlighter",
-  "description": "Highlight CV-relevant skills and qualifications on the UK job page you choose.",
-  "version": "0.1.0",
+  "name": "WorkCV: Tailor Your CV to This Job",
+  "description": "Send the UK job advert you are viewing to WorkCV to tailor a copy of your CV, and highlight the skills it asks for.",
+  "version": "0.2.0",
   "minimum_chrome_version": "116",
   "permissions": [
     "activeTab",
     "scripting"
   ],
   "action": {
-    "default_title": "WorkCV Job Keyword Highlighter",
+    "default_title": "Tailor your CV to this job",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon-16.png",

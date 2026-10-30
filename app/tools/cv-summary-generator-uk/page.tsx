@@ -4,9 +4,10 @@ import { FileCheck2, ShieldCheck, Sparkles } from "lucide-react";
 import { CvSummaryGenerator } from "@/components/cv-summary-generator";
 import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-summary-generator-uk";
-export const metadata: Metadata = { title: "Free CV Summary Generator UK - No Signup", description: "Generate three concise UK CV summary options from your real experience, skills and target role. Free, editable and no signup required.", alternates: { canonical: path }, openGraph: { title: "Free UK CV Summary Generator", description: "Create three evidence-led, editable summaries for the top of your UK CV.", url: path } };
+export const metadata: Metadata = withAgentMetadata(path, { title: "Free CV Summary Generator UK - No Signup", description: "Generate three concise UK CV summary options from your real experience, skills and target role. Free, editable and no signup required.", alternates: { canonical: path }, openGraph: { title: "Free UK CV Summary Generator", description: "Create three evidence-led, editable summaries for the top of your UK CV.", url: path } });
 const faqs = [
   { question: "Is a CV summary the same as a personal statement?", answer: "On a UK CV, CV summary, personal profile, personal summary and CV personal statement usually describe the same concise section at the top of the document. This is different from a longer university or application-form personal statement." },
   { question: "How long should a UK CV summary be?", answer: "Prospects advises keeping a CV personal profile below 150 words. This generator produces shorter 40-to-100-word options designed to be scanned quickly and edited around your strongest evidence." },

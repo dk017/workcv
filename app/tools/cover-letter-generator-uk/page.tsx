@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import { FileCheck2, ShieldCheck, Sparkles } from "lucide-react";
 
 import { CoverLetterGenerator } from "@/components/cover-letter-generator";
-import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cover-letter-generator-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free UK Cover Letter Generator - No Signup",
   description:
     "Generate a tailored UK cover letter from the job advert and your real experience. Free to use with no signup or subscription.",
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
       "Turn a job advert and your real evidence into a tailored four-paragraph UK cover letter.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {
@@ -44,7 +45,7 @@ const faqs = [
   {
     question: "What happens to the information I paste?",
     answer:
-      "WorkCV sends the form fields to the OpenAI API to create the draft and does not save them. Avoid entering sensitive personal data that the letter does not need.",
+      "WorkCV sends the form fields to the OpenAI API to create the draft. If you choose to continue to the editor, the letter, your name and job details are held in the same browser tab for transfer and saved to your account after sign-in. Continue within 30 minutes. Avoid entering sensitive personal data that the letter does not need.",
   },
 ];
 
@@ -110,10 +111,15 @@ export default function CoverLetterGeneratorPage() {
       <section className="border-y border-line bg-paper py-20">
         <div className="container-page grid gap-10 lg:grid-cols-[1fr_0.8fr]">
           <div><SectionLabel>Guidance checked</SectionLabel><h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">Built around current UK careers guidance.</h2><p className="mt-6 text-base leading-8 text-muted">The draft uses the National Careers Service&apos;s three-to-five-paragraph structure, role-specific evidence and UK sign-off convention. It deliberately does not invent company research or candidate achievements.</p><p className="mt-4 text-sm font-bold text-navy">Research reviewed 10 July 2026.</p></div>
-          <div className="grid content-start gap-3 text-sm font-bold text-navy"><a href="https://nationalcareers.service.gov.uk/careers-advice/covering-letter" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">National Careers Service: how to write a cover letter</a><a href="https://developers.openai.com/api/docs/guides/structured-outputs" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">OpenAI: structured model outputs</a></div>
+          <div className="grid content-start gap-3 text-sm font-bold text-navy"><a href="https://nationalcareers.service.gov.uk/careers-advice/covering-letter" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">National Careers Service: how to write a cover letter</a><a href="https://developers.openai.com/api/docs/guides/structured-outputs" target="_blank" rel="noreferrer" className="rounded-md border border-line bg-white p-4 hover:border-navy">OpenAI: structured model outputs</a><a href="/cover-letter-examples-uk" className="rounded-md border border-line bg-white p-4 hover:border-navy">See 10 UK cover letter examples by role</a></div>
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Turn the letter into a complete UK application."
+        body={`Build and preview the CV behind your application, then pay ${site.price} once only if you download the PDF. No monthly subscription.`}
+        trackingContext="cover_letter_generator_money"
+      />
       <RelatedLinksSection title="Use a matching structure." links={[["Open the UK cover letter template", "/tools/cover-letter-template-uk"]]} />
       <FaqSection faqs={faqs} title="UK cover letter questions." />
     </>

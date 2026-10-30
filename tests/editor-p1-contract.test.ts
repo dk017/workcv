@@ -2,7 +2,9 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
-const editorSource = readFileSync("components/cv-editor.tsx", "utf8");
+import { readEditorSource } from "./editor-source.ts";
+
+const editorSource = readEditorSource();
 const formsSource = readFileSync("components/editor/editor-forms.tsx", "utf8");
 const eventsSource = readFileSync("lib/editor-events.ts", "utf8");
 
@@ -21,9 +23,11 @@ test("AI assistance is limited to high-value CV content fields", () => {
 });
 
 test("mobile editing and page-count guidance remain available", () => {
-  assert.match(editorSource, /aria-label="Editor view"/);
-  assert.match(editorSource, /Edit CV/);
-  assert.match(editorSource, /Preview/);
+  // Filling steps show only the form; the page is on Finish or behind the Preview button.
+  assert.match(editorSource, /aria-label="Finish view"/);
+  assert.match(editorSource, /Page and design/);
+  assert.match(editorSource, /setPreviewOpen\(true\)/);
+  assert.match(editorSource, /Back to editing/);
   assert.match(editorSource, /Most UK applicants should aim for two pages/);
   assert.match(editorSource, /Use Compact/);
 });
@@ -34,14 +38,16 @@ test("bullet editing keeps focus and controls remain usable on narrow screens", 
   assert.match(formsSource, /aria-label=\{`Bullet point \$\{index \+ 1\}`\}/);
   assert.match(formsSource, /sm:grid-cols-\[minmax\(0,1fr\)_auto\]/);
   assert.match(formsSource, /h-11 min-w-11/);
-  assert.match(editorSource, /grid w-full grid-cols-2 gap-2 sm:flex/);
+  // Phones keep a fixed bar with Back and Next (or, on Finish, the download/page switch).
+  assert.match(editorSource, /fixed inset-x-0 bottom-0 z-30 flex gap-2/);
+  assert.match(editorSource, /Next: \{stepLabel\(next\)\}/);
 });
 
 test("preview uses the available column without redundant chrome", () => {
   assert.doesNotMatch(editorSource, />\s*Live preview\s*</);
   assert.doesNotMatch(editorSource, /Local draft/);
-  assert.match(editorSource, /availableWidth \/ 794/);
-  assert.match(editorSource, /Math\.min\(1, availableWidth \/ 794\)/);
+  // The preview scales the real page width (A4 or US Letter) to fit, never above actual size.
+  assert.match(editorSource, /Math\.min\(1, availableWidth \/ pageWidth\)/);
 });
 
 test("readiness checks stay out of creation and remain minimal at download", () => {

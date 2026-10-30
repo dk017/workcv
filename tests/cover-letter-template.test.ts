@@ -1,6 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { coverLetterTemplateText } from "../lib/cover-letter-template.ts";
+import { coverLetterTemplateText, changeCoverLetterRecipient } from "../lib/cover-letter-template.ts";
+
+test("recipient changes preserve edited text", () => {
+  const edited = coverLetterTemplateText(true).replace("[Your name]", "Test Applicant");
+  const changed = changeCoverLetterRecipient(edited, false);
+  assert.equal(changed, edited.replace("Dear [Hiring manager name],", "Dear Sir or Madam,").replace("Yours sincerely,", "Yours faithfully,"));
+  assert.equal(changeCoverLetterRecipient(changed, true), edited);
+});
 
 test("uses sincerely when the hiring manager is known", () => {
   const template = coverLetterTemplateText(true);

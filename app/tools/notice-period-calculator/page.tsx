@@ -1,14 +1,15 @@
 import type { Metadata } from "next";
 import { CalendarCheck, FileSearch, Scale, ShieldCheck } from "lucide-react";
 
-import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
-  title: "Notice Period Calculator UK - Last Day and New Start Date",
+export const metadata: Metadata = withAgentMetadata("/tools/notice-period-calculator", {
+  title: "UK Notice Period Calculator - Earliest Start Date",
   description:
-    "Enter the day you hand in notice to see your last working day and earliest new-job start date. Weeks, months and UK statutory notice, free.",
+    "Calculate your contractual end date, earliest new-job start date, latest resignation date and UK statutory notice from your job start date.",
   alternates: { canonical: "/tools/notice-period-calculator" },
   openGraph: {
     title: "UK Notice Period Calculator",
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
       "Check whether a target start date works and see the notice date, contract end date and statutory UK minimums.",
     url: "/tools/notice-period-calculator",
   },
-};
+});
 
 const faqItems = [
   {
@@ -238,6 +239,11 @@ export default function NoticePeriodCalculatorPage() {
           ["Calculate take-home pay", "/tools/take-home-pay-calculator-uk"],
           ["Compare salaries by job", "/tools/uk-salary-by-job-title"],
         ]}
+      />
+      <MoneyPageCta
+        heading="Use the next role as your next step."
+        body={`Update your UK CV while the role details are fresh. Build and preview first, then pay ${site.price} once only if you download the PDF.`}
+        trackingContext="notice_period_money"
       />
       <FaqSection faqs={faqItems} title="UK notice period questions." />
     </>

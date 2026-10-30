@@ -22,9 +22,14 @@ export function isPublicMeasurementPath(pathname: string) {
   const path = sanitizeSameOriginPath(pathname);
   if (!path) return false;
   return !(
+    path === "/admin" ||
+    path.startsWith("/admin/") ||
     path === "/login" ||
     path === "/editor" ||
     path === "/my-cvs" ||
+    path.startsWith("/my-cvs/") ||
+    path === "/account" ||
+    path === "/cv-pdf-parity" ||
     path.startsWith("/cv-pdf/") ||
     path === "/agent-markdown" ||
     path.startsWith("/api/") ||

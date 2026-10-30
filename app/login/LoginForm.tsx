@@ -93,8 +93,8 @@ export default function LoginForm({ initialNext }: { initialNext: string }) {
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
             WorkCV uses a one-time email code so your CV can be saved, reopened,
-            and linked to your PDF payment later. No password and no payment
-            before the editor.
+            and linked to your download purchase later. No password and no
+            payment before the editor.
           </p>
           <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
             {["Build free first", "Return and keep editing", "Secure email-code login", "No monthly subscription"].map(

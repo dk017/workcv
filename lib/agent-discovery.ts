@@ -1,59 +1,26 @@
-import { comparisonCheckedDate, competitors } from "./competitors/index.ts";
+import { markdownPath } from "./md/format.ts";
 import { site } from "./site.ts";
 
-const comparisonLines = competitors
-  .map(
-    (competitor) =>
-      `- ${competitor.name} (${competitor.pricing.headline}): WorkCV vs ${competitor.name} ${site.url}${competitor.vsPath} · ${competitor.alt.subject ?? competitor.name} alternatives ${site.url}${competitor.altPath}`,
-  )
-  .join("\n");
+// The site-level files that describe WorkCV to agents. Keep in sync with robots.txt, llms.txt and ai.txt.
+export const agentDescribedByLinks = [
+  `</llms.txt>; rel="describedby"; type="text/plain"`,
+  `</llms-full.txt>; rel="describedby"; type="text/plain"`,
+  `</ai.txt>; rel="describedby"; type="text/plain"`,
+];
 
-export { agentDiscoveryLinkHeader, agentDiscoveryLinks } from "./agent-discovery-links.ts";
+export function pageLinkHeader(path: string) {
+  return [`<${markdownPath(path)}>; rel="alternate"; type="text/markdown"`, ...agentDescribedByLinks].join(", ");
+}
 
-export const homepageMarkdown = `# WorkCV
+export const agentDiscoveryLinks = [
+  `</index.md>; rel="alternate"; type="text/markdown"`,
+  ...agentDescribedByLinks,
+  `</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"`,
+  `</auth.md>; rel="service-doc"; type="text/markdown"`,
+  `</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"`,
+];
 
-WorkCV is a UK CV builder for job seekers who want a clear, professional CV without a subscription.
-
-## What users can do
-
-- Create a UK-ready CV in a guided editor.
-- Choose a clean CV template.
-- Preview the CV before paying.
-- Download the finished CV as a PDF after payment.
-- Pay ${site.price} once for the PDF download.
-- Avoid monthly subscriptions and automatic renewal.
-
-## Main actions
-
-- Start a CV: ${site.url}/editor
-- Compare templates: ${site.url}/templates
-- View pricing: ${site.url}/pricing
-- Read the no-subscription CV builder page: ${site.url}/cv-builder-no-subscription-uk
-- Browse UK CV examples: ${site.url}/cv-examples-uk
-
-## UK CV builder comparisons
-
-Sourced comparisons of WorkCV with other UK CV builders, prices checked ${comparisonCheckedDate}. Each page lists official sources and says when the other product is the better choice.
-
-- All builders in one table: ${site.url}/compare
-${comparisonLines}
-
-## Important product facts
-
-- WorkCV is built for UK CV expectations.
-- The standard flow exports PDF, not DOCX.
-- Users log in with a one-time email code so their CV can be saved.
-- There is no monthly CV builder subscription in the standard download flow.
-- The current PDF download price is ${site.price}.
-
-## Agent discovery
-
-- API catalog: ${site.url}/.well-known/api-catalog
-- Agent skills index: ${site.url}/.well-known/agent-skills/index.json
-- Auth notes: ${site.url}/auth.md
-- LLM orientation file: ${site.url}/llms.txt
-- Sitemap: ${site.url}/sitemap.xml
-`;
+export const agentDiscoveryLinkHeader = agentDiscoveryLinks.join(", ");
 
 export const createCvSkillMarkdown = `# Create a UK CV with WorkCV
 
@@ -67,25 +34,26 @@ ${site.url}
 
 - Guided UK CV creation.
 - Editable CV templates.
-- Saved CV editing after email-code login.
-- PDF download after one-time payment.
+- Building and previewing a new CV without an account; the draft is kept in the browser.
+- Saving, reopening and downloading after the user verifies their email with a one-time code.
+- PDF and Word (.docx) download after one-time payment.
+- A matching cover letter, included in the same payment.
 - No monthly CV builder subscription in the standard flow.
 
 ## Current limitations
 
-- WorkCV exports PDF only.
+- The Word file uses a single-column layout, so sidebar templates look simpler in Word than in the PDF.
 - WorkCV does not currently expose a public MCP server.
 - WorkCV does not currently expose OAuth/OIDC agent registration.
 - Payment and download require the normal website flow.
 
 ## Suggested browser flow
 
-1. Open ${site.url}/editor.
-2. If redirected to login, ask the user for permission before entering their email address.
-3. Let the user complete the email-code login step.
-4. Fill the CV editor with the user's provided CV details.
-5. Ask the user to review every section and preview page.
-6. If the user wants to download, let them complete checkout through the website.
+1. Open ${site.url}/editor. A new CV opens straight away; no account is needed to build and preview it.
+2. Fill the CV editor with the user's provided CV details.
+3. Ask the user to review every section and preview page.
+4. Until it is saved to an account, the draft exists only in the browser you are using. Downloading, uploading an existing CV or saving the draft asks for an email address and a one-time code: ask the user for permission before entering their email address, and let them enter the code.
+5. If the user wants to download, let them complete checkout through the website.
 
 ## Useful URLs
 
@@ -93,5 +61,6 @@ ${site.url}
 - Templates: ${site.url}/templates
 - Pricing: ${site.url}/pricing
 - CV examples: ${site.url}/cv-examples-uk
+- Compare UK CV builders: ${site.url}/best-cv-builder-uk
 - No-subscription builder: ${site.url}/cv-builder-no-subscription-uk
 `;

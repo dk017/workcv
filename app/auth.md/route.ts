@@ -9,7 +9,9 @@ WorkCV does not currently provide OAuth/OIDC agent registration or a public thir
 
 ## User authentication
 
-Users sign in to WorkCV with a one-time email code through the website. This lets the site save and reopen a user's CV.
+A new CV needs no account. The editor opens straight away, and the draft is kept in the browser until the user saves it.
+
+WorkCV asks for an email address and a one-time code (there is no password) when the user downloads a CV, uploads an existing CV or saves the draft to their account. Signing in is also needed to reopen a saved CV from My CVs, to return from checkout, and to carry results from WorkCV's free tools into the editor.
 
 ## Agent guidance
 

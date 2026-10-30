@@ -2,11 +2,13 @@ import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
+import { fitAdvert, trimToLimit } from "./ai-request-fit.ts";
+
 export const cvSummaryInputSchema = z.object({
-  background: z.string().trim().min(40, "Add more detail about your professional or educational background.").max(2_000),
-  targetRole: z.string().trim().min(2, "Enter the role you are targeting.").max(120),
-  evidence: z.string().trim().min(40, "Add specific skills, achievements or qualifications.").max(2_000),
-  jobDescription: z.string().trim().max(5_000).optional().default(""),
+  background: z.preprocess(trimToLimit(2_000), z.string().trim().min(40, "Add more detail about your professional or educational background.").max(2_000, "Keep your background under 2,000 characters.")),
+  targetRole: z.string().trim().min(2, "Enter the role you are targeting.").max(120, "Keep the target role under 120 characters."),
+  evidence: z.preprocess(trimToLimit(2_000), z.string().trim().min(40, "Add specific skills, achievements or qualifications.").max(2_000, "Keep your skills and achievements under 2,000 characters.")),
+  jobDescription: z.preprocess(trimToLimit(5_000, fitAdvert), z.string().trim().max(5_000, "Keep the job description under 5,000 characters.")).optional().default(""),
   careerStage: z.enum(["early", "experienced", "career-change"]).default("experienced"),
 });
 

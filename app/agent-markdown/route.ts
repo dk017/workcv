@@ -1,21 +1,10 @@
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
-import { homepageMarkdown } from "@/lib/agent-discovery";
+import { markdownPageResponse } from "@/lib/md/http";
 
-export const dynamic = "force-static";
+// Older discovery links pointed here; the homepage markdown now lives at /index.md.
+export const dynamic = "force-dynamic";
 
 export function GET(request: NextRequest) {
-  const path = request.nextUrl.searchParams.get("path") || "/";
-
-  if (path !== "/") {
-    return new Response("Not found", { status: 404 });
-  }
-
-  return new Response(homepageMarkdown, {
-    headers: {
-      "Content-Type": "text/markdown; charset=utf-8",
-      "Vary": "Accept",
-      "X-Markdown-Tokens": String(Math.ceil(homepageMarkdown.length / 4)),
-    },
-  });
+  return markdownPageResponse(request, "/");
 }

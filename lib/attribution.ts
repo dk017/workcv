@@ -1,3 +1,10 @@
+import { isPublicMeasurementPath } from "./public-paths.ts";
+
+export function canCapturePublicTouch(path: string, previousPath?: string, sameDocumentEntry = false) {
+  if (!isPublicMeasurementPath(path)) return false;
+  return !sameDocumentEntry || !previousPath || !isPublicMeasurementPath(previousPath);
+}
+
 export type BrowserSignupAttribution = {
   landingPath?: string;
   referrer?: string;
@@ -22,6 +29,14 @@ export type PersistedSignupAttribution = Omit<
 > & {
   visitorHash?: string;
   sessionHash?: string;
+};
+
+export type SaleAttribution = {
+  source?: string;
+  medium?: string;
+  campaign?: string;
+  landingPath?: string;
+  referrerHost?: string;
 };
 
 // Retained as the browser-facing compatibility name used by existing callers.
@@ -97,4 +112,15 @@ export function sanitizeSignupAttribution(value: unknown): BrowserSignupAttribut
     delete result.lastReferrerHost;
   }
   return result;
+}
+
+export function sanitizeSaleAttribution(value: unknown): SaleAttribution {
+  const attribution = sanitizeSignupAttribution(value);
+  return {
+    source: attribution.lastUtmSource || attribution.utmSource,
+    medium: attribution.lastUtmMedium || attribution.utmMedium,
+    campaign: attribution.lastUtmCampaign || attribution.utmCampaign,
+    landingPath: attribution.lastLandingPath || attribution.landingPath,
+    referrerHost: attribution.lastReferrerHost || attribution.referrerHost,
+  };
 }

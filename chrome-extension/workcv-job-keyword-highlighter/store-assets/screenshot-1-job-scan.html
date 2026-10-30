@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>WorkCV Chrome Web Store screenshot</title>
+    <style>
+      * { box-sizing: border-box; }
+      html, body { width: 1280px; height: 800px; margin: 0; overflow: hidden; }
+      body {
+        background: #dfe7ed;
+        color: #1a1a1a;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+      .browser {
+        position: relative;
+        width: 1280px;
+        height: 800px;
+        background: #fff;
+      }
+      .tabs {
+        height: 42px;
+        display: flex;
+        align-items: end;
+        gap: 8px;
+        padding: 0 16px;
+        background: #dfe5ea;
+      }
+      .traffic-lights { display: flex; gap: 7px; margin: 0 10px 15px 0; }
+      .traffic-lights i { width: 10px; height: 10px; border-radius: 50%; background: #94a3af; }
+      .tab {
+        width: 290px;
+        height: 34px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 14px;
+        border-radius: 10px 10px 0 0;
+        background: #fff;
+        color: #334e68;
+        font-size: 13px;
+      }
+      .tab-icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        display: grid;
+        place-items: center;
+        background: #0f2942;
+        color: #d4a843;
+        font-size: 10px;
+        font-weight: 900;
+      }
+      .toolbar {
+        height: 52px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 0 18px;
+        border-bottom: 1px solid #d9e0e6;
+        background: #fff;
+      }
+      .toolbar-button { color: #607080; font-size: 21px; }
+      .address {
+        height: 36px;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        padding: 0 15px;
+        border-radius: 18px;
+        background: #f1f4f6;
+        color: #536679;
+        font-size: 13px;
+      }
+      .lock { color: #2d7d52; font-size: 12px; }
+      .extension-button {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border-radius: 50%;
+        background: #0f2942;
+        box-shadow: 0 0 0 4px #f5e6c0;
+        color: #d4a843;
+        font-size: 15px;
+        font-weight: 900;
+      }
+      .page {
+        height: 706px;
+        display: grid;
+        grid-template-columns: 215px 1fr;
+        background: #f4f6f8;
+      }
+      .sidebar {
+        padding: 28px 22px;
+        border-right: 1px solid #dbe2e8;
+        background: #fff;
+      }
+      .job-brand {
+        color: #0f2942;
+        font-family: Georgia, serif;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      .side-label {
+        margin: 28px 0 10px;
+        color: #8896a3;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .side-item {
+        margin: 5px 0;
+        padding: 10px 12px;
+        border-radius: 6px;
+        color: #5a6b7b;
+        font-size: 13px;
+      }
+      .side-item.active { background: #edf2f6; color: #0f2942; font-weight: 700; }
+      .content-wrap {
+        position: relative;
+        overflow: hidden;
+        padding: 36px 430px 50px 48px;
+      }
+      .job-card {
+        min-height: 620px;
+        border: 1px solid #dbe2e8;
+        border-radius: 10px;
+        background: #fff;
+        padding: 34px 38px;
+        box-shadow: 0 4px 18px rgba(15, 41, 66, .06);
+      }
+      .company {
+        margin: 0 0 8px;
+        color: #5b7185;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .job-card h1 {
+        margin: 0;
+        color: #0f2942;
+        font-family: Georgia, serif;
+        font-size: 34px;
+        line-height: 1.12;
+      }
+      .meta { display: flex; gap: 16px; margin: 14px 0 24px; color: #607080; font-size: 13px; }
+      .apply {
+        display: inline-block;
+        margin-bottom: 28px;
+        border-radius: 6px;
+        background: #0f2942;
+        padding: 11px 20px;
+        color: #fff;
+        font-size: 13px;
+        font-weight: 700;
+      }
+      .job-card h2 {
+        margin: 22px 0 10px;
+        color: #0f2942;
+        font-family: Georgia, serif;
+        font-size: 21px;
+      }
+      .job-card p, .job-card li { color: #465d71; font-size: 14px; line-height: 1.65; }
+      .job-card ul { margin: 8px 0 0; padding-left: 20px; }
+      mark {
+        border-radius: 3px;
+        box-decoration-break: clone;
+        -webkit-box-decoration-break: clone;
+        padding: 2px 3px;
+        color: #102a43;
+        font-weight: 700;
+      }
+      .hard { background: #cfe8ff; }
+      .soft { background: #d9f2e3; }
+      .qualification { background: #f8df9a; }
+      .action { background: #eadcf8; }
+      .popup {
+        position: absolute;
+        z-index: 5;
+        top: 16px;
+        right: 28px;
+        width: 370px;
+        border: 1px solid #b7c3cd;
+        border-radius: 11px;
+        background: #f8f7f3;
+        padding: 16px;
+        box-shadow: 0 18px 48px rgba(15, 41, 66, .24);
+      }
+      .hero { padding: 3px 3px 10px; }
+      .eyebrow, .meta-label {
+        margin: 0;
+        color: #63788c;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: .12em;
+        text-transform: uppercase;
+      }
+      .hero h2 {
+        margin: 5px 0 7px;
+        color: #0f2942;
+        font-family: Georgia, serif;
+        font-size: 23px;
+        line-height: 1.1;
+      }
+      .hero p:last-child { margin: 0; color: #536679; font-size: 12px; line-height: 1.45; }
+      .panel {
+        margin-top: 9px;
+        border: 1px solid #c9d1d8;
+        border-radius: 8px;
+        background: #fff;
+        padding: 12px;
+      }
+      .page-title { margin: 6px 0 2px; color: #0f2942; font-size: 12px; font-weight: 700; }
+      .page-url { margin: 0; color: #718096; font-size: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+      .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-top: 11px; }
+      button { min-height: 36px; border-radius: 6px; font-size: 11px; font-weight: 700; }
+      .primary { border: 1px solid #0f2942; background: #0f2942; color: #fff; }
+      .secondary { border: 1px solid #a9b4bf; background: #fff; color: #0f2942; }
+      .status { margin: 9px 0 0; color: #246b48; font-size: 11px; }
+      .summary { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; }
+      .summary div { border-left: 3px solid #d4a843; background: #f8f7f3; padding: 8px; }
+      .summary span { display: block; color: #0f2942; font-family: Georgia, serif; font-size: 22px; font-weight: 700; }
+      .summary small { color: #63788c; font-size: 9px; text-transform: uppercase; }
+      .group { margin-top: 11px; }
+      .group-heading { display: flex; align-items: center; justify-content: space-between; }
+      .group-heading h3 { margin: 0; color: #0f2942; font-size: 11px; }
+      .count { border-radius: 99px; background: #eef2f5; padding: 2px 6px; color: #536679; font-size: 9px; font-weight: 700; }
+      .keywords { display: flex; flex-wrap: wrap; gap: 4px; margin: 6px 0 0; padding: 0; list-style: none; }
+      .keywords li { border: 1px solid #d5dce2; border-radius: 99px; padding: 3px 6px; color: #334e68; font-size: 9px; }
+      .privacy { margin: 9px 2px 0; color: #63788c; font-size: 9px; line-height: 1.4; }
+      .scan-badge {
+        position: absolute;
+        right: 405px;
+        top: 28px;
+        border: 1px solid #c7d2da;
+        border-radius: 99px;
+        background: #fff;
+        padding: 7px 11px;
+        color: #246b48;
+        box-shadow: 0 4px 12px rgba(15, 41, 66, .08);
+        font-size: 11px;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="browser">
+      <div class="tabs">
+        <div class="traffic-lights"><i></i><i></i><i></i></div>
+        <div class="tab"><span class="tab-icon">J</span> Customer Service Manager — Northstar</div>
+      </div>
+      <div class="toolbar">
+        <span class="toolbar-button">‹</span>
+        <span class="toolbar-button">›</span>
+        <span class="toolbar-button">↻</span>
+        <div class="address"><span class="lock">●</span> jobs.northstar-example.co.uk/customer-service-manager</div>
+        <div class="extension-button">W</div>
+        <span class="toolbar-button">⋮</span>
+      </div>
+
+      <div class="page">
+        <aside class="sidebar">
+          <div class="job-brand">Northstar Jobs</div>
+          <p class="side-label">Job search</p>
+          <div class="side-item">Search jobs</div>
+          <div class="side-item active">Saved jobs</div>
+          <div class="side-item">Applications</div>
+          <p class="side-label">Your profile</p>
+          <div class="side-item">CV and documents</div>
+          <div class="side-item">Job alerts</div>
+        </aside>
+
+        <div class="content-wrap">
+          <div class="scan-badge">✓ 13 relevant matches highlighted</div>
+          <article class="job-card">
+            <p class="company">Northstar Services Ltd</p>
+            <h1>Customer Service Manager</h1>
+            <div class="meta"><span>Manchester</span><span>£38,000–£44,000</span><span>Full-time · Hybrid</span></div>
+            <span class="apply">Apply for this job</span>
+
+            <h2>About the role</h2>
+            <p>
+              You will <mark class="action">lead</mark> a busy support team,
+              <mark class="action">improve</mark> service standards and use
+              <mark class="hard">data analysis</mark> to identify recurring customer issues.
+            </p>
+
+            <h2>What you’ll bring</h2>
+            <ul>
+              <li>Proven <mark class="hard">customer service</mark> and <mark class="soft">leadership</mark> experience.</li>
+              <li>Confident using <mark class="hard">Excel</mark>, a <mark class="hard">CRM</mark> and performance reports.</li>
+              <li>Strong <mark class="soft">communication</mark> and <mark class="soft">problem-solving</mark> skills.</li>
+              <li>A relevant <mark class="qualification">degree</mark> or equivalent professional experience.</li>
+              <li>Ability to <mark class="action">manage</mark> priorities and <mark class="action">deliver</mark> measurable improvements.</li>
+            </ul>
+          </article>
+
+          <section class="popup">
+            <header class="hero">
+              <p class="eyebrow">UK job-page scanner</p>
+              <h2>WorkCV Keyword Highlighter</h2>
+              <p>Spot skills and qualifications worth considering when you tailor your CV.</p>
+            </header>
+            <div class="panel">
+              <p class="meta-label">Current page</p>
+              <p class="page-title">Customer Service Manager — Northstar</p>
+              <p class="page-url">jobs.northstar-example.co.uk/customer-service-manager</p>
+              <div class="actions">
+                <button class="primary">Scan this page</button>
+                <button class="secondary">Remove highlights</button>
+              </div>
+              <p class="status">Highlighted 13 matches on the page.</p>
+            </div>
+            <div class="panel">
+              <div class="summary">
+                <div><span>13</span><small>matches</small></div>
+                <div><span>286</span><small>visible words</small></div>
+              </div>
+              <div class="group">
+                <div class="group-heading"><h3>Skills and tools</h3><span class="count">4</span></div>
+                <ul class="keywords"><li>customer service ×2</li><li>data analysis</li><li>Excel</li><li>CRM</li></ul>
+              </div>
+              <div class="group">
+                <div class="group-heading"><h3>Qualifications</h3><span class="count">1</span></div>
+                <ul class="keywords"><li>degree</li></ul>
+              </div>
+              <div class="group">
+                <div class="group-heading"><h3>Ways of working</h3><span class="count">3</span></div>
+                <ul class="keywords"><li>leadership</li><li>communication</li><li>problem-solving</li></ul>
+              </div>
+              <div class="group">
+                <div class="group-heading"><h3>Action verbs</h3><span class="count">4</span></div>
+                <ul class="keywords"><li>lead</li><li>improve</li><li>manage</li><li>deliver</li></ul>
+              </div>
+            </div>
+            <p class="privacy">Runs locally on the active tab. No account, history or background scraping.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

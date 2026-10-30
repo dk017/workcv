@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 
 import { LegalPage } from "@/components/legal-page";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/privacy", {
   title: "Privacy Policy",
   description:
     "How WorkCV handles personal data when you build and download a UK CV.",
@@ -13,14 +15,14 @@ export const metadata: Metadata = {
       "How WorkCV handles personal data when you build and download a UK CV.",
     url: "/privacy",
   },
-};
+});
 
 export default function PrivacyPage() {
   return (
     <LegalPage
       title="Privacy Policy"
       intro="This policy explains what personal data WorkCV handles, why we use it, and how to contact us about your data."
-      lastUpdated="27 August 2026"
+      lastUpdated={displayReviewDate(customerContentReview["/privacy"])}
       sections={[
         {
           title: "Who this applies to",
@@ -85,12 +87,45 @@ export default function PrivacyPage() {
                 pages and referral sources make the service useful.
               </p>
               <p>
+                When checkout starts, we save the recorded traffic source,
+                campaign labels, landing page, and referrer hostname with the
+                payment record so completed sales can be attributed to the
+                journey that led to checkout.
+              </p>
+              <p>
                 Random browser and session identifiers are hashed before storage.
                 We do not put CV text, imported document contents, authentication
                 codes, payment-card data, or full browsing URLs into these event
                 records. Referrers are reduced to their hostname. Detailed journey
                 events are retained for up to 180 days and are not used for
                 cross-site advertising or fingerprinting.
+              </p>
+            </>
+          ),
+        },
+        {
+          title: "AI-assisted career tools",
+          body: (
+            <>
+              <p>
+                If you submit text to the CV fit checker, job application pack,
+                cover letter generator or bullet point generator, WorkCV sends the information you provide
+                to our server and to OpenAI to produce a result. These tools do not
+                need contact details, identification numbers or sensitive family or
+                medical information to review wording and job fit. Letter tools use
+                the name you enter for the sign-off.
+                You can replace unnecessary personal details with placeholders
+                before submitting. Merely reading a page does not submit a CV.
+              </p>
+              <p>
+                If you choose to carry selected results into the editor, your
+                browser holds the handoff in the same tab. Transfers expire after
+                30 minutes; the stored copy is removed when consumed, when an expired
+                transfer is read, or when the browser clears the tab session. Content you save in your
+                WorkCV account is then handled as a saved CV draft under this
+                policy. The first-job wizard builds its initial draft in your
+                browser from the fields you enter; it is a different process from
+                the AI-assisted tools named above.
               </p>
             </>
           ),
@@ -115,13 +150,24 @@ export default function PrivacyPage() {
           ),
         },
         {
+          title: "Local file checks and statement worksheets",
+          body: <><p>The PDF/DOCX format checker reads the selected file in your browser. File contents, previews and extracted text are not uploaded during this check. The supporting-statement planner also runs locally without sending your worksheet text to our server or an AI provider. Close the page or clear the result when finished on a shared device.</p><p>If you choose to continue from a file check or application pack into the editor, the handoff is temporarily held in this tab. Extracted CV text is sent to our authenticated import service for structured drafting. Content saved in the editor, including original CV text and application-pack notes, becomes part of your account's saved draft. These notes are separate from the CV PDF. The ordinary usage events described above do not contain the file or worksheet contents.</p></>,
+        },
+        {
+          title: "Job application tracker",
+          body: <><p>The job application tracker stores the jobs you add only in your browser&apos;s local storage on your device. We do not receive them, and clearing your browser data deletes them. Exported CSV files and printed logs stay on your device.</p><p>If you choose &ldquo;Tailor my CV for this job&rdquo;, that job&apos;s title, employer and advert text are held temporarily in this browser tab and used to fill in the Job Application Pack. They are only sent to our server if you then submit that tool. Usage events record that the tracker was used, never the jobs you entered.</p></>,
+        },
+        {
           title: "Storage and retention",
           body: (
             <>
               <p>
-                CV draft content is saved to your WorkCV account after email-code
-                login. Payment records are kept for accounting, fraud prevention,
-                support, and dispute handling.
+                If you build a CV without signing in, the draft is stored only in
+                your browser's local storage on that device and is not saved to
+                WorkCV's servers. It is saved to your WorkCV account once you
+                verify your email with a one-time code. Payment records are kept for accounting, fraud prevention,
+                support, dispute handling, and the sales-attribution purpose
+                described above.
               </p>
               <p>
                 We keep personal data only for as long as needed for the purpose it

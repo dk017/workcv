@@ -15,11 +15,13 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
+import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
-  title: "Care Worker CV Template UK + Example",
+export const metadata: Metadata = withAgentMetadata("/cv-template-care-worker-uk", {
+  title: "Care Worker CV Template UK + Cover Letter",
   description:
-    "Use a care worker CV template for UK jobs with care assistant, safeguarding, records, training and person-centred care examples.",
+    "See a UK care worker CV and matching cover letter, get a free checklist and build your own application using accurate care experience and training.",
   alternates: { canonical: "/cv-template-care-worker-uk" },
   openGraph: {
     title: "Care Worker CV Template UK - WorkCV",
@@ -27,9 +29,9 @@ export const metadata: Metadata = {
       "An editable UK care worker CV with person-centred care, safeguarding and training examples.",
     url: "/cv-template-care-worker-uk",
   },
-};
+});
 
-const editorHref = "/editor?template=classic&roleTemplate=care-worker&new=1";
+const editorHref = "#application-pack";
 const careWorkerCv = getRoleCvTemplate("care-worker");
 
 const jsonLd = {
@@ -184,6 +186,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Care worker cover letter example", "/cover-letter-examples-uk#care-worker"],
   ["Care worker personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
@@ -217,7 +220,7 @@ export default function CareWorkerCvTemplateUkPage() {
               safeguarding, training and reliability into clear shortlist evidence.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={editorHref}>Use care worker CV template</ButtonLink>
+              <ButtonLink href={editorHref} trackingLabel="role_pack_care_worker_hero">Build my CV and letter</ButtonLink>
               <ButtonLink href="#example" variant="secondary">
                 See example
               </ButtonLink>
@@ -231,7 +234,7 @@ export default function CareWorkerCvTemplateUkPage() {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-                  Editable draft
+                  Fictional CV example
                 </p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-navy">
                   Care Worker CV
@@ -241,7 +244,7 @@ export default function CareWorkerCvTemplateUkPage() {
                 href={editorHref}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
               >
-                Edit
+                Personalise
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -253,6 +256,8 @@ export default function CareWorkerCvTemplateUkPage() {
           </div>
         </div>
       </section>
+
+      <RoleApplicationPack id="care-worker" />
 
       <section className="bg-surface py-24">
         <div className="container-page">
@@ -426,9 +431,10 @@ export default function CareWorkerCvTemplateUkPage() {
       />
       <FinalCta
         heading="Start with a care worker CV grounded in real practice."
-        body={`Edit the care-worker draft for your setting and experience, then pay ${site.price} only when you download the final PDF.`}
+        body={`Use your own care experience, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`}
         primaryHref={editorHref}
-        primary="Use care worker CV template"
+        primary="Build my CV and letter"
+        trackingContext="role_pack_care_worker_final"
         secondaryHref="/cv-no-experience-uk"
         secondary="Build without care experience"
       />

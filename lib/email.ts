@@ -56,13 +56,26 @@ export async function sendPurchaseConfirmationEmail(input: {
   amountCents: number | null;
   currency: string;
   editorUrl: string;
+  plan?: "cv" | "pass";
+  passEndsAt?: Date | null;
+  upgrade?: { priceMinor: number; creditMinor: number; endsAt: Date } | null;
 }) {
   const transporter = getEmailTransporter();
   if (!transporter) {
     throw new Error("SMTP is not configured for purchase confirmation email");
   }
+  const isPass = input.plan === "pass";
+  const passEnd = input.passEndsAt
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "Europe/London" }).format(input.passEndsAt)
+    : null;
+  const unlockedText = isPass
+    ? `Your Job Search Pass is active${passEnd ? ` until ${passEnd}` : " for 90 days"}. Every CV and cover letter you create before then is unlocked as PDF and Word, and stays yours to edit and download after the pass ends.`
+    : "Your saved CV is unlocked. You can return to the editor to download it or make further changes.";
 
   const { from, replyTo } = getTransactionalEmailIdentity();
+  const upgradeText = input.upgrade
+    ? `Applying for more jobs? Until ${new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", timeZone: "Europe/London" }).format(input.upgrade.endsAt)} you can upgrade to the Job Search Pass for ${formatAmount(input.upgrade.priceMinor, input.currency)}: your ${formatAmount(input.upgrade.creditMinor, input.currency)} counts towards it. It covers unlimited CVs and cover letters for 90 days and never renews. Open the editor and choose the Job Search Pass at checkout.`
+    : "";
   const amount = formatAmount(input.amountCents, input.currency);
   const safeOrderId = escapeHtml(input.orderId);
   const safeEditorUrl = escapeHtml(input.editorUrl);
@@ -73,18 +86,19 @@ export async function sendPurchaseConfirmationEmail(input: {
     from,
     replyTo,
     to: input.to,
-    subject: "Your WorkCV purchase is confirmed",
+    subject: isPass ? "Your WorkCV Job Search Pass is active" : "Your WorkCV purchase is confirmed",
     text: [
       "Your WorkCV payment was successful.",
       "",
       amountText.trimEnd(),
       `Order reference: ${input.orderId}`,
       "",
-      "Your saved CV is unlocked. You can return to the editor to download it or make further changes.",
+      unlockedText,
       input.editorUrl,
       "",
       "This was a one-time payment. No subscription or automatic renewal was started.",
       "",
+      upgradeText,
       "If you need help, reply to this email.",
     ]
       .filter(Boolean)
@@ -92,7 +106,7 @@ export async function sendPurchaseConfirmationEmail(input: {
     html: `
       <div style="font-family:Arial,sans-serif;line-height:1.6;color:#17202a;max-width:600px">
         <h1 style="color:#0f2942;font-size:24px">Your WorkCV purchase is confirmed</h1>
-        <p>Your payment was successful and your saved CV is now unlocked.</p>
+        <p>Your payment was successful. ${escapeHtml(unlockedText)}</p>
         ${amountHtml}
         <p><strong>Order reference:</strong> ${safeOrderId}</p>
         <p>
@@ -102,6 +116,7 @@ export async function sendPurchaseConfirmationEmail(input: {
         </p>
         <p>You can download your CV or make further changes from the editor.</p>
         <p><strong>This was a one-time payment.</strong> No subscription or automatic renewal was started.</p>
+        ${upgradeText ? `<p style="background:#f5e6c0;padding:12px 14px;border-radius:6px">${escapeHtml(upgradeText)}</p>` : ""}
         <p>If you need help, reply to this email.</p>
       </div>
     `,
