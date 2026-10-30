@@ -7,13 +7,16 @@ import { ArrowRight, Check, Download, FileText, ShieldCheck } from "lucide-react
 
 import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/blank-cv-template-uk";
 
-export const metadata: Metadata = {
-  title: "Blank CV Template UK - Free Word Download (.docx), No Sign-up",
+export const metadata: Metadata = withAgentMetadata(path, {
+  title: "Free CV Template UK Download - Editable Word",
   description:
-    "Free blank UK CV template in Word (.docx). One click to download, no email, sign-up or subscription. Single column, no tables or text boxes, with fill-in prompts.",
+    "Download a free editable CV template for UK jobs as a Word document. No signup, payment or subscription; tailor it before you apply.",
   alternates: { canonical: path },
   openGraph: {
     title: "Free Editable CV Template UK - Word Download",
@@ -21,13 +24,13 @@ export const metadata: Metadata = {
       "Download a clean, single-column UK CV template in Word format and tailor it to the job advert.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {
     question: "Is the blank CV template really free?",
     answer:
-      "Yes. The editable Word document downloads directly with no signup, email gate, payment or subscription. The separate online builder is a different product flow: it is free to build and preview, then charges the one-time PDF price shown before download.",
+      "Yes. The editable Word document downloads directly with no signup, email gate, payment or subscription. The separate online builder is a different product flow: it is free to build and preview, then charges the one-time price shown before download, which includes both a PDF and a formatted Word file.",
   },
   {
     question: "What format is the free CV template?",
@@ -328,12 +331,17 @@ export default function BlankCvTemplatePage() {
         </div>
       </section>
 
-      <WorkedSection title="Check the actual Word template before filling it">
+      <WorkedSection title="Check the actual Word template before filling it" reviewed={customerContentReview[path]}>
         <p>The download is a .docx with editable text. Its sections are Personal Profile, Key Skills, Work Experience, Education and Qualifications, Additional Information and References. The image below shows the actual generated file; the simplified hero illustration is a summary.</p>
         <figure><a href="/product-proof/blank-word-template.png"><img src="/product-proof/blank-word-template.png" alt="Rendered blank WorkCV Word document showing its actual headings and grey replacement instructions" width={794} height={1123} className="mx-auto h-auto w-full max-w-xl border border-line" /></a><figcaption className="mt-3 text-sm text-muted">Actual template preview. Open the image for a larger view and the free DOCX to edit it.</figcaption></figure>
         <ol className="list-decimal space-y-2 pl-6"><li>Use the direct download above and open the .docx in your document editor.</li><li>Save your own working copy with a recognisable filename.</li><li>Replace YOUR NAME, contact prompts, job titles, dates and every grey instruction. Delete unused sections and irrelevant prompts.</li><li>Check the layout and every page after adding your own content.</li><li>Follow the employer&apos;s file instructions and keep your editable master.</li></ol>
-        <p>Read <Link className="underline" href="/cv-word-or-pdf-uk">whether to send Word or PDF</Link> before exporting. The optional online builder requires login and charges {site.price} once for your saved CV&apos;s PDF; this Word download stays free without an account.</p>
+        <p>Read <Link className="underline" href="/cv-word-or-pdf-uk">whether to send Word or PDF</Link> before exporting. The optional online builder needs an email code to save or download and charges {site.price} once for your saved CV as PDF and formatted Word; this blank Word download stays free without an account.</p>
       </WorkedSection>
+      <section className="bg-surface py-12"><div className="container-page max-w-5xl text-base leading-8 text-ink">
+        <h2 className="font-display text-3xl font-semibold text-navy">Need guided formatting and a PDF instead?</h2>
+        <p className="mt-4">Keep the free DOCX if you want to edit the file yourself. WorkCV’s separate builder lets you edit and preview in your account, then charges {site.price} once for one saved CV as a PDF and a formatted Word file. <Link className="font-semibold underline" href={customerQuestionHref("Q02")}>Compare the free and paid options</Link> before choosing.</p>
+        <p className="mt-3 text-sm text-muted">Reviewed <time dateTime={customerContentReview[path]}>{displayReviewDate(customerContentReview[path])}</time>.</p>
+      </div></section>
       <RelatedLinksSection
         title="More ways to improve the application."
         links={[

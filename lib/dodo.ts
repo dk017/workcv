@@ -1,6 +1,7 @@
 import { createHmac, timingSafeEqual } from "crypto";
 
-import { WORKCV_PRICE, WORKCV_PRODUCT_ID } from "@/lib/commerce";
+import { WORKCV_PASS_PRODUCT_ID, WORKCV_PRICE, WORKCV_PRODUCT_ID, productIdForPlan, type WorkcvPlan } from "@/lib/commerce";
+import { upgradeDiscountBody, upgradeDiscountCode } from "@/lib/pass-upgrade";
 
 export const DODO_PRODUCT_ID = WORKCV_PRODUCT_ID;
 
@@ -32,13 +33,21 @@ export function getSiteHost() {
   }
 }
 
-export async function createDodoCheckout(input: { draftId: string; email?: string }) {
+export async function createDodoCheckout(input: {
+  draftId: string;
+  email?: string;
+  plan?: WorkcvPlan;
+  discountCode?: string;
+  upgradeCreditMinor?: number;
+}) {
   if (!DODO_API_KEY) {
     throw new Error("DODO_API_KEY is not configured");
   }
 
+  const plan = input.plan || "cv";
+  const productId = productIdForPlan(plan);
   const body: Record<string, unknown> = {
-    product_cart: [{ product_id: DODO_PRODUCT_ID, quantity: 1 }],
+    product_cart: [{ product_id: productId, quantity: 1 }],
     allowed_payment_method_types: ["credit", "debit", "apple_pay", "google_pay"],
     billing_currency: WORKCV_PRICE.currency,
     return_url: `${getAppUrl()}/editor?payment=success&draftId=${encodeURIComponent(
@@ -49,8 +58,8 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
     )}`,
     metadata: {
       draft_id: input.draftId,
-      product: "cv-download",
-      product_id: DODO_PRODUCT_ID,
+      product: plan === "pass" ? "job-search-pass" : "cv-download",
+      product_id: productId,
       provider: "dodo",
       site_host: getSiteHost(),
     },
@@ -68,6 +77,11 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
 
   if (input.email) {
     body.customer = { email: input.email };
+  }
+  if (input.discountCode) {
+    body.discount_codes = [input.discountCode];
+    // Dodo metadata values are strings.
+    (body.metadata as Record<string, unknown>).upgrade_credit_minor = String(input.upgradeCreditMinor ?? "");
   }
 
   const response = await fetch(`${DODO_API_BASE}/checkouts`, {
@@ -92,8 +106,30 @@ export async function createDodoCheckout(input: { draftId: string; email?: strin
   return {
     checkoutUrl: checkout.checkout_url,
     sessionId: checkout.session_id,
+    productId,
     siteHost: getSiteHost(),
   };
+}
+
+// Single-use credit for a Job Search Pass upgrade; expires in two hours.
+export async function createDodoUpgradeDiscount(creditMinor: number) {
+  if (!DODO_API_KEY) {
+    throw new Error("DODO_API_KEY is not configured");
+  }
+  const code = upgradeDiscountCode();
+  const response = await fetch(`${DODO_API_BASE}/discounts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${DODO_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(upgradeDiscountBody({ creditMinor, passProductId: WORKCV_PASS_PRODUCT_ID, code })),
+  });
+  if (!response.ok) {
+    throw new Error(`Dodo discount failed (${response.status}): ${await response.text()}`);
+  }
+  const discount = (await response.json()) as { code?: string };
+  return discount.code || code;
 }
 
 function decodeWebhookSecret(secret: string): Buffer {

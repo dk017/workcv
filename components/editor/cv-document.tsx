@@ -8,8 +8,11 @@ import {
   ExperienceItem,
   TemplateId,
   lines,
+  orderedCvSections,
+  cvSectionLabels,
 } from "@/lib/editor-data";
 import { getCvNameTypography } from "@/lib/cv-typography";
+import { cvDesignStyle } from "@/lib/cv-design";
 
 export function CvDocument({
   cv,
@@ -22,6 +25,9 @@ export function CvDocument({
     compactPreview ? "shadow-none" : ""
   }`;
 
+  if (cv.layoutPreset && cv.layoutPreset !== "standard") {
+    return <ClassicCvDocument cv={cv} baseClass={baseClass + " cv-preset-" + cv.layoutPreset} />;
+  }
   if (cv.template === "modern") {
     return <ModernCvDocument cv={cv} baseClass={baseClass} />;
   }
@@ -48,10 +54,10 @@ function CvSection({
 }) {
   const headingClass =
     template === "modern"
-      ? "mb-4 border-l-4 border-gold bg-[#fbf6e8] px-3 py-2 text-sm font-bold uppercase tracking-[0.16em] text-navy"
+      ? "mb-4 border-l-4 border-gold bg-[#fbf6e8] px-3 py-2 text-sm font-bold uppercase tracking-[0.04em] text-navy"
       : template === "compact"
-        ? "mb-2 border-b border-line pb-1 text-xs font-bold uppercase tracking-[0.14em] text-navy"
-        : "mb-3 border-b border-line pb-2 text-sm font-bold uppercase tracking-[0.16em] text-navy";
+        ? "mb-2 border-b border-line pb-1 text-xs font-bold uppercase tracking-[0.04em] text-navy"
+        : "mb-3 border-b border-line pb-2 text-sm font-bold uppercase tracking-[0.04em] text-navy";
 
   return (
     <section
@@ -69,6 +75,7 @@ function ClassicCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
   return (
     <article
       className={`${baseClass} cv-template-classic border-t-[10px] border-navy px-12 py-12`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="classic"
     >
       <header className="cv-header border-b-2 border-navy pb-7 text-center">
@@ -87,11 +94,12 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
   return (
     <article
       className={`${baseClass} cv-template-modern grid grid-cols-[230px_minmax(0,1fr)] overflow-hidden border-l-[10px] border-gold`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="modern"
     >
       <aside className="cv-sidebar bg-navy px-7 py-10 text-white">
         <CvName cv={cv} template="modern" />
-        <p className="mt-3 text-sm font-bold uppercase tracking-[0.12em] text-gold-tint">
+        <p className="mt-3 text-sm font-bold uppercase tracking-[0.04em] text-gold-tint">
           {cv.targetRole || <PreviewPlaceholder>Target role</PreviewPlaceholder>}
         </p>
         <div className="mt-8 space-y-5 text-sm leading-6 text-white/85">
@@ -120,13 +128,7 @@ function ModernCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string }) 
         </div>
       </aside>
       <main className="min-w-0 px-10 py-10">
-        <CvSection title="Profile" compact={false} template="modern">
-          <p className="leading-7 text-ink">
-            {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-          </p>
-        </CvSection>
-        <ExperienceContent cv={cv} template="modern" />
-        <EducationContent cv={cv} template="modern" />
+        <CvBody cv={cv} template="modern" />
       </main>
     </article>
   );
@@ -136,6 +138,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
   return (
     <article
       className={`${baseClass} cv-template-compact border-t-[6px] border-line-strong px-10 py-9 text-[13px]`}
+      style={cvDesignStyle(cv.design) as CSSProperties}
       data-template="compact"
     >
       <header className="cv-header grid grid-cols-[1fr_auto] gap-4 border-b-2 border-navy pb-4">
@@ -149,13 +152,7 @@ function CompactCvDocument({ cv, baseClass }: { cv: CvData; baseClass: string })
       </header>
       <div className="cv-compact-body grid grid-cols-[minmax(0,1fr)_220px] gap-8 pt-2">
         <main className="min-w-0">
-          <CvSection title="Profile" compact template="compact">
-            <p className="leading-6 text-ink">
-              {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-            </p>
-          </CvSection>
-          <ExperienceContent cv={cv} template="compact" />
-          <EducationContent cv={cv} template="compact" />
+          <CvBody cv={cv} template="compact" />
         </main>
         <aside>
           <CvSection title="Skills" compact template="compact">
@@ -184,7 +181,7 @@ function CvName({
 
   return (
     <h2
-      className={`cv-name font-display font-semibold leading-tight ${className}`}
+      className={`cv-name font-cvname font-semibold leading-tight ${className}`}
       data-emergency-break={typography.emergencyBreak ? "true" : "false"}
       style={style}
     >
@@ -200,20 +197,19 @@ function CvBody({
   cv: CvData;
   template: TemplateId;
 }) {
-  return (
-    <>
-      <CvSection title="Profile" compact={false} template={template}>
-        <p className="leading-7 text-ink">
-          {cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}
-        </p>
-      </CvSection>
-      <ExperienceContent cv={cv} template={template} />
-      <EducationContent cv={cv} template={template} />
-      <CvSection title="Skills" compact={false} template={template}>
-        <SkillsList cv={cv} />
-      </CvSection>
-    </>
-  );
+  return <>{orderedCvSections(cv).map((section) => {
+    if (section === "experience") return <ExperienceContent key={section} cv={cv} template={template} />;
+    if (section === "education") return <EducationContent key={section} cv={cv} template={template} />;
+    if (section === "skills" && template !== "classic") return null;
+    const extra = section !== "profile" && section !== "skills" ? cv.additionalSections?.[section] : undefined;
+    if (extra !== undefined && !extra.trim()) return null;
+    if (section !== "profile" && section !== "skills" && !extra) return null;
+    return <CvSection key={section} title={cvSectionLabels[section]} compact={template === "compact"} template={template}>
+      {section === "profile" ? <p className="leading-7 text-ink">{cv.profile || <PreviewPlaceholder>Add a concise professional profile.</PreviewPlaceholder>}</p>
+        : section === "skills" ? <SkillsList cv={cv} />
+        : <p className="whitespace-pre-line break-words leading-7 text-ink">{extra}</p>}
+    </CvSection>;
+  })}</>;
 }
 
 function ExperienceContent({
@@ -315,7 +311,7 @@ function ContactLine({
 }) {
   return (
     <div
-      className={`cv-contact-line mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-muted ${
+      className={`cv-contact-line mt-5 flex flex-wrap gap-x-4 gap-y-2 text-sm text-cvmuted ${
         align === "center" ? "justify-center" : "justify-end text-right"
       } ${compact ? "max-w-[260px] text-xs leading-5" : ""}`}
     >
@@ -340,8 +336,8 @@ function SidebarBlock({
   children: React.ReactNode;
 }) {
   return (
-    <section>
-      <h3 className="mb-3 border-b border-white/25 pb-2 text-xs font-bold uppercase tracking-[0.16em] text-gold-tint">
+    <section data-cv-section={title.toLowerCase()}>
+      <h3 className="mb-3 border-b border-white/25 pb-2 text-xs font-bold uppercase tracking-[0.04em] text-gold-tint">
         {title}
       </h3>
       {children}
@@ -371,7 +367,7 @@ function Entry({
           <h4 className="font-bold text-navy">{title}</h4>
           <p className="text-sm font-bold text-ink">{subtitle}</p>
         </div>
-        <p className="cv-entry-dates shrink-0 whitespace-nowrap text-sm text-muted">{dates}</p>
+        <p className="cv-entry-dates shrink-0 whitespace-nowrap text-sm text-cvmuted">{dates}</p>
       </div>
       {bullets.length > 0 && (
         <ul className={compact ? "mt-2 space-y-1.5" : "mt-3 space-y-2"}>

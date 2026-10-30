@@ -1,4 +1,5 @@
 .git
+.private-reports
 .github
 .next
 node_modules

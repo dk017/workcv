@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import { CareerChangeExample } from "@/components/content-worked-examples";
 import Link from "next/link";
@@ -5,13 +6,14 @@ import { ArrowRight, Check, FileText, Search, Shuffle, Target } from "lucide-rea
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/career-change-cv-uk", {
   title: "Career Change CV Example UK + Template",
   description:
     "See career change CV examples for the UK: position transferable skills, explain your move and build a focused CV for the target role.",
   alternates: { canonical: "/career-change-cv-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -357,6 +359,7 @@ export default function CareerChangeCvUkPage() {
       </section>
 
       <CareerChangeExample />
+      <CareerHistoryLinks context="change" />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,
@@ -366,7 +369,7 @@ export default function CareerChangeCvUkPage() {
       />
       <FinalCta
         heading="Build a CV that makes the career change make sense."
-        body={`Log in with an email code, save your CV, and pay ${site.price} only when you download the final PDF.`}
+        body={`Build and preview your CV without an account, save it with an email code, and pay ${site.price} only when you download the final PDF.`}
         secondaryHref="/cv-builder-no-subscription-uk"
         secondary="How pricing works"
       />

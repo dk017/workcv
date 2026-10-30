@@ -16,28 +16,31 @@ import {
 } from "lucide-react";
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import { SampleCvProof } from "@/components/sample-cv-proof";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const pagePath = "/cv-personal-statement-uk";
-const reviewDate = "25 August 2026";
-const reviewDateIso = "2026-08-25";
+const reviewDateIso = customerContentReview["/cv-personal-statement-uk"];
+const reviewDate = displayReviewDate(reviewDateIso);
 const publishedDateIso = "2026-06-13";
 const advertUrl = "https://www.jobs.nhs.uk/candidate/jobadvert/C9301-26-0052";
 
-export const metadata: Metadata = {
-  title: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+export const metadata: Metadata = withAgentMetadata("/cv-personal-statement-uk", {
+  title: "CV Personal Statement UK: 20 Examples + Walkthrough",
   description:
-    "Write a stronger UK CV personal statement with 12 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
+    "Write a stronger UK CV personal statement with 20 evidence-led examples, a real NHS job-advert walkthrough, and a one-time-price CV builder.",
   alternates: { canonical: pagePath },
   openGraph: {
-    title: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+    title: "CV Personal Statement UK: 20 Examples + Job-Advert Walkthrough",
     description:
       "See how to turn a real UK job advert and your evidence into a focused CV personal statement.",
     url: pagePath,
   },
-};
+});
 
 const faqItems = [
   {
@@ -83,7 +86,7 @@ const jsonLd = {
 const articleSchema = {
   "@context": "https://schema.org",
   "@type": "Article",
-  headline: "CV Personal Statement UK: 12 Examples + Job-Advert Walkthrough",
+  headline: "CV Personal Statement UK: 20 Examples + Job-Advert Walkthrough",
   description: metadata.description,
   datePublished: publishedDateIso,
   dateModified: reviewDateIso,
@@ -320,6 +323,97 @@ const examples: Example[] = [
       "Links the example to operational value.",
     ],
   },
+  {
+    title: "Registered nurse",
+    context: "Hospital ward",
+    statement:
+      "NMC-registered adult nurse with two years' experience on a busy medical ward, caring for up to eight patients per shift. Confident with patient assessment, medicines administration and NEWS2 observations, and quick to escalate a deteriorating patient using SBAR. Seeking a band 5 surgical post where safe, compassionate care and clear handovers matter.",
+    annotations: [
+      "Registration and setting come first.",
+      "Names precise clinical skills, not adjectives.",
+      "States the band and setting being targeted.",
+    ],
+    relatedHref: "/cv-template-nurse-uk",
+  },
+  {
+    title: "Secondary teacher",
+    context: "Schools",
+    statement:
+      "Qualified secondary English teacher with QTS and two years' experience teaching Key Stage 3 and GCSE classes of mixed attainment. Plans sequenced lessons, uses regular low-stakes assessment to adapt teaching, and works closely with the SENCO to support pupils with additional needs. Looking for a department where reading for pleasure and consistent routines are priorities.",
+    annotations: [
+      "QTS and key stages stated up front.",
+      "Shows teaching practice through methods, not slogans.",
+      "Ties the target to something specific about the school.",
+    ],
+    relatedHref: "/cv-template-teacher-uk",
+  },
+  {
+    title: "Student (part-time job)",
+    context: "Retail or hospitality",
+    statement:
+      "Second-year business student looking for part-time retail work alongside my degree. Experienced in serving customers as a volunteer at a community bookshop and in organising events for my university society. Reliable, comfortable handling cash and available for up to 16 hours a week, including weekends.",
+    annotations: [
+      "Honest about being a student.",
+      "Uses volunteering and societies as evidence.",
+      "Gives availability, which part-time employers need.",
+    ],
+    relatedHref: "/student-cv-template",
+  },
+  {
+    title: "Healthcare assistant",
+    context: "NHS or care setting",
+    statement:
+      "Healthcare assistant with 18 months' experience supporting patients with personal care, observations and mobility on an elderly care ward. Completed the Care Certificate and trained in basic life support and infection prevention. Seeking a healthcare assistant role where kindness, accurate observations and good teamwork with nurses make a difference.",
+    annotations: [
+      "Lists training actually completed.",
+      "Keeps within the scope of the role.",
+      "Links personal qualities to real tasks.",
+    ],
+  },
+  {
+    title: "Receptionist",
+    context: "Front of house",
+    statement:
+      "Friendly and organised receptionist with two years' experience running the front desk at a busy dental practice. Manages appointment diaries, telephone and email enquiries and patient check-in on practice software, while keeping personal information confidential. Seeking a front-of-house role where a calm, welcoming first impression matters.",
+    annotations: [
+      "Describes the desk tasks employers expect.",
+      "Mentions confidentiality, often essential.",
+      "Uses personality words only with evidence.",
+    ],
+  },
+  {
+    title: "IT support technician",
+    context: "Service desk",
+    statement:
+      "IT support technician with three years' first and second line experience in a 300-user organisation. Resolves hardware, software and account issues through a ticketing system, manages Microsoft 365 and Active Directory accounts, and writes clear guides that reduce repeat calls. Looking to join a service desk that values patient explanation as much as technical fixes.",
+    annotations: [
+      "Gives scale and support level.",
+      "Names systems a screener will search for.",
+      "Shows impact without inventing numbers.",
+    ],
+  },
+  {
+    title: "Accounts assistant",
+    context: "Finance",
+    statement:
+      "Accounts assistant studying for AAT Level 3, with two years' experience processing supplier invoices, matching purchase orders and chasing missing paperwork before month end. Uses Sage and Excel daily, including lookups and pivot tables for spend reports. Seeking a finance role where accuracy and steady progress towards qualification are supported.",
+    annotations: [
+      "Shows the qualification in progress honestly.",
+      "Names specific finance tasks and tools.",
+      "States a realistic next step.",
+    ],
+  },
+  {
+    title: "Hospitality team member",
+    context: "Restaurants and hotels",
+    statement:
+      "Hospitality team member with two years' experience serving customers in a busy café and hotel restaurant. Comfortable taking orders, handling payments and keeping service moving during peak times, with Level 2 Food Hygiene. Looking for a front-of-house role where good service and teamwork keep guests coming back.",
+    annotations: [
+      "Covers the core front-of-house duties.",
+      "Includes the certificate employers ask for.",
+      "Short and easy to scan.",
+    ],
+  },
 ];
 
 const beforeAfter = [
@@ -385,7 +479,7 @@ export default function CvPersonalStatementUkPage() {
               <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
                 A UK CV personal statement should not be a life story. It should
                 quickly show the role you want, the evidence you bring and why
-                the rest of the CV is worth reading. This guide includes 12
+                the rest of the CV is worth reading. This guide includes 20
                 examples and a real advert-to-statement walkthrough.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
@@ -410,11 +504,19 @@ export default function CvPersonalStatementUkPage() {
                 tools, settings, scale and genuine outcomes instead.
               </p>
               <p className="mt-4 text-sm font-bold leading-6 text-navy">
-                12 examples · 1 real advert walkthrough · no invented claims
+                20 examples · 1 real advert walkthrough · no invented claims
               </p>
             </div>
           </div>
         </section>
+
+        <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+          <CustomerAnswer questionId="Q17">
+            <div className="grid gap-4 md:grid-cols-3"><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Keep it</h3><p className="mt-2">It names your target role and points to evidence the rest of your CV demonstrates.</p></div><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Rewrite it</h3><p className="mt-2">It says “dynamic team player” but never names a role, task or relevant skill.</p></div><div className="rounded-lg border border-line bg-white p-5"><h3 className="font-display text-xl font-semibold text-navy">Remove it</h3><p className="mt-2">It repeats the job history without helping the reader understand your application.</p></div></div>
+            <p><strong>Fictional Alex, generic:</strong> “Dynamic team player with excellent organisational skills.” <strong>Evidence-led:</strong> “Retail supervisor moving into office administration, with experience coordinating a 12-person rota, updating an Excel delivery tracker and replying to customer order enquiries.” The second version keeps Alex’s true title and shows what the candidate did.</p>
+            <p>A separate supporting statement requested by an employer needs its own evidence against that role. For <Link className="font-semibold underline" href="/chatgpt-cv-to-pdf-uk#ai-without-invented-facts">AI wording checks</Link>, never add achievements the source CV does not support.</p>
+          </CustomerAnswer>
+        </div></section>
 
         <section className="bg-surface py-24">
           <div className="container-page">
@@ -575,7 +677,7 @@ export default function CvPersonalStatementUkPage() {
 
         <section id="examples" className="scroll-mt-24 bg-surface py-24">
           <div className="container-page">
-            <SectionLabel>12 examples</SectionLabel>
+            <SectionLabel>20 examples</SectionLabel>
             <h2 className="max-w-3xl font-display text-4xl font-semibold text-navy md:text-5xl">
               UK CV personal statement examples with evidence built in.
             </h2>

@@ -241,7 +241,21 @@ const categoryWeights: Record<AtsKeywordCategory, number> = {
 };
 
 const requirementSignals =
-  /\b(essential|required|must|need(?:ed)?|minimum|proven|demonstrable|qualified|qualification|certification|licen[cs]e|experience (?:of|in|with|using)|knowledge of|proficien(?:t|cy))\b/i;
+  /\b(essential|required|must|need(?:ed)?|minimum|proven|demonstrable|qualified|qualification|certification|experience (?:of|in|with|using)|knowledge of|proficien(?:t|cy))\b/i;
+
+// Wording that makes a requirement optional. It outranks requirementSignals, so
+// "a full driving licence is desirable" is not treated as essential.
+const desirableSignals =
+  /\b(desirable|desired|preferred|preferably|ideally|nice to have|a plus|an advantage|advantageous|beneficial|bonus|not essential)\b/i;
+
+// A short line that opens a list of requirements ("Essential:", "Must have") or
+// of optional extras ("Desirable:", "Nice to have"). The importance applies to
+// the bullets underneath it.
+const essentialHeading =
+  /^\W*(essential|required|requirements?|key requirements?|minimum requirements?|must[- ]haves?|you must have|what you(?:'ll| will) need|we need)\b[^.!?]{0,60}$/i;
+const desirableHeading =
+  /^\W*(desirable|preferred|nice[- ]to[- ]haves?|bonus|advantageous|beneficial|ideally|a plus|it would be (?:a )?(?:plus|bonus|advantage))\b[^.!?]{0,60}$/i;
+const bulletLine = /^\s*(?:[-*•▪●–]|\d+[.)])\s+\S/;
 
 const acronymExclusions = new Set([
   "CV",
@@ -267,6 +281,9 @@ function normalise(value: string) {
     .toLowerCase()
     .replace(/&/g, " and ")
     .replace(/[^a-z0-9+#.]+/g, " ")
+    // Keep dots inside terms (node.js) but drop sentence full stops, so "in Salesforce." still matches.
+    .replace(/\.+(?=\s|$)/g, "")
+    .replace(/(?<=^|\s)\.+/g, "")
     .replace(/\s+/g, " ")
     .trim();
 }
@@ -294,19 +311,66 @@ function bestVariantCount(text: string, definition: KeywordDefinition) {
   );
 }
 
-function findRelevantContext(jobDescription: string, definition: KeywordDefinition) {
-  const contexts = jobDescription
-    .split(/[\n.!?;]+/)
-    .map((part) => part.trim())
-    .filter(Boolean);
+type RequirementContext = { text: string; normalised: string; section: "essential" | "desirable" | null };
 
-  return contexts.some((context) => {
-    const normalisedContext = normalise(context);
-    return (
-      requirementSignals.test(context) &&
-      bestVariantCount(normalisedContext, definition) > 0
-    );
+// Splits the advert into sentence-sized contexts and records which heading
+// ("Essential:", "Desirable:") each one sits under.
+function requirementContexts(jobDescription: string): RequirementContext[] {
+  const contexts: RequirementContext[] = [];
+  let section: RequirementContext["section"] = null;
+  const lines = jobDescription.split(/\r?\n/);
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+    if (!trimmed) {
+      // A blank line ends a list unless another bullet follows straight after it.
+      const next = lines.slice(index + 1).find((candidate) => candidate.trim());
+      if (!next || !bulletLine.test(next)) section = null;
+      return;
+    }
+    if (trimmed.length <= 80 && !bulletLine.test(trimmed)) {
+      if (essentialHeading.test(trimmed)) {
+        section = "essential";
+        return;
+      }
+      if (desirableHeading.test(trimmed)) {
+        section = "desirable";
+        return;
+      }
+    }
+    if (!bulletLine.test(trimmed)) section = null;
+    for (const part of trimmed.split(/[.!?;]+/).map((value) => value.trim()).filter(Boolean)) {
+      contexts.push({ text: part, normalised: normalise(part), section });
+    }
   });
+
+  return contexts;
+}
+
+function findRelevantContext(
+  contexts: RequirementContext[],
+  definition: KeywordDefinition,
+): "essential" | "desirable" | null {
+  let desirable = false;
+  for (const context of contexts) {
+    if (bestVariantCount(context.normalised, definition) === 0) continue;
+    const optional = desirableSignals.test(context.text) || context.section === "desirable";
+    if (optional) {
+      desirable = true;
+      continue;
+    }
+    if (requirementSignals.test(context.text) || context.section === "essential") return "essential";
+  }
+  return desirable ? "desirable" : null;
+}
+
+function maskPhrases(text: string, phrases: string[]) {
+  let masked = text;
+  for (const phrase of phrases) {
+    const escaped = phrase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    masked = masked.replace(new RegExp(`(?<![a-z0-9])${escaped}(?![a-z0-9])`, "g"), " ");
+  }
+  return masked.replace(/\s+/g, " ");
 }
 
 function inferredAcronyms(jobDescription: string): KeywordDefinition[] {
@@ -357,23 +421,47 @@ export function analyseAtsKeywords(
     ...definitions,
     ...inferredAcronyms(jobDescription),
   ]);
+  const contexts = requirementContexts(jobDescription);
+  // Action verbs are matched on text with longer known phrases blanked out, so the
+  // "driving" in "driving licence" is not counted as the verb "drive".
+  // Only qualifications use their variants here: variants such as "managed complaints"
+  // are verb phrases that should still count as the verb.
+  const phrasesToMask = candidates
+    .filter((definition) => definition.category !== "Action verb")
+    .flatMap((definition) =>
+      definition.category === "Qualification"
+        ? [definition.term, ...(definition.variants ?? [])]
+        : [definition.term],
+    )
+    .map(normalise)
+    .filter((phrase) => phrase.length > 2)
+    .sort((a, b) => b.length - a.length);
+  const maskedJob = maskPhrases(normalisedJob, phrasesToMask);
+  const maskedCv = maskPhrases(normalisedCv, phrasesToMask);
 
   const keywords = candidates
     .map((definition): AtsKeyword | null => {
-      const occurrences = bestVariantCount(normalisedJob, definition);
+      const isVerb = definition.category === "Action verb";
+      const occurrences = bestVariantCount(isVerb ? maskedJob : normalisedJob, definition);
       if (occurrences === 0) return null;
 
-      const essential = findRelevantContext(jobDescription, definition);
+      const context = findRelevantContext(contexts, definition);
+      const essential = context === "essential";
+      const optional = context === "desirable";
       const importance = essential
         ? "Essential"
-        : occurrences > 1
-          ? "Repeated"
-          : "Relevant";
+        : optional
+          ? "Relevant"
+          : occurrences > 1
+            ? "Repeated"
+            : "Relevant";
       const importanceMultiplier = essential
         ? 1.35
-        : occurrences > 1
-          ? 1.15
-          : 1;
+        : optional
+          ? 1
+          : occurrences > 1
+            ? 1.15
+            : 1;
       const repetitionMultiplier = 1 + Math.min(occurrences - 1, 2) * 0.12;
       const weight =
         categoryWeights[definition.category] *
@@ -383,7 +471,7 @@ export function analyseAtsKeywords(
       return {
         term: definition.term,
         category: definition.category,
-        found: bestVariantCount(normalisedCv, definition) > 0,
+        found: bestVariantCount(isVerb ? maskedCv : normalisedCv, definition) > 0,
         importance,
         weight,
       };

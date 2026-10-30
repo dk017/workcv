@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CvDocument } from "@/components/editor/cv-document";
+import { PdfPageSize } from "@/components/editor/pdf-page-size";
 import { getCvDocument } from "@/lib/cv-documents";
 import { verifyPdfRenderToken } from "@/lib/pdf-render-token";
 
@@ -25,6 +26,7 @@ export default async function PdfRenderPage({
 
   return (
     <main className="pdf-render-shell" data-pdf-ready="true">
+      <PdfPageSize design={document.data.design} />
       <CvDocument cv={document.data} compactPreview />
     </main>
   );

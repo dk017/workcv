@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
-import { ArrowRight, Banknote, BarChart3, CalendarCheck, FileCheck2, FileDown, FileSearch, FileText, ListChecks, Scale, Sparkles } from "lucide-react";
+import { ArrowRight, BadgeCheck, Banknote, BarChart3, CalendarCheck, FileCheck2, FileDown, FileSearch, FileText, ListChecks, Scale, Sparkles } from "lucide-react";
 
-import { FaqSection } from "@/components/marketing";
+import { FaqSection, MoneyPageCta } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 type Tool = {
@@ -25,7 +25,7 @@ const categories: Category[] = [
     { title: "CV Summary Generator", href: "/tools/cv-summary-generator-uk", description: "Compare three concise UK CV summary options built around your target role and real evidence.", icon: FileText },
   ] },
   { title: "CV checkers", description: "Find content, targeting and length issues before you send an application.", tools: [
-    { title: "ATS Score Checker", href: "/tools/ats-score-checker", description: "Compare your CV with a job advert and find matched or missing role-specific terms.", icon: FileCheck2 },
+    { title: "ATS CV Checker", href: "/tools/ats-score-checker", description: "Upload your CV for a readability check, or compare it with a job advert to find matched or missing role-specific terms.", icon: FileCheck2 },
     { title: "CV Gap Detector", href: "/tools/cv-gap-detector-uk", description: "Paste CV text to find missing sections, dates, contact details and evidence signals.", icon: FileSearch },
     { title: "CV Word Count Checker", href: "/tools/cv-word-count-checker", description: "Count words, estimate A4 pages and get a result-specific UK CV length recommendation.", icon: FileText },
     { title: "CV Readability Checker", href: "/tools/cv-readability-checker", description: "Measure Flesch Reading Ease and review long sentences or possible passive wording.", icon: FileSearch },
@@ -36,6 +36,7 @@ const categories: Category[] = [
     { title: "UK Living Wage Checker 2026", href: "/tools/uk-living-wage-checker", description: "Compare hourly pay or salary with current statutory and voluntary UK Living Wage rates.", icon: Scale },
     { title: "Redundancy Pay Calculator", href: "/tools/redundancy-pay-calculator", description: "Calculate statutory redundancy pay with current GB and Northern Ireland limits.", icon: Scale },
     { title: "Notice Period Calculator", href: "/tools/notice-period-calculator", description: "Find your earliest new-job start date and the UK statutory notice minimum.", icon: CalendarCheck },
+    { title: "UK Visa Sponsor Checker", href: "/tools/uk-visa-sponsor-checker", description: "Search the Home Office register to see whether an employer holds a licence to sponsor work visas.", icon: BadgeCheck },
     { title: "UK Salary by Job Title", href: "/tools/uk-salary-by-job-title", description: "Compare lower-quartile, median and upper-quartile gross pay for 60 roles using ONS data.", icon: BarChart3 },
   ] },
   { title: "Templates and downloads", description: "Start from a clean document without an email gate, payment screen or subscription.", tools: [
@@ -44,6 +45,9 @@ const categories: Category[] = [
     { title: "Cover Letter Template", href: "/tools/cover-letter-template-uk", description: "Edit, copy or download a structured UK cover letter template with the correct sign-off.", icon: FileDown },
   ] },
   { title: "Application builders", description: "Turn an existing CV, early experience or a career break into wording you can review and use.", tools: [
+    { title: "Supporting Statement Planner", href: "/tools/supporting-statement-planner-uk", description: "Map Civil Service criteria to your own evidence, check length and download a free text draft.", icon: ListChecks },
+    { title: "CV & Cover Letter Tailoring", href: "/tools/job-application-pack-uk", description: "Turn one job advert and your real CV evidence into requirements, bullets, a cover letter and interview prompts.", icon: Sparkles },
+    { title: "Job Application Tracker", href: "/tools/job-application-tracker-uk", description: "Track every application, follow-up and closing date. Free, no signup, export to Excel.", icon: ListChecks },
     { title: "CV Format Checker", href: "/tools/cv-format-checker-uk", description: "Check pasted CV text for clear headings, dates, evidence and common parsing warning signals.", icon: FileCheck2 },
     { title: "First-Job CV Wizard", href: "/tools/first-job-cv-wizard-uk", description: "Build a truthful first-job CV draft from education, projects, volunteering and strengths.", icon: Sparkles },
     { title: "Transferable Skills Translator", href: "/tools/transferable-skills-translator-uk", description: "Translate real responsibilities into skills and evidence for a UK career change.", icon: ArrowRight },
@@ -67,9 +71,10 @@ const schemas = [
 
 export function ToolsHub() {
   return <>{schemas.map((schema, index) => <script key={index} type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />)}
-    <section className="quiet-grid border-b border-line bg-paper py-16 md:py-24"><div className="container-page"><p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">{tools.length} practical tools for UK job seekers</p><h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">Free UK CV Tools — No Signup Required</h1><p className="mt-7 max-w-3xl text-xl leading-8 text-muted">Generate stronger application drafts, check your CV, understand UK pay and download a clean Word template. Every tool is free to start and works without a subscription.</p><p className="mt-6 text-sm font-bold text-navy">Last reviewed: July 2026</p></div></section>
+    <section className="quiet-grid border-b border-line bg-paper py-16 md:py-24"><div className="container-page"><p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">{tools.length} practical tools for UK job seekers</p><h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">Free UK CV Tools — No Signup Required</h1><p className="mt-7 max-w-3xl text-xl leading-8 text-muted">Generate stronger application drafts, check your CV, understand UK pay and download a clean Word template. Every tool is free to start and works without a subscription.</p><p className="mt-5 max-w-2xl text-sm leading-7 text-muted">Looking for a complete application workflow? Explore the <Link href="/career-tools" className="font-bold text-navy underline">Career &amp; Work Tools hub</Link> for interview, job-search and progression guidance.</p><p className="mt-6 text-sm font-bold text-navy">Last reviewed: July 2026</p></div></section>
     <div className="bg-surface">{categories.map((category, categoryIndex) => <section key={category.title} className={`py-16 md:py-20 ${categoryIndex ? "border-t border-line" : ""}`}><div className="container-page"><div className="grid gap-4 lg:grid-cols-[0.7fr_1.3fr] lg:items-end"><h2 className="font-display text-4xl font-semibold text-navy md:text-5xl">{category.title}</h2><p className="max-w-2xl text-base leading-8 text-muted">{category.description}</p></div><div className={`mt-9 grid gap-4 ${category.tools.length === 1 ? "max-w-2xl" : "md:grid-cols-2 lg:grid-cols-3"}`}>{category.tools.map((tool) => <ToolCard key={tool.href} tool={tool} />)}</div></div></section>)}</div>
     <section className="border-y border-line bg-paper py-16"><div className="container-page grid gap-8 lg:grid-cols-[0.8fr_1.2fr]"><h2 className="font-display text-4xl font-semibold text-navy">How WorkCV reviews tools.</h2><div className="grid gap-5 text-sm leading-7 text-muted sm:grid-cols-2"><p>Rule-based calculators cite GOV.UK, HMRC, Acas or ONS sources and keep calculation logic separate from the interface for testing.</p><p>Writing and CV checks explain what is processed, avoid guarantees and expose limits a result cannot answer.</p></div></div></section>
+    <MoneyPageCta heading="Build the CV behind the tool result." body={`Use a clear UK structure, preview it first, then pay ${site.price} once only if you download the finished PDF.`} trackingContext="tools_hub" />
     <FaqSection faqs={faqs} title="Free UK CV tool questions." />
   </>;
 }

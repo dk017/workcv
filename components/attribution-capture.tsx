@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
-import { shouldReplaceLastTouch } from "@/lib/attribution";
+import { shouldReplaceLastTouch, canCapturePublicTouch } from "@/lib/attribution";
 import { isPublicMeasurementPath } from "@/lib/public-paths";
 
 const storageKey = "workcv_first_touch";
@@ -11,6 +11,9 @@ const lastTouchKey = "workcv_last_touch";
 const visitorKey = "workcv_visitor_id";
 const sessionKey = "workcv_session_id";
 const landingTrackedKey = "workcv_landing_tracked";
+// document.referrer survives client navigation. Consume it once, not again on
+// every CTA, login or checkout event in the same browser document.
+let publicEntryCaptured = false;
 
 type TouchAttribution = {
   landingPath: string;
@@ -24,8 +27,12 @@ type TouchAttribution = {
 };
 
 type FunnelMetadata = {
+  offer_version?: "saved_versions_v2";
   destination?: string;
   placement?: string;
+  tool?: string;
+  lifecycle?: "started" | "completed";
+  result?: "success" | "error";
 };
 
 function randomId() {
@@ -86,18 +93,20 @@ function ensureTrackingContext() {
   }
 
   const touch = currentTouch();
-  if (!window.localStorage.getItem(storageKey)) {
+  const previousFirstTouch = readStoredTouch(storageKey);
+  if (isPublicMeasurementPath(touch.landingPath) && (!previousFirstTouch || !isPublicMeasurementPath(previousFirstTouch.landingPath))) {
     window.localStorage.setItem(storageKey, JSON.stringify(touch));
   }
   const previousLastTouch = readStoredTouch(lastTouchKey);
   if (
-    shouldReplaceLastTouch(
+    canCapturePublicTouch(touch.landingPath, previousLastTouch?.landingPath, publicEntryCaptured) && (!previousLastTouch || !isPublicMeasurementPath(previousLastTouch.landingPath) || shouldReplaceLastTouch(
       previousLastTouch?.capturedAt,
       Boolean(touch.utmSource || touch.referrerHost),
-    )
+    ))
   ) {
     window.localStorage.setItem(lastTouchKey, JSON.stringify(touch));
   }
+  if (isPublicMeasurementPath(touch.landingPath)) publicEntryCaptured = true;
   return { visitorId, sessionId };
 }
 
@@ -108,7 +117,16 @@ function deviceClass() {
 }
 
 export function trackFunnelEvent(
-  eventName: "landing_view" | "marketing_cta_clicked" | "login_started",
+  eventName:
+    | "public_pass_offer_viewed"
+    | "landing_view"
+    | "page_view"
+    | "marketing_cta_clicked"
+    | "login_started"
+    | "tool_started"
+    | "tool_completed"
+    | "guest_editor_started"
+    | "guest_cv_saved",
   metadata: FunnelMetadata = {},
 ) {
   try {
@@ -129,7 +147,7 @@ export function trackFunnelEvent(
         campaign: touch.utmCampaign,
         referrerHost: touch.referrerHost,
         deviceClass: deviceClass(),
-        metadata,
+        metadata: { ...metadata, ...(eventName === "tool_started" ? { lifecycle: "started" } : eventName === "tool_completed" ? { lifecycle: "completed" } : {}) },
       }),
       keepalive: true,
     }).catch(() => undefined);
@@ -140,11 +158,20 @@ export function trackFunnelEvent(
 
 export function AttributionCapture() {
   const pathname = usePathname();
+  const lastPageViewPath = useRef<string | null>(null);
 
   useEffect(() => {
     try {
       ensureTrackingContext();
       if (!isPublicMeasurementPath(pathname)) return;
+
+      // Track one page view per route visit. The ref also prevents React Strict
+      // Mode from sending the initial page view twice during development.
+      if (lastPageViewPath.current !== pathname) {
+        lastPageViewPath.current = pathname;
+        trackFunnelEvent("page_view");
+      }
+
       if (window.sessionStorage.getItem(landingTrackedKey)) return;
       window.sessionStorage.setItem(landingTrackedKey, "1");
       trackFunnelEvent("landing_view");
@@ -171,6 +198,22 @@ export function readFirstTouchAttribution() {
       lastUtmSource: last?.utmSource,
       lastUtmMedium: last?.utmMedium,
       lastUtmCampaign: last?.utmCampaign,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
+export function readCheckoutAttribution() {
+  try {
+    ensureTrackingContext();
+    const touch = readStoredTouch(lastTouchKey) || currentTouch();
+    return {
+      utmSource: touch.utmSource,
+      utmMedium: touch.utmMedium,
+      utmCampaign: touch.utmCampaign,
+      landingPath: isPublicMeasurementPath(touch.landingPath) ? touch.landingPath : undefined,
+      referrerHost: touch.referrerHost,
     };
   } catch {
     return undefined;

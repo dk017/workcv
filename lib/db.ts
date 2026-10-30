@@ -45,6 +45,12 @@ export async function ensurePaymentTables() {
           consent_at TIMESTAMPTZ,
           consent_version TEXT,
           is_test BOOLEAN NOT NULL DEFAULT FALSE,
+          attribution_source TEXT,
+          attribution_medium TEXT,
+          attribution_campaign TEXT,
+          attribution_landing_path TEXT,
+          attribution_referrer_host TEXT,
+          attribution_captured_at TIMESTAMPTZ,
           completed_at TIMESTAMPTZ,
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -52,6 +58,19 @@ export async function ensurePaymentTables() {
 
         CREATE INDEX IF NOT EXISTS workcv_payment_checkouts_draft_idx
           ON workcv_payment_checkouts (draft_id);
+
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_source TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_medium TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_campaign TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_landing_path TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_referrer_host TEXT;
+        ALTER TABLE workcv_payment_checkouts
+          ADD COLUMN IF NOT EXISTS attribution_captured_at TIMESTAMPTZ;
 
         CREATE TABLE IF NOT EXISTS workcv_orders (
           id TEXT PRIMARY KEY,
@@ -69,6 +88,12 @@ export async function ensurePaymentTables() {
           is_test BOOLEAN NOT NULL DEFAULT FALSE,
           confirmation_email_attempted_at TIMESTAMPTZ,
           confirmation_email_sent_at TIMESTAMPTZ,
+          attribution_source TEXT,
+          attribution_medium TEXT,
+          attribution_campaign TEXT,
+          attribution_landing_path TEXT,
+          attribution_referrer_host TEXT,
+          attribution_captured_at TIMESTAMPTZ,
           paid_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
           created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
         );
@@ -78,6 +103,19 @@ export async function ensurePaymentTables() {
 
         ALTER TABLE workcv_orders
           ADD COLUMN IF NOT EXISTS confirmation_email_sent_at TIMESTAMPTZ;
+
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_source TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_medium TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_campaign TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_landing_path TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_referrer_host TEXT;
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS attribution_captured_at TIMESTAMPTZ;
 
         ALTER TABLE workcv_payment_checkouts
           ADD COLUMN IF NOT EXISTS user_id TEXT;
@@ -114,8 +152,13 @@ export async function ensurePaymentTables() {
         END
         $backfill$;
 
+        ALTER TABLE workcv_orders
+          ADD COLUMN IF NOT EXISTS refunded_at TIMESTAMPTZ;
+
         CREATE INDEX IF NOT EXISTS workcv_orders_draft_paid_idx
           ON workcv_orders (draft_id, paid_at);
+        CREATE INDEX IF NOT EXISTS workcv_orders_user_product_idx
+          ON workcv_orders (user_id, product_id, paid_at);
         CREATE INDEX IF NOT EXISTS workcv_orders_test_paid_idx
           ON workcv_orders (is_test, paid_at DESC);
       `)

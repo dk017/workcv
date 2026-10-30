@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -13,7 +12,13 @@ import {
   Sparkles,
 } from "lucide-react";
 
+import { PassOfferView } from "@/components/pass-offer-view";
 import { site } from "@/lib/site";
+import { buildCoverLetterPatch, coverLetterEditorRoute } from "@/lib/cover-letter-handoff";
+import { writeCvToolHandoff } from "@/lib/cv-tool-handoff";
+import { trackFunnelEvent } from "@/components/attribution-capture";
+import { rememberCtaHandoff } from "@/lib/cta-attribution";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 type Fields = {
   fullName: string;
@@ -62,6 +67,8 @@ export function CoverLetterGenerator() {
   const [tone, setTone] = useState<"professional" | "warm">("professional");
   const [length, setLength] = useState<"concise" | "standard">("standard");
   const [result, setResult] = useState<GeneratedResult | null>(null);
+  const [resultInput, setResultInput] = useState<Fields | null>(null);
+  const [handoffError, setHandoffError] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -75,6 +82,7 @@ export function CoverLetterGenerator() {
     event.preventDefault();
     setError("");
     setCopied(false);
+    setHandoffError("");
     setIsLoading(true);
     const controller = new AbortController();
     const timeout = window.setTimeout(() => controller.abort(), 35_000);
@@ -91,13 +99,13 @@ export function CoverLetterGenerator() {
         throw new Error(data.error || "The letter could not be generated.");
       }
       setResult(data);
+      setResultInput({ ...fields });
       window.setTimeout(
         () =>
           resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
         0,
       );
     } catch (requestError) {
-      setResult(null);
       setError(
         requestError instanceof DOMException && requestError.name === "AbortError"
           ? "The request took too long. Please try again."
@@ -120,6 +128,28 @@ export function CoverLetterGenerator() {
     } catch {
       setError("Copy was blocked. Select the letter and copy it manually.");
     }
+  }
+
+  function continueToEditor(pass = false) {
+    const destination = coverLetterEditorRoute + (pass ? "&plan=pass" : "");
+    const placement = pass ? analyticsPlacements.coverLetterPass : analyticsPlacements.coverLetterHandoff;
+    if (!result || !resultInput || isLoading) return;
+    setHandoffError("");
+    try {
+      writeCvToolHandoff({
+        source: "cover-letter-generator",
+        patch: buildCoverLetterPatch(resultInput, result.paragraphs),
+      });
+    } catch {
+      setHandoffError("We could not carry this draft to the editor. Copy your letter first, or allow browser storage and try again.");
+      return;
+    }
+    try { rememberCtaHandoff(placement, destination); } catch { /* Measurement must not block the saved transfer. */ }
+    trackFunnelEvent("marketing_cta_clicked", {
+      destination,
+      placement,
+    });
+    window.location.assign(destination);
   }
 
   return (
@@ -153,7 +183,7 @@ export function CoverLetterGenerator() {
         <div className="mt-6 flex flex-col gap-5 border-t border-line pt-5 lg:flex-row lg:items-end lg:justify-between">
           <p className="flex max-w-2xl gap-2 text-xs leading-5 text-muted">
             <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-success" />
-            Your entries are sent to OpenAI for this generation and are not saved by WorkCV. Do not include sensitive data the letter does not need.
+            Your entries are sent to OpenAI to generate the letter. If you continue to the editor, the letter and job details are held in this browser tab for transfer and saved to your account after sign-in. Continue within 30 minutes. Do not include sensitive data the letter does not need.
           </p>
           <div className="flex flex-wrap gap-2">
             <button type="button" onClick={() => { setFields(example); setResult(null); setError(""); }} disabled={isLoading} className="inline-flex min-h-11 items-center justify-center rounded-md border border-line-strong bg-white px-4 text-sm font-bold text-navy hover:bg-paper disabled:opacity-60">Try example</button>
@@ -194,9 +224,12 @@ export function CoverLetterGenerator() {
             </div>
             <div className="border-t border-line bg-paper p-6 md:p-8">
               <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div><p className="font-display text-2xl font-semibold text-navy">Make the CV match the letter.</p><p className="mt-2 text-sm text-muted">Build and preview free, then unlock your chosen CV PDF once for {site.price}.</p></div>
-                <Link href="/editor?new=1" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover">Build my CV <ArrowRight className="h-4 w-4" /></Link>
+                <div><p className="font-display text-2xl font-semibold text-navy">Make the CV match the letter.</p><p className="mt-2 text-sm text-muted">Build and preview free. Pay {site.price} once for one saved CV and its matching cover letter as PDF and Word. Edits and redownloads of the same CV and letter are included.</p></div>
+                <button type="button" onClick={() => continueToEditor()} disabled={isLoading} data-analytics-placement={analyticsPlacements.coverLetterHandoff} className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white hover:bg-navy-hover disabled:opacity-60">Edit this letter and build my CV <ArrowRight className="h-4 w-4" /></button>
               </div>
+              <p className="mt-3 text-sm leading-6 text-muted">Your letter, name and job details will be ready in a new saved CV after email-code sign-in. Continue in this tab within 30 minutes.</p>
+              <PassOfferView placement={analyticsPlacements.coverLetterPass}><div className="mt-5 border-t border-line pt-5"><p className="text-sm leading-7">Want separate CV and letter versions for several vacancies? Job Search Pass is {site.passPrice} once for {site.passDays} days of new documents, with no renewal. Existing documents and those created during the pass stay covered afterwards. New documents after expiry need a purchase. Reusing the same paid pair for other applications does not require Pass.</p><button type="button" disabled={isLoading} onClick={() => continueToEditor(true)} className="mt-3 min-h-12 rounded-md border border-line-strong px-5 text-sm font-bold text-navy">Keep this letter with Job Search Pass</button></div></PassOfferView>
+              {handoffError ? <p role="alert" className="mt-3 text-sm font-bold text-[#8d3030]">{handoffError}</p> : null}
             </div>
           </section>
         </div>

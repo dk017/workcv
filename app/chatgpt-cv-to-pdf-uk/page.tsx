@@ -1,35 +1,45 @@
 import Link from "next/link";
 import { Guide, GuideSection, GuideTable, GuideSource, CvTextExample, guideMetadata } from "@/components/cv-guide";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { TrackedLink } from "@/components/tracked-link";
+import { customerContentReview } from "@/lib/customer-content-review";
 import { retailAdminCv } from "@/lib/content-cv-examples";
 import { analyticsPlacements } from "@/lib/analytics-placements";
-import { site } from "@/lib/site";
+import { commercialRoutes, site } from "@/lib/site";
 
 const path = "/chatgpt-cv-to-pdf-uk";
 const title = "How to turn a ChatGPT CV into a properly formatted UK PDF";
 export const metadata = guideMetadata(path, "Turn a ChatGPT CV into a UK PDF | WorkCV", "Move your checked CV draft into editable fields, preview the layout and download a UK PDF. See the supported steps, a fictional example and the cost.");
 
 export default function ChatGptCvGuide() {
-  return <Guide path={path} title={title} placement={analyticsPlacements.chatgptGuideEditor} action={["Format my CV", "/editor?template=classic&new=1"]}
-    intro={`Check the facts in your ChatGPT draft, then copy each section into a CV editor or save the text in a Word document for import. WorkCV accepts PDF and DOCX imports; its import dialog does not accept pasted text. Sign in with an email code, review the fields and preview the PDF. The finished download costs ${site.price} once for one saved CV, with no subscription.`}
+  return <Guide path={path} title={title} reviewed={customerContentReview[path]} placement={analyticsPlacements.chatgptGuideEditor} action={["Format my CV", "/editor?template=classic&new=1"]}
+    intro={`Check the facts in your ChatGPT draft, then copy each section into a CV editor or save the text in a Word document for import. WorkCV accepts PDF and DOCX imports; its import dialog does not accept pasted text. Review the fields and preview the PDF; importing a file or downloading asks for your email and a one-time code. The finished download costs ${site.price} once for one saved CV, with no subscription.`}
     links={[["CV builder without a subscription", "/cv-builder-no-subscription-uk"], ["Free blank Word template", "/tools/blank-cv-template-uk"], ["Choose Word or PDF", "/cv-word-or-pdf-uk"], ["Match your CV to a vacancy", "/tools/ats-score-checker"]]}>
-    <GuideSection title="Start with a draft you can stand behind">
+    <CustomerQuestionNav ids={["Q08", "Q09"]} />
+    <CustomerAnswer questionId="Q08">
+      <p>For plain text, copy the checked profile, experience, education and skills into their matching editor fields. For an existing DOCX or text-based PDF, use <strong>More → Import CV</strong>, select the file (up to 10MB) and review the extracted fields. The selected WorkCV template controls the new layout; importing does not preserve the source design.</p>
+      <p>See the supported routes and the actual import/editor/PDF demonstration below. <TrackedLink href={commercialRoutes.moneyPage} placement={analyticsPlacements.customerQ08Money} className="font-semibold text-navy underline">Check the guided builder and PDF cost</TrackedLink> before starting.</p>
+    </CustomerAnswer>
+    <CustomerAnswer questionId="Q09">
       <p>Read every sentence before putting the draft into a template. An impressive-looking paragraph is only useful if you can explain the work behind it. Check employer names, dates, qualification titles, tools and any numbers. Remove a claim if the draft introduced it without evidence from you.</p>
+      <div className="space-y-3 rounded-lg border border-line bg-paper p-6"><h3 className="font-display text-2xl font-semibold text-navy">Fictional Alex Morgan: three possible profiles</h3><p><strong>Generic:</strong> “Dynamic team player with excellent organisational skills and a proven track record of success.”</p><p><strong>Evidence-led:</strong> “Retail supervisor moving into office administration, with experience coordinating a 12-person rota, updating an Excel delivery tracker and replying to customer order enquiries.”</p><p><strong>Reject:</strong> “Reduced stock errors by 40% and became an expert Sage user.” Alex’s source CV supports neither claim.</p><p>The evidence-led version identifies a real role, relevant tasks and verified scope without changing Alex’s job title.</p></div>
+      <p>Useful prompt: “Rewrite this using only the facts I provide. Keep my job titles and dates. Do not invent numbers, qualifications, software skills or outcomes. Flag missing evidence as a question for me instead of filling it in.”</p>
       <p>Keep a copy of your checked text before formatting. Separate the profile, each job, education and skills with clear headings. Delete chat introductions, suggested alternatives, Markdown fences and instructions such as “insert achievement here”. Keep one final version of each section so you do not accidentally import competing drafts.</p>
       <p>Check the employer's instructions about AI assistance as well as the file format. Use the draft as material to review and adapt, and make sure the final application represents your own experience.</p>
       <GuideSource href="https://www.prospects.ac.uk/careers-advice/cvs-and-cover-letters/how-to-write-a-cv">Prospects: CV preparation and responsible AI use</GuideSource>
-    </GuideSection>
+    </CustomerAnswer>
     <GuideSection title="Choose the route that matches what you have">
       <GuideTable caption="Supported ways to move your draft into WorkCV" headings={["Your starting point", "What to do", "What to check"]} rows={[
         ["Text in a ChatGPT conversation", "Copy the profile, jobs, education and skills into the corresponding editor fields.", "The profile box is for your summary, not the entire CV."],
         ["A saved DOCX or text-based PDF", "Choose Import CV and select the file. The current limit is 10MB.", "Review the import summary, then the editable fields; automated extraction can miss or misplace information."],
         ["A photograph or scan", "Use your original editable document or enter the text manually.", "Do not assume an image of a CV can be extracted accurately."],
-        ["You want to format it yourself", "Download the free blank Word template and replace its prompts.", "This is a separate document, not a Word export from the WorkCV editor."],
+        ["You want to format it yourself", "Download the free blank Word template and replace its prompts.", "This is a separate free document. The paid WorkCV editor also exports your finished CV as Word."],
       ]} />
       <p>WorkCV does not connect to your ChatGPT account. Uploading a file moves its content into editable fields; it does not preserve the original document's design. The selected WorkCV template controls the new layout.</p>
     </GuideSection>
     <GuideSection title="Build the PDF in six steps">
       <ol className="list-decimal space-y-4 pl-6">
-        <li><strong>Sign in and start a CV.</strong> Use your email code to enter the editor. Start a new saved CV if this is a separate application document.</li>
+        <li><strong>Start a CV.</strong> The editor opens without an account. Importing a file, saving or downloading asks for your email and a one-time code. Start a new saved CV if this is a separate application document.</li>
         <li><strong>Enter or import your content.</strong> For plain text, work through Profile, Experience, Education and Skills. For a file, open More, choose Import CV, select PDF or DOCX and review the summary before applying it. Read any replacement warning if the current CV is already populated.</li>
         <li><strong>Check each field.</strong> Keep your actual job title in Experience and your intended next job in Target role. Check the employer, start/end dates and the bullet points for every job.</li>
         <li><strong>Choose a template.</strong> Open Template and compare the current layouts. Keep the content consistent while deciding which presentation suits it.</li>

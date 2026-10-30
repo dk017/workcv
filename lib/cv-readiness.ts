@@ -6,11 +6,17 @@ export type ReadinessSection =
   | "education"
   | "skills";
 
+export type ReadinessAction = "improve-profile" | "suggest-skills" | "improve-bullets";
+
 export type ReadinessIssue = {
   id: string;
   section: ReadinessSection;
   severity: "fix" | "improve";
   message: string;
+  /** AI-assisted fix the editor can run for this issue; absent means "go to the section". */
+  action?: ReadinessAction;
+  /** Experience entry the action applies to. */
+  targetId?: string;
 };
 
 function hasUsefulProfile(profile: string) {
@@ -67,6 +73,7 @@ export function calculateCvReadiness(cv: CvData) {
       section: "profile",
       severity: "fix",
       message: "Write a useful profile of at least 8 words.",
+      action: "improve-profile",
     });
   }
 
@@ -91,6 +98,7 @@ export function calculateCvReadiness(cv: CvData) {
       section: "skills",
       severity: "fix",
       message: "Add at least three relevant skills.",
+      action: "suggest-skills",
     });
   }
 
@@ -133,13 +141,37 @@ export function calculateCvReadiness(cv: CvData) {
   ];
 
   const profileWords = cv.profile.trim().split(/\s+/).filter(Boolean).length;
-  if (profileWords > 100) issues.push({ id: "profile-length", section: "profile", severity: "improve", message: `Shorten the profile from ${profileWords} words to 100 or fewer.` });
-  if (!cv.targetRole.trim()) issues.push({ id: "target-role", section: "profile", severity: "improve", message: "Add a specific target role so the CV has a clear direction." });
+  if (profileWords > 100) issues.push({ id: "profile-length", section: "profile", severity: "improve", message: `Shorten the profile from ${profileWords} words to 100 or fewer.`, action: "improve-profile" });
+  if (!cv.targetRole.trim()) {
+    const vacancyRole = cv.targeting?.role?.trim();
+    issues.push({
+      id: "target-role",
+      section: "profile",
+      severity: "improve",
+      message: vacancyRole
+        ? `Add the job title you want under your name. This advert is for "${vacancyRole}"; use it only if it matches your real experience.`
+        : "Add a specific target role so the CV has a clear direction.",
+    });
+  }
   cv.experience.forEach((item, index) => {
     const bullets = item.bullets.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
-    if (item.role.trim() && bullets.length < 2) issues.push({ id: `bullets-${item.id}`, section: "experience", severity: "improve", message: `Add at least two evidence-led bullets to role ${index + 1}.` });
-    if (bullets.length && !bullets.some((bullet) => /\d|£|%/.test(bullet))) issues.push({ id: `evidence-${item.id}`, section: "experience", severity: "improve", message: `Add a number, scale or measurable outcome to role ${index + 1} where truthful.` });
+    if (item.role.trim() && bullets.length < 2) issues.push({ id: `bullets-${item.id}`, section: "experience", severity: "improve", message: `Add at least two evidence-led bullets to role ${index + 1}.`, action: "improve-bullets", targetId: item.id });
+    if (bullets.length && !bullets.some((bullet) => /\d|£|%/.test(bullet))) issues.push({ id: `evidence-${item.id}`, section: "experience", severity: "improve", message: `Add a number, scale or measurable outcome to role ${index + 1} where truthful.`, action: "improve-bullets", targetId: item.id });
   });
+  const dateValues = [
+    ...cv.experience.flatMap((item) => [item.start, item.end]),
+    ...cv.education.flatMap((item) => [item.start, item.end]),
+  ].map((value) => value.trim());
+  const wordDates = dateValues.filter((value) => /^[a-z]{3,9}\.?\s+(19|20)\d{2}$/i.test(value));
+  const numericDates = dateValues.filter((value) => /^(0?[1-9]|1[0-2])\/(19|20)\d{2}$/.test(value));
+  if (wordDates.length > 0 && numericDates.length > 0) {
+    issues.push({
+      id: "dates-format",
+      section: "experience",
+      severity: "improve",
+      message: `Dates use mixed formats (for example ${wordDates[0]} and ${numericDates[0]}). Pick one format throughout.`,
+    });
+  }
   const fixes = issues.filter((issue) => issue.severity === "fix");
   return {
     ready: fixes.length === 0,

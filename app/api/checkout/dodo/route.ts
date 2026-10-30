@@ -3,10 +3,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { userOwnsCvDocument } from "@/lib/cv-documents";
-import { createDodoCheckout, DODO_PRODUCT_ID } from "@/lib/dodo";
+import { createDodoCheckout, createDodoUpgradeDiscount } from "@/lib/dodo";
 import { ensurePaymentTables, getPool } from "@/lib/db";
-import { DIGITAL_CONTENT_CONSENT_VERSION } from "@/lib/commerce";
+import { DIGITAL_CONTENT_CONSENT_VERSION, isWorkcvPlan, productIdForPlan } from "@/lib/commerce";
+import { getPassStatus, getUpgradeOffer } from "@/lib/cv-entitlement";
 import { isApprovedTestUser } from "@/lib/test-orders";
+import { sanitizeSaleAttribution } from "@/lib/attribution";
 
 export const runtime = "nodejs";
 
@@ -27,7 +29,7 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Log in before checkout." }, { status: 401 });
   }
-  const isTest = isApprovedTestUser(user.id);
+  const isTest = isApprovedTestUser(user);
 
   let body: unknown;
   try {
@@ -41,6 +43,14 @@ export async function POST(request: NextRequest) {
   const email = payload.email;
   const consentAccepted = payload.consentAccepted === true;
   const forceNew = payload.forceNew === true;
+  // The editor says whether it showed the upgrade price, so we never charge more than shown.
+  const expectedUpgrade = payload.expectedUpgrade === true;
+  if (payload.plan !== undefined && !isWorkcvPlan(payload.plan)) {
+    return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  }
+  const plan = isWorkcvPlan(payload.plan) ? payload.plan : "cv";
+  const planProductId = productIdForPlan(plan);
+  const providedAttribution = sanitizeSaleAttribution(payload.attribution);
 
   if (!isValidDraftId(draftId)) {
     return NextResponse.json({ error: "Invalid draftId" }, { status: 400 });
@@ -63,6 +73,39 @@ export async function POST(request: NextRequest) {
     }
 
     await ensurePaymentTables();
+    if (plan === "pass" && (await getPassStatus(user.id)).active) {
+      return NextResponse.json(
+        { error: "You already have an active Job Search Pass. Your new CVs are unlocked automatically." },
+        { status: 409 },
+      );
+    }
+    const storedAttributionResult = await getPool().query<{
+      last_utm_source: string | null;
+      last_utm_medium: string | null;
+      last_utm_campaign: string | null;
+      last_landing_path: string | null;
+      last_referrer_host: string | null;
+    }>(
+      `SELECT last_utm_source, last_utm_medium, last_utm_campaign,
+              last_landing_path, last_referrer_host
+       FROM workcv_users WHERE id = $1`,
+      [user.id],
+    );
+    const storedRow = storedAttributionResult.rows[0];
+    const storedAttribution = sanitizeSaleAttribution({
+      lastUtmSource: storedRow?.last_utm_source,
+      lastUtmMedium: storedRow?.last_utm_medium,
+      lastUtmCampaign: storedRow?.last_utm_campaign,
+      lastLandingPath: storedRow?.last_landing_path,
+      lastReferrerHost: storedRow?.last_referrer_host,
+    });
+    const attribution = {
+      source: providedAttribution.source || storedAttribution.source || null,
+      medium: providedAttribution.medium || storedAttribution.medium || null,
+      campaign: providedAttribution.campaign || storedAttribution.campaign || null,
+      landingPath: providedAttribution.landingPath || storedAttribution.landingPath || null,
+      referrerHost: providedAttribution.referrerHost || storedAttribution.referrerHost || null,
+    };
     if (forceNew) {
       await getPool().query(
         `
@@ -80,28 +123,66 @@ export async function POST(request: NextRequest) {
         WHERE draft_id = $1
           AND user_id = $2
           AND status = 'pending'
+          AND product_id = $3
           AND created_at > NOW() - INTERVAL '15 minutes'
           AND checkout_url IS NOT NULL
         ORDER BY created_at DESC
         LIMIT 1
       `,
-      [draftId, user.id],
+      [draftId, user.id, planProductId],
     );
-    if (!forceNew && existing.rows[0]?.checkout_url) {
+    // An eligible upgrade always gets a fresh checkout with its own credit, so a
+    // reused full-price Pass checkout can never be returned instead.
+    const upgrade =
+      plan === "pass"
+        ? await getUpgradeOffer(user).catch((error) => {
+            console.error("upgrade_offer_lookup_failed", error);
+            return { eligible: false } as const;
+          })
+        : ({ eligible: false } as const);
+    if (expectedUpgrade && plan === "pass" && !upgrade.eligible) {
+      return NextResponse.json(
+        {
+          error: "The upgrade price is no longer available, so the Job Search Pass is now the full price. Close this window to see the current price.",
+          upgradeEnded: true,
+        },
+        { status: 409 },
+      );
+    }
+    if (!upgrade.eligible && !forceNew && existing.rows[0]?.checkout_url) {
       return NextResponse.json({ checkoutUrl: existing.rows[0].checkout_url });
+    }
+
+    let discountCode: string | undefined;
+    if (upgrade.eligible) {
+      try {
+        discountCode = await createDodoUpgradeDiscount(upgrade.creditMinor);
+      } catch (error) {
+        console.error("dodo_upgrade_discount_failed", error);
+        return NextResponse.json(
+          { error: "The upgrade price is unavailable right now. Please try again in a minute; you have not been charged." },
+          { status: 409 },
+        );
+      }
     }
 
     const checkout = await createDodoCheckout({
       draftId,
       email: isValidEmail(email) ? email : undefined,
+      plan,
+      discountCode,
+      upgradeCreditMinor: upgrade.eligible ? upgrade.creditMinor : undefined,
     });
 
     await getPool().query(
       `
         INSERT INTO workcv_payment_checkouts
           (id, draft_id, email, product_id, checkout_url, site_host, user_id,
-           consent_at, consent_version, status, is_test, updated_at)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', $9, NOW())
+           consent_at, consent_version, status, is_test, attribution_source,
+           attribution_medium, attribution_campaign, attribution_landing_path,
+           attribution_referrer_host, attribution_captured_at, updated_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, 'pending', $9,
+                $10, $11, $12, $13, $14, NOW(), NOW())
         ON CONFLICT (id) DO UPDATE SET
           draft_id = EXCLUDED.draft_id,
           email = EXCLUDED.email,
@@ -112,18 +193,29 @@ export async function POST(request: NextRequest) {
           consent_at = EXCLUDED.consent_at,
           consent_version = EXCLUDED.consent_version,
           is_test = EXCLUDED.is_test,
+          attribution_source = EXCLUDED.attribution_source,
+          attribution_medium = EXCLUDED.attribution_medium,
+          attribution_campaign = EXCLUDED.attribution_campaign,
+          attribution_landing_path = EXCLUDED.attribution_landing_path,
+          attribution_referrer_host = EXCLUDED.attribution_referrer_host,
+          attribution_captured_at = EXCLUDED.attribution_captured_at,
           updated_at = NOW()
       `,
       [
         checkout.sessionId,
         draftId,
         isValidEmail(email) ? email : null,
-        DODO_PRODUCT_ID,
+        checkout.productId,
         checkout.checkoutUrl,
         checkout.siteHost,
         user.id,
         DIGITAL_CONTENT_CONSENT_VERSION,
         isTest,
+        attribution.source,
+        attribution.medium,
+        attribution.campaign,
+        attribution.landingPath,
+        attribution.referrerHost,
       ]
     );
 

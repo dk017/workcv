@@ -1,5 +1,9 @@
 import type { Metadata } from "next";
-import { WorkedSection, GuideTable } from "@/components/cv-guide";
+import { GuideTable } from "@/components/cv-guide";
+import { TrackedLink } from "@/components/tracked-link";
+import { CustomerAnswer, CustomerQuestionNav } from "@/components/customer-answer";
+import { customerQuestionHref } from "@/lib/customer-questions";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -25,21 +29,23 @@ import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { underTenCvBuilderAnswer } from "@/lib/price-copy";
+import { withAgentMetadata } from "@/lib/agent-metadata";
+import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
-  title: "CV Builder No Subscription UK - Pay Once",
+export const metadata: Metadata = withAgentMetadata("/cv-builder-no-subscription-uk", {
+  title: `CV Builder No Subscription UK - ${site.price} CV + Letter`,
   description:
-    `Use a UK CV builder without a subscription. Build and preview first, then make a one-time ${site.priceGbp} payment for the PDF. No monthly fee or hidden renewal.`,
+    `Build and preview free. Pay ${site.priceGbp} once for your UK CV and matching cover letter as PDF and Word. No subscription. Edit and redownload the same saved CV.`,
   alternates: {
     canonical: "/cv-builder-no-subscription-uk",
   },
   openGraph: {
-    title: "Professional CV Builder UK - WorkCV",
+    title: `UK CV + Cover Letter - ${site.priceGbp} Once, No Subscription`,
     description:
-      `Build your CV first. Pay ${site.priceGbp} when you download. No monthly subscription, no hidden renewal and no automatic renewal.`,
+      `Build and preview free. One ${site.priceGbp} payment unlocks your saved CV and matching cover letter as PDF and Word, with no monthly renewal.`,
     url: "/cv-builder-no-subscription-uk",
   },
-};
+});
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -63,7 +69,7 @@ const comparisonRows = [
     entry: competitorPricing.cvMaker.entry,
     renewal: competitorPricing.cvMaker.renewal,
     annualised: "Check the total for your intended access period",
-    source: competitorPricing.cvMaker.source,
+    source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
   },
   {
     builder: "WorkCV",
@@ -85,8 +91,8 @@ const modelSteps = [
     body: "WorkCV keeps the standard sections practical: contact details, profile, experience, education, skills, and references guidance.",
   },
   {
-    title: "Pay when the PDF is ready",
-    body: `The standard WorkCV flow uses a one-time payment of ${site.price} when you download the final CV as a PDF.`,
+    title: "Download your CV and letter",
+    body: `Pay ${site.price} once for your saved CV and matching cover letter, each as PDF and editable Word. Edits and redownloads of that saved CV and letter are included.`,
   },
   {
     title: "No monthly fee to manage",
@@ -115,17 +121,17 @@ const professionalBuilderSignals = [
 const truthChecks = [
   {
     title: "Free to build, paid to download",
-    body: `You can write and preview the CV before paying. Downloading the finished PDF costs ${site.priceGbp}.`,
+    body: `Build and preview free. Pay ${site.priceGbp} once for one saved CV and its matching cover letter as PDF and Word.`,
   },
   {
     title: "No subscription, not a free PDF claim",
     body:
-      "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV PDF purchase.",
+      "No subscription means no monthly CV builder plan, no automatic renewal and no cancellation step after your WorkCV purchase.",
   },
   {
-    title: "Email-code login, not no-account editing",
+    title: "Start without an account",
     body:
-      "WorkCV asks you to log in with a one-time email code before editing so your CV can be saved and reopened later.",
+      "Build and preview your CV straight away; the draft is kept in your browser. A one-time email code is asked for only when you download, upload an existing CV or save it to reopen later.",
   },
   {
     title: "No hidden monthly fees",
@@ -150,6 +156,7 @@ const internalLinks = [
   ["CVMaker UK alternative", "/cvmaker-alternative"],
   ["LiveCareer alternative UK", "/livecareer-alternative"],
   ["UK resume builder without subscription", "/resume-builder-uk-no-subscription"],
+  ["Career & work tools", "/career-tools"],
   ["Student CV template UK", "/student-cv-template"],
   ["CV with no experience", "/cv-no-experience-uk"],
   ["School leaver CV example", "/school-leaver-cv-example"],
@@ -157,48 +164,18 @@ const internalLinks = [
 
 const faqItems = [
   {
-    question: "Is WorkCV a subscription?",
-    answer:
-      `No. WorkCV does not use a monthly subscription for the standard CV download flow. You build first and pay ${site.priceGbp} when you download your final PDF.`,
-  },
-  {
     question: "How much does WorkCV cost in the UK?",
     answer:
-      `WorkCV costs ${site.priceGbp} when you download your finished CV as a PDF. You can build your CV before paying.`,
+      `WorkCV costs ${site.priceGbp} once for one saved CV and its matching cover letter, each as PDF and editable Word. Build and preview free. Edits and redownloads of that saved CV and letter are included; separate new CVs need a separate payment.`,
   },
   {
     question: "Is WorkCV a UK CV builder under £10?",
     answer: underTenCvBuilderAnswer(site.priceAmount, site.priceGbp),
   },
   {
-    question: "Can I build a CV without paying monthly?",
-    answer:
-      "Yes. WorkCV is designed for people who want one finished UK CV without a recurring monthly CV builder plan, monthly fee or hidden renewal.",
-  },
-  {
-    question: "Is WorkCV a pay-once CV builder?",
-    answer:
-      `Yes. In the standard WorkCV flow, you build and preview first, then make a one-time ${site.priceGbp} payment when you download the finished PDF.`,
-  },
-  {
-    question: "Are there hidden fees or automatic renewals?",
-    answer:
-      "No. WorkCV does not start a monthly CV builder subscription, hidden renewal or automatic renewal in the standard PDF download flow.",
-  },
-  {
-    question: "Can I use WorkCV without an account or sign up?",
-    answer:
-      "No. WorkCV uses email-code login before the editor so your CV can be saved and reopened. There is no password to remember, but it is not a no-account CV builder.",
-  },
-  {
     question: "Why do many CV builders use subscriptions?",
     answer:
       "Many CV builders offer low trial prices that renew into a paid plan unless cancelled. That model can suit people who need ongoing access, but it may be more than you need for one CV download.",
-  },
-  {
-    question: "Is there a completely free CV builder in the UK?",
-    answer:
-      "Yes, some organisations offer free CV tools. WorkCV is different: it is free to build and preview, then paid when you download the PDF, with a clear one-time download price and no monthly CV builder subscription.",
   },
   {
     question: "Does WorkCV follow UK CV expectations?",
@@ -209,7 +186,7 @@ const faqItems = [
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "UK CV builder with a one-time PDF download price, no monthly fee, no hidden renewal and no subscription in the standard download flow.",
+    `UK CV builder: ${site.priceGbp} once for one saved CV and matching cover letter as PDF and Word. No subscription or automatic renewal.`,
   url: `${site.url}/cv-builder-no-subscription-uk`,
 });
 
@@ -249,24 +226,25 @@ export default function NoSubscriptionUkPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Use the professional CV builder to organise your experience,
-              choose a practical UK template and preview every page. Pay once
-              only when this saved CV is ready to download as a PDF. No monthly
-              fee, no hidden renewal and no subscription to cancel.
+              choose a practical UK template and write a matching cover letter.
+              Preview both, then pay {site.price} once for PDF and Word downloads.
+              No monthly fee, hidden renewal or subscription to cancel.
             </p>
             <div className="mt-6 max-w-2xl rounded-xl border border-gold bg-gold-tint p-5 text-sm leading-7 text-navy">
               <p className="font-bold">One clear price before you start</p>
               <p className="mt-1 text-muted">
-                Build and preview your saved CV first. Pay {site.priceGbp} once
-                only when the PDF is ready. There is no monthly subscription or
-                automatic renewal. Email-code login is required before editing.
+                {site.priceGbp} covers one saved CV and its matching cover letter,
+                each as PDF and Word. Edit and redownload that same CV and letter
+                without paying again. A separate new CV needs its own payment.
+                No account is needed to start; an email code is asked for when you save or download.
               </p>
             </div>
             <div className="mt-8 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
                 "Free to build before paying",
-                `One-time ${site.price} PDF download`,
+                "CV + matching cover letter",
                 "No automatic renewal",
-                "No hidden monthly fees",
+                "PDF + editable Word included",
               ].map((item) => (
                 <div key={item} className="flex items-center gap-2">
                   <Check className="h-5 w-5 shrink-0 text-success" />
@@ -280,18 +258,20 @@ export default function NoSubscriptionUkPage() {
                 Compare costs
               </ButtonLink>
             </div>
+            <p className="mt-4 text-sm leading-6 text-muted"><TrackedLink href="/samples/chatgpt-cv-alex-morgan.pdf" placement={analyticsPlacements.noSubscriptionHeroSample} className="font-bold text-navy underline underline-offset-4">Inspect a free sample CV PDF before signing in</TrackedLink>. Fictional details; no account or payment required for the sample.</p>
           </div>
           <CvPreview />
         </div>
       </section>
 
+      <CustomerQuestionNav ids={["Q01", "Q07", "Q03"]} />
       <section className="border-y border-line bg-surface">
         <div className="container-page grid gap-4 py-5 sm:grid-cols-2 lg:grid-cols-4">
           {[
             "Pay once for one saved CV",
-            "No monthly fee",
+            "Free blank DOCX option",
             "No automatic renewal",
-            "No hidden renewal",
+            "Edit and redownload the paid CV",
           ].map((item) => (
             <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
               <ShieldCheck className="h-5 w-5 shrink-0 text-success" />
@@ -301,17 +281,30 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
-      <WorkedSection title="What you receive when you pay once">
+      <section className="border-y border-line bg-paper py-16"><div className="container-page max-w-5xl space-y-8">
+      <CustomerAnswer questionId="Q01">
         <GuideTable caption="The WorkCV offer" headings={["Stage", "Included"]} rows={[
-          ["Start", "Email-code login so the CV can be saved and reopened."],
+          ["Start", "No account needed. Your draft is kept in this browser until you save it with an email code."],
           ["Before payment", "Build in the editor and preview the layout for free. This is not a trial that renews."],
-          ["Payment", `${site.price} once to unlock the PDF for one saved CV. No monthly renewal.`],
-          ["Download", "PDF output. Payment is associated with the saved CV, not an unlimited collection of new CVs."],
+          ["Payment", `${site.price} once to unlock one saved CV and its matching cover letter as PDF and Word. No monthly renewal.`],
+          ["Download", "A PDF and an editable Word (DOCX) file for each document. The CV Word export uses a single-column layout. Edits and redownloads of the same saved CV and its letter are included; a separate new CV needs its own payment."],
           ["Need Word?", "Use the separate free blank DOCX template. It is not an export of your editor CV."],
         ]} />
-        <p>Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link> to move it into the supported editor fields or file import. Review the current on-screen status before importing over a populated CV.</p>
-        <p>See <Link className="underline" href="/pricing">pricing and entitlement details</Link>, the <Link className="underline" href="/refund-policy">refund policy</Link> and the <Link className="underline" href="/cv-word-or-pdf-uk">Word/PDF decision guide</Link> before choosing the appropriate document route.</p>
-      </WorkedSection>
+        <p>Inspect the <Link className="font-semibold underline" href="/samples/workcv-customer-service-cv-example.pdf">sample PDF</Link> before starting. Already have a draft? Follow the <Link className="underline" href="/chatgpt-cv-to-pdf-uk">ChatGPT-to-PDF walkthrough</Link>. For costs and future downloads, read <Link className="underline" href={customerQuestionHref("Q05")}>how to reopen a paid CV</Link> and <Link className="underline" href={customerQuestionHref("Q06")}>what one payment covers</Link>.</p>
+      </CustomerAnswer>
+      <CustomerAnswer questionId="Q07">
+        <ol className="list-decimal space-y-2 pl-6"><li>Open the editor and start your CV; no account is needed.</li><li>Edit and preview your CV without entering payment details.</li><li>When you download, upload an existing CV or save, enter your email and the one-time code so the CV is kept in your account.</li><li>Choose PDF download only when ready for checkout.</li></ol>
+        <p>Need no account at all? <Link className="font-semibold underline" href="/tools/blank-cv-template-uk">Download the free blank DOCX</Link>. It is a separate file you edit yourself.</p>
+      </CustomerAnswer>
+      <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview["/cv-builder-no-subscription-uk"]}>{displayReviewDate(customerContentReview["/cv-builder-no-subscription-uk"])}</time>.</p>
+      </div></section>
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q03">
+          <ol className="list-decimal space-y-3 pl-6"><li>Open WorkCV in your phone or tablet browser and start a CV; no account is needed to build and preview it.</li><li>Enter your details, or select <strong>More → Import CV</strong> to upload a PDF or DOCX file (uploading asks for your email and a one-time code first). The import dialog does not take pasted text.</li><li>Check every imported field; correct names, dates and experience.</li><li>Switch between <strong>Edit CV</strong> and <strong>Preview</strong> to review every page.</li><li>Choose the PDF download and complete checkout when you are ready.</li><li>Open the downloaded PDF and confirm its contents before applying.</li></ol>
+          <p>On iPhone and iPad, check Safari’s downloads list or the Files app; the location depends on browser and device settings. See <a className="font-semibold underline" href="https://support.apple.com/en-gb/102440" target="_blank" rel="noopener noreferrer">Apple’s download guide</a>. For other browsers, check their downloads list.</p>
+          <p>If checkout succeeded but you cannot find the file, <TrackedLink className="font-semibold underline" placement={analyticsPlacements.customerQ03Support} href={customerQuestionHref("Q24")}>follow the paid download checks</TrackedLink>.</p>
+        </CustomerAnswer>
+      </div></section>
       <section id="compare" className="bg-surface py-24">
         <div className="container-page">
           <SectionLabel>Cost comparison</SectionLabel>
@@ -446,8 +439,9 @@ export default function NoSubscriptionUkPage() {
               <p className="mt-6 text-lg leading-8 text-muted">
                 People search for no-subscription CV builders because they do
                 not want a cheap trial that turns into a monthly fee. WorkCV is
-                direct about the tradeoff: you need an email-code login so the
-                CV can be saved, and you pay once only if you download the PDF.
+                direct about the tradeoff: you can build without an account, you
+                add an email code to save the CV, and you pay once only if you
+                download the PDF.
               </p>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
@@ -577,15 +571,17 @@ export default function NoSubscriptionUkPage() {
         </div>
       </section>
 
+      <section className="bg-white py-12"><div className="container-page max-w-5xl"><h2 className="font-display text-3xl font-semibold text-navy">Choose the saved versions you need</h2><p className="mt-5 leading-8">For {site.price} once, keep editing and downloading the same saved CV and matching letter, including for another application. For {site.passPrice} once, the Job Search Pass covers existing CVs and unlimited new CVs created during {site.passDays} days. Covered documents remain editable and downloadable after expiry; new documents created later need a new purchase.</p><div className="mt-5 flex flex-wrap gap-5 font-bold underline"><TrackedLink href="/pricing#job-search-pass" placement="no_subscription_versions_pricing">Compare the two plans</TrackedLink><Link href="/tailor-cv-to-job-description-uk">See when separate versions help</Link></div></div></section>
       <SampleCvProof trackingContext={analyticsPlacements.noSubscriptionSample} />
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingNoSubscription} />
       <FaqSection
         faqs={faqItems}
         title="Questions about no-subscription CV builders."
       />
       <FinalCta
         heading={`Build free. Pay ${site.priceGbp} when you download.`}
-        body="No monthly CV builder subscription, no hidden renewal, no automatic renewal, and no cancellation step after you finish your CV."
+        body={`One ${site.price} payment includes your saved CV and matching cover letter, each as PDF and Word. Edit and redownload the same CV and letter without another payment. No subscription or automatic renewal.`}
         primaryHref="/editor?template=classic&new=1"
         primary="Build my CV"
         trackingContext={analyticsPlacements.noSubscriptionFinal}

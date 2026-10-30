@@ -18,6 +18,9 @@ WorkCV UK is a Next.js CV builder for UK job seekers. The production offer is si
 - `npm run type-check` runs TypeScript validation
 - `npm run build` builds the production app
 - `npm run indexnow:submit` submits every URL in the production sitemap to IndexNow after deployment
+- `npm run smoke:mcp` runs an isolated MCP workflow with synthetic data and no database or payments
+
+The optional MCP prototype is disabled by default. See [MCP pilot setup and launch requirements](docs/MCP_PILOT.md).
 
 ## Confirmed decisions
 

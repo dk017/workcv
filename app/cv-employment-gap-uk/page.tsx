@@ -12,13 +12,14 @@ import {
 
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-employment-gap-uk", {
   title: "CV Employment Gap UK - How to Explain Gaps",
   description:
     "Worried about a gap in your CV? Learn how to explain employment gaps in a UK CV with clear wording examples and a no-subscription CV builder.",
   alternates: { canonical: "/cv-employment-gap-uk" },
-};
+});
 
 const jsonLd = {
   "@context": "https://schema.org",

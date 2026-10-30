@@ -13,14 +13,30 @@ import {
 
 process.env.ANALYTICS_HASH_SECRET = "test-only-analytics-secret";
 
-test("landing views deduplicate by session while other events keep their event ID", () => {
+test("landing views deduplicate by session while route and CTA events keep their event ID", () => {
   assert.equal(
     funnelEventDedupeValue("landing_view", "event_1234567890123456", "session_1234567890123456"),
     "landing_view:session_1234567890123456",
   );
   assert.equal(
     funnelEventDedupeValue(
+      "page_view",
+      "event_1234567890123456",
+      "session_1234567890123456",
+    ),
+    "event_1234567890123456",
+  );
+  assert.equal(
+    funnelEventDedupeValue(
       "marketing_cta_clicked",
+      "event_1234567890123456",
+      "session_1234567890123456",
+    ),
+    "event_1234567890123456",
+  );
+  assert.equal(
+    funnelEventDedupeValue(
+      "tool_started",
       "event_1234567890123456",
       "session_1234567890123456",
     ),
@@ -103,8 +119,21 @@ test("server sanitisation rejects private landing views but permits login-start 
     sanitizeFunnelEvent({ ...base, eventName: "landing_view", path: "/login" }),
     null,
   );
+  assert.equal(
+    sanitizeFunnelEvent({ ...base, eventName: "page_view", path: "/editor" }),
+    null,
+  );
   assert.ok(
     sanitizeFunnelEvent({ ...base, eventName: "login_started", path: "/login" }),
+  );
+  assert.equal(
+    sanitizeFunnelEvent({
+      ...base,
+      eventName: "tool_started",
+      path: "/editor",
+      metadata: { tool: "job_application_pack", lifecycle: "started" },
+    }),
+    null,
   );
 });
 
@@ -116,10 +145,62 @@ test("invalid CTA metadata is discarded instead of relabelled", () => {
   assert.deepEqual(event?.metadata, {});
 });
 
+
+test("tool lifecycle events accept only bounded metadata and the right state", () => {
+  const started = sanitizeFunnelEvent({
+    ...validEvent,
+    eventName: "tool_started",
+    metadata: {
+      tool: "job_application_pack",
+      lifecycle: "started",
+      placement: "job_application_pack_generate",
+      raw_text: "must not survive",
+    },
+  });
+  assert.deepEqual(started?.metadata, {
+    tool: "job_application_pack",
+    lifecycle: "started",
+    placement: "job_application_pack_generate",
+  });
+
+  const completed = sanitizeFunnelEvent({
+    ...validEvent,
+    eventName: "tool_completed",
+    metadata: {
+      tool: "job_application_pack",
+      lifecycle: "completed",
+      result: "success",
+    },
+  });
+  assert.deepEqual(completed?.metadata, {
+    tool: "job_application_pack",
+    lifecycle: "completed",
+    result: "success",
+  });
+
+  assert.equal(
+    sanitizeFunnelEvent({
+      ...validEvent,
+      eventName: "tool_completed",
+      metadata: { tool: "job_application_pack", lifecycle: "started" },
+    }),
+    null,
+  );
+});
+
 test("hashes browser identifiers before persistence", () => {
   const value = "visitor_12345678901234";
   const hash = hashAnalyticsIdentifier(value);
   assert.notEqual(hash, value);
   assert.match(hash, /^[a-f0-9]{64}$/);
   assert.equal(hash, hashAnalyticsIdentifier(value));
+});
+
+
+test("public Pass visibility requires a public page, a placement and a fixed offer version", () => {
+  const event = { ...validEvent, eventName: "public_pass_offer_viewed", metadata: { placement: "pricing_pass_editor", offer_version: "saved_versions_v2", employer: "private" } };
+  assert.deepEqual(sanitizeFunnelEvent(event)?.metadata, { placement: "pricing_pass_editor", offer_version: "saved_versions_v2" });
+  assert.equal(sanitizeFunnelEvent({ ...event, path: "/editor" }), null);
+  assert.equal(sanitizeFunnelEvent({ ...event, metadata: { placement: "pricing_pass_editor", offer_version: "private content" } }), null);
+  assert.equal(sanitizeFunnelEvent({ ...event, metadata: { offer_version: "saved_versions_v2" } }), null);
 });

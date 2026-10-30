@@ -1,3 +1,4 @@
+import { FirstJobExample } from "@/components/first-job-example";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -15,11 +16,13 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
+import { RoleApplicationPack } from "@/components/role-application-pack";
 
-export const metadata: Metadata = {
-  title: "Warehouse Operative CV Template UK + Example",
+export const metadata: Metadata = withAgentMetadata("/cv-template-warehouse-uk", {
+  title: "Warehouse CV Examples UK: With and Without Experience",
   description:
-    "Use a warehouse operative CV template for UK jobs with picker, packer, goods-in, dispatch, scanner, manual-handling and shift examples.",
+    "Complete UK warehouse CV and cover letter examples with and without experience. Show genuine picking, packing or transferable skills, with a free application checklist.",
   alternates: { canonical: "/cv-template-warehouse-uk" },
   openGraph: {
     title: "Warehouse CV Template UK - WorkCV",
@@ -27,9 +30,9 @@ export const metadata: Metadata = {
       "An editable UK warehouse CV with picking, dispatch, scanner and safe-working examples.",
     url: "/cv-template-warehouse-uk",
   },
-};
+});
 
-const editorHref = "/editor?template=classic&roleTemplate=warehouse&new=1";
+const editorHref = "#application-pack";
 const warehouseCv = getRoleCvTemplate("warehouse");
 
 const jsonLd = {
@@ -179,6 +182,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Warehouse cover letter example", "/cover-letter-examples-uk#warehouse-operative"],
   ["Warehouse personal statement examples", "/cv-personal-statement-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
@@ -213,7 +217,7 @@ export default function WarehouseCvTemplateUkPage() {
               reliability examples you can adapt.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={editorHref}>Use warehouse CV template</ButtonLink>
+              <ButtonLink href={editorHref} trackingLabel="role_pack_warehouse_hero">Build my CV and letter</ButtonLink>
               <ButtonLink href="#example" variant="secondary">
                 See example
               </ButtonLink>
@@ -224,7 +228,7 @@ export default function WarehouseCvTemplateUkPage() {
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-                  Editable draft
+                  Fictional CV example
                 </p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-navy">
                   Warehouse Operative CV
@@ -234,7 +238,7 @@ export default function WarehouseCvTemplateUkPage() {
                 href={editorHref}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
               >
-                Edit
+                Personalise
                 <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -249,6 +253,10 @@ export default function WarehouseCvTemplateUkPage() {
           </div>
         </div>
       </section>
+
+      <nav aria-label="Choose a warehouse example" className="container-page flex flex-wrap gap-4 py-5 font-bold underline"><a href="#application-pack">Experienced example and own application</a><a href="#no-experience-example">First warehouse job: CV and letter</a></nav>
+      <RoleApplicationPack id="warehouse" />
+      <FirstJobExample id="warehouse" />
 
       <section className="bg-surface py-24">
         <div className="container-page">
@@ -451,9 +459,10 @@ export default function WarehouseCvTemplateUkPage() {
       />
       <FinalCta
         heading="Start with a warehouse CV that already knows the shift."
-        body={`Use the editable warehouse template, adapt it to the vacancy, then pay ${site.price} only when you download the final PDF.`}
+        body={`Build with your own evidence, then pay ${site.price} once for your saved CV and matching cover letter as PDF and Word.`}
         primaryHref={editorHref}
-        primary="Use warehouse CV template"
+        primary="Build my CV and letter"
+        trackingContext="role_pack_warehouse_final"
         secondaryHref="/cv-no-experience-uk"
         secondary="No-experience CV help"
       />

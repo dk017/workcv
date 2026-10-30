@@ -12,6 +12,9 @@ import { reportConversionFailure } from "@/lib/conversion-alerts";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
 import { ensurePaymentTables, getPool } from "@/lib/db";
 import { sendPurchaseConfirmationEmail } from "@/lib/email";
+import { planForProductId } from "@/lib/commerce";
+import { passExpiry, refundRevokesAccess } from "@/lib/pass-rules";
+import { getUpgradeOffer } from "@/lib/cv-entitlement";
 
 export const runtime = "nodejs";
 
@@ -24,6 +27,7 @@ type DodoWebhookEvent = {
 
 type DodoPaymentPayload = {
   payment_id?: string;
+  refund_id?: string;
   id?: string;
   checkout_session_id?: string | null;
   customer?: {
@@ -82,6 +86,7 @@ export async function POST(request: NextRequest) {
     "payment.succeeded",
     "payment.failed",
     "payment.cancelled",
+    "refund.succeeded",
   ]);
   if (!event.type || !supportedEventTypes.has(event.type)) {
     return NextResponse.json({ status: "ignored" });
@@ -92,13 +97,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Missing payment payload" }, { status: 400 });
   }
 
+  if (event.type === "refund.succeeded") {
+    return handleRefund(data);
+  }
+
   const metadata = data.metadata || {};
   const draftId = metadataString(metadata, "draft_id") || metadataString(metadata, "draftId");
   const productId = metadataString(metadata, "product_id") || DODO_PRODUCT_ID;
   const eventSiteHost = metadataString(metadata, "site_host")?.toLowerCase() || null;
   const expectedSiteHost = getSiteHost();
 
-  if (productId !== DODO_PRODUCT_ID) {
+  const plan = planForProductId(productId);
+  if (!plan) {
     return NextResponse.json({ status: "ignored", reason: "product_mismatch" });
   }
 
@@ -148,6 +158,12 @@ export async function POST(request: NextRequest) {
     let consentAt: Date | null = null;
     let consentVersion: string | null = null;
     let isTest = false;
+    let attributionSource: string | null = null;
+    let attributionMedium: string | null = null;
+    let attributionCampaign: string | null = null;
+    let attributionLandingPath: string | null = null;
+    let attributionReferrerHost: string | null = null;
+    let attributionCapturedAt: Date | null = null;
     if (checkoutId) {
       const checkout = await getPool().query<{
         email: string | null;
@@ -155,12 +171,21 @@ export async function POST(request: NextRequest) {
         consent_at: Date | null;
         consent_version: string | null;
         is_test: boolean;
+        attribution_source: string | null;
+        attribution_medium: string | null;
+        attribution_campaign: string | null;
+        attribution_landing_path: string | null;
+        attribution_referrer_host: string | null;
+        attribution_captured_at: Date | null;
       }>(
         `
           UPDATE workcv_payment_checkouts
           SET completed_at = NOW(), status = 'paid', updated_at = NOW()
           WHERE id = $1
-          RETURNING email, user_id, consent_at, consent_version, is_test
+          RETURNING email, user_id, consent_at, consent_version, is_test,
+                    attribution_source, attribution_medium, attribution_campaign,
+                    attribution_landing_path, attribution_referrer_host,
+                    attribution_captured_at
         `,
         [checkoutId]
       );
@@ -169,14 +194,23 @@ export async function POST(request: NextRequest) {
       consentAt = checkout.rows[0]?.consent_at || null;
       consentVersion = checkout.rows[0]?.consent_version || null;
       isTest = checkout.rows[0]?.is_test === true;
+      attributionSource = checkout.rows[0]?.attribution_source || null;
+      attributionMedium = checkout.rows[0]?.attribution_medium || null;
+      attributionCampaign = checkout.rows[0]?.attribution_campaign || null;
+      attributionLandingPath = checkout.rows[0]?.attribution_landing_path || null;
+      attributionReferrerHost = checkout.rows[0]?.attribution_referrer_host || null;
+      attributionCapturedAt = checkout.rows[0]?.attribution_captured_at || null;
     }
 
     await getPool().query(
       `
         INSERT INTO workcv_orders
           (id, draft_id, email, product_id, amount_cents, currency, checkout_id,
-           raw_event_type, user_id, consent_at, consent_version, is_test)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+           raw_event_type, user_id, consent_at, consent_version, is_test,
+           attribution_source, attribution_medium, attribution_campaign,
+           attribution_landing_path, attribution_referrer_host, attribution_captured_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12,
+                $13, $14, $15, $16, $17, $18)
         ON CONFLICT (id) DO NOTHING
       `,
       [
@@ -192,6 +226,12 @@ export async function POST(request: NextRequest) {
         consentAt,
         consentVersion,
         isTest,
+        attributionSource,
+        attributionMedium,
+        attributionCampaign,
+        attributionLandingPath,
+        attributionReferrerHost,
+        attributionCapturedAt,
       ]
     );
 
@@ -222,12 +262,20 @@ export async function POST(request: NextRequest) {
 
       if (claimed.rows.length > 0) {
         try {
+          // Tell a single-CV buyer about the upgrade only if they can actually use it.
+          const upgrade =
+            plan === "cv" && checkoutUserId
+              ? await getUpgradeOffer({ id: checkoutUserId, email }).catch(() => ({ eligible: false }) as const)
+              : ({ eligible: false } as const);
           await sendPurchaseConfirmationEmail({
             to: email,
             orderId: paymentId,
             amountCents,
             currency,
             editorUrl: `${getAppUrl()}/editor?draftId=${encodeURIComponent(draftId)}`,
+            plan,
+            passEndsAt: plan === "pass" ? passExpiry(new Date()) : null,
+            upgrade: upgrade.eligible ? { priceMinor: upgrade.priceMinor, creditMinor: upgrade.creditMinor, endsAt: new Date(upgrade.endsAt) } : null,
           });
           await getPool().query(
             `
@@ -268,5 +316,30 @@ export async function POST(request: NextRequest) {
       },
     });
     return NextResponse.json({ error: "Webhook processing failed" }, { status: 500 });
+  }
+}
+
+// A full refund revokes the order's access; partial refunds are left in place.
+async function handleRefund(data: DodoPaymentPayload) {
+  const paymentId = data.payment_id;
+  if (!paymentId) return NextResponse.json({ error: "Missing payment_id" }, { status: 400 });
+  try {
+    await ensurePaymentTables();
+    const order = await getPool().query<{ amount_cents: number | null }>(
+      "SELECT amount_cents FROM workcv_orders WHERE id = $1",
+      [paymentId],
+    );
+    if (!order.rows[0]) return NextResponse.json({ status: "ignored", reason: "unknown_payment" });
+    if (!refundRevokesAccess(readAmountCents(data), order.rows[0].amount_cents)) {
+      return NextResponse.json({ status: "ok", access: "kept_partial_refund" });
+    }
+    await getPool().query(
+      "UPDATE workcv_orders SET refunded_at = COALESCE(refunded_at, NOW()) WHERE id = $1",
+      [paymentId],
+    );
+    return NextResponse.json({ status: "ok", access: "revoked" });
+  } catch (error) {
+    console.error("dodo_refund_processing_failed", error);
+    return NextResponse.json({ error: "Refund processing failed" }, { status: 500 });
   }
 }

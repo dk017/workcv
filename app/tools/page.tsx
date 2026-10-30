@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 
 import { ToolsHub } from "@/components/tools-hub";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools", {
   title: "Free UK CV Tools - No Signup Required",
   description:
     "Free UK CV tools: ATS checker, personal statement generator, salary calculator, and more. No signup, no subscription.",
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
       "Free CV generators, checkers, salary calculators and Word templates for UK job seekers.",
     url: "/tools",
   },
-};
+});
 
 export default function ToolsPage() {
   return <ToolsHub />;

@@ -10,8 +10,9 @@ import {
 import { CvLengthChecker } from "@/components/cv-length-checker";
 import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/tools/cv-word-count-checker", {
   title: "Free CV Word Count Checker UK - No Signup",
   description:
     "Paste your CV to count its words, estimate A4 pages and get a UK-focused Too Short, Good Length or Too Long verdict with practical editing steps.",
@@ -22,7 +23,7 @@ export const metadata: Metadata = {
       "Count your CV words, estimate its A4 page length and get practical UK-focused editing guidance.",
     url: "/tools/cv-word-count-checker",
   },
-};
+});
 
 const faqItems = [
   {
@@ -233,6 +234,7 @@ export default function CvLengthCheckerPage() {
       <RelatedLinksSection
         title="Check more than length."
         links={[
+          ["How long should a CV be (UK)", "/how-long-should-a-cv-be-uk"],
           ["Shorten a CV: complete worked example", "/shorten-cv-to-two-pages"],
           ["Check readability", "/tools/cv-readability-checker"],
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],

@@ -139,6 +139,11 @@ export function TemplateGallery() {
             </Link>
           </div>
 
+          <div className="mb-8 rounded-lg border border-line bg-paper p-5">
+            <h3 className="text-xl font-bold text-navy">Need education first or a compact single column?</h3>
+            <p className="mt-3 text-sm leading-7">The editor includes section ordering, optional projects, certifications, volunteering and languages, plus three single-column presets. Compare real sample PDFs and extracted text before choosing.</p>
+            <Link href="/cv-layout-tests-uk" className="mt-3 inline-flex min-h-11 items-center font-bold text-navy underline">Compare all six designs and presets</Link>
+          </div>
           <div className="grid gap-6 xl:grid-cols-3">
             {templates.map((template) => {
               const details = templateDetails[template.id];
@@ -147,7 +152,7 @@ export function TemplateGallery() {
                   key={template.id}
                   className="rounded-xl border border-line bg-paper p-4 shadow-sm"
                 >
-                  <div className="template-page-preview mb-5 overflow-hidden rounded-lg border border-line bg-white p-4">
+                  <div data-md-skip className="template-page-preview mb-5 overflow-hidden rounded-lg border border-line bg-white p-4">
                     <div
                       className="gallery-preview-document pointer-events-none mx-auto"
                       style={{
@@ -221,7 +226,7 @@ export function TemplateGallery() {
                 <ArrowRight className="h-4 w-4" />
               </Link>
               <Link
-                href="/resume-template-uk"
+                href="/professional-cv-template-uk"
                 className="inline-flex items-center gap-2 text-sm font-bold text-navy"
               >
                 Use the UK resume template

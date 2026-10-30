@@ -1,196 +1,95 @@
 import Link from "next/link";
-import { ArrowRight, ShieldCheck } from "lucide-react";
+import { cancelGuides } from "@/components/cancel-guide-links";
+import { ArrowRight } from "lucide-react";
 
 import { TrackedLink } from "@/components/tracked-link";
-import { buildLoginHref } from "@/lib/safe-redirect";
-import { routes, site } from "@/lib/site";
-
-const startEditorHref = buildLoginHref("/editor");
+import { commercialRoutes, site } from "@/lib/site";
 
 type Faq = {
   question: string;
   answer: string;
 };
 
-export function Header() {
-  return (
-    <header className="sticky top-0 z-40 border-b border-line bg-surface/90 backdrop-blur">
-      <div className="container-page flex h-16 items-center justify-between gap-6">
-        <Link href="/" className="font-display text-2xl font-semibold text-navy">
-          WorkCV
-        </Link>
-        <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
-          {routes.slice(1).map((route) => (
-            <Link key={route.href} href={route.href} className="hover:text-navy">
-              {route.label}
-            </Link>
-          ))}
-        </nav>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/templates"
-            className="hidden rounded-md border border-line-strong px-4 py-2 text-sm font-bold text-navy hover:bg-white sm:inline-flex"
-          >
-            See example
-          </Link>
-          <Link
-            href={startEditorHref}
-            className="rounded-md bg-navy px-4 py-2 text-sm font-bold text-white shadow-sm hover:bg-navy-hover"
-          >
-            Start free
-          </Link>
-        </div>
-      </div>
-    </header>
-  );
-}
+const footerGroups: Array<{ title: string; links: Array<[string, string]> }> = [
+  {
+    title: "Product",
+    links: [
+      ["Templates", "/templates"],
+      ["Pricing", "/pricing"],
+      ["CV examples", "/cv-examples-uk"],
+      ["No subscription", "/cv-builder-no-subscription-uk"],
+      ["CV builder guide", "/best-cv-builder-uk"],
+      ["CV builder charges", "/cv-builder-scams-uk"],
+    ],
+  },
+  {
+    title: "Free tools",
+    links: [
+      ["ATS CV checker", "/tools/ats-score-checker"],
+      ["Visa sponsor checker", "/tools/uk-visa-sponsor-checker"],
+      ["Job tracker", "/tools/job-application-tracker-uk"],
+      ["CV length checker", "/tools/cv-word-count-checker"],
+      ["Statement generator", "/tools/cv-summary-generator-uk"],
+      ["All free tools", "/tools"],
+    ],
+  },
+  {
+    title: "Money and work",
+    links: [
+      ["UK salary checker", "/tools/uk-salary-by-job-title"],
+      ["Take-home pay", "/tools/take-home-pay-calculator-uk"],
+      ["Notice calculator", "/tools/notice-period-calculator"],
+      ["Redundancy pay", "/tools/redundancy-pay-calculator"],
+      ["CV guide", "/how-to-write-a-cv-uk"],
+    ],
+  },
+  {
+    title: "Company",
+    links: [
+      ["About", "/about"],
+      ["Contact", "/contact"],
+      ["Privacy", "/privacy"],
+      ["Terms", "/terms"],
+      ["Refunds", "/refund-policy"],
+    ],
+  },
+];
 
 export function Footer({ line = site.summary }: { line?: string }) {
   return (
-    <footer className="border-t border-line bg-surface">
-      <div className="container-page flex flex-col gap-8 py-10">
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <p className="max-w-2xl font-display text-2xl font-semibold leading-tight text-navy">
-            {line}
-          </p>
-          <div className="flex flex-wrap gap-5 text-sm font-medium text-navy">
-            <Link href="/pricing">Pricing</Link>
-            <Link href="/templates">Templates</Link>
-            <Link href="/how-to-write-a-cv-uk">CV guide</Link>
-            <Link href="/tools">Free tools</Link>
-            <Link href="/tools/ats-score-checker">ATS checker</Link>
-            <Link href="/tools/cv-word-count-checker">CV length checker</Link>
-            <Link href="/tools/uk-salary-by-job-title">UK salary checker</Link>
-            <Link href="/tools/cv-summary-generator-uk">Statement generator</Link>
-            <Link href="/tools/notice-period-calculator">Notice calculator</Link>
-            <Link href="/tools/take-home-pay-calculator-uk">Take-home pay</Link>
-            <Link href="/tools/redundancy-pay-calculator">Redundancy pay</Link>
-            <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
-            <Link href="/cv-builder-scams-uk">CV builder charges</Link>
-            <Link href="/compare">Compare CV builders</Link>
-            <Link href="/contact">Contact</Link>
-            <Link href="/privacy">Privacy</Link>
-            <Link href="/terms">Terms</Link>
-            <Link href="/refund-policy">Refunds</Link>
-          </div>
+    <footer className="border-t border-line bg-paper text-sm">
+      <div className="container-page grid gap-x-4 gap-y-8 py-10 sm:py-14 lg:grid-cols-[1.4fr_repeat(4,1fr)] lg:gap-x-8">
+        <div className="flex flex-col gap-2.5">
+          <span className="flex items-center gap-2 font-display text-xl font-extrabold text-navy">
+            <svg aria-hidden="true" viewBox="0 0 64 64" className="h-[26px] w-[26px] shrink-0">
+              <rect width="64" height="64" rx="12" fill="#0F2942" />
+              <path d="M12 16h9l6 28h-8L12 16Zm17 0h7l-5 28h-8l6-28Zm9 0h8l-3 28h-8l3-28Zm10 0h8l-7 28h-8l7-28Z" fill="#fff" />
+              <rect x="12" y="50" width="40" height="4" rx="2" fill="#D4A843" />
+            </svg>
+            WorkCV
+          </span>
+          <p className="max-w-xs leading-relaxed text-muted">{line}</p>
         </div>
-        <div className="flex flex-wrap items-center gap-4">
-          <a
-            href="https://dang.ai"
-            target="_blank"
-            rel="dofollow noopener"
-            className="inline-block no-underline"
-            aria-label="Verified on DANG"
-          >
-            <img
-              src="https://assets.dang.ai/badges/dang-verified-dark.png"
-              alt="Verified on DANG!"
-              width={260}
-              height={94}
-              className="block h-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://www.scrolllaunch.com/products/workcv?ref=badge"
-            target="_blank"
-            rel="noopener"
-            className="inline-block"
-            aria-label="WorkCV featured on ScrollLaunch"
-          >
-            <img
-              src="https://www.scrolllaunch.com/api/badge/workcv?variant=launched&theme=light"
-              alt="WorkCV - Featured on ScrollLaunch"
-              className="block h-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://mediapronet.com/?utm_source=workcv.co.uk&utm_medium=badge"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            aria-label="WorkCV promoted on MEDIAPRONET"
-          >
-            <img
-              src="https://mediapronet.com/api/badge?style=classic"
-              alt="Promoted on MEDIAPRONET"
-              height={54}
-              className="block h-[54px] w-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://sitepatent.com/?utm_source=workcv.co.uk&utm_medium=badge"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            aria-label="WorkCV promoted on SitePatent"
-          >
-            <img
-              src="https://sitepatent.com/api/badge?style=classic"
-              alt="Promoted on SitePatent"
-              height={54}
-              className="block h-[54px] w-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://codetrendy.com/?utm_source=workcv.co.uk&utm_medium=badge"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            aria-label="WorkCV promoted on CodeTrendy"
-          >
-            <img
-              src="https://codetrendy.com/api/badge?style=classic"
-              alt="Promoted on CodeTrendy"
-              height={54}
-              className="block h-[54px] w-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://marketingdb.live"
-            target="_blank"
-            rel="noopener noreferrer nofollow sponsored"
-            className="inline-block"
-            aria-label="WorkCV listed on MarketingDB"
-          >
-            <img
-              src="https://marketingdb.live/badge.svg"
-              alt="Listed on MarketingDB"
-              width={190}
-              height={44}
-              className="block h-11 w-auto max-w-full border-0"
-            />
-          </a>
-          <a
-            href="https://www.aidirectori.es"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            aria-label="WorkCV listed on AI Directories"
-          >
-            <img
-              src="https://cdn.aidirectori.es/ai-tools/badges/dark-mode.png"
-              alt="AI Directories Badge"
-              width={208}
-              height={44}
-              className="block h-11 w-auto max-w-[208px] border-0"
-            />
-          </a>
-          <a
-            href="https://findly.tools/workcv?utm_source=workcv"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-block"
-            aria-label="WorkCV featured on Findly.tools"
-          >
-            <img
-              src="https://findly.tools/badges/findly-tools-badge-dark.svg"
-              alt="Featured on Findly.tools"
-              width={175}
-              height={55}
-              className="block h-[55px] w-auto max-w-full border-0"
-            />
-          </a>
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 md:grid-cols-4 md:gap-x-8 lg:contents">
+          {footerGroups.map((group) => (
+            <nav key={group.title} aria-label={group.title} className="flex flex-col">
+              <p className="pb-1 font-bold text-navy">{group.title}</p>
+              {group.links.map(([label, href]) => (
+                <Link key={href} href={href} className="flex min-h-9 items-center text-muted hover:text-navy">
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          ))}
         </div>
+      </div>
+      <div className="container-page flex flex-wrap gap-x-5 gap-y-1 border-t border-line pb-10 pt-5">
+        <p className="w-full py-1 font-bold text-navy sm:w-auto">Cancel a CV builder subscription:</p>
+        {cancelGuides.map((guide) => (
+          <Link key={guide.href} href={guide.href} className="flex min-h-9 items-center text-muted hover:text-navy sm:min-h-0">
+            {guide.name}
+          </Link>
+        ))}
       </div>
     </footer>
   );
@@ -228,28 +127,6 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
-export function TrustStrip() {
-  const items = [
-    "Guided UK sections",
-    "Formatting handled",
-    "Preview every page",
-    "Save and update anytime",
-  ];
-
-  return (
-    <section className="border-y border-line bg-surface">
-      <div className="container-page grid gap-3 py-5 sm:grid-cols-2 lg:grid-cols-4">
-        {items.map((item) => (
-          <div key={item} className="flex items-center gap-3 text-sm font-bold text-navy">
-            <ShieldCheck className="h-5 w-5 text-success" />
-            {item}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
-}
-
 export function NoSubscriptionCtaStrip() {
   return (
     <section className="border-y border-line bg-navy py-8 text-white">
@@ -262,17 +139,58 @@ export function NoSubscriptionCtaStrip() {
             Tired of CV builders charging you monthly?
           </h2>
           <p className="mt-3 max-w-2xl text-base leading-7 text-white/75">
-            WorkCV costs {site.price} when you download your PDF. No monthly
+            Pay {site.price} once for your CV and matching cover letter as PDF and Word. No monthly
             subscription, no automatic renewal, and nothing to cancel later.
           </p>
         </div>
         <Link
-          href="/cv-builder-no-subscription-uk"
+          href={commercialRoutes.moneyPage}
           className="inline-flex min-h-12 shrink-0 items-center justify-center gap-2 rounded-md bg-white px-5 py-3 text-sm font-bold text-navy transition hover:-translate-y-0.5"
         >
           See how it works
           <ArrowRight className="h-4 w-4" />
         </Link>
+      </div>
+    </section>
+  );
+}
+
+export function MoneyPageCta({
+  heading = "Build the CV behind your next application.",
+  body = `Build and preview free. Pay ${site.price} once for one saved UK CV and its matching cover letter, each as PDF and Word. No subscription; edits and redownloads of the same saved CV and letter are included.`,
+  trackingContext = "money_page_cta",
+  secondary = true,
+}: {
+  heading?: string;
+  body?: string;
+  trackingContext?: string;
+  secondary?: boolean;
+}) {
+  return (
+    <section className="border-y border-line bg-navy py-16 text-white">
+      <div className="container-page text-center">
+        <h2 className="font-display text-4xl font-semibold md:text-5xl">{heading}</h2>
+        <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/75">{body}</p>
+        <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+          <TrackedLink
+            href={commercialRoutes.moneyPage}
+            placement={`${trackingContext}_money`}
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-white px-6 py-3 text-sm font-bold text-navy"
+          >
+            See the no-subscription CV builder
+            <ArrowRight className="h-4 w-4" />
+          </TrackedLink>
+          {secondary ? (
+            <TrackedLink
+              href={commercialRoutes.editor}
+              placement={`${trackingContext}_editor`}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md border border-white/35 px-6 py-3 text-sm font-bold text-white"
+            >
+              Start building free
+              <ArrowRight className="h-4 w-4" />
+            </TrackedLink>
+          ) : null}
+        </div>
       </div>
     </section>
   );
@@ -399,157 +317,6 @@ function PreviewSection({
   );
 }
 
-const transformationDetails = [
-  "Resolved customer queries and complaints",
-  "Trained two new starters",
-  "Covered high-volume weekend shifts",
-];
-
-function TransformationField({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <div className="mb-2 text-sm font-bold text-navy">{label}</div>
-      <div className="rounded-md border border-line-strong bg-paper px-4 py-3 text-sm text-ink">
-        {value}
-      </div>
-    </div>
-  );
-}
-
-export function TransformationSection() {
-  return (
-    <section id="transformation" className="quiet-grid scroll-mt-16 bg-paper py-16">
-      <div className="container-wide">
-        <SectionLabel>From details to document</SectionLabel>
-        <h2 className="max-w-4xl font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
-          Your details go in. A polished UK CV comes out.
-        </h2>
-        <p className="mt-6 max-w-3xl text-lg leading-8 text-muted">
-          You add the content. WorkCV takes care of the structure, spacing,
-          hierarchy, and page layout.
-        </p>
-
-        <div className="mt-8 grid items-center gap-8 lg:grid-cols-[0.9fr_auto_1.1fr]">
-          <div>
-            <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              What you add
-            </h3>
-            <div className="space-y-4 rounded-xl border border-line-strong bg-white p-5 shadow-sm sm:p-6">
-              <TransformationField label="Role" value="Customer Service Assistant" />
-              <TransformationField label="Employer" value="Northline Retail" />
-              <TransformationField label="Location" value="Leeds" />
-              <div>
-                <div className="mb-2 text-sm font-bold text-navy">Experience</div>
-                <div className="space-y-2 rounded-md border border-line-strong bg-paper px-4 py-3 text-sm leading-6 text-ink">
-                  {transformationDetails.map((detail) => (
-                    <div key={detail}>{detail}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <ArrowRight
-            aria-hidden="true"
-            className="mx-auto h-10 w-10 rotate-90 text-navy lg:rotate-0"
-            strokeWidth={1.75}
-          />
-
-          <div>
-            <h3 className="mb-4 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              What you get
-            </h3>
-            <div className="rounded-xl border border-line-strong bg-white p-6 shadow-soft sm:p-8">
-              <div className="flex items-center justify-between gap-4">
-                <div className="h-1.5 w-20 bg-gold" />
-                <div className="flex items-center gap-3 text-[10px] font-bold uppercase tracking-[0.14em] text-navy">
-                  Classic UK
-                  <span className="h-2.5 w-2.5 rounded-full bg-gold" />
-                </div>
-              </div>
-              <h3 className="mt-8 font-display text-4xl font-semibold leading-none text-navy sm:text-5xl">
-                Emily Thompson
-              </h3>
-              <p className="mt-3 text-base font-bold text-ink">Customer Service Assistant</p>
-              <p className="mt-1 text-sm text-muted">Leeds, UK</p>
-              <div className="my-6 border-t border-line" />
-              <div className="text-xs font-bold uppercase tracking-[0.14em] text-navy">
-                Experience
-              </div>
-              <ul className="mt-4 space-y-3 text-sm leading-6 text-ink">
-                {transformationDetails.map((detail) => (
-                  <li key={detail}>{detail}</li>
-                ))}
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8 flex justify-center">
-          <ButtonLink href={startEditorHref}>Start free with email code</ButtonLink>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function ProofSection() {
-  const proofPoints = [
-    {
-      stat: `${site.price}`,
-      title: "shown before the editor",
-      body:
-        "The price is not saved for the last click. You see the one-time PDF price before you start.",
-    },
-    {
-      stat: "0",
-      title: "renewals to cancel",
-      body:
-        "The checkout unlocks one saved CV PDF. There is no monthly plan, renewal date, or account trap.",
-    },
-    {
-      stat: "2026",
-      title: "UK pricing checked",
-      body:
-        "The pricing page compares WorkCV against trial-and-renewal CV builders using dated source checks.",
-    },
-  ];
-
-  return (
-    <section className="bg-surface py-24">
-      <div className="container-page grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-        <div>
-          <SectionLabel>Proof before payment</SectionLabel>
-          <h2 className="font-display text-4xl font-semibold leading-tight text-navy md:text-5xl">
-            The promise is visible before you pay.
-          </h2>
-          <p className="mt-6 text-lg leading-8 text-muted">
-            CV builders make people nervous because the cheap trial is often not
-            the real price. WorkCV keeps the proof close to the action: price,
-            preview, and no renewal are all clear before checkout.
-          </p>
-          <div className="mt-8">
-            <ButtonLink href="/pricing" variant="secondary">
-              Check the pricing proof
-            </ButtonLink>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-3 lg:grid-cols-1">
-          {proofPoints.map((item) => (
-            <div key={item.title} className="rounded-xl border border-line bg-paper p-6">
-              <div className="font-display text-5xl font-semibold leading-none text-navy">
-                {item.stat}
-              </div>
-              <h3 className="mt-4 text-base font-bold text-navy">{item.title}</h3>
-              <p className="mt-3 text-sm leading-6 text-muted">{item.body}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function FaqSection({ faqs, title }: { faqs: Faq[]; title: string }) {
   return (
     <section id="faq" className="bg-paper py-24">
@@ -564,7 +331,7 @@ export function FaqSection({ faqs, title }: { faqs: Faq[]; title: string }) {
               <summary className="cursor-pointer list-none font-bold text-navy">
                 <span className="flex items-center justify-between gap-4">
                   {faq.question}
-                  <span className="text-xl text-gold">+</span>
+                  <span aria-hidden="true" className="text-xl text-gold">+</span>
                 </span>
               </summary>
               <p className="mt-4 max-w-3xl leading-7 text-muted">{faq.answer}</p>

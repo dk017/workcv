@@ -18,22 +18,28 @@ export default async function EditorPage({
 }: {
   searchParams: {
     template?: string;
+    layoutPreset?: string;
     payment?: string;
     draftId?: string;
     roleTemplate?: string;
     new?: string;
     from?: string;
+    plan?: string;
   };
 }) {
   const user = await getCurrentUser();
-  if (!user) {
+  // Starting a new CV needs no account: the draft stays in the browser until the visitor saves it.
+  const needsAccount = Boolean(searchParams.draftId || searchParams.payment || searchParams.from);
+  if (!user && needsAccount) {
     const editorParams = new URLSearchParams();
     if (searchParams.template) editorParams.set("template", searchParams.template);
+    if (searchParams.layoutPreset) editorParams.set("layoutPreset", searchParams.layoutPreset);
     if (searchParams.payment) editorParams.set("payment", searchParams.payment);
     if (searchParams.draftId) editorParams.set("draftId", searchParams.draftId);
     if (searchParams.roleTemplate) editorParams.set("roleTemplate", searchParams.roleTemplate);
     if (searchParams.new) editorParams.set("new", searchParams.new);
     if (searchParams.from) editorParams.set("from", searchParams.from);
+    if (searchParams.plan === "pass") editorParams.set("plan", "pass");
     redirect(
       buildLoginHref(
         `/editor${editorParams.toString() ? `?${editorParams.toString()}` : ""}`,
@@ -41,5 +47,5 @@ export default async function EditorPage({
     );
   }
 
-  return <CvEditor />;
+  return <CvEditor guest={!user} />;
 }

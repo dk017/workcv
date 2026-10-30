@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { getCurrentUserFromRequest } from "@/lib/auth";
-import { createCvDocument, parseTemplate } from "@/lib/cv-documents";
+import { createCvDocument, duplicateCvDocument, parseTemplate } from "@/lib/cv-documents";
+import { describeCvValidationError } from "@/lib/cv-save-validation";
+import { CvValidationError, parseCvData } from "@/lib/cv-schema";
+import { parseTailorJob } from "@/lib/job-tailor";
 import { parseRoleTemplate } from "@/lib/role-cv-templates";
 
 export async function POST(request: NextRequest) {
@@ -9,6 +12,31 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
 
   const body = await request.json().catch(() => ({}));
+  if (typeof body.copyFrom === "string") {
+    if (!/^[a-zA-Z0-9_-]{12,80}$/.test(body.copyFrom)) {
+      return NextResponse.json({ error: "Invalid CV" }, { status: 400 });
+    }
+    // An optional job turns the copy into a CV tailored for that vacancy.
+    const job = body.job === undefined ? undefined : parseTailorJob(body.job);
+    if (job === null) return NextResponse.json({ error: "Invalid job details" }, { status: 400 });
+    const copy = await duplicateCvDocument(user.id, body.copyFrom, job);
+    if (!copy) return NextResponse.json({ error: "CV not found" }, { status: 404 });
+    return NextResponse.json({ document: copy });
+  }
+  // A guest draft: the CV a visitor built before signing in, validated like any saved CV.
+  if (body.guestDraft !== undefined) {
+    try {
+      const draft = parseCvData(body.guestDraft);
+      const document = await createCvDocument(user.id, undefined, undefined, draft);
+      return NextResponse.json({ document });
+    } catch (error) {
+      if (error instanceof CvValidationError) {
+        const issue = describeCvValidationError(error);
+        return NextResponse.json({ error: issue.message, code: "INVALID_CV_DATA", field: issue.field }, { status: 400 });
+      }
+      throw error;
+    }
+  }
   const template = parseTemplate(typeof body.template === "string" ? body.template : null);
   const roleTemplate = parseRoleTemplate(
     typeof body.roleTemplate === "string" ? body.roleTemplate : null

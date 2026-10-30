@@ -4,11 +4,16 @@ export function ComparisonTable({
   rows,
 }: {
   caption: string;
-  headers: [string, string, string] | [string, string];
+  headers: [string, string, string, string] | [string, string, string] | [string, string];
   rows: string[][];
 }) {
   return (
-    <div className="mt-10 overflow-x-auto rounded-xl border border-line bg-white">
+    <div
+      className="mt-10 overflow-x-auto rounded-xl border border-line bg-white"
+      role="region"
+      aria-label={caption}
+      tabIndex={0}
+    >
       <table className="w-full min-w-[680px] border-collapse text-left text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead className="bg-navy text-white">
@@ -24,7 +29,7 @@ export function ComparisonTable({
           {rows.map((row) => (
             <tr key={row.join("|")} className="border-t border-line align-top">
               {row.map((cell, index) =>
-                index === 0 && headers.length === 3 ? (
+                index === 0 && headers.length >= 3 ? (
                   <th key={index} scope="row" className="bg-paper p-5 font-bold text-navy">
                     {cell}
                   </th>

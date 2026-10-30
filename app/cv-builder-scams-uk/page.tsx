@@ -14,8 +14,10 @@ import {
 } from "@/lib/competitor-pricing";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
+import { PassOffer } from "@/components/pass-offer";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-builder-scams-uk", {
   title: "CV Builder Scams UK? Avoid Trial Renewal Charges",
   description:
     "Learn how low-cost CV builder trials can become recurring charges, what to check before paying, and how WorkCV's one-time price differs.",
@@ -28,7 +30,7 @@ export const metadata: Metadata = {
       "A factual UK guide to CV builder introductory prices, automatic renewals, cancellation evidence, and one-time alternatives.",
     url: "/cv-builder-scams-uk",
   },
-};
+});
 
 const checkedDate = competitorPricingCheckedDate;
 
@@ -104,11 +106,6 @@ export default function CvBuilderScamsUkPage() {
       <article>
         <section className="quiet-grid bg-paper py-16 md:py-24">
           <div className="container-page">
-            <div className="mb-8 flex flex-wrap items-center gap-2 text-sm font-bold text-muted">
-              <Link href="/" className="hover:text-navy">Home</Link>
-              <span>/</span>
-              <span className="text-navy">CV builder charges UK</span>
-            </div>
             <div className="max-w-4xl">
               <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
                 Checked {checkedDate}
@@ -263,7 +260,7 @@ export default function CvBuilderScamsUkPage() {
                 </h2>
                 <p className="mt-6 text-lg leading-8 text-muted">
                   WorkCV uses a narrower model. Build and preview first, then
-                  pay {site.price} once to unlock that saved CV. There is no
+                  pay {site.price} once to unlock that saved CV and its matching cover letter. There is no
                   trial conversion, subscription, or automatic renewal. You can
                   return to the same CV, edit it, and download the updated PDF
                   without paying again. A separate new CV has its own one-time
@@ -291,7 +288,7 @@ export default function CvBuilderScamsUkPage() {
                   ["MyPerfectCV pricing", "https://www.myperfectcv.co.uk/pricing"],
                   ["LiveCareer UK pricing", "https://www.livecareer.co.uk/pricing"],
                   ["Resume.io UK pricing", "https://resume.io/uk/pricing"],
-                  ["CVMaker UK pricing", "https://www.cvmaker.uk/pricing"],
+                  ["CVMaker UK pricing", "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk"],
                 ].map(([label, href]) => (
                   <a
                     key={href}
@@ -317,6 +314,7 @@ export default function CvBuilderScamsUkPage() {
         </section>
       </article>
 
+      <PassOffer audience="switching" trackingLabel={analyticsPlacements.passSwitchingScams} />
       <FaqSection faqs={faqItems} title="Questions about CV builder charges." />
       <FinalCta
         heading="Build your CV without starting a subscription."

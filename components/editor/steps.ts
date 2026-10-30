@@ -1,0 +1,88 @@
+import type { ReadinessIssue } from "@/lib/cv-readiness";
+import { hasCoverLetterContent } from "@/lib/cover-letter-document";
+import { lines, type CvData } from "@/lib/editor-data";
+
+// The editor's steps, in order. The summary comes after the history it summarises.
+export const steps = [
+  { id: "contact", label: "Contact" },
+  { id: "experience", label: "Experience" },
+  { id: "education", label: "Education" },
+  { id: "skills", label: "Skills" },
+  { id: "profile", label: "Profile" },
+  { id: "more", label: "More sections" },
+  { id: "letter", label: "Cover letter" },
+  { id: "finish", label: "Finish and preview" },
+] as const;
+
+export type StepId = (typeof steps)[number]["id"];
+
+export function parseStep(value: string | null | undefined): StepId | null {
+  return steps.some((step) => step.id === value) ? (value as StepId) : null;
+}
+
+export function stepIndex(id: StepId) {
+  return steps.findIndex((step) => step.id === id);
+}
+
+export function nextStep(id: StepId): StepId | null {
+  return steps[stepIndex(id) + 1]?.id ?? null;
+}
+
+export function previousStep(id: StepId): StepId | null {
+  return steps[stepIndex(id) - 1]?.id ?? null;
+}
+
+export function stepLabel(id: StepId) {
+  return steps[stepIndex(id)].label;
+}
+
+// Readiness issues name a CV section; contact details and the target role live on the Contact step.
+export function stepForIssue(issue: ReadinessIssue): StepId {
+  if (issue.section === "profile") return issue.id === "contact" || issue.id === "target-role" ? "contact" : "profile";
+  return parseStep(issue.section) ?? "contact";
+}
+
+// The step that edits a saved field, from a save error's field path ("experience.0.role").
+// The job advert has no step: it is edited in the advert panel (null).
+export function stepForCvField(field: string): StepId | null {
+  const top = field.split(".")[0];
+  if (["fullName", "targetRole", "email", "phone", "location", "linkedin"].includes(top)) return "contact";
+  if (top === "experience" || top === "applicationPack") return "experience";
+  if (top === "education" || top === "skills" || top === "profile") return top;
+  if (top === "coverLetter") return "letter";
+  if (["layoutPreset", "sectionOrder", "additionalSections"].includes(top)) return "more";
+  if (top === "template" || top === "design") return "finish";
+  return null;
+}
+
+// The step that edits a part of the CV page, named by its section ("experience", "contact"…).
+export function stepForCvSection(section: string): StepId {
+  if (section === "header" || section === "contact") return "contact";
+  if (section.includes("experience")) return "experience";
+  if (section === "education" || section === "skills" || section === "profile") return section;
+  return "more";
+}
+
+const words = (text: string) => text.trim().split(/\s+/).filter(Boolean).length;
+
+// A tick in the step bar: the step has the essentials. Optional steps tick once they have content.
+export function stepComplete(cv: CvData, id: StepId, unlocked: boolean): boolean {
+  switch (id) {
+    case "contact":
+      return Boolean(cv.fullName.trim() && (cv.email.trim() || cv.phone.trim()));
+    case "experience":
+      return cv.experience.some((item) => item.role.trim() && item.company.trim() && item.bullets.trim());
+    case "education":
+      return cv.education.some((item) => item.qualification.trim() && item.institution.trim());
+    case "skills":
+      return lines(cv.skills).length >= 3;
+    case "profile":
+      return words(cv.profile) >= 20;
+    case "more":
+      return Object.values(cv.additionalSections || {}).some((value) => Boolean(value?.trim()));
+    case "letter":
+      return hasCoverLetterContent(cv);
+    case "finish":
+      return unlocked;
+  }
+}

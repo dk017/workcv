@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
-import { DM_Sans, Fraunces } from "next/font/google";
-import Script from "next/script";
+import { Arimo, Caladea, Carlito, DM_Sans, EB_Garamond, Fraunces, Gelasio } from "next/font/google";
 
 import { Header } from "@/components/header";
 import { Footer } from "@/components/marketing";
 import { AttributionCapture } from "@/components/attribution-capture";
 import { BreadcrumbSchema } from "@/components/breadcrumb-schema";
-import { site } from "@/lib/site";
+import { SiteFrame } from "@/components/site-frame";
+import { site, founder } from "@/lib/site";
 import "./globals.css";
 
 const dmSans = DM_Sans({
@@ -20,6 +20,16 @@ const fraunces = Fraunces({
   variable: "--font-fraunces",
   display: "swap",
 });
+
+// CV fonts chosen on the Finish step. Each has the same measurements as the Word font it
+// stands in for (Calibri, Cambria, Arial, Georgia; Garamond is a close match). Not preloaded:
+// a font downloads only when a CV uses it.
+const carlito = Carlito({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-carlito" });
+const caladea = Caladea({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-caladea" });
+const arimo = Arimo({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-arimo" });
+const gelasio = Gelasio({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-gelasio" });
+const ebGaramond = EB_Garamond({ subsets: ["latin"], weight: ["400", "700"], display: "swap", preload: false, variable: "--font-eb-garamond" });
+const cvFontVariables = [carlito, caladea, arimo, gelasio, ebGaramond].map((font) => font.variable).join(" ");
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),
@@ -66,10 +76,13 @@ const brandSchema = {
       "@id": `${site.url}/#organization`,
       name: site.name,
       url: site.url,
+      description: site.description,
       logo: {
         "@type": "ImageObject",
         url: `${site.url}/opengraph-image`,
       },
+      founder: { "@type": "Person", name: founder.name },
+      email: site.email,
     },
     {
       "@type": "WebSite",
@@ -86,15 +99,8 @@ const brandSchema = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable}`}>
+    <html lang="en-GB" className={`${dmSans.variable} ${fraunces.variable} ${cvFontVariables}`}>
       <head>
-        <Script
-          defer
-          data-site="hq2xtnu4"
-          data-domain="workcv.co.uk"
-          src="https://piqo.app/piqo.js"
-          strategy="beforeInteractive"
-        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(brandSchema) }}
@@ -103,9 +109,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body className="font-sans antialiased">
         <AttributionCapture />
-        <Header />
-        <main>{children}</main>
-        <Footer />
+        <SiteFrame header={<Header />} footer={<Footer />}>{children}</SiteFrame>
       </body>
     </html>
   );

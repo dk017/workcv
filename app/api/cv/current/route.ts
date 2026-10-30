@@ -5,16 +5,14 @@ import { getCurrentUserFromRequest } from "@/lib/auth";
 import { reportConversionFailure } from "@/lib/conversion-alerts";
 import {
   CvUpdateConflictError,
+  deleteCvDocument,
   getCvDocument,
   getOrCreateCurrentCv,
   parseTemplate,
   updateCvDocument,
 } from "@/lib/cv-documents";
-import {
-  CvValidationError,
-  formatCvValidationError,
-  parseCvData,
-} from "@/lib/cv-schema";
+import { describeCvValidationError } from "@/lib/cv-save-validation";
+import { CvValidationError, parseCvData } from "@/lib/cv-schema";
 
 export async function GET(request: NextRequest) {
   const user = await getCurrentUserFromRequest(request);
@@ -81,8 +79,9 @@ export async function PUT(request: NextRequest) {
       );
     }
     if (error instanceof CvValidationError) {
+      const issue = describeCvValidationError(error);
       return NextResponse.json(
-        { error: formatCvValidationError(error), code: "INVALID_CV_DATA" },
+        { error: issue.message, code: "INVALID_CV_DATA", field: issue.field },
         { status: 400 },
       );
     }
@@ -96,4 +95,17 @@ export async function PUT(request: NextRequest) {
     });
     throw error;
   }
+}
+
+export async function DELETE(request: NextRequest) {
+  const user = await getCurrentUserFromRequest(request);
+  if (!user) return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+
+  const documentId = request.nextUrl.searchParams.get("documentId") || "";
+  if (!/^[a-zA-Z0-9_-]{12,80}$/.test(documentId)) {
+    return NextResponse.json({ error: "Invalid CV" }, { status: 400 });
+  }
+  const deleted = await deleteCvDocument(user.id, documentId);
+  if (!deleted) return NextResponse.json({ error: "CV not found" }, { status: 404 });
+  return NextResponse.json({ deleted: true });
 }

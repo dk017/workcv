@@ -1,3 +1,4 @@
+import { RoleApplicationPack } from "@/components/role-application-pack";
 import Link from "next/link";
 import { ArrowRight, Check, FileText, GraduationCap, SearchCheck } from "lucide-react";
 
@@ -17,6 +18,7 @@ import { site } from "@/lib/site";
 
 export type EarlyCareerPageConfig = {
   slug: string;
+  applicationPackId?: string;
   roleTemplate: Extract<RoleTemplateId, "student" | "school-leaver">;
   kicker: string;
   heading: string;
@@ -37,7 +39,7 @@ export type EarlyCareerPageConfig = {
 };
 
 export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig }) {
-  const editorHref = `/editor?template=classic&roleTemplate=${config.roleTemplate}&new=1`;
+  const editorHref = config.applicationPackId ? "#application-pack" : `/editor?template=classic&roleTemplate=${config.roleTemplate}&new=1`;
   const cv = getRoleCvTemplate(config.roleTemplate);
   const faqSchema = {
     "@context": "https://schema.org",
@@ -74,7 +76,7 @@ export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig })
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">{config.intro}</p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <ButtonLink href={editorHref}>{config.primaryLabel}</ButtonLink>
+              <ButtonLink href={editorHref} trackingLabel={config.applicationPackId ? `role_pack_${config.applicationPackId}_hero` : undefined}>{config.primaryLabel}</ButtonLink>
               <ButtonLink href="#example" variant="secondary">
                 See the example
               </ButtonLink>
@@ -88,7 +90,7 @@ export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig })
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.14em] text-navy">
-                  Editable draft
+                  {config.applicationPackId ? "Fictional CV example" : "Editable draft"}
                 </p>
                 <h2 className="mt-1 font-display text-2xl font-semibold text-navy">
                   {config.exampleTitle}
@@ -98,7 +100,7 @@ export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig })
                 href={editorHref}
                 className="inline-flex min-h-10 items-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
               >
-                Edit <ArrowRight className="h-4 w-4" />
+                {config.applicationPackId ? "Personalise" : "Edit"} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
             <div className="template-page-preview overflow-hidden rounded-lg border border-line bg-[#eef6f3] p-3">
@@ -112,6 +114,8 @@ export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig })
           </div>
         </div>
       </section>
+
+      {config.applicationPackId && <RoleApplicationPack id={config.applicationPackId} />}
 
       <section className="bg-surface py-24">
         <div className="container-page">
@@ -243,6 +247,7 @@ export function EarlyCareerCvPage({ config }: { config: EarlyCareerPageConfig })
 
       <FaqSection faqs={config.faqs} title={`${config.kicker} questions.`} />
       <FinalCta
+        trackingContext={config.applicationPackId ? `role_pack_${config.applicationPackId}_final` : undefined}
         heading={config.finalHeading}
         body={config.finalBody}
         primaryHref={editorHref}

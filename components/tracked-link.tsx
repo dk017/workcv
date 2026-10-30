@@ -11,6 +11,7 @@ export function TrackedLink({
   placement,
   className,
   download,
+  tabIndex,
   onClick,
   children,
 }: {
@@ -18,6 +19,7 @@ export function TrackedLink({
   placement: string;
   className?: string;
   download?: boolean;
+  tabIndex?: number;
   onClick?: MouseEventHandler<HTMLAnchorElement>;
   children: React.ReactNode;
 }) {
@@ -26,6 +28,7 @@ export function TrackedLink({
       href={href}
       className={className}
       download={download}
+      tabIndex={tabIndex}
       data-analytics-placement={placement}
       onClick={(event) => {
         rememberCtaHandoff(placement, href);

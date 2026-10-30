@@ -16,9 +16,12 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { buildWorkCvProductSchema } from "@/lib/product-schema";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { TrackedLink } from "@/components/tracked-link";
+import { analyticsPlacements } from "@/lib/analytics-placements";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
-  title: "ATS CV Template UK - Clean Applicant Tracking Format",
+export const metadata: Metadata = withAgentMetadata("/ats-cv-template-uk", {
+  title: "ATS CV Template UK - Applicant Tracking Format",
   description:
     "Edit an ATS-friendly UK CV template with standard headings, a clean single-column structure and honest job-specific wording. Preview before paying.",
   alternates: { canonical: "/ats-cv-template-uk" },
@@ -28,7 +31,7 @@ export const metadata: Metadata = {
       "Use a clean, editable UK CV starting point and learn what ATS-friendly can—and cannot—promise.",
     url: "/ats-cv-template-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const atsCv = getRoleCvTemplate("general");
@@ -47,7 +50,7 @@ const faqItems = [
   {
     question: "Should I upload a PDF or DOCX CV?",
     answer:
-      "Follow the vacancy or application portal. Prospects notes that not every ATS accepts the same file formats. WorkCV exports PDF, so use another tool if an employer explicitly requires DOCX or another format.",
+      "Follow the vacancy or application portal. Prospects notes that not every ATS accepts the same file formats. WorkCV exports both PDF and an editable Word (DOCX) file, so you can send whichever format the employer asks for.",
   },
   {
     question: "Should I copy keywords from the job advert?",
@@ -73,7 +76,7 @@ const faqSchema = {
 
 const productSchema = buildWorkCvProductSchema({
   description:
-    "An editable, single-column UK CV template with standard headings, PDF preview and a one-time PDF unlock.",
+    "An editable, single-column UK CV template with standard headings, a free preview and a one-time unlock for PDF and Word, with a matching cover letter.",
   url: "/ats-cv-template-uk",
 });
 
@@ -189,7 +192,7 @@ export default function AtsCvTemplateUkPage() {
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
               Start with a clean single-column CV, replace the example with
               accurate evidence and tailor it to the vacancy. Preview every page
-              before deciding whether to unlock the PDF.
+              before deciding whether to pay.
             </p>
             <div className="mt-7 grid gap-3 text-sm font-bold text-navy sm:grid-cols-2">
               {[
@@ -210,6 +213,13 @@ export default function AtsCvTemplateUkPage() {
                 Check my approach
               </ButtonLink>
             </div>
+            <p className="mt-4 text-sm leading-6 text-muted">
+              Already have a CV?{" "}
+              <Link href="/tools/ats-score-checker" className="font-bold text-navy underline underline-offset-4">
+                Upload it to the free ATS CV checker
+              </Link>{" "}
+              to see how it reads.
+            </p>
           </div>
 
           <div className="rounded-2xl border border-line bg-white p-4 shadow-soft md:p-6">
@@ -241,7 +251,7 @@ export default function AtsCvTemplateUkPage() {
           </div>
           <div className="flex gap-3 text-sm leading-6 text-ink">
             <FileText className="h-5 w-5 shrink-0 text-gold" />
-            <p><strong className="text-navy">PDF only:</strong> check the application accepts PDF before paying for the WorkCV export.</p>
+            <p><strong className="text-navy">PDF and Word:</strong> choose the format the employer asks for. The <TrackedLink href="/cv-builder-no-subscription-uk" placement={analyticsPlacements.atsTemplateBundleMoney} className="font-bold text-navy underline underline-offset-4">{site.price} no-subscription CV builder</TrackedLink> includes your saved CV and matching cover letter in both formats.</p>
           </div>
         </div>
       </section>
@@ -310,7 +320,7 @@ export default function AtsCvTemplateUkPage() {
             <p className="mt-6 text-lg leading-8 text-muted">
               Prospects warns that ATS compatibility differs and recommends
               checking the advert, application instructions or recruiter for the
-              required format. WorkCV currently exports PDF only.
+              required format. WorkCV exports both PDF and an editable Word (DOCX) file.
             </p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -450,7 +460,7 @@ export default function AtsCvTemplateUkPage() {
       <FaqSection faqs={faqItems} title="Questions about ATS-friendly UK CV templates." />
       <FinalCta
         heading="Start with the cleanest WorkCV structure."
-        body={`Edit the Classic template, tailor it to the vacancy and preview every page. If the employer accepts PDF, unlock this saved CV once for ${site.price}.`}
+        body={`Edit the Classic template, tailor it to the vacancy and preview every page. Pay ${site.price} once for this saved CV and its matching cover letter as PDF and Word. Send the format the employer requests.`}
         primaryHref={editorHref}
         primary="Use the ATS-friendly template"
         secondaryHref="/templates"

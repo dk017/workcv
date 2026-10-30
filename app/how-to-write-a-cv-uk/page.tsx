@@ -1,3 +1,4 @@
+import { CareerHistoryLinks } from "@/components/career-history-links";
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
@@ -13,13 +14,14 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
-  title: "How to Write a CV UK - 10-Step Guide and Editable Example",
+export const metadata: Metadata = withAgentMetadata("/how-to-write-a-cv-uk", {
+  title: "How to Write a CV UK: 10-Step Guide + Example",
   description:
     "Learn how to write a UK CV in 10 practical steps. Includes section examples, ATS guidance, an evidence worksheet and a complete editable CV template.",
   alternates: { canonical: "/how-to-write-a-cv-uk" },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=general&new=1";
 const exampleCv = getRoleCvTemplate("general");
@@ -409,6 +411,13 @@ export default function HowToWriteACvUkPage() {
               Tailoring does not mean rewriting every sentence. It means making
               the employer's important criteria easy to find and support.
             </p>
+            <p className="mt-4 text-base leading-7 text-muted">
+              Then upload your finished CV to the{" "}
+              <Link href="/tools/ats-score-checker" className="font-bold text-navy underline underline-offset-4">
+                free ATS CV checker
+              </Link>{" "}
+              to check how it reads, and add the job advert to see what it evidences.
+            </p>
           </div>
           <div className="grid gap-3">
             {finalChecks.map((item) => (
@@ -466,6 +475,7 @@ export default function HowToWriteACvUkPage() {
         </div>
       </section>
 
+      <CareerHistoryLinks context="general" />
       <FaqSection
         faqs={jsonLd.mainEntity.map((item) => ({
           question: item.name,
@@ -474,6 +484,7 @@ export default function HowToWriteACvUkPage() {
         title="Questions about writing a UK CV."
       />
       <section className="bg-paper py-12"><div className="container-page"><h2 className="font-display text-3xl font-semibold text-navy">Already have a written draft?</h2><p className="mt-4 max-w-3xl text-lg leading-8 text-muted">Follow the <Link href="/chatgpt-cv-to-pdf-uk" className="font-bold text-navy underline">ChatGPT-to-PDF walkthrough</Link> to check the text, move it into the editor and review the finished file.</p></div></section>
+      <section className="bg-white py-10"><div className="container-page"><h2 className="font-display text-3xl font-semibold text-navy">Ready to adapt your draft for an advert?</h2><p className="mt-4 max-w-3xl leading-8">Keep your history accurate and choose the evidence that fits. <Link href="/tailor-cv-to-job-description-uk" className="font-bold underline">See one applicant tailor a CV and matching letter for two jobs</Link>, with profiles, bullets and a final checklist.</p></div></section>
       <FinalCta
         heading="Turn the guide into your own finished CV."
         body={`Open the complete example, replace it with your real evidence, then pay ${site.price} only when the final PDF is ready.`}

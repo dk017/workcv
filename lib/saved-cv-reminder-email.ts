@@ -35,7 +35,7 @@ export async function sendSavedCvReminderEmail(input: {
       "You can return whenever you are ready to review or continue editing it:",
       input.savedCvsUrl,
       "",
-      `Building and previewing are free. A finished saved CV PDF costs ${input.price} once, with no subscription or automatic renewal.`,
+      `Building and previewing are free. A finished saved CV and its matching cover letter cost ${input.price} once, as PDF and Word, with no subscription or automatic renewal.`,
       "",
       "This is a one-time saved-draft reminder. There is no deadline or expiring price.",
       `To opt out of future WorkCV research or saved-draft emails: ${input.unsubscribeUrl}`,
@@ -48,7 +48,7 @@ export async function sendSavedCvReminderEmail(input: {
         <h1 style="color:#0f2942;font-size:24px">Your WorkCV draft is still saved</h1>
         <p>You can return whenever you are ready to review or continue editing it.</p>
         <p><a href="${safeSavedCvsUrl}" style="display:inline-block;background:#0f2942;color:#fff;text-decoration:none;padding:12px 18px;border-radius:6px;font-weight:bold">Open my saved CV</a></p>
-        <p>Building and previewing are free. A finished saved CV PDF costs <strong>${safePrice} once</strong>, with no subscription or automatic renewal.</p>
+        <p>Building and previewing are free. A finished saved CV and its matching cover letter cost <strong>${safePrice} once</strong>, as PDF and Word, with no subscription or automatic renewal.</p>
         <p>This is a one-time saved-draft reminder. There is no deadline or expiring price.</p>
         <p><a href="${safeUnsubscribeUrl}">Opt out of future WorkCV research or saved-draft emails</a></p>
         <p>WorkCV<br>contact@workcv.co.uk</p>

@@ -4,16 +4,17 @@ import { FileSearch, ListChecks, ShieldCheck } from "lucide-react";
 import { CvGapDetector } from "@/components/cv-gap-detector";
 import { FaqSection, RelatedLinksSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-gap-detector-uk";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Gap Detector UK - Find Missing Sections",
   description:
     "Paste your CV and find missing sections, contact details, dates, skills and evidence. Free UK CV content check with no signup.",
   alternates: { canonical: path },
   openGraph: { title: "Free UK CV Gap Detector", description: "Find missing CV sections and weak content signals without uploading a file.", url: path },
-};
+});
 
 const faqs = [
   { question: "What does the CV gap detector check?", answer: "It checks pasted text for contact details, an introduction, experience or projects, education, skills, dates, bullets, evidence of outcomes and personal details UK guidance says to omit." },

@@ -1,0 +1,5 @@
+import Link from "next/link";
+export function CareerHistoryLinks({ context }: { context: "general" | "change" | "return" | "redundancy" | "letters" }) {
+ const lead = {general:"Need help with a particular career history?",change:"Changing the kind or level of work you want?",return:"Returning to a different level of responsibility?",redundancy:"Rebuilding your CV after a long time with one employer?",letters:"Need a letter that explains a specific career move?"}[context];
+ return <section className="border-y border-line bg-paper py-10"><div className="container-page max-w-5xl space-y-4"><h2 className="font-display text-2xl font-semibold">{lead}</h2><p className="leading-7"><Link className="font-bold underline" href="/cv-after-long-service-uk">CV examples after years at the same company</Link> show promotions and an unchanged title, with a free career timeline worksheet.</p><p className="leading-7"><Link className="font-bold underline" href="/overqualified-cv-example-uk">CV and letter examples for a less senior role</Link> show two complete applications from the same facts, plus a free evidence selector.</p></div></section>;
+}

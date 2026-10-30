@@ -3,12 +3,16 @@ import Link from "next/link";
 import { FileCheck2, ListChecks, ShieldCheck, Sparkles } from "lucide-react";
 
 import { CvBulletPointGenerator } from "@/components/cv-bullet-point-generator";
-import { FaqSection, SectionLabel } from "@/components/marketing";
+import { CustomerAnswer } from "@/components/customer-answer";
+import { noMetricsExamples } from "@/lib/customer-answer-examples";
+import { customerContentReview, displayReviewDate } from "@/lib/customer-content-review";
+import { FaqSection, MoneyPageCta, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
 const path = "/tools/cv-bullet-point-generator";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata(path, {
   title: "Free CV Bullet Point Generator UK - No Signup",
   description:
     "Generate five concise UK CV bullet points from your real responsibilities and achievements. Tailor them to a job advert, free with no signup.",
@@ -19,7 +23,7 @@ export const metadata: Metadata = {
       "Turn rough experience notes into five concise, evidence-led and editable UK CV bullet points.",
     url: path,
   },
-};
+});
 
 const faqs = [
   {
@@ -50,7 +54,7 @@ const faqs = [
   {
     question: "What happens to the information I enter?",
     answer:
-      "WorkCV sends the form fields to the OpenAI API to create the draft and does not save them. Do not include confidential employer, customer or personal information.",
+      "WorkCV sends your submitted fields through its server to OpenAI to create the draft. Remove unnecessary personal and confidential details before submitting, and read the privacy policy. If you carry selected wording into the editor, saved draft content follows the account policy.",
   },
 ];
 
@@ -110,6 +114,14 @@ export default function CvBulletPointGeneratorPage() {
         </div>
       </section>
 
+      <section className="bg-surface py-16"><div className="container-page max-w-5xl">
+        <CustomerAnswer questionId="Q20">
+          <div className="grid gap-5">{noMetricsExamples.map((example) => <div key={example.original} className="rounded-lg border border-line bg-white p-6"><h3 className="font-display text-xl font-semibold text-navy">From a duty to a useful bullet</h3><p className="mt-3"><strong>Original:</strong> {example.original}</p><p className="mt-2"><strong>Known facts:</strong> {example.knownFacts}</p><p className="mt-2"><strong>Evidence-led bullet:</strong> {example.improved}</p><p className="mt-2 text-sm text-muted">Fictional illustrative facts; no invented speed, revenue or percentage.</p></div>)}</div>
+          <p>Use a reliable number if you have one. Otherwise, a clear responsibility with context is more useful than a guessed outcome. Review the generator’s suggestions against your own notes before using them.</p>
+          <p className="text-sm text-muted">Reviewed <time dateTime={customerContentReview[path]}>{displayReviewDate(customerContentReview[path])}</time>.</p>
+        </CustomerAnswer>
+      </div></section>
+
       <section className="bg-surface py-20">
         <div className="container-page grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
@@ -159,6 +171,11 @@ export default function CvBulletPointGeneratorPage() {
         </div>
       </section>
 
+      <MoneyPageCta
+        heading="Put the strongest bullets into a complete UK CV."
+        body={`Build and preview your tailored CV, then pay ${site.price} once only if you download the PDF. No monthly subscription.`}
+        trackingContext="cv_bullet_generator_money"
+      />
       <FaqSection faqs={faqs} title="CV bullet point questions." />
     </>
   );

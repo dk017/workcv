@@ -3,6 +3,7 @@ import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
 import { analyseAtsKeywords, type AtsAnalysis } from "./ats-keyword-checker.ts";
+import { seniorityLabel, stripWrappingQuotes } from "./cv-fit-labels.ts";
 
 export const cvFitInputSchema = z.object({
   jobDescription: z
@@ -174,7 +175,11 @@ function postProcessAiAssessment(raw: unknown, input: CvFitInput): AiAssessment 
 
   return {
     ...parsed,
-    requirements: parsed.requirements.map((item) => {
+    requirements: parsed.requirements.map((rawItem) => {
+      const item = {
+        ...rawItem,
+        cvEvidence: rawItem.cvEvidence === null ? null : stripWrappingQuotes(rawItem.cvEvidence),
+      };
       if (item.status === "not-evidenced") {
         return { ...item, cvEvidence: null };
       }
@@ -187,9 +192,9 @@ function postProcessAiAssessment(raw: unknown, input: CvFitInput): AiAssessment 
           "This requirement is not clearly evidenced in the CV text supplied.",
       };
     }),
-    vaguePhrases: parsed.vaguePhrases.filter((item) =>
-      exactSourceEvidence(cvText, item.phrase),
-    ),
+    vaguePhrases: parsed.vaguePhrases
+      .map((item) => ({ ...item, phrase: stripWrappingQuotes(item.phrase) }))
+      .filter((item) => exactSourceEvidence(cvText, item.phrase)),
   };
 }
 
@@ -258,7 +263,7 @@ export function scoreCvFit(
       label: "Role clarity",
       score: roleClarityScore,
       maximum: 20,
-      explanation: `The CV communicates “${ai.communicatedRole}” at ${ai.seniority} level.`,
+      explanation: `The CV communicates “${ai.communicatedRole}” at ${seniorityLabel(ai.seniority)}.`,
     },
     {
       id: "structure",

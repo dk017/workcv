@@ -16,8 +16,9 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-graduate-uk", {
   title: "Graduate CV Template UK + Entry-Level Example",
   description:
     "Use a graduate CV template for UK jobs with degree, internship, placement, project, part-time work and transferable-skill examples.",
@@ -28,7 +29,7 @@ export const metadata: Metadata = {
       "An editable UK graduate CV with degree, placement, project and transferable-skill examples.",
     url: "/cv-template-graduate-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=graduate&new=1";
 const graduateCv = getRoleCvTemplate("graduate");
@@ -180,6 +181,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Graduate cover letter example", "/cover-letter-examples-uk#internship"],
   ["Student CV template", "/student-cv-template"],
   ["CV no experience UK", "/cv-no-experience-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],

@@ -15,8 +15,9 @@ import { CvDocument } from "@/components/cv-editor";
 import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/marketing";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
+import { withAgentMetadata } from "@/lib/agent-metadata";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = withAgentMetadata("/cv-template-driver-uk", {
   title: "Driver CV Template UK - Editable Example",
   description:
     "Use an editable driver CV template for UK delivery, van and HGV roles. Build a clear CV around licence, route, safety, customer and delivery-record evidence.",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
       "Start with an editable UK driver CV example and tailor it to delivery, van, courier or HGV roles.",
     url: "/cv-template-driver-uk",
   },
-};
+});
 
 const editorHref = "/editor?template=classic&roleTemplate=driver&new=1";
 const driverCv = getRoleCvTemplate("driver");
@@ -162,6 +163,7 @@ const sourceNotes = [
 ];
 
 const relatedLinks = [
+  ["Delivery driver cover letter example", "/cover-letter-examples-uk#delivery-driver"],
   ["Professional CV builder", "/cv-builder-no-subscription-uk"],
   ["ATS CV template UK", "/ats-cv-template-uk"],
   ["Warehouse CV template", "/cv-template-warehouse-uk"],

@@ -1,14 +1,15 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { customerContentReview } from "../lib/customer-content-review.ts";
 
 const page = readFileSync("app/cv-personal-statement-uk/page.tsx", "utf8");
 const examples = page.split("const examples: Example[] = [")[1]?.split("const beforeAfter")[0] ?? "";
 const proof = readFileSync("components/sample-cv-proof.tsx", "utf8");
-const sitemap = readFileSync("app/sitemap.ts", "utf8");
+const sitemap = readFileSync("lib/md/public-routes.ts", "utf8");
 
 test("personal statement page has exactly twelve required examples", () => {
-  assert.equal((examples.match(/\n    title:/g) || []).length, 12);
+  assert.equal((examples.match(/\n    title:/g) || []).length, 20);
   for (const title of [
     "NHS administrative assistant",
     "Care worker",
@@ -57,8 +58,10 @@ test("required commercial pages render the proof component", () => {
   ]) assert.match(readFileSync(route, "utf8"), /SampleCvProof/);
 });
 
-test("personal statement route has an explicit current sitemap date", () => {
-  assert.match(sitemap, /path: "\/cv-personal-statement-uk"[^\n]*lastModified: "2026-08-25"/);
+test("personal statement review date is shared by the page and sitemap override", () => {
+  assert.match(page, /customerContentReview\["\/cv-personal-statement-uk"\]/);
+  assert.match(sitemap, /customerReviewDate\(route\.path\)/);
+  assert.ok(/^\d{4}-\d{2}-\d{2}$/.test(customerContentReview["/cv-personal-statement-uk"]));
 });
 
 test("required related pages link to personal statement guidance", () => {

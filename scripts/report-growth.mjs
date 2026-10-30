@@ -1,6 +1,6 @@
 import pg from "pg";
 
-import { calculateStepConversions, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
+import { addMarketingCluster, normalizeMetricRows, normalizeNumericRows } from "./growth-report-core.mjs";
 
 const { Pool } = pg;
 
@@ -23,6 +23,7 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL is required");
 const privateLanding = `(path = '/login' OR path = '/editor' OR path = '/my-cvs' OR path LIKE '/cv-pdf/%' OR path LIKE '/api/%')`;
 const sourceCase = `CASE
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'chatgpt|openai' THEN 'chatgpt'
+  WHEN LOWER(COALESCE(host_value, '')) = 'search.brave.com' OR LOWER(COALESCE(source_value, '')) IN ('brave','brave_search') THEN 'brave'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'claude|anthropic' THEN 'claude'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'gemini|bard\\.google' THEN 'gemini'
   WHEN LOWER(COALESCE(source_value, '') || ' ' || COALESCE(host_value, '')) ~ 'perplexity' THEN 'perplexity'
@@ -40,7 +41,8 @@ try {
     to_regclass('public.workcv_editor_events') IS NOT NULL AS editor,
     to_regclass('public.workcv_signup_events') IS NOT NULL AS signup,
     to_regclass('public.workcv_orders') IS NOT NULL AS orders,
-    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'is_test') AS order_test`);
+    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'is_test') AS order_test,
+    EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'workcv_orders' AND column_name = 'attribution_captured_at') AS order_attribution`);
   if (Object.values(ready.rows[0] || {}).some((value) => value !== true)) {
     throw new Error("Growth schema is not ready; run npm run db:prepare:growth first");
   }
@@ -55,10 +57,18 @@ try {
   const metrics = await pool.query(`${bounds}
     SELECT 'qualified_sessions' metric, COUNT(DISTINCT session_hash)::bigint value FROM workcv_funnel_events, bounds
       WHERE event_name='landing_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'public_page_views', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'public_page_view_sessions', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding} AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'marketing_cta_clickers', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='marketing_cta_clicked' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'marketing_cta_clicks', COUNT(*)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='marketing_cta_clicked' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'job_application_pack_starts', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='tool_started' AND is_test=FALSE AND metadata->>'tool'='job_application_pack' AND created_at>=window_start AND created_at<report_end
+    UNION ALL SELECT 'job_application_pack_completions', COUNT(*)::bigint FROM workcv_funnel_events, bounds
+      WHERE event_name='tool_completed' AND is_test=FALSE AND metadata->>'tool'='job_application_pack' AND metadata->>'result'='success' AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'login_starters', COUNT(DISTINCT session_hash)::bigint FROM workcv_funnel_events, bounds
       WHERE event_name='login_started' AND is_test=FALSE AND created_at>=window_start AND created_at<report_end
     UNION ALL SELECT 'signups', COUNT(DISTINCT user_id)::bigint FROM workcv_signup_events, bounds
@@ -150,15 +160,78 @@ try {
     SELECT source,landing_path,device_class,utc_week_start,COUNT(*)::bigint sessions,
       COALESCE(SUM(cta_clicks),0)::bigint cta_clicks,
       (ROUND(100.0*COUNT(*) FILTER (WHERE cta_clicks>0)/NULLIF(COUNT(*),0),1)::text||'%') cta_click_rate
-    FROM sessions GROUP BY source,landing_path,device_class,utc_week_start ORDER BY utc_week_start DESC,sessions DESC`, params);
+     FROM sessions GROUP BY source,landing_path,device_class,utc_week_start ORDER BY utc_week_start DESC,sessions DESC`, params);
+
+  const pageViews = await pool.query(`${bounds}
+    SELECT source_normalized source, path, device_class, COUNT(*)::bigint page_views,
+      COUNT(DISTINCT session_hash)::bigint sessions
+    FROM workcv_funnel_events, bounds
+    WHERE event_name='page_view' AND is_test=FALSE AND NOT ${privateLanding}
+      AND created_at>=window_start AND created_at<report_end
+    GROUP BY source_normalized, path, device_class
+    ORDER BY page_views DESC, sessions DESC, source, path`, params);
 
   const lastTouch = await pool.query(`${bounds}, attributed AS (
-      SELECT o.amount_cents,normalized.source,COALESCE(u.last_landing_path,'(unknown)') landing_path
+      SELECT o.amount_cents,normalized.source,
+        COALESCE(
+          CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END,
+          '(unknown)'
+        ) landing_path
       FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
-      CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM (SELECT u.last_utm_source source_value,u.last_referrer_host host_value) raw) normalized,bounds
+      CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM (
+        SELECT CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END source_value,
+               CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END host_value
+      ) raw) normalized,bounds
       WHERE o.amount_cents>0 AND o.is_test=FALSE AND o.paid_at>=window_start AND o.paid_at<report_end)
     SELECT source,landing_path,COUNT(*)::bigint production_orders,COALESCE(SUM(amount_cents),0)::bigint revenue_pence
     FROM attributed GROUP BY source,landing_path ORDER BY production_orders DESC,source,landing_path`, params);
+
+  const latestSale = await pool.query(`WITH latest_order AS (
+      SELECT o.paid_at,o.amount_cents,o.currency,o.attribution_captured_at,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_source ELSE u.last_utm_source END sale_source_value,
+        CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_referrer_host ELSE u.last_referrer_host END sale_host_value,
+        COALESCE(
+          CASE WHEN o.attribution_captured_at IS NOT NULL THEN o.attribution_landing_path ELSE u.last_landing_path END,
+          '(unknown)'
+        ) landing_path,
+        u.last_utm_source,u.last_referrer_host
+      FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
+      WHERE o.amount_cents>0 AND o.is_test=FALSE
+      ORDER BY o.paid_at DESC LIMIT 1
+    )
+    SELECT paid_at,amount_cents,currency,${sourceCase} source,landing_path,
+      CASE
+        WHEN attribution_captured_at IS NOT NULL THEN 'checkout_snapshot'
+        WHEN COALESCE(last_utm_source,'')<>'' OR COALESCE(last_referrer_host,'')<>'' THEN 'legacy_profile_fallback'
+        ELSE 'unknown'
+      END attribution_basis
+    FROM latest_order CROSS JOIN LATERAL (
+      SELECT latest_order.sale_source_value AS source_value, latest_order.sale_host_value AS host_value
+    ) raw`);
+
+  const toolUsage = await pool.query(`${bounds}
+    SELECT metadata->>'tool' tool, event_name, metadata->>'result' result,
+      metadata->>'placement' placement, COUNT(*)::bigint events,
+      COUNT(DISTINCT session_hash)::bigint sessions
+    FROM workcv_funnel_events, bounds
+    WHERE event_name IN ('tool_started','tool_completed') AND is_test=FALSE
+      AND created_at>=window_start AND created_at<report_end
+    GROUP BY metadata->>'tool',event_name,metadata->>'result',metadata->>'placement' ORDER BY tool,event_name,result,placement`, params);
+  const acquisitionSales = await pool.query(`${bounds}, attributed AS (
+    SELECT o.amount_cents, normalized.source,
+      CASE WHEN u.first_landing_path LIKE '/%' AND u.first_landing_path NOT IN ('/login','/editor','/my-cvs')
+        AND u.first_landing_path NOT LIKE '/api/%' AND u.first_landing_path NOT LIKE '/cv-pdf/%'
+        THEN u.first_landing_path ELSE '(unknown public landing)' END landing_path
+    FROM workcv_orders o LEFT JOIN workcv_users u ON u.id=o.user_id
+    CROSS JOIN LATERAL (SELECT ${sourceCase} source FROM
+      (SELECT u.utm_source source_value,u.first_referrer host_value) raw) normalized,bounds
+    WHERE o.amount_cents>0 AND o.is_test=FALSE AND o.paid_at>=window_start AND o.paid_at<report_end)
+    SELECT source,landing_path,COUNT(*)::bigint orders,SUM(amount_cents)::bigint revenue_pence
+    FROM attributed GROUP BY source,landing_path ORDER BY orders DESC`, params);
+  console.log("Paid orders by recorded first-touch acquisition (separate from checkout attribution; not causal proof)");
+  console.table(normalizeNumericRows(acquisitionSales.rows));
+  console.log("Tool events and distinct sessions (completion events may repeat; no worksheet or CV text)");
+  console.table(normalizeNumericRows(toolUsage.rows));
 
   const quality = await pool.query(`${bounds}
     SELECT 'unattributed_signups' metric,COUNT(DISTINCT s.user_id)::bigint value FROM workcv_signup_events s LEFT JOIN workcv_users u ON u.id=s.user_id,bounds
@@ -179,14 +252,17 @@ try {
   console.table(metricRows);
   const grossPence = metricRows.find((row) => row.metric === "gross_production_gbp_pence")?.value || 0;
   console.log(`Gross production revenue (GBP): £${(grossPence / 100).toFixed(2)}`);
-  console.log("Step conversion (same operational event window)");
-  console.table(calculateStepConversions(metricRows));
+  console.log("Operational totals mix sessions, users and orders. Do not divide them into step conversion rates. Use report:growth:production for linked visitor milestones.");
   console.log("First-touch funnel by source and first public landing (no PII)");
-  console.table(normalizeNumericRows(firstTouch.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(firstTouch.rows), "landing_path"));
   console.log("Acquisition sessions by source, landing, device, and UTC week");
-  console.table(normalizeNumericRows(acquisition.rows));
-  console.log("Last-touch positive production orders (no PII)");
-  console.table(normalizeNumericRows(lastTouch.rows));
+  console.table(addMarketingCluster(normalizeNumericRows(acquisition.rows), "landing_path"));
+  console.log("Public page views by source, route, and device (no PII)");
+  console.table(addMarketingCluster(normalizeNumericRows(pageViews.rows), "path"));
+  console.log("Sale source and landing page (checkout snapshot; legacy rows use profile fallback)");
+  console.table(addMarketingCluster(normalizeNumericRows(lastTouch.rows), "landing_path"));
+  console.log("Most recent positive production sale (no buyer identifiers)");
+  console.table(normalizeNumericRows(latestSale.rows));
   console.log("Data quality and explicitly excluded activity");
   console.table(normalizeMetricRows(quality.rows));
 } finally {

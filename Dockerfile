@@ -39,6 +39,7 @@ RUN apt-get update \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/lib/marketing-clusters-data.json ./lib/marketing-clusters-data.json
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/pdf-runtime-smoke.mjs ./scripts/pdf-runtime-smoke.mjs
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/prepare-growth-schema.mjs ./scripts/prepare-growth-schema.mjs
 COPY --from=builder --chown=nextjs:nodejs /app/scripts/growth-report-core.mjs ./scripts/growth-report-core.mjs

@@ -10,7 +10,12 @@ import {
 } from "@/lib/editor-data";
 import { getRoleCvTemplate, type RoleTemplateId } from "@/lib/role-cv-templates";
 import { parseCvData, repairCvData } from "@/lib/cv-schema";
+import { duplicateTitle, prepareDuplicateCv } from "@/lib/cv-duplicate";
+import { tailorCvForJob, tailoredCvTitle, type TailorJob } from "@/lib/job-tailor";
 import { recordServerEditorEvent } from "@/lib/server-editor-events";
+import { localUnlockEnabled } from "@/lib/local-unlock";
+import { WORKCV_PASS, WORKCV_PASS_PRODUCT_ID } from "@/lib/commerce";
+import { unlockedDocumentSql } from "@/lib/pass-rules";
 
 export type CvDocument = {
   id: string;
@@ -24,7 +29,9 @@ export type CvDocumentSummary = {
   targetRole: string;
   template: TemplateId;
   updatedAt: string;
+  createdAt: string;
   paid: boolean;
+  data: CvData;
 };
 
 function isValidTemplate(value: unknown): value is TemplateId {
@@ -143,6 +150,7 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
     data: CvData;
     template_id: string;
     updated_at: Date;
+    created_at: Date;
     paid: boolean;
   }>(
     `
@@ -152,14 +160,13 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
         d.data,
         d.template_id,
         d.updated_at,
-        EXISTS (
-          SELECT 1 FROM workcv_orders o WHERE o.draft_id = d.id
-        ) AS paid
+        d.created_at,
+        ${unlockedDocumentSql("$2", "$3")} AS paid
       FROM workcv_cv_documents d
       WHERE d.user_id = $1
       ORDER BY d.updated_at DESC
     `,
-    [userId]
+    [userId, WORKCV_PASS_PRODUCT_ID, WORKCV_PASS.days]
   );
 
   return result.rows.map((row) => {
@@ -170,7 +177,9 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
       targetRole: data.targetRole?.trim() || "No target role added",
       template: data.template,
       updatedAt: row.updated_at.toISOString(),
-      paid: row.paid,
+      createdAt: row.created_at.toISOString(),
+      paid: row.paid || localUnlockEnabled(),
+      data,
     };
   });
 }
@@ -178,12 +187,16 @@ export async function listCvDocuments(userId: string): Promise<CvDocumentSummary
 export async function createCvDocument(
   userId: string,
   template?: TemplateId,
-  roleTemplate?: RoleTemplateId
+  roleTemplate?: RoleTemplateId,
+  // A CV someone built before signing in, saved to their account as it is.
+  guestDraft?: CvData,
 ) {
   await ensureAuthTables();
 
   const id = crypto.randomUUID();
-  const seed = roleTemplate
+  const seed = guestDraft
+    ? guestDraft
+    : roleTemplate
     ? getRoleCvTemplate(roleTemplate, template)
     : createBlankCv(template);
   const data = parseCvData(seed);
@@ -197,7 +210,7 @@ export async function createCvDocument(
   );
 
   const row = result.rows[0];
-  const creationMethod = roleTemplate ? "role_template" : template ? "template" : "blank";
+  const creationMethod = guestDraft ? "guest_draft" : roleTemplate ? "role_template" : template ? "template" : "blank";
   await recordServerEditorEvent({
     userId,
     documentId: row.id,
@@ -206,6 +219,38 @@ export async function createCvDocument(
     metadata: { creation_method: creationMethod },
   });
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
+}
+
+// With a job, the copy is created already pointed at that vacancy and named after it.
+export async function duplicateCvDocument(userId: string, sourceId: string, job?: TailorJob) {
+  await ensureAuthTables();
+  const source = await getPool().query<{ title: string; data: CvData; template_id: string }>(
+    "SELECT title, data, template_id FROM workcv_cv_documents WHERE id = $1 AND user_id = $2",
+    [sourceId, userId],
+  );
+  const row = source.rows[0];
+  if (!row) return null;
+  const copy = prepareDuplicateCv(repairCvData(row.data, parseTemplate(row.template_id)));
+  const data = parseCvData(job ? tailorCvForJob(copy, job) : copy);
+  const fallbackTitle = duplicateTitle(row.title || data.fullName || "My CV");
+  const id = crypto.randomUUID();
+  const result = await getPool().query<{ id: string; data: CvData; updated_at: Date }>(
+    `
+      INSERT INTO workcv_cv_documents (id, user_id, title, data, template_id)
+      VALUES ($1, $2, $3, $4::jsonb, $5)
+      RETURNING id, data, updated_at
+    `,
+    [id, userId, job ? tailoredCvTitle(job, fallbackTitle) : fallbackTitle, JSON.stringify(data), data.template],
+  );
+  const created = result.rows[0];
+  await recordServerEditorEvent({
+    userId,
+    documentId: created.id,
+    eventName: "document_created",
+    eventKey: `document_created:${created.id}`,
+    metadata: { creation_method: job ? "job_tailor" : "duplicate" },
+  });
+  return { id: created.id, data: repairCvData(created.data), updatedAt: created.updated_at.toISOString() };
 }
 
 export class CvUpdateConflictError extends Error {
@@ -260,6 +305,13 @@ export async function updateCvDocument(
     return null;
   }
   return { id: row.id, data: repairCvData(row.data), updatedAt: row.updated_at.toISOString() };
+}
+
+// Deletes one of the user's own CVs. Orders keep their record of what was bought.
+export async function deleteCvDocument(userId: string, documentId: string) {
+  await ensureAuthTables();
+  const result = await getPool().query("DELETE FROM workcv_cv_documents WHERE id = $1 AND user_id = $2", [documentId, userId]);
+  return (result.rowCount ?? 0) > 0;
 }
 
 export async function userOwnsCvDocument(userId: string, documentId: string) {

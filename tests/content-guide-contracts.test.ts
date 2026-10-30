@@ -18,7 +18,7 @@ test("shortening example removes words while retaining employer chronology", () 
   for (const fact of ["September 2022 - Present", "July 2019 - August 2022", "12-person", "North Lane College"]) assert.ok(shorterCv.includes(fact));
 });
 test("four articles have canonical ownership and their proof assets exist", () => {
-  const sitemap = readFileSync("app/sitemap.ts", "utf8");
+  const sitemap = readFileSync("lib/md/public-routes.ts", "utf8");
   for (const slug of ["chatgpt-cv-to-pdf-uk", "convert-resume-to-uk-cv", "shorten-cv-to-two-pages", "cv-word-or-pdf-uk"]) {
     const source = readFileSync(`app/${slug}/page.tsx`, "utf8");
     assert.ok(source.includes(`const path = "/${slug}"`));
