@@ -6,9 +6,9 @@ import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "UK Notice Period Calculator - Earliest Start Date",
+  title: "Notice Period Calculator UK - Last Day and New Start Date",
   description:
-    "Calculate your contractual end date, earliest new-job start date, latest resignation date and UK statutory notice from your job start date.",
+    "Enter the day you hand in notice to see your last working day and earliest new-job start date. Weeks, months and UK statutory notice, free.",
   alternates: { canonical: "/tools/notice-period-calculator" },
   openGraph: {
     title: "UK Notice Period Calculator",

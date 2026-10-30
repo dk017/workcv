@@ -26,9 +26,9 @@ import { site } from "@/lib/site";
 const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
-  title: "How to Cancel MyPerfectCV UK - Step by Step",
+  title: "Cancel MyPerfectCV UK: Stop the £16.95 Renewal (Steps)",
   description:
-    "Step-by-step guide to cancelling your MyPerfectCV subscription in the UK. Stop automatic renewals, keep proof, and compare a no-subscription CV builder.",
+    "How to cancel MyPerfectCV in the UK: account settings, phone and email routes, what the £2.95 and £16.95 charges are, and what to do if you are still billed.",
   alternates: {
     canonical: "/cancel-myperfectcv-uk",
   },

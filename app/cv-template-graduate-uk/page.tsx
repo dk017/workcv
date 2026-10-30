@@ -18,7 +18,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Graduate CV Template UK + Entry-Level Example | WorkCV",
+  title: "Graduate CV Template UK + Entry-Level Example",
   description:
     "Use a graduate CV template for UK jobs with degree, internship, placement, project, part-time work and transferable-skill examples.",
   alternates: { canonical: "/cv-template-graduate-uk" },

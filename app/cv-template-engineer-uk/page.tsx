@@ -17,7 +17,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Engineer CV Template UK + Example | WorkCV",
+  title: "Engineer CV Template UK + Example",
   description:
     "Use an engineer CV template for UK jobs with discipline fit, technical tools, projects, safety and measurable engineering evidence.",
   alternates: {

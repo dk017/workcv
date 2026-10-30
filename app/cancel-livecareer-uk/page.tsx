@@ -26,9 +26,9 @@ import { site } from "@/lib/site";
 const checkedDate = competitorPricingCheckedDate;
 
 export const metadata: Metadata = {
-  title: "How to Cancel LiveCareer UK - Step by Step",
+  title: "Cancel LiveCareer UK: Stop the £19.85 Renewal (Steps)",
   description:
-    "How to cancel LiveCareer in the UK. Stop automatic renewal charges with account settings, support routes, and a confirmation checklist.",
+    "Cancel LiveCareer UK in 4 clicks: Settings, Subscription, Cancel. What the £1.95 and £19.85 charges are, how to get proof, and what to do if you are still billed.",
   alternates: {
     canonical: "/cancel-livecareer-uk",
   },
@@ -98,6 +98,11 @@ const faqItems = [
     question: "How much does LiveCareer UK cost after the trial?",
     answer:
       `On the official pricing page checked ${checkedDate}, LiveCareer listed ${competitorPricing.liveCareer.entry}, followed by automatic renewal at ${competitorPricing.liveCareer.renewal}.`,
+  },
+  {
+    question: "What is the £1.95 or £19.85 LiveCareer charge on my statement?",
+    answer:
+      `On LiveCareer's UK pricing page checked ${checkedDate}, ${competitorPricing.liveCareer.entry} was the trial price and ${competitorPricing.liveCareer.renewal} was the automatic renewal. A £19.85 charge usually means the trial ended without being cancelled. Cancel in Settings, then Subscription, and keep the cancellation reference email.`,
   },
   {
     question: "Does LiveCareer send cancellation proof?",

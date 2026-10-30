@@ -17,7 +17,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Warehouse Operative CV Template UK + Example | WorkCV",
+  title: "Warehouse Operative CV Template UK + Example",
   description:
     "Use a warehouse operative CV template for UK jobs with picker, packer, goods-in, dispatch, scanner, manual-handling and shift examples.",
   alternates: { canonical: "/cv-template-warehouse-uk" },

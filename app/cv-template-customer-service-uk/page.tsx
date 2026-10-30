@@ -17,7 +17,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Customer Service CV Template UK + Example | WorkCV",
+  title: "Customer Service CV Template UK + Example",
   description:
     "Use a customer service CV template for UK jobs with adviser, assistant and support examples for complaints, CRM, communication and outcomes.",
   alternates: {
