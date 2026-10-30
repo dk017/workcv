@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { CalendarCheck, FileSearch, Scale, ShieldCheck } from "lucide-react";
 
+import { JobMoveCvPrompt } from "@/components/job-move-cv-prompt";
 import { FaqSection, MoneyPageCta, RelatedLinksSection, SectionLabel } from "@/components/marketing";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 import { NoticePeriodCalculator } from "@/components/notice-period-calculator";
 import { site } from "@/lib/site";
 import { withAgentMetadata } from "@/lib/agent-metadata";
@@ -169,6 +171,14 @@ export default function NoticePeriodCalculatorPage() {
           </div>
         </div>
       </section>
+      <div className="bg-surface pb-16">
+        <div className="container-page">
+          <JobMoveCvPrompt
+            placement={analyticsPlacements.noticePageCv}
+            heading="Handing in your notice for a new job? Make sure your CV is ready first."
+          />
+        </div>
+      </div>
 
       <section className="border-y border-line bg-paper py-20">
         <div className="container-page grid gap-12 lg:grid-cols-[1fr_0.9fr]">
@@ -242,7 +252,6 @@ export default function NoticePeriodCalculatorPage() {
       />
       <MoneyPageCta
         heading="Use the next role as your next step."
-        body={`Update your UK CV while the role details are fresh. Build and preview first, then pay ${site.price} once only if you download the PDF.`}
         trackingContext="notice_period_money"
       />
       <FaqSection faqs={faqItems} title="UK notice period questions." />

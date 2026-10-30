@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { FormEvent, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -26,7 +25,8 @@ import {
   NoticeUnit,
   todayIsoDate,
 } from "@/lib/notice-period-calculator";
-import { site } from "@/lib/site";
+import { JobMoveCvPrompt } from "@/components/job-move-cv-prompt";
+import { analyticsPlacements } from "@/lib/analytics-placements";
 
 const noticeOptions = [
   { value: "1-week", label: "1 week" },
@@ -481,24 +481,10 @@ export function NoticePeriodCalculator() {
             </div>
 
             <div className="border-t border-line bg-paper p-6 md:p-8">
-              <div className="grid gap-5 sm:grid-cols-[1fr_auto] sm:items-center">
-                <div>
-                  <p className="font-display text-2xl font-semibold text-navy">
-                    Planning your next application?
-                  </p>
-                  <p className="mt-2 text-sm leading-6 text-muted">
-                    Build and preview your UK CV free, then pay {site.price} once for
-                    the CV and a matching cover letter. No subscription.
-                  </p>
-                </div>
-                <Link
-                  href="/editor?new=1"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-md bg-navy px-5 text-sm font-bold text-white transition hover:-translate-y-0.5 hover:bg-navy-hover"
-                >
-                  Build my CV for {site.price}
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </div>
+              <JobMoveCvPrompt
+                placement={analyticsPlacements.noticeResultCv}
+                heading={`Your earliest new start date is ${formatUkDate(result.earliestNewStartDate)}. Is your CV ready for the next role?`}
+              />
             </div>
           </section>
         </div>
