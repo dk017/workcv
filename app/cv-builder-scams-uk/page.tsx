@@ -291,7 +291,7 @@ export default function CvBuilderScamsUkPage() {
                   ["MyPerfectCV pricing", "https://www.myperfectcv.co.uk/pricing"],
                   ["LiveCareer UK pricing", "https://www.livecareer.co.uk/pricing"],
                   ["Resume.io UK pricing", "https://resume.io/uk/pricing"],
-                  ["CVMaker UK pricing", "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk"],
+                  ["CVMaker UK pricing", "https://www.cvmaker.uk/pricing"],
                 ].map(([label, href]) => (
                   <a
                     key={href}

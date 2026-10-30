@@ -1,6 +1,22 @@
 import type { MetadataRoute } from "next";
 
+import { comparisonCheckedIso, competitors } from "@/lib/competitors";
 import { site } from "@/lib/site";
+
+type SitemapRoute = {
+  path: string;
+  priority: number;
+  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
+  lastModified?: string;
+};
+
+const competitorRoutes: SitemapRoute[] = [
+  { path: "/compare", priority: 0.9, changeFrequency: "monthly", lastModified: comparisonCheckedIso },
+  ...competitors.flatMap((competitor): SitemapRoute[] => [
+    { path: competitor.vsPath, priority: 0.85, changeFrequency: "monthly", lastModified: comparisonCheckedIso },
+    { path: competitor.altPath, priority: 0.85, changeFrequency: "monthly", lastModified: comparisonCheckedIso },
+  ]),
+];
 
 const routes = [
   { path: "/chatgpt-cv-to-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
@@ -8,9 +24,9 @@ const routes = [
   { path: "/shorten-cv-to-two-pages", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/cv-word-or-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { path: "/", priority: 1.0, changeFrequency: "weekly" },
-  { path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-08-26" },
-  { path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-29" },
-  { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-09-06" },
+  { path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-30" },
+  { path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-30" },
+  { path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-30" },
   { path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },
   { path: "/resume-template-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-06-22" },
   { path: "/cv-vs-resume-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
@@ -63,29 +79,12 @@ const routes = [
   { path: "/cv-template-warehouse-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
   { path: "/cv-template-graduate-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
   { path: "/cv-template-care-worker-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/zety-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/canva-cv-alternative-uk", priority: 0.8, changeFrequency: "monthly" },
-  { path: "/enhancv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
-  { path: "/livecareer-alternative", priority: 0.75, changeFrequency: "monthly" },
-  { path: "/cancel-myperfectcv-uk", priority: 0.85, changeFrequency: "weekly", lastModified: "2026-10-30" },
-  { path: "/cancel-resume-io-uk", priority: 0.85, changeFrequency: "weekly" },
-  { path: "/cancel-cvmaker-uk", priority: 0.8, changeFrequency: "weekly" },
-  { path: "/cancel-livecareer-uk", priority: 0.8, changeFrequency: "weekly", lastModified: "2026-10-30" },
-  { path: "/cancel-enhancv-uk", priority: 0.75, changeFrequency: "weekly" },
-  { path: "/cancel-zety-uk", priority: 0.8, changeFrequency: "weekly" },
+  ...competitorRoutes,
   { path: "/contact", priority: 0.5, changeFrequency: "monthly" },
   { path: "/privacy", priority: 0.35, changeFrequency: "yearly" },
   { path: "/terms", priority: 0.35, changeFrequency: "yearly" },
   { path: "/refund-policy", priority: 0.45, changeFrequency: "yearly" },
-] satisfies Array<{
-  path: string;
-  priority: number;
-  changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"];
-  lastModified?: string;
-}>;
+] satisfies SitemapRoute[];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date("2026-06-13");

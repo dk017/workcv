@@ -65,7 +65,7 @@ const competitors = [
     renewal: competitorPricing.cvMaker.renewal,
     ongoing: "Check the current total for your intended access period",
     cancellation: "Yes",
-    source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
+    source: competitorPricing.cvMaker.source,
   },
   {
     builder: "WorkCV",
