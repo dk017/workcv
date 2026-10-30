@@ -56,7 +56,7 @@ const config: CompetitorVsConfig = {
     "You want more templates and designs to choose from",
     "You will cancel before day 14, or deliberately choose the annual plan",
   ],
-  cancelGuides: { a: "/cancel-zety-uk", b: "/cancel-myperfectcv-uk" },
+  alternatives: { a: "/zety-alternative-uk", b: "/myperfectcv-alternative-uk" },
   faqs: [
     {
       question: "Are Zety and MyPerfectCV the same company?",

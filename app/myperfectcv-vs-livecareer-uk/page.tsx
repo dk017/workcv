@@ -54,7 +54,7 @@ const config: CompetitorVsConfig = {
     "You prefer LiveCareer's template set; features are otherwise very close",
     "You also want an HTML copy of your CV, which LiveCareer lists alongside Word and PDF",
   ],
-  cancelGuides: { a: "/cancel-myperfectcv-uk", b: "/cancel-livecareer-uk" },
+  alternatives: { a: "/myperfectcv-alternative-uk", b: "/livecareer-alternative" },
   faqs: [
     {
       question: "Are MyPerfectCV and LiveCareer the same company?",

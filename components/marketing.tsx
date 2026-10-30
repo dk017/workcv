@@ -1,8 +1,8 @@
 import Link from "next/link";
-import { cancelGuides } from "@/components/cancel-guide-links";
 import { ArrowRight } from "lucide-react";
 
 import { TrackedLink } from "@/components/tracked-link";
+import { competitorNav } from "@/lib/competitors/nav";
 import { commercialRoutes, site } from "@/lib/site";
 
 type Faq = {
@@ -84,10 +84,13 @@ export function Footer({ line = site.summary }: { line?: string }) {
         </div>
       </div>
       <div className="container-page flex flex-wrap gap-x-5 gap-y-1 border-t border-line pb-10 pt-5">
-        <p className="w-full py-1 font-bold text-navy sm:w-auto">Cancel a CV builder subscription:</p>
-        {cancelGuides.map((guide) => (
-          <Link key={guide.href} href={guide.href} className="flex min-h-9 items-center text-muted hover:text-navy sm:min-h-0">
-            {guide.name}
+        <p className="w-full py-1 font-bold text-navy sm:w-auto">Compare CV builders:</p>
+        <Link href="/compare" className="flex min-h-9 items-center text-muted hover:text-navy sm:min-h-0">
+          All builders
+        </Link>
+        {competitorNav.slice(0, 8).map((competitor) => (
+          <Link key={competitor.slug} href={competitor.vsPath} className="flex min-h-9 items-center text-muted hover:text-navy sm:min-h-0">
+            WorkCV vs {competitor.name}
           </Link>
         ))}
       </div>

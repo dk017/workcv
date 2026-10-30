@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 import test from "node:test";
 
 import { competitorPlans, costOverDays, formatMinor } from "../lib/competitor-plans.ts";
@@ -41,11 +41,13 @@ test("Bold-run brands are labelled with the operator named in their terms", () =
 });
 
 test("comparison pages are registered and linked", () => {
-  const sitemap = read("lib/md/public-routes.ts");
-  const breadcrumbs = read("components/site-breadcrumbs.tsx");
+  // Generated WorkCV vs and alternatives routes are listed once in lib/competitors/nav.ts.
+  const nav = read("lib/competitors/nav.ts");
+  const sitemap = read("lib/md/public-routes.ts") + nav;
+  const breadcrumbs = read("components/site-breadcrumbs.tsx") + nav;
   const bestBuilder = read("app/best-cv-builder-uk/page.tsx");
   for (const path of comparisonPages) {
-    assert.match(sitemap, new RegExp(`path: "${path}"`));
+    assert.match(sitemap, new RegExp(`[pP]ath: "${path}"`));
     assert.match(breadcrumbs, new RegExp(`"${path}"`));
     assert.match(bestBuilder, new RegExp(`"${path}"`));
   }
@@ -62,8 +64,13 @@ test("comparison copy takes prices from the plan data and never quotes a pound p
 });
 
 test("WorkCV feature claims on alternative pages match the current product", () => {
-  const template = read("components/focused-alternative-page.tsx");
-  for (const source of [template, read("app/livecareer-alternative/page.tsx"), read("app/cvmaker-alternative/page.tsx"), read("app/enhancv-alternative-uk/page.tsx")]) {
-    assert.doesNotMatch(source, /No application tracking|does not include a\s+cover-letter builder|no cover-letter builder/);
+  const sources = [
+    "lib/competitors/workcv.ts",
+    "components/compare/competitor-vs-page.tsx",
+    "components/compare/competitor-alternatives-page.tsx",
+    ...readdirSync("lib/competitors").map((file) => `lib/competitors/${file}`),
+  ].map(read);
+  for (const source of sources) {
+    assert.doesNotMatch(source, /No application tracking|does not include a\s+cover-letter builder|no cover[- ]letter builder|No AI writing|exports PDF only|PDF download only/i);
   }
 });

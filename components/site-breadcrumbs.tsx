@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { competitorNav } from "@/lib/competitors/nav";
 import { site } from "@/lib/site";
 
 type Crumb = { name: string; href: string };
@@ -13,9 +14,17 @@ type Crumb = { name: string; href: string };
 const sections = {
   templates: { name: "CV templates", href: "/templates" },
   pricing: { name: "Pricing", href: "/pricing" },
+  compare: { name: "Compare CV builders", href: "/compare" },
 } as const;
 
 const pages: Record<string, { name: string; parent?: keyof typeof sections }> = {
+  "/compare": { name: "Compare CV builders" },
+  ...Object.fromEntries(
+    competitorNav.flatMap((competitor) => [
+      [competitor.vsPath, { name: `WorkCV vs ${competitor.name}`, parent: "compare" as const }],
+      [competitor.altPath, { name: `${competitor.altLabel} alternatives`, parent: "compare" as const }],
+    ]),
+  ),
   "/templates": { name: "CV templates" },
   "/ats-cv-template-uk": { name: "ATS CV template", parent: "templates" },
   "/professional-cv-template-uk": { name: "UK CV template", parent: "templates" },
@@ -35,22 +44,8 @@ const pages: Record<string, { name: string; parent?: keyof typeof sections }> = 
   "/cv-builder-no-subscription-uk": { name: "No-subscription CV builder", parent: "pricing" },
   "/resume-builder-uk-no-subscription": { name: "No-subscription resume builder", parent: "pricing" },
   "/cv-builder-scams-uk": { name: "CV builder charges", parent: "pricing" },
-  "/cancel-cvmaker-uk": { name: "Cancel CVMaker", parent: "pricing" },
-  "/cancel-enhancv-uk": { name: "Cancel Enhancv", parent: "pricing" },
-  "/cancel-livecareer-uk": { name: "Cancel LiveCareer", parent: "pricing" },
-  "/cancel-myperfectcv-uk": { name: "Cancel MyPerfectCV", parent: "pricing" },
-  "/cancel-resume-io-uk": { name: "Cancel Resume.io", parent: "pricing" },
-  "/cancel-zety-uk": { name: "Cancel Zety", parent: "pricing" },
-  "/canva-cv-alternative-uk": { name: "Canva CV alternative", parent: "pricing" },
-  "/cvmaker-alternative": { name: "CVMaker alternative", parent: "pricing" },
-  "/enhancv-alternative-uk": { name: "Enhancv alternative", parent: "pricing" },
-  "/livecareer-alternative": { name: "LiveCareer alternative", parent: "pricing" },
-  "/myperfectcv-alternative-uk": { name: "MyPerfectCV alternative", parent: "pricing" },
-  "/myperfectcv-vs-livecareer-uk": { name: "MyPerfectCV vs LiveCareer", parent: "pricing" },
-  "/zety-vs-myperfectcv-uk": { name: "Zety vs MyPerfectCV", parent: "pricing" },
-  "/kickresume-alternative-uk": { name: "Kickresume alternative", parent: "pricing" },
-  "/resume-io-alternative-uk": { name: "Resume.io alternative", parent: "pricing" },
-  "/zety-alternative-uk": { name: "Zety alternative", parent: "pricing" },
+  "/myperfectcv-vs-livecareer-uk": { name: "MyPerfectCV vs LiveCareer", parent: "compare" },
+  "/zety-vs-myperfectcv-uk": { name: "Zety vs MyPerfectCV", parent: "compare" },
   "/career-change-cv-uk": { name: "Career change CV" },
   "/cover-letter-examples-uk": { name: "Cover letter examples" },
   "/cv-employment-gap-uk": { name: "Employment gaps" },

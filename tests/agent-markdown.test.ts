@@ -191,7 +191,7 @@ test("markdown, llms.txt and llms-full.txt are rendered from each page's own HTM
 
   const full = await (await getLlmsFull(new Request("https://workcv.co.uk/llms-full.txt"))).text();
   assert.match(full, /^# WorkCV - full content\n\n> /);
-  assert.match(full, /Generated: \d{4}-\d{2}-\d{2}\nPages: 98 of 98 public pages/);
+  assert.match(full, /Generated: \d{4}-\d{2}-\d{2}\nPages: 109 of 109 public pages/);
   assert.match(full, /---\n<!-- source: https:\/\/workcv\.co\.uk\/pricing -->\n\n# Heading for \/pricing\n/);
   // Core pages come first, legal pages last.
   assert.ok(full.indexOf("source: https://workcv.co.uk -->") < full.indexOf("source: https://workcv.co.uk/how-to-write-a-cv-uk -->"));
