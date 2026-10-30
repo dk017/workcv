@@ -1,4 +1,5 @@
 import { customerReviewDate } from "../customer-content-review.ts";
+import { competitorNav } from "../competitors/nav.ts";
 
 export type PublicRouteSection = "core" | "guides" | "templates" | "tools" | "comparisons" | "extensions" | "legal";
 export type ChangeFrequency = "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
@@ -31,10 +32,10 @@ export const publicRoutes = [
   { section: "guides", path: "/common-job-interview-questions-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-13" },
   { section: "guides", path: "/thank-you-email-after-interview-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-09-13" },
   { section: "guides", path: "/career-advancement-strategies-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-09-13" },
-  { section: "core", path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-02" },
-  { section: "comparisons", path: "/best-cv-builder-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-09-10" },
-  { section: "comparisons", path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-06-29" },
-  { section: "core", path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-02" },
+  { section: "core", path: "/pricing", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-30" },
+  { section: "comparisons", path: "/best-cv-builder-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-30" },
+  { section: "comparisons", path: "/cv-builder-scams-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-30" },
+  { section: "core", path: "/cv-builder-no-subscription-uk", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-10-30" },
   { section: "guides", path: "/resume-builder-uk-no-subscription", priority: 0.9, changeFrequency: "weekly" },
   { section: "guides", path: "/cv-vs-resume-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { section: "core", path: "/cv-examples-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
@@ -92,26 +93,17 @@ export const publicRoutes = [
   { section: "templates", path: "/cv-template-warehouse-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
   { section: "templates", path: "/cv-template-graduate-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-08-26" },
   { section: "templates", path: "/cv-template-care-worker-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
-  { section: "comparisons", path: "/myperfectcv-alternative-uk", priority: 0.85, changeFrequency: "weekly", lastModified: "2026-10-04" },
   { section: "comparisons", path: "/myperfectcv-vs-livecareer-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
   { section: "comparisons", path: "/zety-vs-myperfectcv-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { section: "comparisons", path: "/kickresume-alternative-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { section: "comparisons", path: "/resume-io-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/zety-alternative-uk", priority: 0.85, changeFrequency: "weekly", lastModified: "2026-10-04" },
-  { section: "comparisons", path: "/canva-cv-alternative-uk", priority: 0.8, changeFrequency: "monthly" },
-  { section: "comparisons", path: "/enhancv-alternative-uk", priority: 0.85, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cvmaker-alternative", priority: 0.75, changeFrequency: "monthly" },
-  { section: "comparisons", path: "/livecareer-alternative", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-10-04" },
-  { section: "comparisons", path: "/cancel-myperfectcv-uk", priority: 0.85, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cancel-resume-io-uk", priority: 0.85, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cancel-cvmaker-uk", priority: 0.8, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cancel-livecareer-uk", priority: 0.8, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cancel-enhancv-uk", priority: 0.75, changeFrequency: "weekly" },
-  { section: "comparisons", path: "/cancel-zety-uk", priority: 0.8, changeFrequency: "weekly" },
   { section: "core", path: "/contact", priority: 0.5, changeFrequency: "monthly" },
   { section: "legal", path: "/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-09-23" },
   { section: "legal", path: "/terms", priority: 0.35, changeFrequency: "yearly" },
   { section: "legal", path: "/refund-policy", priority: 0.45, changeFrequency: "yearly" },
+  { section: "comparisons", path: "/compare", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-30" },
+  ...competitorNav.flatMap((competitor) => [
+    { section: "comparisons", path: competitor.vsPath, priority: 0.85, changeFrequency: "monthly", lastModified: "2026-10-30" },
+    { section: "comparisons", path: competitor.altPath, priority: 0.85, changeFrequency: "monthly", lastModified: "2026-10-30" },
+  ] as const),
 ] as const satisfies readonly PublicRoute[];
 
 // Pages that exist under app/ but are deliberately not public. tests/agent-markdown.test.ts

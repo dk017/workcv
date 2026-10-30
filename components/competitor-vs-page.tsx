@@ -25,7 +25,8 @@ export type CompetitorVsConfig = {
   featureRows: string[][];
   chooseA: string[];
   chooseB: string[];
-  cancelGuides: { a: string; b: string };
+  /** Alternatives pages for each brand, for readers who want to leave one. */
+  alternatives: { a: string; b: string };
   faqs: Array<{ question: string; answer: string }>;
 };
 
@@ -212,11 +213,11 @@ export function CompetitorVsPage({ config }: { config: CompetitorVsConfig }) {
       <section className="bg-paper py-16">
         <div className="container-page grid gap-5 md:grid-cols-2">
           {[
-            [a.brand, config.cancelGuides.a],
-            [b.brand, config.cancelGuides.b],
+            [a.brand, config.alternatives.a],
+            [b.brand, config.alternatives.b],
           ].map(([brand, href]) => (
             <Link key={href} href={href} className="flex items-center justify-between gap-4 rounded-xl border border-line bg-white p-6 font-bold text-navy hover:border-navy">
-              Already on a {brand} trial? How to cancel {brand} in the UK
+              Already on a {brand} trial? See {brand} alternatives and how to switch
               <ArrowRight className="h-5 w-5 shrink-0" aria-hidden="true" />
             </Link>
           ))}
