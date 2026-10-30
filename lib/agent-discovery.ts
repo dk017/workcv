@@ -1,14 +1,14 @@
+import { comparisonCheckedDate, competitors } from "./competitors/index.ts";
 import { site } from "./site.ts";
 
-export const agentDiscoveryLinks = [
-  `</llms.txt>; rel="alternate"; type="text/plain"`,
-  `</agent-markdown>; rel="alternate"; type="text/markdown"`,
-  `</.well-known/api-catalog>; rel="api-catalog"; type="application/linkset+json"`,
-  `</auth.md>; rel="service-doc"; type="text/markdown"`,
-  `</.well-known/agent-skills/index.json>; rel="service-desc"; type="application/json"`,
-];
+const comparisonLines = competitors
+  .map(
+    (competitor) =>
+      `- ${competitor.name} (${competitor.pricing.headline}): WorkCV vs ${competitor.name} ${site.url}${competitor.vsPath} · ${competitor.alt.subject ?? competitor.name} alternatives ${site.url}${competitor.altPath}`,
+  )
+  .join("\n");
 
-export const agentDiscoveryLinkHeader = agentDiscoveryLinks.join(", ");
+export { agentDiscoveryLinkHeader, agentDiscoveryLinks } from "./agent-discovery-links.ts";
 
 export const homepageMarkdown = `# WorkCV
 
@@ -30,6 +30,13 @@ WorkCV is a UK CV builder for job seekers who want a clear, professional CV with
 - View pricing: ${site.url}/pricing
 - Read the no-subscription CV builder page: ${site.url}/cv-builder-no-subscription-uk
 - Browse UK CV examples: ${site.url}/cv-examples-uk
+
+## UK CV builder comparisons
+
+Sourced comparisons of WorkCV with other UK CV builders, prices checked ${comparisonCheckedDate}. Each page lists official sources and says when the other product is the better choice.
+
+- All builders in one table: ${site.url}/compare
+${comparisonLines}
 
 ## Important product facts
 

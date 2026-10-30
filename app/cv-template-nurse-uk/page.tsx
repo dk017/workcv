@@ -17,7 +17,7 @@ import { site } from "@/lib/site";
 import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 
 export const metadata: Metadata = {
-  title: "Nurse CV Template UK + Example | WorkCV",
+  title: "Nurse CV Template UK + Example",
   description:
     "Use a nurse CV template for UK jobs with clinical evidence, NHS and private-care guidance, registration details and editable examples.",
   alternates: { canonical: "/cv-template-nurse-uk" },

@@ -113,6 +113,17 @@ const nextConfig = {
         destination: "/resume-builder-uk-no-subscription",
         permanent: true,
       },
+      // Cancellation guides were replaced by comparison pages on 30 October 2026.
+      ...[
+        ["/cancel-myperfectcv-uk", "/myperfectcv-alternative-uk"],
+        ["/cancel-livecareer-uk", "/livecareer-alternative"],
+        ["/cancel-zety-uk", "/zety-alternative-uk"],
+        ["/cancel-resume-io-uk", "/resume-io-alternative-uk"],
+        ["/cancel-cvmaker-uk", "/cvmaker-alternative"],
+        ["/cancel-enhancv-uk", "/enhancv-alternative-uk"],
+        ["/myperfectcv-vs-livecareer-uk", "/compare"],
+        ["/compare-cv-builders", "/compare"],
+      ].map(([source, destination]) => ({ source, destination, permanent: true })),
     ];
   },
 };

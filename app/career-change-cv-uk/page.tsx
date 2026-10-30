@@ -7,7 +7,7 @@ import { ButtonLink, FaqSection, FinalCta, SectionLabel } from "@/components/mar
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Career Change CV Example UK + Template | WorkCV",
+  title: "Career Change CV Example UK + Template",
   description:
     "See career change CV examples for the UK: position transferable skills, explain your move and build a focused CV for the target role.",
   alternates: { canonical: "/career-change-cv-uk" },

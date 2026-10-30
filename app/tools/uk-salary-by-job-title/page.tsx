@@ -9,7 +9,7 @@ import { site } from "@/lib/site";
 import { analyticsPlacements } from "@/lib/analytics-placements";
 
 export const metadata: Metadata = {
-  title: "UK Salary by Job Title - ONS 2025 Pay Checker",
+  title: "Salary Comparison by Job Title UK - ONS 2025 Pay Data",
   description:
     "Search 60 common UK job titles and compare lower-quartile, median and upper-quartile annual pay from ONS ASHE 2025 data.",
   alternates: { canonical: "/tools/uk-salary-by-job-title" },

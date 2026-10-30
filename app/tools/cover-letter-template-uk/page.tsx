@@ -6,7 +6,7 @@ import { FaqSection, SectionLabel } from "@/components/marketing";
 import { site } from "@/lib/site";
 
 const path = "/tools/cover-letter-template-uk";
-export const metadata: Metadata = { title: "Free UK Cover Letter Template - Word Download", description: "Use a free editable UK cover letter template or download it for Microsoft Word. Correct UK structure and sign-off, no signup required.", alternates: { canonical: path }, openGraph: { title: "Free UK Cover Letter Template", description: "Edit, copy or download a structured UK cover letter template with practical prompts.", url: path } };
+export const metadata: Metadata = { title: "UK Cover Letter Template and Format - Free Word Download", description: "Free UK cover letter template in Word format: the four-paragraph layout, address block and sign-off UK employers expect. Edit online or download, no sign-up.", alternates: { canonical: path }, openGraph: { title: "Free UK Cover Letter Template", description: "Edit, copy or download a structured UK cover letter template with practical prompts.", url: path } };
 const faqs = [
   { question: "Is this UK cover letter template free?", answer: "Yes. You can edit and copy the template in your browser or download the Word document without an account, email gate, payment or subscription." },
   { question: "How should a UK cover letter be structured?", answer: "Use a direct opening naming the role, one or two evidence paragraphs connecting your experience to the vacancy, and a concise closing. The National Careers Service describes a typical cover letter as three to five paragraphs." },

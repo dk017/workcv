@@ -13,7 +13,7 @@ import { site } from "@/lib/site";
 const path = "/tools/cv-template-word-uk";
 
 export const metadata: Metadata = {
-  title: "How to Edit a CV Template in Word UK | WorkCV",
+  title: "How to Edit a CV Template in Word UK",
   description:
     "Learn how to edit a UK CV template in Microsoft Word: replace prompts, keep styles consistent, fix page breaks and export a clean PDF.",
   alternates: { canonical: path },

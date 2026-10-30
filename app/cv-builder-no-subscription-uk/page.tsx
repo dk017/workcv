@@ -63,7 +63,7 @@ const comparisonRows = [
     entry: competitorPricing.cvMaker.entry,
     renewal: competitorPricing.cvMaker.renewal,
     annualised: "Check the total for your intended access period",
-    source: "https://www.cvmaker.uk/help/what-are-the-costs-of-cvmaker-uk",
+    source: competitorPricing.cvMaker.source,
   },
   {
     builder: "WorkCV",

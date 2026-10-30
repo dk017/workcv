@@ -17,7 +17,7 @@ import { getRoleCvTemplate } from "@/lib/role-cv-templates";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "Care Worker CV Template UK + Example | WorkCV",
+  title: "Care Worker CV Template UK + Example",
   description:
     "Use a care worker CV template for UK jobs with care assistant, safeguarding, records, training and person-centred care examples.",
   alternates: { canonical: "/cv-template-care-worker-uk" },

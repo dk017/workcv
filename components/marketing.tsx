@@ -67,6 +67,7 @@ export function Footer({ line = site.summary }: { line?: string }) {
             <Link href="/tools/redundancy-pay-calculator">Redundancy pay</Link>
             <Link href="/cv-builder-no-subscription-uk">No subscription</Link>
             <Link href="/cv-builder-scams-uk">CV builder charges</Link>
+            <Link href="/compare">Compare CV builders</Link>
             <Link href="/contact">Contact</Link>
             <Link href="/privacy">Privacy</Link>
             <Link href="/terms">Terms</Link>
