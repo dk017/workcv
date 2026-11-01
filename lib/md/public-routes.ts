@@ -14,6 +14,7 @@ export type PublicRoute = {
 // Every indexable page. The sitemap, the markdown versions, llms.txt, llms-full.txt and the
 // middleware's markdown negotiation all read this list, so a new public page is added here once.
 export const publicRoutes = [
+  { section: "guides", path: "/uk-cv-format", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-11-01" },
   { section: "guides", path: "/cv-after-long-service-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
   { section: "guides", path: "/overqualified-cv-example-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
   { section: "guides", path: "/tailor-cv-to-job-description-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-10-02" },
@@ -23,7 +24,7 @@ export const publicRoutes = [
   { section: "guides", path: "/chatgpt-cv-to-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { section: "guides", path: "/convert-resume-to-uk-cv", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
   { section: "guides", path: "/shorten-cv-to-two-pages", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
-  { section: "guides", path: "/cv-word-or-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-06" },
+  { section: "guides", path: "/cv-word-or-pdf-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-11-01" },
   { section: "core", path: "/", priority: 1.0, changeFrequency: "weekly" },
   { section: "core", path: "/career-tools", priority: 0.95, changeFrequency: "weekly", lastModified: "2026-09-13" },
   { section: "guides", path: "/top-job-boards-uk", priority: 0.85, changeFrequency: "monthly", lastModified: "2026-09-13" },

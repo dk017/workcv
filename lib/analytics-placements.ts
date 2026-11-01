@@ -24,6 +24,7 @@ export const analyticsPlacements = {
   overseasGuideEditor: "overseas_guide_editor",
   shortenGuideCheck: "shorten_guide_check",
   formatGuideWord: "format_guide_word",
+  ukCvFormatEditor: "uk_cv_format_editor",
   blankTemplateDownload: "blank_template_download",
   blankTemplateEditor: "blank_template_editor",
   careEntryEditor: "care_entry_editor",

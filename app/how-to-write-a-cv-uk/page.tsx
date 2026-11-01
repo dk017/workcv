@@ -184,6 +184,7 @@ const situationLinks = [
 ];
 
 const roleLinks = [
+  ["UK CV format", "/uk-cv-format"],
   ["CV vs resume UK", "/cv-vs-resume-uk"],
   ["Nurse CV", "/cv-template-nurse-uk"],
   ["Teacher CV", "/cv-template-teacher-uk"],

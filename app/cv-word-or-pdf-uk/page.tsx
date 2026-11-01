@@ -35,16 +35,16 @@ export default function CvFormatGuide() {
     <GuideSection title="Which WorkCV option gives you the file you need?">
       <GuideTable caption="WorkCV document options" headings={["Option", "What you receive", "Account and cost"]} rows={[
         ["Blank Word template", "An editable .docx with instructions to replace. Fill and format it yourself.", "Free direct download; no account required."],
-        ["Online CV editor", "A PDF of your saved CV, using the selected WorkCV layout.", `No account to start; email code to save or download. Build and preview free; ${site.price} once for one saved CV's PDF.`],
+        ["Online CV editor", "Your saved CV as a PDF in the selected WorkCV layout, plus an editable Word (.docx) copy in a single-column layout.", `No account to start; email code to save or download. Build and preview free; ${site.price} once for one saved CV and its matching letter as PDF and Word.`],
       ]} />
-      <p>The Word template is not an export of a CV already built in the editor. If you need DOCX, use the <Link className="underline" href="/tools/blank-cv-template-uk">blank Word template</Link> and enter your content there. If PDF is suitable, <Link className="underline" href="/editor?template=classic&new=1">build and preview in WorkCV</Link> before deciding to pay.</p>
+      <p>The free Word template is blank: you type your content into it and format it yourself. If you would rather build in the editor, <Link className="underline" href="/editor?template=classic&new=1">build and preview in WorkCV</Link> before deciding to pay; the paid download includes both files, so you can send whichever the employer asks for.</p>
     </GuideSection>
     <GuideSection title="Send the final version, not your working file">
       <p>Use a clear filename such as <code>Alex-Morgan-CV.pdf</code> or <code>Alex-Morgan-CV.docx</code>. Remove internal labels such as “draft”, “old” or “final-final” once the file is ready. Do not change an extension by renaming it: use the document application's actual save or export option.</p>
       <p>Keep the file under the stated size limit. Check that comments, tracked changes, template instructions and unused example text are absent. Open the attachment from the draft email or inspect the uploaded file where the portal allows it; this catches accidentally selecting an older version.</p>
       <p><strong>Should I send both?</strong> Usually provide the requested file rather than attaching competing versions without explanation. If both are requested, make sure their content agrees.</p>
       <p><strong>Can an ATS read PDFs?</strong> Support depends on the system and its configuration. Follow the listed formats and use a text-based document; do not rely on a universal “ATS-safe” label.</p>
-      <p><strong>Can I export my WorkCV CV to Word?</strong> The current editor download is PDF. The free DOCX is a separate blank template.</p>
+      <p><strong>Can I export my WorkCV CV to Word?</strong> Yes. Once a saved CV is paid for, you can download it as PDF and as an editable Word file. The Word copy always uses a single column, whichever design you chose, so check it before sending if you picked a sidebar layout.</p>
     </GuideSection>
   </Guide>;
 }
