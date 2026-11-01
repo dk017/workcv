@@ -273,10 +273,10 @@ export default function ResumeIoAlternativeUkPage() {
               confirmation step before relying on cancellation being complete.
             </p>
             <Link
-              href="/cancel-resume-io-uk"
+              href="/workcv-vs-resume-io-uk#cancel"
               className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
             >
-              Read the cancellation guide
+              How to cancel, and WorkCV vs Resume.io
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

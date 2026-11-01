@@ -369,10 +369,10 @@ export default function EnhancvAlternativeUkPage() {
               before the next renewal date.
             </p>
             <Link
-              href="/cancel-enhancv-uk"
+              href="/workcv-vs-enhancv-uk#cancel"
               className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
             >
-              Read the sourced cancellation guide
+              How to cancel, and WorkCV vs Enhancv
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -434,7 +434,7 @@ export default function EnhancvAlternativeUkPage() {
         body={`WorkCV costs ${site.price} once for a saved CV and its matching cover letter, as PDF and Word. No monthly WorkCV subscription and no automatic renewal.`}
         primaryHref="/editor"
         primary="Build my UK CV"
-        secondaryHref="/cancel-enhancv-uk"
+        secondaryHref="/workcv-vs-enhancv-uk#cancel"
         secondary="Cancel an existing Enhancv plan"
       />
     </>

@@ -42,6 +42,12 @@ const nextConfig = {
   },
   async redirects() {
     return [
+      { source: "/cancel-myperfectcv-uk", destination: "/workcv-vs-myperfectcv-uk", permanent: true },
+      { source: "/cancel-zety-uk", destination: "/workcv-vs-zety-uk", permanent: true },
+      { source: "/cancel-livecareer-uk", destination: "/workcv-vs-livecareer-uk", permanent: true },
+      { source: "/cancel-resume-io-uk", destination: "/workcv-vs-resume-io-uk", permanent: true },
+      { source: "/cancel-cvmaker-uk", destination: "/workcv-vs-cvmaker-uk", permanent: true },
+      { source: "/cancel-enhancv-uk", destination: "/workcv-vs-enhancv-uk", permanent: true },
       { source: "/cv-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       { source: "/resume-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       {

@@ -45,7 +45,7 @@ const config: FocusedAlternativeConfig = {
     ["Current limits", "Features depend on the selected CVMaker service", "Three CV layouts; no online profile or job board"],
     ["Best fit", "Users who value the broader ongoing service", "UK CVs and cover letters without recurring billing"],
   ],
-  cancellationHref: "/cancel-cvmaker-uk",
+  cancellationHref: "/workcv-vs-cvmaker-uk#cancel",
   cancellationCopy:
     "Switching tools does not cancel an existing CVMaker subscription. Follow the official account process, keep written confirmation and check the next statement.",
   sources: [

@@ -287,10 +287,10 @@ export default function ZetyAlternativeUkPage() {
               steps.
             </p>
             <Link
-              href="/cancel-zety-uk"
+              href="/workcv-vs-zety-uk#cancel"
               className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-navy underline decoration-line-strong underline-offset-4"
             >
-              Read the cancellation guide
+              How to cancel, and WorkCV vs Zety
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
