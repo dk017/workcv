@@ -81,6 +81,8 @@ export const publicRoutes = [
   { section: "extensions", path: "/wordpress/uk-career-tools-plugin/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-07-27" },
   { section: "extensions", path: "/chrome/job-keyword-highlighter", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-07-27" },
   { section: "extensions", path: "/chrome/job-keyword-highlighter/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-07-27" },
+  { section: "extensions", path: "/chrome/uk-visa-sponsor-checker", priority: 0.75, changeFrequency: "monthly", lastModified: "2026-10-31" },
+  { section: "extensions", path: "/chrome/uk-visa-sponsor-checker/privacy", priority: 0.35, changeFrequency: "yearly", lastModified: "2026-10-31" },
   { section: "guides", path: "/right-to-work-cv-uk", priority: 0.8, changeFrequency: "monthly", lastModified: "2026-10-05" },
   { section: "guides", path: "/how-to-write-a-cv-uk", priority: 0.95, changeFrequency: "monthly", lastModified: "2026-10-02" },
   { section: "templates", path: "/professional-cv-template-uk", priority: 0.9, changeFrequency: "monthly", lastModified: "2026-09-29" },

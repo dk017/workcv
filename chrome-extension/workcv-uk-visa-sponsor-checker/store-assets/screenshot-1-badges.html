@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>UK Visa Sponsor Checker screenshot: badges</title>
+    <!-- Fictional job board and employers, so no real company's licence status is shown. -->
+    <style>
+      * { box-sizing: border-box; }
+      html, body { width: 1280px; height: 800px; margin: 0; overflow: hidden; }
+      body { background: #dfe7ed; color: #1a1a1a; font-family: Arial, Helvetica, sans-serif; }
+      .chrome { height: 84px; background: #dfe5ea; padding: 8px 16px 0; }
+      .tab { width: 300px; height: 34px; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 10px 10px 0 0; background: #fff; color: #334e68; font-size: 13px; }
+      .bar { height: 42px; display: flex; align-items: center; gap: 12px; padding: 0 12px; background: #fff; margin: 0 -16px; border-bottom: 1px solid #d5dce2; }
+      .url { flex: 1; height: 28px; border-radius: 14px; background: #eef2f5; display: flex; align-items: center; padding: 0 14px; color: #52606d; font-size: 13px; }
+      .ext { width: 26px; height: 26px; border-radius: 6px; background: #0f2942; display: grid; place-items: center; }
+      .ext svg { width: 18px; height: 18px; }
+      .page { display: grid; grid-template-columns: 1fr 380px; gap: 28px; padding: 26px 48px; height: 716px; background: #f6f7f9; }
+      .head { grid-column: 1 / -1; display: flex; align-items: baseline; gap: 16px; }
+      .head h1 { margin: 0; font-size: 26px; color: #1f2933; }
+      .head span { color: #616e7c; font-size: 15px; }
+      .list { display: grid; gap: 12px; align-content: start; }
+      .job { border: 1px solid #d9e2ec; border-radius: 10px; background: #fff; padding: 16px 20px; }
+      .job h2 { margin: 0 0 6px; font-size: 18px; color: #1d4ed8; }
+      .job .co { display: flex; align-items: center; gap: 8px; font-size: 15px; color: #1f2933; }
+      .job .meta { margin-top: 6px; color: #616e7c; font-size: 13px; }
+      .badge { display: inline-flex; align-items: center; min-height: 22px; border: 1px solid; border-radius: 999px; padding: 1px 9px; font-size: 12px; font-weight: 700; }
+      .listed { border-color: #246b48; background: #effaf3; color: #1d5a3b; }
+      .possible { border-color: #b9891f; background: #fdf6e3; color: #75540d; }
+      .grey { border-color: #b8c2cc; background: #f4f6f8; color: #47596b; }
+      .callout { align-self: start; border-radius: 12px; background: #0f2942; color: #fff; padding: 28px; }
+      .callout p.k { margin: 0; color: #d4a843; font-size: 12px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+      .callout h3 { margin: 10px 0 12px; font-family: Georgia, serif; font-size: 30px; line-height: 1.15; }
+      .callout p { margin: 0 0 12px; color: #d8e2ec; font-size: 15px; line-height: 1.5; }
+      .pop { position: absolute; left: 440px; top: 240px; width: 360px; border: 1px solid #c9d1d8; border-radius: 10px; background: #fff; padding: 16px; box-shadow: 0 14px 40px rgba(15,41,66,.25); font-size: 13px; line-height: 1.5; }
+      .pop h4 { margin: 0 0 6px; color: #0f2942; font-size: 15px; }
+      .pop ul { margin: 6px 0 0; padding-left: 18px; color: #334e68; }
+      .pop small { display: block; margin-top: 10px; color: #63788c; font-size: 11px; }
+      .pop a { display: block; margin-top: 8px; color: #0f2942; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <div class="chrome">
+      <div class="tab">Software engineer jobs in London</div>
+      <div class="bar">
+        <div class="url">jobs.example.co.uk/search?q=software+engineer&amp;l=London</div>
+        <div class="ext"><svg viewBox="0 0 128 128"><path d="M64 14 104 28v34c0 26-18 42-40 54-22-12-40-28-40-54V28z" fill="#d4a843"/><path d="m45 64 14 14 25-28" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+    <div class="page">
+      <div class="head"><h1>Software engineer jobs in London</h1><span>248 results</span></div>
+      <div class="list">
+        <article class="job"><h2>Backend Engineer (Python)</h2><div class="co">Northgate Analytics Ltd <span class="badge listed">✓ Licensed sponsor</span></div><p class="meta">London · Hybrid · £70,000 – £85,000</p></article>
+        <article class="job"><h2>Senior Platform Engineer</h2><div class="co">Brightwater Health <span class="badge possible">? Similar name listed</span></div><p class="meta">London · Full-time · £80,000 – £95,000</p></article>
+        <article class="job"><h2>Graduate Software Developer</h2><div class="co">Meridian Logistics <span class="badge listed">✓ Licensed sponsor</span></div><p class="meta">Croydon · On-site · £34,000</p></article>
+        <article class="job"><h2>Full Stack Developer</h2><div class="co">Fernhill Studio <span class="badge grey">Not found on register</span></div><p class="meta">London · Remote · £55,000 – £65,000</p></article>
+        <article class="job"><h2>Java Developer, 6-month contract</h2><div class="co">Talent Bridge Recruitment <span class="badge grey">Agency advert</span></div><p class="meta">London · Contract · £500 a day</p></article>
+      </div>
+      <aside class="callout">
+        <p class="k">UK Visa Sponsor Checker</p>
+        <h3>See who can sponsor your visa as you browse.</h3>
+        <p>A badge beside every employer, checked against the Home Office register of licensed sponsors.</p>
+        <p>Reloaded from GOV.UK twice a day. Only employer names are sent.</p>
+      </aside>
+    </div>
+    <div class="pop">
+      <h4>Northgate Analytics Ltd holds a sponsor licence</h4>
+      <ul><li><strong>Northgate Analytics Limited</strong> · London · Skilled Worker (A rating)</li></ul>
+      <small>A licence means the employer can sponsor workers, not that this job qualifies. Home Office register dated 30 October 2026. Information, not immigration advice.</small>
+      <a>Search the register on WorkCV</a>
+    </div>
+  </body>
+</html>

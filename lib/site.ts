@@ -9,6 +9,8 @@ export const site = {
   url: "https://workcv.co.uk",
   // Store listing by item ID, so the link survives renames of the listing.
   chromeExtensionUrl: "https://chromewebstore.google.com/detail/bpledmncejopbidegmhdefkpdjgojlmg",
+  // UK Visa Sponsor Checker extension. Empty until its store listing is published.
+  sponsorExtensionUrl: "",
   locale: "en-GB",
   priceAmount,
   priceCurrency,

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=1280, initial-scale=1">
+    <title>UK Visa Sponsor Checker screenshot: popup</title>
+    <!-- Fictional employer, so no real company's licence status is shown. -->
+    <link rel="stylesheet" href="../popup.css">
+    <style>
+      html, body { width: 1280px; height: 800px; margin: 0; overflow: hidden; }
+      body { display: grid; grid-template-columns: 1fr 400px; align-items: center; gap: 60px; padding: 0 110px; background: #0f2942; }
+      .copy p.k { margin: 0; color: #d4a843; font-size: 13px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+      .copy h2 { margin: 14px 0 18px; color: #fff; font-family: Georgia, serif; font-size: 46px; line-height: 1.1; }
+      .copy p { margin: 0 0 14px; color: #d8e2ec; font-size: 18px; line-height: 1.55; }
+      .frame { width: 360px; border-radius: 12px; overflow: hidden; box-shadow: 0 20px 60px rgba(0,0,0,.35); background: #f8f7f3; }
+    </style>
+  </head>
+  <body>
+    <div class="copy">
+      <p class="k">Any job advert</p>
+      <h2>Check any employer by name.</h2>
+      <p>Type a name, or let the extension find the employer on the advert you are reading.</p>
+      <p>See the licence routes, locations and rating from the Home Office register.</p>
+    </div>
+    <div class="frame">
+      <main class="shell">
+        <header class="hero">
+          <p class="eyebrow">Home Office register</p>
+          <h1>UK Visa Sponsor Checker</h1>
+          <p>See which employers hold a licence to sponsor work visas, right on the job boards you use.</p>
+        </header>
+        <section class="panel">
+          <label class="meta-label">Check an employer</label>
+          <div class="search"><input value="Meridian Logistics"><button class="primary">Check</button></div>
+          <button class="secondary wide">Find the employer on this page</button>
+          <div class="result listed">
+            <strong>An employer with this name holds a sponsor licence.</strong>
+            <ul><li>Meridian Logistics Ltd, Croydon: Skilled Worker (A rating)</li></ul>
+            <small>Register dated 2026-10-30. <a>See all results on WorkCV</a></small>
+          </div>
+        </section>
+      </main>
+    </div>
+  </body>
+</html>

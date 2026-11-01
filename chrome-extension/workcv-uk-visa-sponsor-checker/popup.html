@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>UK Visa Sponsor Checker</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="shell">
+      <header class="hero">
+        <p class="eyebrow">Home Office register</p>
+        <h1>UK Visa Sponsor Checker</h1>
+        <p>See which employers hold a licence to sponsor work visas, right on the job boards you use.</p>
+      </header>
+
+      <section class="panel">
+        <label class="switch">
+          <input id="enabledToggle" type="checkbox" checked>
+          <span>Show sponsor badges on job sites</span>
+        </label>
+        <p class="hint">Badges appear on LinkedIn, Indeed, Reed, Totaljobs, CV-Library and Glassdoor job pages.</p>
+      </section>
+
+      <section class="panel">
+        <form id="searchForm">
+          <label class="meta-label" for="employerInput">Check an employer</label>
+          <div class="search">
+            <input id="employerInput" type="text" maxlength="160" autocomplete="off" placeholder="Employer name">
+            <button class="primary" type="submit">Check</button>
+          </div>
+        </form>
+        <button id="pageButton" class="secondary wide" type="button">Find the employer on this page</button>
+        <p class="status" id="statusMessage"></p>
+        <div id="resultPanel" class="result" hidden></div>
+      </section>
+
+      <footer class="panel footer">
+        <p>Only employer names are sent to WorkCV to search the register, and each answer is kept in your browser for a day. A licence means the employer can sponsor workers, not that a particular job qualifies. Information, not immigration advice.</p>
+        <a id="guideLink" href="#" target="_blank" rel="noreferrer">How to show your right to work on a UK CV</a>
+      </footer>
+    </main>
+    <script src="employers.js"></script>
+    <script src="popup.js"></script>
+  </body>
+</html>
