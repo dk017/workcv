@@ -2,8 +2,8 @@
 export const customerContentReview = {
   "/cv-after-long-service-uk": "2026-10-05",
   "/overqualified-cv-example-uk": "2026-10-05",
-  "/livecareer-alternative": "2026-10-05",
-  "/myperfectcv-alternative-uk": "2026-10-05",
+  "/livecareer-alternative": "2026-11-01",
+  "/myperfectcv-alternative-uk": "2026-11-01",
   "/cv-builder-no-subscription-uk": "2026-10-02",
   "/pricing": "2026-10-02",
   "/tools/blank-cv-template-uk": "2026-09-23",

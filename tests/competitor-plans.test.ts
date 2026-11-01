@@ -63,7 +63,7 @@ test("comparison copy takes prices from the plan data and never quotes a pound p
 
 test("WorkCV feature claims on alternative pages match the current product", () => {
   const template = read("components/focused-alternative-page.tsx");
-  for (const source of [template, read("app/livecareer-alternative/page.tsx"), read("app/cvmaker-alternative/page.tsx"), read("app/enhancv-alternative-uk/page.tsx")]) {
+  for (const source of [template, read("lib/cv-builder-alternatives.ts"), read("components/cv-builder-alternatives-page.tsx")]) {
     assert.doesNotMatch(source, /No application tracking|does not include a\s+cover-letter builder|no cover-letter builder/);
   }
 });

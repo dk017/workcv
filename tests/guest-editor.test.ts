@@ -29,7 +29,7 @@ test("the editor needs an account only to reopen a saved CV, after payment, or f
 });
 
 test("public start buttons open the editor directly, not the sign-in page", () => {
-  for (const file of ["../app/page.tsx", "../app/pricing/page.tsx", "../components/pass-offer.tsx", "../components/search-plan-choice.tsx", "../components/job-application-tracker.tsx"]) {
+  for (const file of ["../app/page.tsx", "../app/pricing/page.tsx", "../components/pass-offer.tsx", "../components/cv-builder-alternatives-page.tsx", "../components/job-application-tracker.tsx"]) {
     const source = readFileSync(new URL(file, import.meta.url), "utf8");
     assert.doesNotMatch(source, /buildLoginHref\("\/editor/, file);
   }

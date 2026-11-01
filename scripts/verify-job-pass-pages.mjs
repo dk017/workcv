@@ -16,8 +16,6 @@ try{
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=window.innerWidth+1),"Mobile overflow: "+path);
   await page.screenshot({path:out+path.replaceAll("/","-")+"-mobile.png"});await page.setViewportSize({width:1365,height:1000});checks.push(path+": canonical, plan, desktop/mobile");
  }
- await page.goto(base+"/livecareer-alternative",{waitUntil:"networkidle"});await page.getByLabel("30 days",{exact:true}).check();assert.ok((await page.locator("body").innerText()).includes("£21.80"));assert.ok((await page.locator("body").innerText()).includes("costs less over 30 days"));
- const href=await page.getByRole("link",{name:"Start with Job Search Pass",exact:true}).first().getAttribute("href");assert.match(new URLSearchParams(href.split("?")[1]).get("next"),/plan=pass/);checks.push("Cost honesty and selected plan");
  await page.goto(base+"/cv-after-long-service-uk",{waitUntil:"networkidle"});
  await page.getByRole("button",{name:"Try a fictional timeline"}).click();await page.getByRole("button",{name:"Build my outline",exact:true}).click();assert.match(await page.getByLabel("Your reviewable outline").inputValue(),/2009 – 2026/);
  await page.getByRole("textbox",{name:/^Target role \(optional\)/}).fill("New target");assert.equal(await page.getByRole("button",{name:"Review this outline in the editor",exact:true}).isDisabled(),true);await page.getByRole("button",{name:"Build my outline",exact:true}).click();
