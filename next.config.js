@@ -48,6 +48,15 @@ const nextConfig = {
       { source: "/cancel-resume-io-uk", destination: "/workcv-vs-resume-io-uk", permanent: true },
       { source: "/cancel-cvmaker-uk", destination: "/workcv-vs-cvmaker-uk", permanent: true },
       { source: "/cancel-enhancv-uk", destination: "/workcv-vs-enhancv-uk", permanent: true },
+      // Short vs addresses that visitors and AI assistants guess.
+      { source: "/workcv-vs-myperfectcv", destination: "/workcv-vs-myperfectcv-uk", permanent: true },
+      { source: "/workcv-vs-zety", destination: "/workcv-vs-zety-uk", permanent: true },
+      { source: "/workcv-vs-livecareer", destination: "/workcv-vs-livecareer-uk", permanent: true },
+      { source: "/workcv-vs-resume-io", destination: "/workcv-vs-resume-io-uk", permanent: true },
+      { source: "/workcv-vs-cvmaker", destination: "/workcv-vs-cvmaker-uk", permanent: true },
+      { source: "/workcv-vs-enhancv", destination: "/workcv-vs-enhancv-uk", permanent: true },
+      { source: "/workcv-vs-canva", destination: "/canva-cv-alternative-uk", permanent: true },
+      { source: "/workcv-vs-kickresume", destination: "/kickresume-alternative-uk", permanent: true },
       { source: "/cv-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       { source: "/resume-template-uk", destination: "/professional-cv-template-uk", permanent: true },
       {

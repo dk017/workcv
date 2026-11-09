@@ -16,6 +16,19 @@ test("each WorkCV vs page replaces a cancellation guide with a permanent redirec
   }
 });
 
+test("short WorkCV vs addresses redirect to a real page", () => {
+  const config = readFileSync("next.config.js", "utf8");
+  const shortcuts = [
+    ...workcvVsBrands.map((page) => [page.path.replace(/-uk$/, ""), page.path]),
+    ["/workcv-vs-canva", "/canva-cv-alternative-uk"],
+    ["/workcv-vs-kickresume", "/kickresume-alternative-uk"],
+  ];
+  for (const [source, destination] of shortcuts) {
+    assert.ok(config.includes(`{ source: "${source}", destination: "${destination}", permanent: true }`), source);
+    assert.ok(existsSync(`app${destination}/page.tsx`), destination);
+  }
+});
+
 test("WorkCV vs pages keep dated cancellation steps and sources", () => {
   for (const page of workcvVsBrands) {
     assert.ok(page.cancel.steps.length >= 4, page.brand);
