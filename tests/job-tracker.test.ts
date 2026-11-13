@@ -133,3 +133,11 @@ test("demo rows retain their label after reload, so they cannot inflate real-job
   const imported = csvToJobs(jobsToCsv(rows), makeId).jobs;
   assert.equal(imported.filter(row => row.isExample).length, 2);
 });
+
+test("a newly added job offers a CV for that job straight away, with its own tracking", async () => {
+  const { readFileSync } = await import("node:fs");
+  const source = readFileSync(new URL("../components/job-application-tracker.tsx", import.meta.url), "utf8");
+  assert.match(source, /if \(!existing\) setNewJobId\(job\.id\)/);
+  assert.match(source, /placement=\{analyticsPlacements\.trackerNewJobTailor\}/);
+  assert.match(source, /placement=\{analyticsPlacements\.trackerNewJobPack\}/);
+});

@@ -22,9 +22,11 @@ test("guest milestones are recorded from the editor, with only a placement", () 
   assert.deepEqual(saved.metadata, { placement: "download" });
 });
 
-test("the editor needs an account only to reopen a saved CV, after payment, or from a tool", () => {
+test("the editor needs an account only to reopen a saved CV, after payment, or from a tool other than the job tracker", () => {
   const page = readFileSync(new URL("../app/editor/page.tsx", import.meta.url), "utf8");
-  assert.match(page, /const needsAccount = Boolean\(searchParams\.draftId \|\| searchParams\.payment \|\| searchParams\.from\);/);
+  assert.match(page, /const needsAccount = Boolean\(searchParams\.draftId \|\| searchParams\.payment \|\| \(searchParams\.from && searchParams\.from !== "job-tailor"\)\);/);
+  const hook = readFileSync(new URL("../components/editor/use-cv-editor.ts", import.meta.url), "utf8");
+  assert.match(hook, /const fromJob = params\.get\("from"\) === "job-tailor";/);
   assert.match(page, /<CvEditor guest=\{!user\} \/>/);
 });
 

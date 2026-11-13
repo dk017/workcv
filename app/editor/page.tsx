@@ -29,7 +29,8 @@ export default async function EditorPage({
 }) {
   const user = await getCurrentUser();
   // Starting a new CV needs no account: the draft stays in the browser until the visitor saves it.
-  const needsAccount = Boolean(searchParams.draftId || searchParams.payment || searchParams.from);
+  // A job from the tracker can start one too.
+  const needsAccount = Boolean(searchParams.draftId || searchParams.payment || (searchParams.from && searchParams.from !== "job-tailor"));
   if (!user && needsAccount) {
     const editorParams = new URLSearchParams();
     if (searchParams.template) editorParams.set("template", searchParams.template);

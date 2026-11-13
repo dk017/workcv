@@ -150,23 +150,44 @@ export function useCvEditor({ guest = false }: { guest?: boolean } = {}) {
       const template = templates.some((item) => item.id === templateParam) ? (templateParam as CvData["template"]) : undefined;
       const roleTemplate = parseRoleTemplate(params.get("roleTemplate"));
       const stored = readGuestDraft();
+      // A job sent from the tracker. A guest has no saved CV to copy, so it sets up a new one.
+      const fromJob = params.get("from") === "job-tailor";
+      let job: TailorJob | null = null;
+      if (fromJob) {
+        jobTailorStartedRef.current = true;
+        try {
+          job = parseJobTailorHandoff(window.sessionStorage.getItem(jobTailorHandoffKey));
+          window.sessionStorage.removeItem(jobTailorHandoffKey);
+        } catch { /* Blocked browser storage. */ }
+      }
       let initial: CvData;
       if (stored && cvHasContent(stored)) {
         // Never replace work the visitor hasn't saved; say so if they asked for something else.
         initial = stored;
-        if (roleTemplate || params.get("new") === "1") setGuestKeptExisting(true);
+        if (roleTemplate || params.get("new") === "1" || fromJob) setGuestKeptExisting(true);
       } else {
         initial = roleTemplate ? getRoleCvTemplate(roleTemplate, template) : createBlankCv(template);
         const preset = params.get("layoutPreset");
         if (isCvLayoutPreset(preset)) initial = { ...initial, layoutPreset: preset };
+        if (job) {
+          const hasAdvert = job.advertText.length >= minAdvertLength;
+          initial = tailorCvForJob(initial, job);
+          setJobTailor({ mode: "attached", role: job.role, employer: job.employer, hasAdvert });
+          if (!hasAdvert) {
+            setJobDescriptionDraft("");
+            setTailoringOpen(true);
+          }
+        } else if (fromJob) {
+          setJobTailorError("The job details expired or could not be read. Open the job again and choose Tailor my CV for this job.");
+        }
       }
       setCv(initial);
       setSaveSnapshot({ status: "saved", error: null, errorKind: null, errorDetail: null, version: 0 });
       if (params.get("import") === "1") setAccountPrompt("import");
-      for (const key of ["new", "roleTemplate", "template", "layoutPreset", "import"]) params.delete(key);
+      for (const key of ["new", "roleTemplate", "template", "layoutPreset", "import", "from"]) params.delete(key);
       window.history.replaceState(null, "", `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`);
       setLoaded(true);
-      trackFunnelEvent("guest_editor_started", { placement: stored && cvHasContent(stored) ? "resumed" : roleTemplate ? "sample" : template ? "template" : "blank" });
+      trackFunnelEvent("guest_editor_started", { placement: stored && cvHasContent(stored) ? "resumed" : job ? "job_tailor" : roleTemplate ? "sample" : template ? "template" : "blank" });
     };
 
     const loadDocument = async () => {

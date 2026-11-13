@@ -100,6 +100,8 @@ export function JobApplicationTracker() {
   const [notice, setNotice] = useState("");
   const [filter, setFilter] = useState<JobStatus | "all">("all");
   const [today, setToday] = useState("");
+  // The job the visitor has just added, so the next step (a CV for it) is offered straight away.
+  const [newJobId, setNewJobId] = useState<string | null>(null);
   const fileRef = useRef<HTMLInputElement>(null);
   const startedRef = useRef(false);
   const realJobCount = jobs.filter(job => !job.isExample).length;
@@ -177,6 +179,7 @@ export function JobApplicationTracker() {
     }
     const job = cleanJob(parsed.data);
     setJobs((current) => (existing ? current.map((item) => (item.id === job.id ? job : item)) : [job, ...current]));
+    if (!existing) setNewJobId(job.id);
     setDraft(null);
     setFormError("");
   }
@@ -270,6 +273,9 @@ export function JobApplicationTracker() {
       // The pack still opens; the visitor can paste the details.
     }
   }
+
+  const newJob = jobs.find((job) => job.id === newJobId && !job.isExample && !closedStatuses.includes(job.status) && job.status !== "offer");
+  const newJobHasAdvert = Boolean(newJob?.advertText && newJob.advertText.trim().length >= minAdvertLength);
 
   const card = (job: TrackedJob) => {
     const urgency = today ? jobUrgency(job, today) : null;
@@ -419,6 +425,42 @@ export function JobApplicationTracker() {
       <p className="mt-3 text-sm text-muted">
         Saved only in this browser. Nothing is sent to WorkCV unless you check a sponsor licence, which sends only the employer name.{jobs.length >= 5 ? " Export a CSV now and then so you have a backup." : ""}
       </p>
+
+      {newJob ? (
+        <section aria-labelledby="new-job-cv-title" className="mt-5 rounded-lg border-2 border-navy bg-white p-5">
+          <div className="flex items-start justify-between gap-3">
+            <div>
+              <p className="text-sm font-bold uppercase tracking-[0.12em] text-success">Saved to your tracker</p>
+              <h3 id="new-job-cv-title" className="mt-1 font-display text-xl font-semibold text-navy md:text-2xl">
+                {newJob.status === "saved" ? "Before you apply" : "Next"}: make your CV fit {newJob.role} at {newJob.employer}
+              </h3>
+            </div>
+            <button type="button" onClick={() => setNewJobId(null)} aria-label="Dismiss" className="shrink-0 text-muted hover:text-navy"><X className="h-5 w-5" /></button>
+          </div>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-muted">
+            {newJob.status === "saved"
+              ? "A CV that uses the advert's own words is easier to match to the job. "
+              : "Keep a CV version for this job, ready for the interview and for similar roles. "}
+            {newJobHasAdvert
+              ? "The editor opens with this job and shows the keywords its advert asks for."
+              : "The editor opens with this job filled in; paste the advert there to see the keywords it asks for."}{" "}
+            If you already have a saved CV, it is copied, so the original stays as it is. Free to build and preview.
+          </p>
+          <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <TrackedLink
+              href={jobTailorEditorPath}
+              placement={analyticsPlacements.trackerNewJobTailor}
+              onClick={() => rememberForTailoring(newJob)}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-md bg-navy px-4 text-sm font-bold text-white hover:bg-navy-hover"
+            >
+              <Wand2 className="h-4 w-4" aria-hidden="true" /> Tailor my CV for this job
+            </TrackedLink>
+            <TrackedLink href={packHref} placement={analyticsPlacements.trackerNewJobPack} onClick={() => rememberForPack(newJob)} className="text-sm font-bold text-navy underline underline-offset-4">
+              Or get free CV points and a cover letter draft
+            </TrackedLink>
+          </div>
+        </section>
+      ) : null}
 
       {realJobCount >= passOfferThreshold ? (
         <div className="mt-5 flex flex-col gap-4 rounded-lg border-2 border-gold bg-white p-5 md:flex-row md:items-center md:justify-between">
