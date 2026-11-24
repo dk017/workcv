@@ -36,3 +36,13 @@ test("public start buttons open the editor directly, not the sign-in page", () =
     assert.doesNotMatch(source, /buildLoginHref\("\/editor/, file);
   }
 });
+
+test("editor links only use from= values the editor handles, so guests are not sent to sign in for nothing", async () => {
+  const { execSync } = await import("node:child_process");
+  const handled = new Set(["job-tailor", "cv-fit-assessment", "career-tool"]);
+  const out = execSync(`git grep -hoE "/editor\?[^\\"' ]*from=[a-z-]+" -- app components lib`, { encoding: "utf8" });
+  for (const match of out.trim().split("\n").filter(Boolean)) {
+    const value = match.split("from=")[1];
+    assert.ok(handled.has(value), `${match} uses an unhandled from= value`);
+  }
+});

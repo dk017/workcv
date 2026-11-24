@@ -7,7 +7,7 @@ import {
   FileText,
   PoundSterling,
   KeyRound,
-  Lock,
+
   ShieldCheck,
   UserCheck,
 } from "lucide-react";
@@ -18,11 +18,13 @@ import { analyticsPlacements } from "@/lib/analytics-placements";
 import { withAgentMetadata } from "@/lib/agent-metadata";
 import { TrackedLink } from "@/components/tracked-link";
 import { PassOffer } from "@/components/pass-offer";
+import { RightToWorkLinePicker } from "@/components/right-to-work-line-picker";
+import { rightToWorkSituations } from "@/lib/right-to-work-lines";
 
 export const metadata: Metadata = withAgentMetadata("/right-to-work-cv-uk", {
-  title: "Right to Work CV UK - What to Include",
+  title: "Right to Work on a CV (UK): What to Write, With Examples",
   description:
-    "Should you mention right to work on a UK CV? Learn when to include it, what not to share, and how to keep your CV clear and safe.",
+    "Pick your situation and copy the exact right to work line for your UK CV: citizen, settled status, visa or sponsorship. Plus where it goes and what never to share.",
   alternates: { canonical: "/right-to-work-cv-uk" },
 });
 
@@ -99,33 +101,7 @@ const includeRules = [
   },
 ];
 
-const wordingExamples = [
-  [
-    "British or Irish citizen",
-    "Right to work in the UK.",
-    "No need to add passport details or nationality unless it is relevant and you choose to.",
-  ],
-  [
-    "No sponsorship needed",
-    "Right to work in the UK. No visa sponsorship required.",
-    "Use only if accurate. This can help where employers screen for sponsorship requirements.",
-  ],
-  [
-    "Limited permission",
-    "Right to work in the UK; details available for employer checks.",
-    "Avoid oversharing dates or document numbers on the CV. Be ready to explain accurately during hiring.",
-  ],
-  [
-    "Need sponsorship",
-    "Requires Skilled Worker visa sponsorship.",
-    "Being upfront saves wasted applications. Apply to employers that hold a sponsor licence, for roles that can be sponsored.",
-  ],
-  [
-    "Applying from overseas",
-    "Eligible to work in the UK from [month/year], subject to employer right to work checks.",
-    "Use cautious wording if your right to work starts later or depends on a process.",
-  ],
-];
+const wordingExamples = rightToWorkSituations.map((item) => [item.label, item.line, item.note]);
 
 const dontShare = [
   "Passport number",
@@ -171,18 +147,18 @@ export default function RightToWorkCvUkPage() {
       />
 
       <section className="quiet-grid bg-paper py-20 md:py-28">
-        <div className="container-page grid items-center gap-12 lg:grid-cols-[1fr_0.82fr]">
+        <div className="container-page grid items-start gap-12 lg:grid-cols-[1fr_0.9fr]">
           <div>
             <p className="mb-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
               Right to work CV UK
             </p>
             <h1 className="max-w-4xl font-display text-5xl font-semibold leading-[1.02] text-navy md:text-7xl">
-              Mention right to work only when it helps.
+              Right to work on your CV: what to write.
             </h1>
             <p className="mt-7 max-w-2xl text-xl leading-8 text-muted">
-              A UK employer must check right to work before employment, but your
-              CV should not expose private document details. Use a short, accurate
-              line only when it removes uncertainty for the role.
+              One short, accurate line near your contact details is enough. Pick
+              your situation to get the wording. The employer does the official
+              check later, so private document details stay off the CV.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <ButtonLink href="/editor" trackingLabel={analyticsPlacements.rightToWorkHeroEditor}>Build my UK CV</ButtonLink>
@@ -192,19 +168,7 @@ export default function RightToWorkCvUkPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-line bg-white p-6 shadow-soft">
-            <Lock className="h-7 w-7 text-gold" />
-            <p className="mt-5 text-sm font-bold uppercase tracking-[0.14em] text-navy">
-              Safety rule
-            </p>
-            <h2 className="mt-3 font-display text-3xl font-semibold text-navy">
-              Never put a share code on a public CV.
-            </h2>
-            <p className="mt-5 text-sm leading-7 text-muted">
-              A share code is for an employer check, not for a PDF that may be
-              uploaded to job boards, recruiters, email chains or databases.
-            </p>
-          </div>
+          <RightToWorkLinePicker />
         </div>
       </section>
 

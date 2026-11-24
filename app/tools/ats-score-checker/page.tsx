@@ -353,7 +353,7 @@ export default function AtsScoreCheckerPage() {
       <FinalCta
         heading="Turn the evidence you found into a clearer CV."
         body={`Carry your genuine experience into a guided UK CV, preview the pages, and pay ${site.price} once for the CV and a matching cover letter as PDF and Word.`}
-        primaryHref="/editor?from=ats-checker"
+        primaryHref="/editor?template=classic&new=1"
         primary="Continue in the CV editor"
         secondaryHref={commercialRoutes.moneyPage}
         secondary="See the no-subscription builder"

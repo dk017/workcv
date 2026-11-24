@@ -242,7 +242,7 @@ export default function UkSalaryByJobTitlePage() {
               Calculate take-home pay
             </Link>
             <ButtonLink
-              href="/editor?from=salary-checker"
+              href="/editor?template=classic&new=1"
               trackingLabel={analyticsPlacements.salaryEditor}
             >
               Tailor my CV for the role

@@ -216,7 +216,8 @@ function ReadabilityResult({
             <p className="font-display text-2xl font-semibold text-navy">Next: check it against a real job advert.</p>
             <p className="mt-2 max-w-2xl text-sm leading-6 text-muted">
               Paste an advert to see which requirements and keywords your CV evidences. Or rebuild it in a clean,
-              single-column UK layout; you only pay {site.price} if you download.
+              single-column UK layout: sign in with an email code and your CV text carries across. You only pay{" "}
+              {site.price} if you download.
             </p>
           </div>
           <div className="flex flex-col gap-2 sm:flex-row md:flex-col">
