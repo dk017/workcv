@@ -90,6 +90,8 @@ export const analyticsPlacements = {
   rightToWorkFinal: "right_to_work_final",
   rightToWorkSponsorChecker: "right_to_work_sponsor_checker",
   rightToWorkPickerEditor: "right_to_work_picker_editor",
+  resignationEditor: "resignation_editor",
+  resignationMoney: "resignation_money",
   rightToWorkPickerSponsor: "right_to_work_picker_sponsor",
   passSponsorChecker: "pass_sponsor_checker",
   redundancyFinal: "redundancy_calculator_final",

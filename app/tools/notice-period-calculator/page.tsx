@@ -234,6 +234,7 @@ export default function NoticePeriodCalculatorPage() {
       <RelatedLinksSection
         title="Plan the change in work and pay."
         links={[
+          ["Write your resignation letter", "/tools/resignation-letter-generator-uk"],
           ["Estimate redundancy pay", "/tools/redundancy-pay-calculator"],
           ["What to do after redundancy", "/situations/made-redundant"],
           ["Calculate take-home pay", "/tools/take-home-pay-calculator-uk"],

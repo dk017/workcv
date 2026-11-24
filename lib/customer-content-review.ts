@@ -11,6 +11,7 @@ export const customerContentReview = {
   "/chatgpt-cv-to-pdf-uk": "2026-09-23",
   "/tools/job-application-pack-uk": "2026-10-05",
   "/tools/ats-score-checker": "2026-10-02",
+  "/tools/resignation-letter-generator-uk": "2026-11-24",
   "/canva-cv-alternative-uk": "2026-09-23",
   "/cv-word-or-pdf-uk": "2026-11-01",
   "/shorten-cv-to-two-pages": "2026-09-23",

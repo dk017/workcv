@@ -17,6 +17,8 @@ const required: Array<[string, string]> = [
   ["app/cv-builder-no-subscription-uk/page.tsx", "/best-cv-builder-uk"],
   ["app/best-cv-builder-uk/page.tsx", "/cv-builder-no-subscription-uk"],
   ["app/cv-builder-scams-uk/page.tsx", "/cv-builder-no-subscription-uk"],
+  ["app/tools/notice-period-calculator/page.tsx", "/tools/resignation-letter-generator-uk"],
+  ["app/tools/resignation-letter-generator-uk/page.tsx", "/tools/notice-period-calculator"],
 ];
 
 test("high-traffic and buyer pages keep their key internal links", () => {

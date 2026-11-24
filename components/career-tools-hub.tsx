@@ -63,6 +63,7 @@ const categories: HubCategory[] = [
       { title: "Made redundant? Start here", href: "/situations/made-redundant", description: "Work through immediate CV, pay and job-search decisions." },
       { title: "Redundancy pay calculator", href: "/tools/redundancy-pay-calculator", description: "Estimate statutory redundancy pay and check the assumptions." },
       { title: "Notice period calculator", href: "/tools/notice-period-calculator", description: "Plan an earliest start date around your notice period." },
+      { title: "Resignation letter generator", href: "/tools/resignation-letter-generator-uk", description: "Write the letter or email, with your last day worked out." },
       { title: "UK salary by job title", href: "/tools/uk-salary-by-job-title", description: "Compare published pay benchmarks before you target your next role." },
     ],
   },
