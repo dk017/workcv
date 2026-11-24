@@ -144,6 +144,8 @@ const internalLinks = [
   ["Turn a ChatGPT CV into a PDF", "/chatgpt-cv-to-pdf-uk"],
   ["Should I send Word or PDF?", "/cv-word-or-pdf-uk"],
   ["Compare CV builder prices", "/pricing"],
+  ["Best CV builder UK: how to choose", "/best-cv-builder-uk"],
+  ["CV builder traps to avoid", "/cv-builder-scams-uk"],
   ["Free blank UK CV template", "/tools/blank-cv-template-uk"],
   ["How to edit a CV in Word", "/tools/cv-template-word-uk"],
   ["CV personal statement examples", "/cv-personal-statement-uk"],

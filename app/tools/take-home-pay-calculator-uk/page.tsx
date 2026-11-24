@@ -219,6 +219,12 @@ export default function SalaryCalculatorPage() {
             >
               Compare gross salary by job title
             </Link>
+            <Link
+              href="/tools/uk-living-wage-checker"
+              className="rounded-md border border-line bg-white p-4 hover:border-navy"
+            >
+              Check pay against the 2026 Living Wage
+            </Link>
           </div>
         </div>
       </section>

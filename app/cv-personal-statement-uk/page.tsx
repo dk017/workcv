@@ -447,6 +447,7 @@ const checklist = [
 ];
 
 const relatedLinks = [
+  ["Free CV summary generator", "/tools/cv-summary-generator-uk"],
   ["Career change CV UK", "/career-change-cv-uk"],
   ["Return to work CV UK", "/return-to-work-cv-uk"],
   ["CV employment gap UK", "/cv-employment-gap-uk"],

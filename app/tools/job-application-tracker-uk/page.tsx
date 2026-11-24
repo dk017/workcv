@@ -231,6 +231,7 @@ export default function JobApplicationTrackerPage() {
           ["Check your CV against an advert", "/tools/ats-score-checker"],
           ["Cover letter examples", "/cover-letter-examples-uk"],
           ["What to do after redundancy", "/situations/made-redundant"],
+          ["CV builder with no subscription", "/cv-builder-no-subscription-uk"],
         ]}
       />
       <FaqSection faqs={faqItems} title="Job application tracker questions." />

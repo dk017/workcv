@@ -231,7 +231,11 @@ export default function UkSalaryByJobTitlePage() {
             </h2>
             <p className="mt-3 text-sm leading-7 text-muted">
               Use current 2026/27 Income Tax, National Insurance, pension and
-              student-loan thresholds.
+              student-loan thresholds. For hourly pay, check it against the{" "}
+              <Link href="/tools/uk-living-wage-checker" className="font-bold text-navy underline underline-offset-4">
+                2026 Living Wage
+              </Link>
+              .
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">

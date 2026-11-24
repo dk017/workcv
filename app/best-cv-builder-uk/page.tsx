@@ -291,6 +291,8 @@ export default function BestCvBuilderUkPage() {
       <ComparisonLinks
         heading="Head-to-head comparisons"
         links={[
+          ["CV builder with no subscription", "/cv-builder-no-subscription-uk"],
+          ["CV builder traps to avoid", "/cv-builder-scams-uk"],
           ["MyPerfectCV vs LiveCareer", "/myperfectcv-vs-livecareer-uk"],
           ["Zety vs MyPerfectCV", "/zety-vs-myperfectcv-uk"],
           ["Kickresume alternative", "/kickresume-alternative-uk"],

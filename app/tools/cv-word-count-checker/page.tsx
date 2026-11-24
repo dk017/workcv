@@ -239,6 +239,7 @@ export default function CvLengthCheckerPage() {
           ["Check readability", "/tools/cv-readability-checker"],
           ["Check keyword balance", "/tools/cv-keyword-density-checker"],
           ["Find missing CV content", "/tools/cv-gap-detector-uk"],
+          ["Build a two-page CV without a subscription", "/cv-builder-no-subscription-uk"],
         ]}
       />
       <FaqSection faqs={faqItems} title="UK CV length questions." />

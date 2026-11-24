@@ -309,6 +309,13 @@ export default function CvBuilderScamsUkPage() {
                 Compare all prices
                 <ArrowRight className="h-4 w-4" />
               </Link>
+              <Link
+                href="/cv-builder-no-subscription-uk"
+                className="mt-3 flex items-center gap-2 text-sm font-bold text-navy"
+              >
+                See the no-subscription CV builder
+                <ArrowRight className="h-4 w-4" />
+              </Link>
             </aside>
           </div>
         </section>
